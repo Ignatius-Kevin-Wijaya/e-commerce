@@ -1,0 +1,38 @@
+# Prometheus configuration for scraping e-commerce microservices
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alert_rules.yaml"
+
+scrape_configs:
+  - job_name: "api-gateway"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["api-gateway:8080"]
+
+  - job_name: "auth-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["auth-service:8001"]
+
+  - job_name: "product-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["product-service:8002"]
+
+  - job_name: "cart-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["cart-service:8003"]
+
+  - job_name: "order-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["order-service:8004"]
+
+  - job_name: "payment-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["payment-service:8005"]

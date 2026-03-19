@@ -1,0 +1,14 @@
+server:
+  host: "0.0.0.0"
+  port: 8004
+
+database:
+  pool_size: 10
+  max_overflow: 20
+
+services:
+  product_service_url: "http://product-service:8002"
+  cart_service_url: "http://cart-service:8003"
+
+logging:
+  level: "info"

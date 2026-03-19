@@ -1,0 +1,28 @@
+# Promtail configuration — ships container logs to Loki
+server:
+  http_listen_port: 9080
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: containers
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: ecommerce
+          __path__: /var/log/containers/*.log
+
+    pipeline_stages:
+      - json:
+          expressions:
+            level: level
+            message: msg
+            service: service
+      - labels:
+          level:
+          service:

@@ -1,0 +1,74 @@
+name: CI — Lint & Test
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - auth-service
+          - product-service
+          - cart-service
+          - order-service
+          - payment-service
+
+    defaults:
+      run:
+        working-directory: services/${{ matrix.service }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff pytest pytest-asyncio httpx
+
+      - name: Lint with ruff
+        run: ruff check .
+
+      - name: Run tests
+        run: pytest tests/ -v --tb=short
+        env:
+          DATABASE_URL: "sqlite+aiosqlite:///./test.db"
+          JWT_SECRET_KEY: "ci-test-secret"
+          JWT_ALGORITHM: "HS256"
+          JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+          JWT_REFRESH_TOKEN_EXPIRE_DAYS: "7"
+          REDIS_URL: "redis://localhost:6379/0"
+          ENVIRONMENT: "testing"
+
+  gateway-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api-gateway
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff
+
+      - name: Lint with ruff
+        run: ruff check .

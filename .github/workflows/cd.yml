@@ -1,0 +1,76 @@
+name: CD — Build & Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "services/**"
+      - "api-gateway/**"
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository_owner }}/ecommerce
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        include:
+          - service: auth-service
+            context: services/auth-service
+          - service: product-service
+            context: services/product-service
+          - service: cart-service
+            context: services/cart-service
+          - service: order-service
+            context: services/order-service
+          - service: payment-service
+            context: services/payment-service
+          - service: api-gateway
+            context: api-gateway
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Set Kubernetes context
+        run: |
+          echo "⚠️  In production, configure kubeconfig from secrets:"
+          echo "  kubectl config set-cluster ..."
+          echo "  kubectl config set-credentials ..."
+          echo "Skipping actual deploy in this template."
+
+      # Uncomment when you have a real cluster:
+      # - name: Deploy to Kubernetes
+      #   run: bash scripts/deploy.sh

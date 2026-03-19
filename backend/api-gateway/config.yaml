@@ -1,0 +1,17 @@
+server:
+  host: "0.0.0.0"
+  port: 8080
+
+services:
+  auth_service_url: "http://auth-service:8001"
+  product_service_url: "http://product-service:8002"
+  cart_service_url: "http://cart-service:8003"
+  order_service_url: "http://order-service:8004"
+  payment_service_url: "http://payment-service:8005"
+
+rate_limit:
+  per_minute: 60
+  redis_db: 1
+
+logging:
+  level: "info"

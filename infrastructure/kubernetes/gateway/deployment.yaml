@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  labels:
+    app: api-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: ghcr.io/your-org/ecommerce-api-gateway:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: AUTH_SERVICE_URL
+              value: "http://auth-service:8001"
+            - name: PRODUCT_SERVICE_URL
+              value: "http://product-service:8002"
+            - name: CART_SERVICE_URL
+              value: "http://cart-service:8003"
+            - name: ORDER_SERVICE_URL
+              value: "http://order-service:8004"
+            - name: PAYMENT_SERVICE_URL
+              value: "http://payment-service:8005"
+            - name: REDIS_URL
+              value: "redis://redis:6379/1"
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secrets
+                  key: jwt-secret
+            - name: ENVIRONMENT
+              value: "production"
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10

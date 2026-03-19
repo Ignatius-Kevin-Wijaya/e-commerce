@@ -1,0 +1,63 @@
+{
+  "dashboard": {
+    "title": "E-Commerce API Dashboard",
+    "uid": "ecommerce-api",
+    "panels": [
+      {
+        "title": "Request Rate (RPS)",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total[5m])) by (job)",
+            "legendFormat": "{{ job }}"
+          }
+        ]
+      },
+      {
+        "title": "Error Rate (%)",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) by (job) / sum(rate(http_requests_total[5m])) by (job) * 100",
+            "legendFormat": "{{ job }}"
+          }
+        ]
+      },
+      {
+        "title": "Latency P50 (seconds)",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, job))",
+            "legendFormat": "{{ job }}"
+          }
+        ]
+      },
+      {
+        "title": "Latency P99 (seconds)",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, job))",
+            "legendFormat": "{{ job }}"
+          }
+        ]
+      },
+      {
+        "title": "Active Connections",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 24, "x": 0, "y": 16 },
+        "targets": [
+          {
+            "expr": "sum(http_requests_in_progress) by (job)",
+            "legendFormat": "{{ job }}"
+          }
+        ]
+      }
+    ]
+  }
+}

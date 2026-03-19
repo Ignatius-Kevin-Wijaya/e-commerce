@@ -1,0 +1,199 @@
+version: "3.9"
+
+services:
+  # ──── Databases ────────────────────────────────────────────
+  auth-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: ${AUTH_DB_NAME:-auth_db}
+      POSTGRES_USER: ${AUTH_DB_USER:-auth_user}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD:-change_me_auth}
+    ports:
+      - "5433:5432"
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${AUTH_DB_USER:-auth_user}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  product-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: ${PRODUCT_DB_NAME:-product_db}
+      POSTGRES_USER: ${PRODUCT_DB_USER:-product_user}
+      POSTGRES_PASSWORD: ${PRODUCT_DB_PASSWORD:-change_me_product}
+    ports:
+      - "5434:5432"
+    volumes:
+      - product_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${PRODUCT_DB_USER:-product_user}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  order-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: ${ORDER_DB_NAME:-order_db}
+      POSTGRES_USER: ${ORDER_DB_USER:-order_user}
+      POSTGRES_PASSWORD: ${ORDER_DB_PASSWORD:-change_me_order}
+    ports:
+      - "5435:5432"
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${ORDER_DB_USER:-order_user}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ──── Application Services ────────────────────────────────
+  auth-service:
+    build:
+      context: ./backend/services/auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${AUTH_DB_USER:-auth_user}:${AUTH_DB_PASSWORD:-change_me_auth}@auth-db:5432/${AUTH_DB_NAME:-auth_db}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-super_secret_dev_key}
+      - JWT_ALGORITHM=${JWT_ALGORITHM:-HS256}
+      - JWT_ACCESS_TOKEN_EXPIRE_MINUTES=${JWT_ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      - JWT_REFRESH_TOKEN_EXPIRE_DAYS=${JWT_REFRESH_TOKEN_EXPIRE_DAYS:-7}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - LOG_LEVEL=${LOG_LEVEL:-debug}
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  product-service:
+    build:
+      context: ./backend/services/product-service
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${PRODUCT_DB_USER:-product_user}:${PRODUCT_DB_PASSWORD:-change_me_product}@product-db:5432/${PRODUCT_DB_NAME:-product_db}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - LOG_LEVEL=${LOG_LEVEL:-debug}
+    depends_on:
+      product-db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  cart-service:
+    build:
+      context: ./backend/services/cart-service
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8003"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CART_TTL_SECONDS=${CART_TTL_SECONDS:-604800}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - LOG_LEVEL=${LOG_LEVEL:-debug}
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  order-service:
+    build:
+      context: ./backend/services/order-service
+      dockerfile: Dockerfile
+    ports:
+      - "8004:8004"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${ORDER_DB_USER:-order_user}:${ORDER_DB_PASSWORD:-change_me_order}@order-db:5432/${ORDER_DB_NAME:-order_db}
+      - PRODUCT_SERVICE_URL=http://product-service:8002
+      - CART_SERVICE_URL=http://cart-service:8003
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - LOG_LEVEL=${LOG_LEVEL:-debug}
+    depends_on:
+      order-db:
+        condition: service_healthy
+      product-service:
+        condition: service_started
+      cart-service:
+        condition: service_started
+    restart: unless-stopped
+
+  payment-service:
+    build:
+      context: ./backend/services/payment-service
+      dockerfile: Dockerfile
+    ports:
+      - "8005:8005"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${ORDER_DB_USER:-order_user}:${ORDER_DB_PASSWORD:-change_me_order}@order-db:5432/${ORDER_DB_NAME:-order_db}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-sk_test_fake_key}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-whsec_fake_secret}
+      - ORDER_SERVICE_URL=http://order-service:8004
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - LOG_LEVEL=${LOG_LEVEL:-debug}
+    depends_on:
+      order-db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:8001
+      - PRODUCT_SERVICE_URL=http://product-service:8002
+      - CART_SERVICE_URL=http://cart-service:8003
+      - ORDER_SERVICE_URL=http://order-service:8004
+      - PAYMENT_SERVICE_URL=http://payment-service:8005
+      - REDIS_URL=redis://redis:6379/1
+      - RATE_LIMIT_PER_MINUTE=${RATE_LIMIT_PER_MINUTE:-60}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-super_secret_dev_key}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - LOG_LEVEL=${LOG_LEVEL:-debug}
+    depends_on:
+      - auth-service
+      - product-service
+      - cart-service
+      - order-service
+      - payment-service
+      - redis
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://localhost:8080
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+    depends_on:
+      - api-gateway
+    restart: unless-stopped
+
+volumes:
+  auth_db_data:
+  product_db_data:
+  order_db_data:
+  redis_data:
