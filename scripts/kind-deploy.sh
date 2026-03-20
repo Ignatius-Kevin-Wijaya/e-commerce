@@ -75,8 +75,8 @@ kubectl apply -f infrastructure/kind/monitoring/promtail.yaml
 echo ""
 echo "✅ KIND Deployment Complete!"
 echo ""
-echo "🌐 Frontend:     http://ecommerce.local (Add to /etc/hosts: 127.0.0.1 ecommerce.local)
-echo "🌐 API Gateway:  http://api.ecommerce.local (Add to /etc/hosts: 127.0.0.1 api.ecommerce.local)
+echo "🌐 Frontend:     http://ecommerce.local (Add to /etc/hosts: 127.0.0.1 ecommerce.local)"
+echo "🌐 API Gateway:  http://api.ecommerce.local (Add to /etc/hosts: 127.0.0.1 api.ecommerce.local)"
 echo "📈 Grafana:      http://localhost:30030 (admin / admin)"
 echo "🔎 Prometheus:   http://localhost:30090"
 echo ""
