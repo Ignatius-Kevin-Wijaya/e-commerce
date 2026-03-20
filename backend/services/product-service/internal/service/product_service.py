@@ -76,6 +76,28 @@ class ProductService:
         updated = await self.repo.update_product(product_id, **kwargs)
         return updated
 
+    async def decrease_stock(self, product_id: UUID, quantity: int) -> Product:
+        if quantity <= 0:
+            raise ProductServiceError("Quantity to decrease must be positive", 400)
+        
+        updated = await self.repo.update_stock(product_id, -quantity)
+        if not updated:
+            product = await self.repo.find_by_id(product_id)
+            if not product:
+                raise ProductServiceError("Product not found", 404)
+            else:
+                raise ProductServiceError("Insufficient stock", 400)
+        return updated
+
+    async def increase_stock(self, product_id: UUID, quantity: int) -> Product:
+        if quantity <= 0:
+            raise ProductServiceError("Quantity to increase must be positive", 400)
+        
+        updated = await self.repo.update_stock(product_id, quantity)
+        if not updated:
+            raise ProductServiceError("Product not found", 404)
+        return updated
+
     async def delete_product(self, product_id: UUID) -> None:
         success = await self.repo.soft_delete(product_id)
         if not success:

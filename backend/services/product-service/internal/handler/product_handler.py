@@ -36,6 +36,14 @@ class ProductUpdate(BaseModel):
     image_url: Optional[str] = None
 
 
+class DecreaseStockRequest(BaseModel):
+    quantity: int = Field(..., gt=0)
+
+
+class IncreaseStockRequest(BaseModel):
+    quantity: int = Field(..., gt=0)
+
+
 class ProductResponse(BaseModel):
     id: str
     name: str
@@ -174,6 +182,34 @@ async def delete_product(
     """Soft-delete a product."""
     try:
         await service.delete_product(product_id)
+    except ProductServiceError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.patch("/products/{product_id}/stock/decrease", response_model=ProductResponse)
+async def decrease_stock(
+    product_id: UUID,
+    body: DecreaseStockRequest,
+    service: ProductService = Depends(get_product_service),
+):
+    """Decrease the stock of a product."""
+    try:
+        product = await service.decrease_stock(product_id, body.quantity)
+        return product_to_response(product)
+    except ProductServiceError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.patch("/products/{product_id}/stock/increase", response_model=ProductResponse)
+async def increase_stock(
+    product_id: UUID,
+    body: IncreaseStockRequest,
+    service: ProductService = Depends(get_product_service),
+):
+    """Increase the stock of a product (e.g. after order cancellation)."""
+    try:
+        product = await service.increase_stock(product_id, body.quantity)
+        return product_to_response(product)
     except ProductServiceError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 

@@ -38,3 +38,25 @@ class ProductClient:
         if not product:
             return False
         return product.get("stock", 0) >= quantity
+
+    async def decrease_stock(self, product_id: str, quantity: int) -> bool:
+        """Decrease stock in the Product Service after an order is created."""
+        try:
+            async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+                data = {"quantity": quantity}
+                resp = await client.patch(f"{self.base_url}/products/{product_id}/stock/decrease", json=data)
+                return resp.status_code == 200
+        except httpx.RequestError:
+            pass
+        return False
+
+    async def increase_stock(self, product_id: str, quantity: int) -> bool:
+        """Increase stock in the Product Service after an order is cancelled."""
+        try:
+            async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+                data = {"quantity": quantity}
+                resp = await client.patch(f"{self.base_url}/products/{product_id}/stock/increase", json=data)
+                return resp.status_code == 200
+        except httpx.RequestError:
+            pass
+        return False

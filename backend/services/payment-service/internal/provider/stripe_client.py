@@ -49,16 +49,7 @@ class StripeClient:
         intent_id = f"pi_{uuid.uuid4().hex[:24]}"
         client_secret = f"{intent_id}_secret_{uuid.uuid4().hex[:16]}"
 
-        # Simulate: amounts over $999.99 (99999 cents) "fail" for testing
-        if amount_cents > 99999:
-            return PaymentIntent(
-                id=intent_id,
-                amount=amount_cents,
-                currency=currency,
-                status="failed",
-                client_secret=client_secret,
-            )
-
+        # In this mock, we let all amounts succeed.
         return PaymentIntent(
             id=intent_id,
             amount=amount_cents,

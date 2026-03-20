@@ -89,7 +89,14 @@ class OrderService:
         )
         created = await self.repo.create(order)
 
-        # 4. Clear the cart (best effort — don't fail the order if this fails)
+        # 4. Decrease stock
+        for item in cart["items"]:
+            success = await self.product_client.decrease_stock(item["product_id"], item["quantity"])
+            if not success:
+                # In a real system, we would trigger a rollback or compensation here
+                print(f"Warning: Failed to decrease stock for {item['product_id']}")
+
+        # 5. Clear the cart (best effort — don't fail the order if this fails)
         await self.cart_client.clear_cart(user_id)
 
         return created
@@ -115,4 +122,13 @@ class OrderService:
                 f"Cannot transition from {order.status.value} to {new_status.value}", 400
             )
 
-        return await self.repo.update_status(order_id, new_status)
+        updated_order = await self.repo.update_status(order_id, new_status)
+
+        if new_status == OrderStatus.CANCELLED:
+            # Restore stock for each item
+            for item in updated_order.items:
+                success = await self.product_client.increase_stock(str(item.product_id), item.quantity)
+                if not success:
+                    print(f"Warning: Failed to restore stock for {item.product_id}")
+
+        return updated_order
