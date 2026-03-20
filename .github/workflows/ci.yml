@@ -10,6 +10,7 @@ jobs:
   lint-and-test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         service:
           - auth-service
@@ -20,7 +21,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: services/${{ matrix.service }}
+        working-directory: backend/services/${{ matrix.service }}
 
     steps:
       - uses: actions/checkout@v4
@@ -29,6 +30,15 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.service }}-${{ hashFiles(format('backend/services/{0}/requirements.txt', matrix.service)) }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.service }}-
+            ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
@@ -54,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: api-gateway
+        working-directory: backend/api-gateway
 
     steps:
       - uses: actions/checkout@v4
@@ -64,6 +74,15 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-api-gateway-${{ hashFiles('backend/api-gateway/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-api-gateway-
+            ${{ runner.os }}-pip-
+
       - name: Install dependencies
         run: |
           pip install --upgrade pip
@@ -72,3 +91,38 @@ jobs:
 
       - name: Lint with ruff
         run: ruff check .
+
+  frontend-ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            frontend/.next/cache
+          key: ${{ runner.os }}-npm-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: "http://localhost:8080"

@@ -4,8 +4,9 @@ on:
   push:
     branches: [main]
     paths:
-      - "services/**"
-      - "api-gateway/**"
+      - "backend/services/**"
+      - "backend/api-gateway/**"
+      - "frontend/**"
 
 env:
   REGISTRY: ghcr.io
@@ -19,23 +20,30 @@ jobs:
       packages: write
 
     strategy:
+      fail-fast: false
       matrix:
         include:
           - service: auth-service
-            context: services/auth-service
+            context: backend/services/auth-service
           - service: product-service
-            context: services/product-service
+            context: backend/services/product-service
           - service: cart-service
-            context: services/cart-service
+            context: backend/services/cart-service
           - service: order-service
-            context: services/order-service
+            context: backend/services/order-service
           - service: payment-service
-            context: services/payment-service
+            context: backend/services/payment-service
           - service: api-gateway
-            context: api-gateway
+            context: backend/api-gateway
+          - service: frontend
+            context: frontend
+            build-args: NEXT_PUBLIC_API_URL=https://api.ecommerce.local
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -45,13 +53,16 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ${{ matrix.context }}
           push: true
+          build-args: ${{ matrix.build-args || '' }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ github.sha }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:latest
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
   deploy:
     needs: build-and-push
@@ -66,11 +77,27 @@ jobs:
 
       - name: Set Kubernetes context
         run: |
-          echo "⚠️  In production, configure kubeconfig from secrets:"
-          echo "  kubectl config set-cluster ..."
-          echo "  kubectl config set-credentials ..."
+          echo "⚠️  Configure kubeconfig from GitHub Secrets before enabling this step."
+          echo "  Required secrets: KUBE_CONFIG (base64-encoded kubeconfig)"
           echo "Skipping actual deploy in this template."
+        # Uncomment and set KUBE_CONFIG secret to enable real deploys:
+        # run: |
+        #   echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > /tmp/kubeconfig
+        #   export KUBECONFIG=/tmp/kubeconfig
 
-      # Uncomment when you have a real cluster:
-      # - name: Deploy to Kubernetes
-      #   run: bash scripts/deploy.sh
+      # Uncomment when KUBE_CONFIG is available:
+      # - name: Update image tags & deploy
+      #   run: |
+      #     export KUBECONFIG=/tmp/kubeconfig
+      #     for svc in auth product cart order payment; do
+      #       kubectl set image deployment/${svc}-service \
+      #         ${svc}-service=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${svc}-service:${{ github.sha }} \
+      #         -n ecommerce
+      #     done
+      #     kubectl set image deployment/api-gateway \
+      #       api-gateway=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-api-gateway:${{ github.sha }} \
+      #       -n ecommerce
+      #     kubectl set image deployment/frontend \
+      #       frontend=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-frontend:${{ github.sha }} \
+      #       -n ecommerce
+      #     kubectl rollout status deployment -n ecommerce --timeout=300s

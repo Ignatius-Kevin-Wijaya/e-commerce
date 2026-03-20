@@ -17,7 +17,7 @@ spec:
       containers:
         - name: frontend
           image: ghcr.io/your-org/ecommerce-frontend:latest
-          imagePullPolicy: Never  # Use local KIND registry image
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
           env:

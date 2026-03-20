@@ -1,5 +1,10 @@
 .PHONY: help dev down build test lint migrate seed deploy clean logs kind-up kind-down kind-load kind-secrets kind-monitoring kind-load-test kind-status
 
+# ──── Image Registry ───────────────────────────────────────
+# Override via env: IMAGE_REGISTRY=ghcr.io/myorg make kind-load
+IMAGE_REGISTRY ?= ghcr.io/$(shell git remote get-url origin 2>/dev/null | sed -E 's|.*github.com[:/]([^/]+)/.*|\1|' | tr '[:upper:]' '[:lower:]')
+IMAGE_TAG      ?= latest
+
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
@@ -68,11 +73,11 @@ kind-down: ## Destroy the local KIND cluster
 kind-load: ## Rebuild all images and load them into KIND
 	@echo "🐳 Rebuilding and loading images into KIND..."
 	@for svc in auth product cart order payment; do \
-		docker build -q -t ghcr.io/your-org/ecommerce-$$svc-service:latest backend/services/$$svc-service; \
-		kind load docker-image ghcr.io/your-org/ecommerce-$$svc-service:latest --name ecommerce; \
+		docker build -q -t $(IMAGE_REGISTRY)/ecommerce-$$svc-service:$(IMAGE_TAG) backend/services/$$svc-service; \
+		kind load docker-image $(IMAGE_REGISTRY)/ecommerce-$$svc-service:$(IMAGE_TAG) --name ecommerce; \
 	done
-	@docker build -q -t ghcr.io/your-org/ecommerce-api-gateway:latest backend/api-gateway
-	@kind load docker-image ghcr.io/your-org/ecommerce-api-gateway:latest --name ecommerce
+	@docker build -q -t $(IMAGE_REGISTRY)/ecommerce-api-gateway:$(IMAGE_TAG) backend/api-gateway
+	@kind load docker-image $(IMAGE_REGISTRY)/ecommerce-api-gateway:$(IMAGE_TAG) --name ecommerce
 	@echo "🔄 Rollout restart deployments..."
 	@kubectl rollout restart deployment -n ecommerce
 
