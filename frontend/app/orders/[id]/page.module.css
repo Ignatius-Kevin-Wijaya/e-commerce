@@ -1,0 +1,165 @@
+.backBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin-bottom: var(--space-xl);
+    transition: color var(--transition-fast);
+}
+
+.backBtn:hover {
+    color: var(--fg);
+}
+
+.header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--space-2xl);
+}
+
+.header h1 {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+}
+
+.date {
+    margin-top: var(--space-xs);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: var(--space-xl);
+    align-items: start;
+}
+
+.section {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-md);
+}
+
+.section h3 {
+    font-size: 0.9375rem;
+    margin-bottom: var(--space-md);
+}
+
+.items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) 0;
+}
+
+.itemInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.itemName {
+    font-weight: 500;
+    font-size: 0.9375rem;
+}
+
+.itemMeta {
+    font-size: 0.8125rem;
+    color: var(--muted);
+}
+
+.itemSubtotal {
+    font-weight: 500;
+}
+
+.totalRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+}
+
+.address,
+.notes {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+}
+
+.paymentInfo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.paymentRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+}
+
+.paymentRow span:first-child {
+    color: var(--muted);
+}
+
+.timeline {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.timelineItem {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+}
+
+.timelineDot {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+}
+
+.timelineLabel {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.timelineDate {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--muted);
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+}

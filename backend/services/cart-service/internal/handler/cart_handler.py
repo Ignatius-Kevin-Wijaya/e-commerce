@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Header
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List
 
 from internal.model.cart_item import CartItem
 from internal.repository.cart_repository import CartRepository

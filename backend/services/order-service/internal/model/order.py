@@ -10,7 +10,7 @@ LEARNING NOTES:
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Enum, Numeric, String, Text
+from sqlalchemy import Column, DateTime, Enum, Numeric, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, relationship
 import enum

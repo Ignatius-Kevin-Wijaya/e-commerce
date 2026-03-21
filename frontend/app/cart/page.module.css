@@ -1,0 +1,175 @@
+.layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: var(--space-2xl);
+    align-items: start;
+}
+
+.items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+
+.itemImage {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--bg-secondary);
+    flex-shrink: 0;
+}
+
+.itemImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.itemPlaceholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--border);
+    font-size: 1.5rem;
+}
+
+.itemInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.itemName {
+    display: block;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    margin-bottom: var(--space-xs);
+    transition: color var(--transition-fast);
+}
+
+.itemName:hover {
+    color: var(--fg-secondary);
+}
+
+.itemPrice {
+    font-size: 0.8125rem;
+    color: var(--muted);
+}
+
+.itemActions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.quantityControl {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+}
+
+.qtyBtn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: background var(--transition-fast);
+}
+
+.qtyBtn:hover:not(:disabled) {
+    background: var(--bg-secondary);
+}
+
+.qtyBtn:disabled {
+    opacity: 0.3;
+}
+
+.qtyValue {
+    width: 36px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.875rem;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    line-height: 32px;
+}
+
+.subtotal {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    min-width: 70px;
+    text-align: right;
+}
+
+.removeBtn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: var(--muted);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.removeBtn:hover {
+    background: #fee2e2;
+    color: var(--error);
+}
+
+.summary {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-lg));
+}
+
+.summary h3 {
+    font-size: 1.0625rem;
+}
+
+.summaryRow {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9375rem;
+}
+
+.summaryTotal {
+    font-weight: 600;
+    font-size: 1.0625rem;
+}
+
+@media (max-width: 768px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .item {
+        flex-wrap: wrap;
+    }
+
+    .itemActions {
+        width: 100%;
+        justify-content: space-between;
+        padding-top: var(--space-sm);
+        border-top: 1px solid var(--border);
+    }
+}

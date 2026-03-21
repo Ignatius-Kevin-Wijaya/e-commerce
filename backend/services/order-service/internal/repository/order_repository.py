@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from internal.model.order import Order, OrderStatus
-from internal.model.order_item import OrderItem
 
 
 class OrderRepository:

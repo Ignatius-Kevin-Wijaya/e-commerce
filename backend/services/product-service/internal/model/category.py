@@ -8,12 +8,9 @@ LEARNING NOTES:
 - `stock` tracks inventory count.
 """
 
-import uuid
 from datetime import datetime
-from decimal import Decimal
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, DateTime, Integer, String, Text
 from sqlalchemy.orm import DeclarativeBase, relationship
 
 

@@ -13,6 +13,7 @@ import os
 import time
 
 from fastapi import FastAPI, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 
@@ -29,8 +30,6 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
 )
 logger = logging.getLogger("gateway")
-
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="E-Commerce API Gateway",

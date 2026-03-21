@@ -1,0 +1,137 @@
+.backBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin-bottom: var(--space-xl);
+    transition: color var(--transition-fast);
+}
+
+.backBtn:hover {
+    color: var(--fg);
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3xl);
+    align-items: start;
+}
+
+.imageSection {
+    aspect-ratio: 1;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: var(--border);
+}
+
+.details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.category {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.name {
+    font-size: 1.75rem;
+}
+
+.price {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--fg) !important;
+}
+
+.description {
+    line-height: 1.8;
+}
+
+.stock {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-top: var(--space-sm);
+}
+
+.quantityControl {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.qtyBtn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+    transition: background var(--transition-fast);
+}
+
+.qtyBtn:hover {
+    background: var(--bg-secondary);
+}
+
+.qtyValue {
+    width: 48px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    line-height: 40px;
+}
+
+.addBtn {
+    flex: 1;
+}
+
+.meta {
+    margin-top: var(--space-lg);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--border);
+}
+
+.meta small {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .layout {
+        grid-template-columns: 1fr;
+        gap: var(--space-xl);
+    }
+}

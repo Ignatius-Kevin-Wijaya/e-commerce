@@ -1,6 +1,5 @@
 """Cart service — business logic."""
 
-from typing import Optional
 
 from internal.model.cart_item import Cart, CartItem
 from internal.repository.cart_repository import CartRepository

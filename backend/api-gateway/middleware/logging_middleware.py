@@ -9,7 +9,6 @@ LEARNING NOTES:
 """
 
 import logging
-import time
 import uuid
 
 logger = logging.getLogger("gateway")

@@ -100,7 +100,7 @@ class PaymentService:
     async def process_webhook(self, event_type: str, data: dict) -> None:
         """Handle incoming Stripe webhook events."""
         if event_type == "payment_intent.succeeded":
-            provider_id = data.get("id")
+            _provider_id = data.get("id")
             # In production, look up payment by provider_id and update status
             pass
         elif event_type == "payment_intent.payment_failed":

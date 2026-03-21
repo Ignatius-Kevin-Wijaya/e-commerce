@@ -1,0 +1,88 @@
+.layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: var(--space-xl);
+    align-items: start;
+}
+
+.card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-md);
+}
+
+.card h3 {
+    font-size: 0.9375rem;
+    margin-bottom: var(--space-lg);
+}
+
+.avatarLarge {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 600;
+    background: var(--accent);
+    color: var(--accent-fg);
+    border-radius: 50%;
+    margin: 0 auto var(--space-md);
+}
+
+.card>h2 {
+    text-align: center;
+    font-size: 1.25rem;
+    margin-bottom: var(--space-xs);
+}
+
+.card>p {
+    text-align: center;
+}
+
+.details {
+    display: flex;
+    flex-direction: column;
+}
+
+.fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border);
+}
+
+.field:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.fieldLabel {
+    font-size: 0.875rem;
+    color: var(--muted);
+}
+
+.fieldValue {
+    font-size: 0.9375rem;
+    font-weight: 500;
+}
+
+.actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+@media (max-width: 768px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+}

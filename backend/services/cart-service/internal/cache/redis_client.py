@@ -8,7 +8,6 @@ LEARNING NOTES:
 - TTL (Time-To-Live) automatically expires idle carts after 7 days.
 """
 
-import json
 import os
 from typing import Optional
 
