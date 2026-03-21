@@ -20,7 +20,7 @@ async def client():
     mock_redis.ping.return_value = True
 
     with patch("internal.cache.redis_client.get_redis", return_value=mock_redis):
-        from cmd.main import app
+        from app.main import app
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
             yield ac

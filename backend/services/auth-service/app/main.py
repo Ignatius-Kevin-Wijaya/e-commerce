@@ -29,11 +29,13 @@ logging.basicConfig(level=getattr(logging, LOG_LEVEL, logging.INFO))
 logger = logging.getLogger("auth-service")
 
 # ── Database engine (connection pool) ─────────────────────────
+# SQLite doesn't support pool_size/max_overflow (it uses NullPool)
+_engine_kwargs = {} if DATABASE_URL.startswith("sqlite") else {"pool_size": 10, "max_overflow": 20}
+
 engine = create_async_engine(
     DATABASE_URL,
     echo=(ENVIRONMENT == "development"),
-    pool_size=10,
-    max_overflow=20,
+    **_engine_kwargs,
 )
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 

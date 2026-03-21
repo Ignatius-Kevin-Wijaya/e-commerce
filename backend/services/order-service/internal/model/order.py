@@ -10,8 +10,7 @@ LEARNING NOTES:
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Enum, Numeric, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, DateTime, Enum, Numeric, Text, Uuid
 from sqlalchemy.orm import DeclarativeBase, relationship
 import enum
 
@@ -31,8 +30,8 @@ class OrderStatus(str, enum.Enum):
 class Order(Base):
     __tablename__ = "orders"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), nullable=False, index=True)
+    id = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(Uuid(as_uuid=True), nullable=False, index=True)
     status = Column(Enum(OrderStatus), nullable=False, default=OrderStatus.PENDING)
     total_amount = Column(Numeric(12, 2), nullable=False, default=0)
     shipping_address = Column(Text, nullable=True)

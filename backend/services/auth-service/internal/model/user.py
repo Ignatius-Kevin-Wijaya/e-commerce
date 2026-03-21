@@ -11,8 +11,7 @@ LEARNING NOTES:
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, Text, Uuid
 from sqlalchemy.orm import DeclarativeBase, relationship
 
 
@@ -24,7 +23,7 @@ class Base(DeclarativeBase):
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = Column(String(255), unique=True, nullable=False, index=True)
     username = Column(String(100), unique=True, nullable=False, index=True)
     hashed_password = Column(Text, nullable=False)
@@ -44,8 +43,8 @@ class User(Base):
 class Session(Base):
     __tablename__ = "sessions"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    id = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(Uuid(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     refresh_token = Column(Text, nullable=False, unique=True)
     user_agent = Column(String(500), nullable=True)
     ip_address = Column(String(45), nullable=True)

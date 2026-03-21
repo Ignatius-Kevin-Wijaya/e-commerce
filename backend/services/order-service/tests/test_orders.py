@@ -23,19 +23,21 @@ async def setup_database():
 
 @pytest_asyncio.fixture
 async def client():
-    from cmd.main import app
-    from fastapi import Request, Response
+    from app.main import app
+    from internal.handler.order_handler import get_order_service
+    from internal.repository.order_repository import OrderRepository
+    from internal.service.order_service import OrderService
 
-    @app.middleware("http")
-    async def override_db_session(request: Request, call_next):
+    async def override_get_order_service():
         async with TestSession() as session:
-            request.state.db = session
-            response: Response = await call_next(request)
-            return response
+            repo = OrderRepository(session)
+            yield OrderService(repo)
 
+    app.dependency_overrides[get_order_service] = override_get_order_service
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
+    app.dependency_overrides.clear()
 
 
 class TestOrderHealth:

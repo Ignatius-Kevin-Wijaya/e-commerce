@@ -35,23 +35,22 @@ async def setup_database():
 
 @pytest_asyncio.fixture
 async def client():
-    """Create a test HTTP client with a test DB session."""
-    # Import here to avoid circular imports with test DB override
-    from cmd.main import app
+    """Create a test HTTP client with test DB overrides."""
+    from app.main import app
+    from internal.handler.auth_handler import get_auth_service
+    from internal.repository.user_repository import UserRepository
+    from internal.service.auth_service import AuthService
 
-    # Override the DB session middleware for testing
-    from fastapi import Request, Response
-
-    @app.middleware("http")
-    async def override_db_session(request: Request, call_next):
+    async def override_get_auth_service():
         async with TestSession() as session:
-            request.state.db = session
-            response: Response = await call_next(request)
-            return response
+            repo = UserRepository(session)
+            yield AuthService(repo)
 
+    app.dependency_overrides[get_auth_service] = override_get_auth_service
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
+    app.dependency_overrides.clear()
 
 
 # ── Tests ────────────────────────────────────────────────────

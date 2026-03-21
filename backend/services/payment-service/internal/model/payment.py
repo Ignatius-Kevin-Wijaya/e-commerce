@@ -12,8 +12,7 @@ import uuid
 from datetime import datetime
 import enum
 
-from sqlalchemy import Column, DateTime, Enum, Numeric, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, DateTime, Enum, Numeric, String, Text, Uuid
 from sqlalchemy.orm import DeclarativeBase
 
 
@@ -32,9 +31,9 @@ class PaymentStatus(str, enum.Enum):
 class Payment(Base):
     __tablename__ = "payments"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    order_id = Column(UUID(as_uuid=True), nullable=False, index=True)
-    user_id = Column(UUID(as_uuid=True), nullable=False, index=True)
+    id = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    order_id = Column(Uuid(as_uuid=True), nullable=False, index=True)
+    user_id = Column(Uuid(as_uuid=True), nullable=False, index=True)
     amount = Column(Numeric(12, 2), nullable=False)
     currency = Column(String(3), nullable=False, default="USD")
     status = Column(Enum(PaymentStatus), nullable=False, default=PaymentStatus.PENDING)

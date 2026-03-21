@@ -50,7 +50,7 @@ jobs:
         run: ruff check .
 
       - name: Run tests
-        run: pytest tests/ -v --tb=short
+        run: PYTHONPATH=. pytest tests/ -v --tb=short
         env:
           DATABASE_URL: "sqlite+aiosqlite:///./test.db"
           JWT_SECRET_KEY: "ci-test-secret"

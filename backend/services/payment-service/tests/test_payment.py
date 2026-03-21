@@ -23,19 +23,21 @@ async def setup_database():
 
 @pytest_asyncio.fixture
 async def client():
-    from cmd.main import app
-    from fastapi import Request, Response
+    from app.main import app
+    from internal.handler.payment_handler import get_payment_service
+    from internal.repository.payment_repository import PaymentRepository
+    from internal.service.payment_service import PaymentService
 
-    @app.middleware("http")
-    async def override_db_session(request: Request, call_next):
+    async def override_get_payment_service():
         async with TestSession() as session:
-            request.state.db = session
-            response: Response = await call_next(request)
-            return response
+            repo = PaymentRepository(session)
+            yield PaymentService(repo)
 
+    app.dependency_overrides[get_payment_service] = override_get_payment_service
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
+    app.dependency_overrides.clear()
 
 
 class TestPaymentHealth:
