@@ -1,12 +1,21 @@
 name: CD — Build & Deploy
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "backend/services/**"
-      - "backend/api-gateway/**"
-      - "frontend/**"
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      services:
+        description: 'Services to deploy (comma-separated, leave empty for all)'
+        required: false
+        default: ''
+        type: string
 
 env:
   REGISTRY: ghcr.io
