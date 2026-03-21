@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { productApi, Product, Category, PaginatedProducts } from '@/lib/api';
+import { productApi, Category, PaginatedProducts } from '@/lib/api';
 import ProductCard from '@/components/ProductCard';
 import Pagination from '@/components/Pagination';
 import styles from './page.module.css';
@@ -20,12 +20,18 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
-    productApi
-      .list({ page, page_size: 12, category_id: categoryId, search: search || undefined })
-      .then(setData)
-      .catch(() => { })
-      .finally(() => setLoading(false));
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const result = await productApi.list({ page, page_size: 12, category_id: categoryId, search: search || undefined });
+        setData(result);
+      } catch {
+        // ignore
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
   }, [page, categoryId, search]);
 
   const handleSearch = (e: React.FormEvent) => {

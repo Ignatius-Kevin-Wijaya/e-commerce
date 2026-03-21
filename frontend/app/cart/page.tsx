@@ -1,29 +1,35 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { cartApi, Cart } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import styles from './page.module.css';
 
 export default function CartPage() {
-    const router = useRouter();
     const { isAuthenticated, isLoading: authLoading } = useAuth();
     const [cart, setCart] = useState<Cart | null>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState<string | null>(null);
 
     useEffect(() => {
-        if (authLoading) return;
-        if (!isAuthenticated) {
-            setLoading(false);
-            return;
-        }
-        cartApi.get()
-            .then(setCart)
-            .catch(() => { })
-            .finally(() => setLoading(false));
+        const fetchCart = async () => {
+            if (authLoading) return;
+            if (!isAuthenticated) {
+                setLoading(false);
+                return;
+            }
+            try {
+                const data = await cartApi.get();
+                setCart(data);
+            } catch {
+                // ignore
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCart();
     }, [isAuthenticated, authLoading]);
 
     const updateQuantity = async (productId: string, quantity: number) => {

@@ -12,13 +12,19 @@ export default function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
 
     useEffect(() => {
-        if (isAuthenticated) {
-            cartApi.get()
-                .then(cart => setCartCount(cart.item_count))
-                .catch(() => setCartCount(0));
-        } else {
-            setCartCount(0);
-        }
+        const fetchCart = async () => {
+            if (isAuthenticated) {
+                try {
+                    const cart = await cartApi.get();
+                    setCartCount(cart.item_count);
+                } catch {
+                    setCartCount(0);
+                }
+            } else {
+                setCartCount(0);
+            }
+        };
+        fetchCart();
     }, [isAuthenticated]);
 
     return (

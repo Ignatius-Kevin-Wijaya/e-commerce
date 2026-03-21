@@ -7,7 +7,7 @@
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { authApi, User, ApiError } from './api';
+import { authApi, User } from './api';
 
 interface AuthContextType {
     user: User | null;

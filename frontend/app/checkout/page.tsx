@@ -50,8 +50,8 @@ export default function CheckoutPage() {
 
             // 3. Navigate to order detail
             router.push(`/orders/${order.id}`);
-        } catch (err: any) {
-            setError(err.message || 'Failed to place order');
+        } catch (err: unknown) {
+            setError((err as Error).message || 'Failed to place order');
         } finally {
             setSubmitting(false);
         }
