@@ -38,6 +38,16 @@ spec:
                 secretKeyRef:
                   name: auth-secrets
                   key: jwt-secret
+            - name: INTERNAL_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: internal-gateway-secret
+            - name: CORS_ORIGINS
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: cors-origins
             - name: ENVIRONMENT
               value: "production"
           resources:

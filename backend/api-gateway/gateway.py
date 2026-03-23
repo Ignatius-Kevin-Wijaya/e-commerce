@@ -41,12 +41,15 @@ app = FastAPI(
     version="1.0.0",
 )
 
+_cors_origins_raw = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://ecommerce.local")
+CORS_ORIGINS = [origin.strip() for origin in _cors_origins_raw.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://ecommerce.local"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Correlation-ID"],
 )
 
 limiter = Limiter(key_func=get_remote_address)

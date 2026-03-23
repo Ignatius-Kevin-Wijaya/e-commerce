@@ -41,6 +41,11 @@ spec:
               value: "production"
             - name: LOG_LEVEL
               value: "info"
+            - name: INTERNAL_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: internal-gateway-secret
           resources:
             requests:
               cpu: "100m"

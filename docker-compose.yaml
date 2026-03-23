@@ -175,6 +175,7 @@ services:
       - ENVIRONMENT=${ENVIRONMENT:-development}
       - LOG_LEVEL=${LOG_LEVEL:-debug}
       - INTERNAL_GATEWAY_SECRET=${INTERNAL_GATEWAY_SECRET:-dev_secret_gateway_key}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://ecommerce.local}
     depends_on:
       - auth-service
       - product-service

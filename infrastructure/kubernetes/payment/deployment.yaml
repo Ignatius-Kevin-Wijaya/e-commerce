@@ -40,6 +40,11 @@ spec:
               value: "http://order-service:8004"
             - name: ENVIRONMENT
               value: "production"
+            - name: INTERNAL_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: internal-gateway-secret
           resources:
             requests:
               cpu: "100m"
