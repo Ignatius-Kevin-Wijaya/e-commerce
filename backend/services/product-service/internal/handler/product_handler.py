@@ -1,12 +1,21 @@
 """
 Product HTTP handlers — CRUD routes for products and categories.
+
+SECURITY NOTES:
+- Read operations (GET) are intentionally public — anyone can browse the catalog.
+- Write operations (POST/PUT/DELETE/PATCH) are admin-only.
+- The `require_admin` dependency reads the `X-Is-Admin` header which is set
+  exclusively by the API Gateway after validating the JWT. Backend services
+  should NEVER be reachable directly from the internet (use NetworkPolicy / firewall).
+- This is the "defense in depth" principle: the gateway AND the service both
+  enforce authorization independently.
 """
 
 from decimal import Decimal
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -90,6 +99,35 @@ async def get_product_service(request: Request) -> ProductService:
     return ProductService(repo)
 
 
+async def require_admin(
+    x_is_admin: str = Header(default="false", alias="X-Is-Admin"),
+) -> None:
+    """
+    FastAPI dependency that enforces admin-only access.
+
+    LEARNING NOTE — How this works end-to-end:
+    1. Client sends JWT in `Authorization: Bearer <token>` header.
+    2. API Gateway validates the JWT and reads `is_admin` from its payload.
+    3. Gateway sets `X-Is-Admin: true` (or false) before forwarding the request.
+    4. This dependency reads that header. If it's not "true", we reject with 403.
+
+    WHY a header and not re-validating the JWT here?
+    - Simpler: services don't need the JWT secret
+    - Consistent: one place (gateway) does auth for all services
+    - The header is safe because services are on an internal network only
+      reachable from the gateway (enforced via Kubernetes NetworkPolicy or
+      Docker Compose internal networks)
+
+    Raises:
+        HTTPException 403 if the caller is not an admin.
+    """
+    if x_is_admin.lower() != "true":
+        raise HTTPException(
+            status_code=403,
+            detail="Admin access required. Only administrators can perform this action.",
+        )
+
+
 def product_to_response(product) -> ProductResponse:
     return ProductResponse(
         id=str(product.id),
@@ -143,8 +181,9 @@ async def get_product(
 async def create_product(
     body: ProductCreate,
     service: ProductService = Depends(get_product_service),
+    _: None = Depends(require_admin),  # 🔒 Admin only
 ):
-    """Create a new product (admin only in production)."""
+    """Create a new product. Requires admin role."""
     try:
         product = await service.create_product(
             name=body.name,
@@ -164,8 +203,9 @@ async def update_product(
     product_id: UUID,
     body: ProductUpdate,
     service: ProductService = Depends(get_product_service),
+    _: None = Depends(require_admin),  # 🔒 Admin only
 ):
-    """Update an existing product."""
+    """Update an existing product. Requires admin role."""
     try:
         updates = body.model_dump(exclude_unset=True)
         product = await service.update_product(product_id, **updates)
@@ -178,8 +218,9 @@ async def update_product(
 async def delete_product(
     product_id: UUID,
     service: ProductService = Depends(get_product_service),
+    _: None = Depends(require_admin),  # 🔒 Admin only
 ):
-    """Soft-delete a product."""
+    """Soft-delete a product. Requires admin role."""
     try:
         await service.delete_product(product_id)
     except ProductServiceError as e:
@@ -191,8 +232,9 @@ async def decrease_stock(
     product_id: UUID,
     body: DecreaseStockRequest,
     service: ProductService = Depends(get_product_service),
+    _: None = Depends(require_admin),  # 🔒 Admin only
 ):
-    """Decrease the stock of a product."""
+    """Decrease the stock of a product. Requires admin role."""
     try:
         product = await service.decrease_stock(product_id, body.quantity)
         return product_to_response(product)
@@ -205,8 +247,9 @@ async def increase_stock(
     product_id: UUID,
     body: IncreaseStockRequest,
     service: ProductService = Depends(get_product_service),
+    _: None = Depends(require_admin),  # 🔒 Admin only
 ):
-    """Increase the stock of a product (e.g. after order cancellation)."""
+    """Increase the stock of a product (e.g. after order cancellation). Requires admin role."""
     try:
         product = await service.increase_stock(product_id, body.quantity)
         return product_to_response(product)
@@ -227,8 +270,9 @@ async def list_categories(service: ProductService = Depends(get_product_service)
 async def create_category(
     body: CategoryCreate,
     service: ProductService = Depends(get_product_service),
+    _: None = Depends(require_admin),  # 🔒 Admin only
 ):
-    """Create a new category."""
+    """Create a new category. Requires admin role."""
     try:
         category = await service.create_category(body.name, body.description)
         return CategoryResponse(id=category.id, name=category.name, description=category.description)

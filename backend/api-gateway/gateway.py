@@ -18,7 +18,7 @@ from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from clients.auth_client import ServiceClient
-from middleware.auth_middleware import extract_user_id, validate_token
+from middleware.auth_middleware import extract_is_admin, extract_user_id, validate_token
 from middleware.logging_middleware import generate_correlation_id, log_request
 from routes import find_route
 
@@ -74,18 +74,24 @@ async def proxy(request: Request, path: str):
 
     # Auth check
     user_id = None
+    is_admin = False
     if route.requires_auth:
         auth_header = request.headers.get("authorization")
         payload = validate_token(auth_header)
         if not payload:
             return JSONResponse(status_code=401, content={"detail": "Unauthorized"})
         user_id = extract_user_id(payload)
+        is_admin = extract_is_admin(payload)
 
     # Build forwarding headers
     headers = dict(request.headers)
     headers["X-Correlation-ID"] = correlation_id
     if user_id:
         headers["X-User-ID"] = user_id
+    # 🔒 SECURITY: Always forward admin status so services can enforce
+    # role-based access control without re-validating the JWT themselves.
+    # Non-authenticated requests get X-Is-Admin: false (safe default).
+    headers["X-Is-Admin"] = str(is_admin).lower()
 
     # Read request body
     body = await request.body()
