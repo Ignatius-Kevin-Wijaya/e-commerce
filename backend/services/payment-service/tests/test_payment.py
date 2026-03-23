@@ -40,6 +40,13 @@ async def client():
     app.dependency_overrides.clear()
 
 
+# ── Helpers ──────────────────────────────────────────────────────────────────
+
+USER_A_HEADERS = {"X-User-ID": "550e8400-e29b-41d4-a716-44665544000a", "X-Is-Admin": "false"}
+USER_B_HEADERS = {"X-User-ID": "550e8400-e29b-41d4-a716-44665544000b", "X-Is-Admin": "false"}
+ADMIN_HEADERS = {"X-User-ID": "550e8400-e29b-41d4-a716-446655441111", "X-Is-Admin": "true"}
+
+
 class TestPaymentHealth:
     @pytest.mark.asyncio
     async def test_health(self, client):
@@ -60,7 +67,7 @@ class TestPayments:
             "amount": 99.99,
             "currency": "USD",
             "idempotency_key": "test-key-1",
-        }, headers={"X-User-ID": "550e8400-e29b-41d4-a716-446655440001"})
+        }, headers=USER_A_HEADERS)
         assert resp.status_code == 201
         data = resp.json()
         assert data["status"] == "success"
@@ -73,9 +80,54 @@ class TestPayments:
             "amount": 50.00,
             "idempotency_key": "idem-key-2",
         }
-        headers = {"X-User-ID": "550e8400-e29b-41d4-a716-446655440003"}
+        headers = USER_A_HEADERS
 
         resp1 = await client.post("/payments", json=payload, headers=headers)
         resp2 = await client.post("/payments", json=payload, headers=headers)
 
-        assert resp1.json()["id"] == resp2.json()["id"]  # Same payment returned
+        assert resp1.json()["id"] == resp2.json()["id"]
+
+
+class TestPaymentAuthorization:
+    @pytest.mark.asyncio
+    async def test_get_payment_idor_protection(self, client):
+        """Test that user B cannot see user A's payment, but User A and Admin can."""
+        # 1. Create payment as User A
+        create_resp = await client.post("/payments", json={
+            "order_id": "550e8400-e29b-41d4-a716-44665544000a",
+            "amount": 10.00,
+            "currency": "USD",
+        }, headers=USER_A_HEADERS)
+        payment_id = create_resp.json()["id"]
+
+        # 2. Try to get as User B (Should be 403)
+        get_b_resp = await client.get(f"/payments/{payment_id}", headers=USER_B_HEADERS)
+        assert get_b_resp.status_code == 403
+        assert get_b_resp.json()["detail"] == "Not authorized to view this payment"
+
+        # 3. Try to get as User A (Should be 200)
+        get_a_resp = await client.get(f"/payments/{payment_id}", headers=USER_A_HEADERS)
+        assert get_a_resp.status_code == 200
+
+        # 4. Try to get as Admin (Should be 200)
+        get_admin_resp = await client.get(f"/payments/{payment_id}", headers=ADMIN_HEADERS)
+        assert get_admin_resp.status_code == 200
+
+    @pytest.mark.asyncio
+    async def test_get_payment_by_order_idor_protection(self, client):
+        """Test that user B cannot see user A's payment by order ID."""
+        order_id = "550e8400-e29b-41d4-a716-44665544000c"
+        # 1. Create payment as User A
+        await client.post("/payments", json={
+            "order_id": order_id,
+            "amount": 20.00,
+            "currency": "USD",
+        }, headers=USER_A_HEADERS)
+
+        # 2. Try to get by order_id as User B (Should be 403)
+        get_b_resp = await client.get(f"/payments/order/{order_id}", headers=USER_B_HEADERS)
+        assert get_b_resp.status_code == 403
+
+        # 3. Try to get by order_id as User A (Should be 200)
+        get_a_resp = await client.get(f"/payments/order/{order_id}", headers=USER_A_HEADERS)
+        assert get_a_resp.status_code == 200

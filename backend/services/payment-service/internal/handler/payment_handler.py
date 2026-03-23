@@ -82,10 +82,15 @@ async def create_payment(
 @router.get("/{payment_id}", response_model=PaymentResponse)
 async def get_payment(
     payment_id: UUID,
+    x_user_id: str = Header(..., alias="X-User-ID"),
+    x_is_admin: str = Header(default="false", alias="X-Is-Admin"),
     service: PaymentService = Depends(get_payment_service),
 ):
     try:
         payment = await service.get_payment(payment_id)
+        # Check ownership or admin status (IDOR Protection)
+        if x_is_admin.lower() != "true" and str(payment.user_id) != x_user_id:
+            raise HTTPException(status_code=403, detail="Not authorized to view this payment")
         return payment_to_response(payment)
     except PaymentServiceError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
@@ -94,10 +99,15 @@ async def get_payment(
 @router.get("/order/{order_id}", response_model=PaymentResponse)
 async def get_payment_by_order(
     order_id: UUID,
+    x_user_id: str = Header(..., alias="X-User-ID"),
+    x_is_admin: str = Header(default="false", alias="X-Is-Admin"),
     service: PaymentService = Depends(get_payment_service),
 ):
     try:
         payment = await service.get_payment_by_order(order_id)
+        # Check ownership or admin status (IDOR Protection)
+        if x_is_admin.lower() != "true" and str(payment.user_id) != x_user_id:
+            raise HTTPException(status_code=403, detail="Not authorized to view this payment")
         return payment_to_response(payment)
     except PaymentServiceError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
