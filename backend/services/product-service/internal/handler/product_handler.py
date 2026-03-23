@@ -19,6 +19,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from internal.limiter import limiter
 from internal.repository.product_repository import ProductRepository
 from internal.service.product_service import ProductService, ProductServiceError
 
@@ -146,7 +147,9 @@ def product_to_response(product) -> ProductResponse:
 # ── Product Routes ───────────────────────────────────────────
 
 @router.get("/products", response_model=PaginatedProductResponse)
+@limiter.limit("10/minute")
 async def list_products(
+    request: Request,
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     category_id: Optional[int] = Query(None),

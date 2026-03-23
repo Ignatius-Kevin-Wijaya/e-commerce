@@ -46,7 +46,7 @@ spec:
               memory: "512Mi"
           readinessProbe:
             exec:
-              command: ["pg_isready", "-U", "order_user"]
+              command: ["pg_isready", "-U", "order_user", "-d", "order_db"]
             initialDelaySeconds: 5
             periodSeconds: 10
   volumeClaimTemplates:

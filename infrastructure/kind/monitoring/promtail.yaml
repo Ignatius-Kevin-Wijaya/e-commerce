@@ -20,9 +20,6 @@ data:
         kubernetes_sd_configs:
           - role: pod
         relabel_configs:
-          - action: keep
-            source_labels: [__meta_kubernetes_namespace]
-            regex: ecommerce|monitoring
           - source_labels: [__meta_kubernetes_pod_label_app]
             target_label: app
           - source_labels: [__meta_kubernetes_namespace]
@@ -32,14 +29,15 @@ data:
           - source_labels: [__meta_kubernetes_pod_container_name]
             target_label: container
           - action: replace
-            replacement: /var/log/pods/*$1/*.log
-            separator: /
             source_labels:
+              - __meta_kubernetes_namespace
+              - __meta_kubernetes_pod_name
               - __meta_kubernetes_pod_uid
-              - __meta_kubernetes_pod_container_name
+            separator: _
             target_label: __path__
+            replacement: /var/log/pods/$1/*/*.log
         pipeline_stages:
-          - docker: {}
+          - cri: {}
 
 ---
 # ── RBAC: allow Promtail to discover pods via Kubernetes SD ──────────────────
@@ -104,6 +102,11 @@ spec:
       containers:
         - name: promtail
           image: grafana/promtail:latest
+          env:
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
           args:
             - "-config.file=/etc/promtail/promtail.yaml"
           # ── Limit open file descriptors inside the container ─────────────

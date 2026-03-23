@@ -15,6 +15,7 @@ from internal.model.order_item import OrderItem  # noqa: F401
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://order_user:change_me_order@localhost:5435/order_db")
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+INTERNAL_GATEWAY_SECRET = os.getenv("INTERNAL_GATEWAY_SECRET", "dev_secret_gateway_key")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "info").upper()
 
 logging.basicConfig(level=getattr(logging, LOG_LEVEL, logging.INFO))
@@ -39,6 +40,23 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Order Service", description="Order lifecycle management", version="1.0.0", lifespan=lifespan)
 Instrumentator().instrument(app).expose(app)
+
+from fastapi.responses import JSONResponse
+
+@app.middleware("http")
+async def verify_gateway_secret_middleware(request: Request, call_next):
+    """
+    🔒 SECURITY: Critical #5 Protection against Header Spoofing
+    Ensures that every request comes through the API Gateway by verifying the internal secret.
+    """
+    if request.url.path in ["/health", "/ready", "/docs", "/openapi.json", "/"] or request.url.path.startswith("/metrics"):
+        return await call_next(request)
+        
+    secret = request.headers.get("x-internal-gateway-secret")
+    if secret != INTERNAL_GATEWAY_SECRET:
+        return JSONResponse(status_code=403, content={"detail": "Forbidden: Invalid Internal Gateway Secret"})
+        
+    return await call_next(request)
 
 
 @app.middleware("http")

@@ -35,7 +35,8 @@ async def client():
 
     app.dependency_overrides[get_payment_service] = override_get_payment_service
     transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+    headers = {"X-Internal-Gateway-Secret": "dev_secret_gateway_key"}
+    async with AsyncClient(transport=transport, base_url="http://test", headers=headers) as ac:
         yield ac
     app.dependency_overrides.clear()
 

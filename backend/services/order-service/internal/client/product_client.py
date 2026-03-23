@@ -25,11 +25,15 @@ import httpx
 logger = logging.getLogger(__name__)
 
 PRODUCT_SERVICE_URL = os.getenv("PRODUCT_SERVICE_URL", "http://localhost:8002")
+INTERNAL_GATEWAY_SECRET = os.getenv("INTERNAL_GATEWAY_SECRET", "dev_secret_gateway_key")
 TIMEOUT = 10.0  # seconds
 
 # Internal service-to-service calls are trusted as admin-level operations.
 # These headers are sent only by server-side code, never by the client.
-_INTERNAL_HEADERS = {"X-Is-Admin": "true"}
+_INTERNAL_HEADERS = {
+    "X-Is-Admin": "true",
+    "X-Internal-Gateway-Secret": INTERNAL_GATEWAY_SECRET
+}
 
 
 class ProductClient:
@@ -40,7 +44,10 @@ class ProductClient:
         """Fetch a product by ID from the Product Service."""
         try:
             async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-                resp = await client.get(f"{self.base_url}/products/{product_id}")
+                resp = await client.get(
+                    f"{self.base_url}/products/{product_id}",
+                    headers={"X-Internal-Gateway-Secret": INTERNAL_GATEWAY_SECRET}
+                )
                 if resp.status_code == 200:
                     return resp.json()
                 return None

@@ -9,6 +9,7 @@ from typing import Optional
 import httpx
 
 CART_SERVICE_URL = os.getenv("CART_SERVICE_URL", "http://localhost:8003")
+INTERNAL_GATEWAY_SECRET = os.getenv("INTERNAL_GATEWAY_SECRET", "dev_secret_gateway_key")
 TIMEOUT = 10.0
 
 
@@ -22,7 +23,10 @@ class CartClient:
             async with httpx.AsyncClient(timeout=TIMEOUT) as client:
                 resp = await client.get(
                     f"{self.base_url}/cart",
-                    headers={"X-User-ID": user_id},
+                    headers={
+                        "X-User-ID": user_id,
+                        "X-Internal-Gateway-Secret": INTERNAL_GATEWAY_SECRET
+                    },
                 )
                 if resp.status_code == 200:
                     return resp.json()
@@ -36,7 +40,10 @@ class CartClient:
             async with httpx.AsyncClient(timeout=TIMEOUT) as client:
                 resp = await client.delete(
                     f"{self.base_url}/cart",
-                    headers={"X-User-ID": user_id},
+                    headers={
+                        "X-User-ID": user_id,
+                        "X-Internal-Gateway-Secret": INTERNAL_GATEWAY_SECRET
+                    },
                 )
                 return resp.status_code == 204
         except httpx.RequestError:

@@ -23,6 +23,7 @@ from internal.model.user import Base
 # ── Configuration ─────────────────────────────────────────────
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://auth_user:change_me_auth@localhost:5433/auth_db")
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+INTERNAL_GATEWAY_SECRET = os.getenv("INTERNAL_GATEWAY_SECRET", "dev_secret_gateway_key")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "info").upper()
 
 logging.basicConfig(level=getattr(logging, LOG_LEVEL, logging.INFO))
@@ -63,6 +64,23 @@ app = FastAPI(
 
 # Prometheus metrics endpoint at /metrics
 Instrumentator().instrument(app).expose(app)
+
+from fastapi.responses import JSONResponse
+
+@app.middleware("http")
+async def verify_gateway_secret_middleware(request: Request, call_next):
+    """
+    🔒 SECURITY: Critical #5 Protection against Header Spoofing
+    Ensures that every request comes through the API Gateway by verifying the internal secret.
+    """
+    if request.url.path in ["/health", "/ready", "/docs", "/openapi.json", "/"] or request.url.path.startswith("/metrics"):
+        return await call_next(request)
+        
+    secret = request.headers.get("x-internal-gateway-secret")
+    if secret != INTERNAL_GATEWAY_SECRET:
+        return JSONResponse(status_code=403, content={"detail": "Forbidden: Invalid Internal Gateway Secret"})
+        
+    return await call_next(request)
 
 
 # ── Middleware: attach DB session to each request ─────────────

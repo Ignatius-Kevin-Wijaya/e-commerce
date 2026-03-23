@@ -27,6 +27,7 @@ from routes import find_route
 
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "info").upper()
+INTERNAL_GATEWAY_SECRET = os.getenv("INTERNAL_GATEWAY_SECRET", "dev_secret_gateway_key")
 
 logging.basicConfig(
     level=getattr(logging, LOG_LEVEL, logging.INFO),
@@ -98,6 +99,10 @@ async def _proxy_core(request: Request, path: str):
     # role-based access control without re-validating the JWT themselves.
     # Non-authenticated requests get X-Is-Admin: false (safe default).
     headers["X-Is-Admin"] = str(is_admin).lower()
+    
+    # 🔒 SECURITY: Critical #5 Protection against Header Spoofing
+    # Forward the gateway secret so backend services know the request didn't bypass the proxy.
+    headers["X-Internal-Gateway-Secret"] = INTERNAL_GATEWAY_SECRET
 
     # Read request body
     body = await request.body()

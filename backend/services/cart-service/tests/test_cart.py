@@ -22,8 +22,9 @@ async def client():
     with patch("internal.cache.redis_client.get_redis", return_value=mock_redis):
         from app.main import app
         transport = ASGITransport(app=app)
-        async with AsyncClient(transport=transport, base_url="http://test") as ac:
-            yield ac
+    headers = {"X-Internal-Gateway-Secret": "dev_secret_gateway_key"}
+    async with AsyncClient(transport=transport, base_url="http://test", headers=headers) as ac:
+        yield ac
 
 
 class TestCartHealth:
