@@ -40,6 +40,12 @@ async def client():
     app.dependency_overrides.clear()
 
 
+# ── Helpers ──────────────────────────────────────────────────────────────────
+
+ADMIN_HEADERS = {"X-Is-Admin": "true", "X-User-ID": "550e8400-e29b-41d4-a716-446655441111"}
+USER_HEADERS = {"X-Is-Admin": "false", "X-User-ID": "550e8400-e29b-41d4-a716-446655440000"}
+
+
 class TestOrderHealth:
     @pytest.mark.asyncio
     async def test_health(self, client):
@@ -55,6 +61,28 @@ class TestOrderHealth:
 class TestOrders:
     @pytest.mark.asyncio
     async def test_list_orders_empty(self, client):
-        resp = await client.get("/orders", headers={"X-User-ID": "550e8400-e29b-41d4-a716-446655440000"})
+        resp = await client.get("/orders", headers=USER_HEADERS)
         assert resp.status_code == 200
         assert resp.json() == []
+
+
+class TestOrderStatusAuthorization:
+    @pytest.mark.asyncio
+    async def test_update_status_without_admin_returns_403(self, client):
+        """A regular user cannot update order status."""
+        resp = await client.patch(
+            "/orders/550e8400-e29b-41d4-a716-446655449999/status",
+            json={"status": "shipped"},
+            headers=USER_HEADERS,
+        )
+        assert resp.status_code == 403
+
+    @pytest.mark.asyncio
+    async def test_update_status_with_admin_returns_404_not_403(self, client):
+        """An admin user bypasses the 403 auth block (fails with 404 since order doesn't exist)."""
+        resp = await client.patch(
+            "/orders/550e8400-e29b-41d4-a716-446655449999/status",
+            json={"status": "shipped"},
+            headers=ADMIN_HEADERS,
+        )
+        assert resp.status_code == 404, "Admin should bypass auth and hit the 404 Not Found block"

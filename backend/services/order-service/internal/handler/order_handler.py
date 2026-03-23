@@ -54,6 +54,13 @@ async def get_order_service(request: Request) -> OrderService:
     return OrderService(repo)
 
 
+async def require_admin(
+    x_is_admin: str = Header(default="false", alias="X-Is-Admin"),
+) -> None:
+    if x_is_admin.lower() != "true":
+        raise HTTPException(status_code=403, detail="Admin access required.")
+
+
 def order_to_response(order) -> OrderResponse:
     return OrderResponse(
         id=str(order.id),
@@ -127,6 +134,7 @@ async def update_order_status(
     order_id: UUID,
     body: UpdateStatusRequest,
     service: OrderService = Depends(get_order_service),
+    _: None = Depends(require_admin),
 ):
     """Update the status of an order (admin / internal)."""
     try:

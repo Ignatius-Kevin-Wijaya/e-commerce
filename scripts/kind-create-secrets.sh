@@ -40,7 +40,7 @@ ORDER_DB_USER="${ORDER_DB_USER:-order_user}"
 ORDER_DB_PASSWORD="${ORDER_DB_PASSWORD:-change_me_order}"
 ORDER_DB_NAME="${ORDER_DB_NAME:-order_db}"
 
-JWT_SECRET_KEY="${JWT_SECRET_KEY:-super_secret_dev_key_change_me}"
+JWT_SECRET_KEY="${JWT_SECRET_KEY:-dev_only_fallback_jwt_secret_must_be_over_32_characters_long_min}"
 
 STRIPE_SECRET_KEY="${STRIPE_SECRET_KEY:-sk_test_fake_key}"
 STRIPE_WEBHOOK_SECRET="${STRIPE_WEBHOOK_SECRET:-whsec_fake_secret}"
