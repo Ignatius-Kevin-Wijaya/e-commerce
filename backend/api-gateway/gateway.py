@@ -16,6 +16,9 @@ from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 from clients.auth_client import ServiceClient
 from middleware.auth_middleware import extract_is_admin, extract_user_id, validate_token
@@ -45,6 +48,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 Instrumentator().instrument(app).expose(app)
 
 
@@ -53,10 +60,9 @@ async def gateway_health():
     return {"status": "healthy", "service": "api-gateway"}
 
 
-@app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"])
-async def proxy(request: Request, path: str):
+async def _proxy_core(request: Request, path: str):
     """
-    Catch-all reverse proxy handler.
+    Core reverse proxy logic.
     1. Find the matching route.
     2. Validate auth if required.
     3. Forward the request to the backend.
@@ -127,3 +133,28 @@ async def proxy(request: Request, path: str):
         headers=response_headers,
         media_type=upstream_response.headers.get("content-type"),
     )
+
+
+# ── Explicit Rate-Limited Routes ───────────────────────────────
+
+@app.post("/auth/login")
+@limiter.limit("5/minute")
+async def proxy_login(request: Request):
+    """Rate limited login proxy."""
+    return await _proxy_core(request, "auth/login")
+
+
+@app.post("/auth/register")
+@limiter.limit("3/hour")
+async def proxy_register(request: Request):
+    """Rate limited register proxy."""
+    return await _proxy_core(request, "auth/register")
+
+
+# ── Catch-All Route ──────────────────────────────────────────
+
+@app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"])
+async def catch_all_proxy(request: Request, path: str):
+    """Fallback proxy for all other paths."""
+    return await _proxy_core(request, path)
+
