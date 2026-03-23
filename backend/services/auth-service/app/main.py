@@ -13,6 +13,7 @@ import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, Response
+from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
@@ -64,8 +65,6 @@ app = FastAPI(
 
 # Prometheus metrics endpoint at /metrics
 Instrumentator().instrument(app).expose(app)
-
-from fastapi.responses import JSONResponse
 
 @app.middleware("http")
 async def verify_gateway_secret_middleware(request: Request, call_next):

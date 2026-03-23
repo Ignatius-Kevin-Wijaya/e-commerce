@@ -5,6 +5,7 @@ import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from internal.cache.redis_client import close_redis
@@ -29,8 +30,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Cart Service", description="Redis-backed shopping cart", version="1.0.0", lifespan=lifespan)
 Instrumentator().instrument(app).expose(app)
-
-from fastapi.responses import JSONResponse
 
 @app.middleware("http")
 async def verify_gateway_secret_middleware(request: Request, call_next):

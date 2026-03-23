@@ -5,6 +5,7 @@ import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, Response
+from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -45,8 +46,6 @@ app = FastAPI(title="Product Service", description="Product catalog and categori
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 Instrumentator().instrument(app).expose(app)
-
-from fastapi.responses import JSONResponse
 
 @app.middleware("http")
 async def verify_gateway_secret_middleware(request: Request, call_next):
