@@ -1,0 +1,488 @@
+# k6 Auth-Service Load Test Scripts — Three load patterns for thesis experiments
+# Targets auth-service DIRECTLY (bypasses gateway rate limiter)
+# Uses POST /auth/login (bcrypt verification) for CPU-bound workload
+#
+# How it works:
+#   1. setup() registers N test users via POST /auth/register
+#   2. Each VU picks a random user and does POST /auth/login (triggers bcrypt)
+#   3. bcrypt verify_password() is CPU-intensive — this is what makes auth-service "CPU-bound"
+#
+# Usage:
+#   kubectl apply -f k6-auth-job.yaml -n ecommerce    # Creates ConfigMaps + Jobs
+#
+# For each experiment run:
+#   1. Apply the experiment config (B1/B2/H1/H2/H3/K1)
+#   2. kubectl create job k6-auth-gradual-run1 --from=job/k6-auth-test-gradual -n ecommerce
+#   3. Wait for completion: kubectl logs -f job/k6-auth-gradual-run1 -n ecommerce
+#   4. Delete before next run: kubectl delete job k6-auth-gradual-run1 -n ecommerce
+
+---
+# ── k6 Script: Auth Gradual Ramp ────────────────────────────────────────────
+# Linear increase from 20 → 200 RPS over 5 minutes
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-auth-script-gradual
+  namespace: ecommerce
+data:
+  load-test.js: |
+    import http from 'k6/http';
+    import { check, sleep } from 'k6';
+    import { SharedArray } from 'k6/data';
+
+    export const options = {
+      scenarios: {
+        gradual_ramp: {
+          executor: 'ramping-arrival-rate',
+          startRate: 20,
+          timeUnit: '1s',
+          preAllocatedVUs: 300,
+          maxVUs: 500,
+          stages: [
+            { duration: '2m', target: 20 },   // Warm-up (excluded from analysis)
+            { duration: '5m', target: 200 },   // Gradual ramp: 20 → 200 RPS
+            { duration: '2m', target: 200 },   // Sustain peak
+            { duration: '3m', target: 0 },     // Cooldown observation
+          ],
+        },
+      },
+      thresholds: {
+        http_req_duration: ['p(95)<2000'],
+        http_req_failed: ['rate<0.05'],
+      },
+    };
+
+    const BASE_URL = __ENV.TARGET_URL || 'http://auth-service.ecommerce.svc.cluster.local:8001';
+    const GATEWAY_SECRET = __ENV.INTERNAL_GATEWAY_SECRET || '';
+    const NUM_USERS = parseInt(__ENV.NUM_TEST_USERS || '50');
+
+    const params = {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Internal-Gateway-Secret': GATEWAY_SECRET,
+      },
+    };
+
+    // Pre-generate user list (shared across VUs, created once)
+    const testUsers = new SharedArray('users', function () {
+      const users = [];
+      for (let i = 0; i < NUM_USERS; i++) {
+        users.push({
+          email: `loadtest_user_${i}@test.local`,
+          username: `loadtest_user_${i}`,
+          password: 'LoadTest_P@ss_2026!',
+        });
+      }
+      return users;
+    });
+
+    // setup() runs ONCE before the test — registers test users
+    export function setup() {
+      console.log(`Seeding ${NUM_USERS} test users...`);
+      let seeded = 0;
+      let skipped = 0;
+
+      for (let i = 0; i < NUM_USERS; i++) {
+        const user = testUsers[i];
+        const res = http.post(
+          `${BASE_URL}/auth/register`,
+          JSON.stringify({
+            email: user.email,
+            username: user.username,
+            password: user.password,
+            full_name: `Load Test User ${i}`,
+          }),
+          params
+        );
+
+        if (res.status === 201) {
+          seeded++;
+        } else if (res.status === 400 || res.status === 409) {
+          // User already exists from a previous run — this is fine
+          skipped++;
+        } else {
+          console.warn(`Failed to seed user ${i}: ${res.status} ${res.body}`);
+        }
+      }
+      console.log(`Seeding complete: ${seeded} created, ${skipped} already existed`);
+      return { ready: true };
+    }
+
+    // Main test function — each VU iteration picks a random user and logs in
+    export default function (data) {
+      const user = testUsers[Math.floor(Math.random() * testUsers.length)];
+
+      const res = http.post(
+        `${BASE_URL}/auth/login`,
+        JSON.stringify({
+          email: user.email,
+          password: user.password,
+        }),
+        params
+      );
+
+      check(res, {
+        'login status is 200': (r) => r.status === 200,
+        'has access_token': (r) => {
+          try { return JSON.parse(r.body).access_token !== undefined; }
+          catch(e) { return false; }
+        },
+        'response time < 2000ms': (r) => r.timings.duration < 2000,
+      });
+    }
+
+---
+# ── k6 Script: Auth Sudden Spike ────────────────────────────────────────────
+# 50 RPS baseline → instant jump to 200 RPS at t=2min
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-auth-script-spike
+  namespace: ecommerce
+data:
+  load-test.js: |
+    import http from 'k6/http';
+    import { check, sleep } from 'k6';
+    import { SharedArray } from 'k6/data';
+
+    export const options = {
+      scenarios: {
+        sudden_spike: {
+          executor: 'ramping-arrival-rate',
+          startRate: 50,
+          timeUnit: '1s',
+          preAllocatedVUs: 300,
+          maxVUs: 500,
+          stages: [
+            { duration: '2m', target: 50 },    // Warm-up at baseline (excluded)
+            { duration: '10s', target: 200 },   // Sudden spike to 200 RPS
+            { duration: '4m50s', target: 200 }, // Sustain spike
+            { duration: '2m', target: 200 },    // Continue peak
+            { duration: '3m', target: 0 },      // Cooldown observation
+          ],
+        },
+      },
+      thresholds: {
+        http_req_duration: ['p(95)<2000'],
+        http_req_failed: ['rate<0.05'],
+      },
+    };
+
+    const BASE_URL = __ENV.TARGET_URL || 'http://auth-service.ecommerce.svc.cluster.local:8001';
+    const GATEWAY_SECRET = __ENV.INTERNAL_GATEWAY_SECRET || '';
+    const NUM_USERS = parseInt(__ENV.NUM_TEST_USERS || '50');
+
+    const params = {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Internal-Gateway-Secret': GATEWAY_SECRET,
+      },
+    };
+
+    const testUsers = new SharedArray('users', function () {
+      const users = [];
+      for (let i = 0; i < NUM_USERS; i++) {
+        users.push({
+          email: `loadtest_user_${i}@test.local`,
+          username: `loadtest_user_${i}`,
+          password: 'LoadTest_P@ss_2026!',
+        });
+      }
+      return users;
+    });
+
+    export function setup() {
+      console.log(`Seeding ${NUM_USERS} test users...`);
+      let seeded = 0;
+      let skipped = 0;
+      for (let i = 0; i < NUM_USERS; i++) {
+        const user = testUsers[i];
+        const res = http.post(
+          `${BASE_URL}/auth/register`,
+          JSON.stringify({
+            email: user.email,
+            username: user.username,
+            password: user.password,
+            full_name: `Load Test User ${i}`,
+          }),
+          params
+        );
+        if (res.status === 201) seeded++;
+        else if (res.status === 400 || res.status === 409) skipped++;
+        else console.warn(`Failed to seed user ${i}: ${res.status} ${res.body}`);
+      }
+      console.log(`Seeding complete: ${seeded} created, ${skipped} already existed`);
+      return { ready: true };
+    }
+
+    export default function (data) {
+      const user = testUsers[Math.floor(Math.random() * testUsers.length)];
+      const res = http.post(
+        `${BASE_URL}/auth/login`,
+        JSON.stringify({ email: user.email, password: user.password }),
+        params
+      );
+      check(res, {
+        'login status is 200': (r) => r.status === 200,
+        'has access_token': (r) => {
+          try { return JSON.parse(r.body).access_token !== undefined; }
+          catch(e) { return false; }
+        },
+        'response time < 2000ms': (r) => r.timings.duration < 2000,
+      });
+    }
+
+---
+# ── k6 Script: Auth Oscillating ─────────────────────────────────────────────
+# Alternating between 50 and 200 RPS every 90 seconds
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-auth-script-oscillating
+  namespace: ecommerce
+data:
+  load-test.js: |
+    import http from 'k6/http';
+    import { check, sleep } from 'k6';
+    import { SharedArray } from 'k6/data';
+
+    export const options = {
+      scenarios: {
+        oscillating: {
+          executor: 'ramping-arrival-rate',
+          startRate: 50,
+          timeUnit: '1s',
+          preAllocatedVUs: 300,
+          maxVUs: 500,
+          stages: [
+            { duration: '2m', target: 50 },    // Warm-up (excluded)
+            { duration: '10s', target: 200 },   // Spike up
+            { duration: '1m20s', target: 200 }, // Hold high (90s total)
+            { duration: '10s', target: 50 },    // Drop down
+            { duration: '1m20s', target: 50 },  // Hold low (90s total)
+            { duration: '10s', target: 200 },   // Spike up
+            { duration: '1m20s', target: 200 }, // Hold high (90s total)
+            { duration: '10s', target: 50 },    // Drop down
+            { duration: '1m20s', target: 50 },  // Hold low (90s total)
+            { duration: '10s', target: 200 },   // Final spike
+            { duration: '50s', target: 200 },   // Hold high
+            { duration: '3m', target: 0 },      // Cooldown observation
+          ],
+        },
+      },
+      thresholds: {
+        http_req_duration: ['p(95)<2000'],
+        http_req_failed: ['rate<0.05'],
+      },
+    };
+
+    const BASE_URL = __ENV.TARGET_URL || 'http://auth-service.ecommerce.svc.cluster.local:8001';
+    const GATEWAY_SECRET = __ENV.INTERNAL_GATEWAY_SECRET || '';
+    const NUM_USERS = parseInt(__ENV.NUM_TEST_USERS || '50');
+
+    const params = {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Internal-Gateway-Secret': GATEWAY_SECRET,
+      },
+    };
+
+    const testUsers = new SharedArray('users', function () {
+      const users = [];
+      for (let i = 0; i < NUM_USERS; i++) {
+        users.push({
+          email: `loadtest_user_${i}@test.local`,
+          username: `loadtest_user_${i}`,
+          password: 'LoadTest_P@ss_2026!',
+        });
+      }
+      return users;
+    });
+
+    export function setup() {
+      console.log(`Seeding ${NUM_USERS} test users...`);
+      let seeded = 0;
+      let skipped = 0;
+      for (let i = 0; i < NUM_USERS; i++) {
+        const user = testUsers[i];
+        const res = http.post(
+          `${BASE_URL}/auth/register`,
+          JSON.stringify({
+            email: user.email,
+            username: user.username,
+            password: user.password,
+            full_name: `Load Test User ${i}`,
+          }),
+          params
+        );
+        if (res.status === 201) seeded++;
+        else if (res.status === 400 || res.status === 409) skipped++;
+        else console.warn(`Failed to seed user ${i}: ${res.status} ${res.body}`);
+      }
+      console.log(`Seeding complete: ${seeded} created, ${skipped} already existed`);
+      return { ready: true };
+    }
+
+    export default function (data) {
+      const user = testUsers[Math.floor(Math.random() * testUsers.length)];
+      const res = http.post(
+        `${BASE_URL}/auth/login`,
+        JSON.stringify({ email: user.email, password: user.password }),
+        params
+      );
+      check(res, {
+        'login status is 200': (r) => r.status === 200,
+        'has access_token': (r) => {
+          try { return JSON.parse(r.body).access_token !== undefined; }
+          catch(e) { return false; }
+        },
+        'response time < 2000ms': (r) => r.timings.duration < 2000,
+      });
+    }
+
+---
+# ── k6 Auth Job Template: Gradual Ramp ──────────────────────────────────────
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k6-auth-test-gradual
+  namespace: ecommerce
+spec:
+  template:
+    metadata:
+      labels:
+        app: k6
+        target: auth-service
+    spec:
+      containers:
+        - name: k6
+          image: grafana/k6:latest
+          command: ["k6", "run", "--out", "json=/results/results.json", "/scripts/load-test.js"]
+          env:
+            - name: TARGET_URL
+              value: "http://auth-service.ecommerce.svc.cluster.local:8001"
+            - name: NUM_TEST_USERS
+              value: "50"
+            - name: INTERNAL_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: internal-gateway-secret
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          volumeMounts:
+            - name: k6-script
+              mountPath: /scripts
+            - name: k6-results
+              mountPath: /results
+      volumes:
+        - name: k6-script
+          configMap:
+            name: k6-auth-script-gradual
+        - name: k6-results
+          emptyDir: {}
+      restartPolicy: Never
+  backoffLimit: 0
+
+---
+# ── k6 Auth Job Template: Sudden Spike ──────────────────────────────────────
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k6-auth-test-spike
+  namespace: ecommerce
+spec:
+  template:
+    metadata:
+      labels:
+        app: k6
+        target: auth-service
+    spec:
+      containers:
+        - name: k6
+          image: grafana/k6:latest
+          command: ["k6", "run", "--out", "json=/results/results.json", "/scripts/load-test.js"]
+          env:
+            - name: TARGET_URL
+              value: "http://auth-service.ecommerce.svc.cluster.local:8001"
+            - name: NUM_TEST_USERS
+              value: "50"
+            - name: INTERNAL_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: internal-gateway-secret
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          volumeMounts:
+            - name: k6-script
+              mountPath: /scripts
+            - name: k6-results
+              mountPath: /results
+      volumes:
+        - name: k6-script
+          configMap:
+            name: k6-auth-script-spike
+        - name: k6-results
+          emptyDir: {}
+      restartPolicy: Never
+  backoffLimit: 0
+
+---
+# ── k6 Auth Job Template: Oscillating ───────────────────────────────────────
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k6-auth-test-oscillating
+  namespace: ecommerce
+spec:
+  template:
+    metadata:
+      labels:
+        app: k6
+        target: auth-service
+    spec:
+      containers:
+        - name: k6
+          image: grafana/k6:latest
+          command: ["k6", "run", "--out", "json=/results/results.json", "/scripts/load-test.js"]
+          env:
+            - name: TARGET_URL
+              value: "http://auth-service.ecommerce.svc.cluster.local:8001"
+            - name: NUM_TEST_USERS
+              value: "50"
+            - name: INTERNAL_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: internal-gateway-secret
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          volumeMounts:
+            - name: k6-script
+              mountPath: /scripts
+            - name: k6-results
+              mountPath: /results
+      volumes:
+        - name: k6-script
+          configMap:
+            name: k6-auth-script-oscillating
+        - name: k6-results
+          emptyDir: {}
+      restartPolicy: Never
+  backoffLimit: 0

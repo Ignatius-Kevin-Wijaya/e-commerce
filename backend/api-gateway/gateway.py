@@ -52,7 +52,8 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type", "X-Correlation-ID"],
 )
 
-limiter = Limiter(key_func=get_remote_address)
+RATE_LIMIT_ENABLED = os.getenv("RATE_LIMIT_ENABLED", "false").lower() == "true"
+limiter = Limiter(key_func=get_remote_address, enabled=RATE_LIMIT_ENABLED)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 

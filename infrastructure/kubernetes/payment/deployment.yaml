@@ -2,10 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: payment-service
+  namespace: ecommerce
   labels:
     app: payment-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: payment-service
@@ -16,7 +17,7 @@ spec:
     spec:
       containers:
         - name: payment-service
-          image: ghcr.io/your-org/ecommerce-payment-service:latest
+          image: ecommerce.azurecr.io/payment-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8005

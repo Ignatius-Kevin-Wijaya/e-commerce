@@ -1,0 +1,37 @@
+# H1: HPA Default — product-service
+# CPU-based HPA with default Kubernetes behavior policy
+# targetCPU: 70%, no behavior field (uses K8s defaults)
+# minReplicas: 1, maxReplicas: 5
+#
+# Purpose: How HPA performs "out of the box" — the most common production config
+#
+# Usage:
+#   kubectl apply -f b1-underprovisioned.yaml -n ecommerce   # Reset to 1 replica first
+#   kubectl apply -f h1-hpa-default.yaml -n ecommerce
+# Cleanup:
+#   kubectl delete hpa product-service-hpa-default -n ecommerce
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: product-service-hpa-default
+  namespace: ecommerce
+  labels:
+    experiment: h1-hpa-default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: product-service
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+  # No behavior field — uses Kubernetes defaults:
+  # scaleUp: stabilizationWindowSeconds=0, 4 pods or 100% per 15s (max)
+  # scaleDown: stabilizationWindowSeconds=300 (5 min wait before scale-down)

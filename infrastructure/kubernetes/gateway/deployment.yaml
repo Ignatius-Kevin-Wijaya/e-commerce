@@ -2,10 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api-gateway
+  namespace: ecommerce
   labels:
     app: api-gateway
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: api-gateway
@@ -16,8 +17,8 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: ghcr.io/your-org/ecommerce-api-gateway:latest
-          imagePullPolicy: IfNotPresent
+          image: ecommerce.azurecr.io/api-gateway:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:

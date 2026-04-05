@@ -2,10 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: product-service
+  namespace: ecommerce
   labels:
     app: product-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: product-service
@@ -16,8 +17,8 @@ spec:
     spec:
       containers:
         - name: product-service
-          image: ghcr.io/your-org/ecommerce-product-service:latest
-          imagePullPolicy: IfNotPresent
+          image: ecommerce.azurecr.io/product-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8002
           env:

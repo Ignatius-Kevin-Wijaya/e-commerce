@@ -1,38 +1,47 @@
+# B1: Under-provisioned Baseline — product-service
+# Fixed at 1 replica, no autoscaling
+# Purpose: Lower-bound baseline showing degradation without scaling
+#
+# Usage: kubectl apply -f b1-underprovisioned.yaml -n ecommerce
+# Reset: kubectl delete -f b1-underprovisioned.yaml -n ecommerce
+#
+# This is a "no-op" config — the deployment already runs at replicas: 1.
+# This file exists to make the experiment protocol explicit and scriptable.
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: order-service
+  name: product-service
   namespace: ecommerce
   labels:
-    app: order-service
+    app: product-service
+    experiment: b1-underprovisioned
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: order-service
+      app: product-service
   template:
     metadata:
       labels:
-        app: order-service
+        app: product-service
     spec:
       containers:
-        - name: order-service
-          image: ecommerce.azurecr.io/order-service:latest
+        - name: product-service
+          image: ecommerce.azurecr.io/product-service:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8004
+            - containerPort: 8002
           env:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: order-secrets
+                  name: product-secrets
                   key: database-url
-            - name: PRODUCT_SERVICE_URL
-              value: "http://product-service:8002"
-            - name: CART_SERVICE_URL
-              value: "http://cart-service:8003"
             - name: ENVIRONMENT
               value: "production"
+            - name: LOG_LEVEL
+              value: "info"
             - name: INTERNAL_GATEWAY_SECRET
               valueFrom:
                 secretKeyRef:
@@ -48,12 +57,12 @@ spec:
           livenessProbe:
             httpGet:
               path: /health
-              port: 8004
+              port: 8002
             initialDelaySeconds: 10
             periodSeconds: 15
           readinessProbe:
             httpGet:
               path: /ready
-              port: 8004
+              port: 8002
             initialDelaySeconds: 5
             periodSeconds: 10

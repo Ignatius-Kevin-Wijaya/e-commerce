@@ -1,38 +1,55 @@
+# B1: Under-provisioned Baseline — auth-service
+# Fixed at 1 replica, no autoscaling
+# Purpose: Lower-bound baseline showing degradation without scaling
+#
+# Usage: kubectl apply -f b1-underprovisioned.yaml -n ecommerce
+# Reset: kubectl delete -f b1-underprovisioned.yaml -n ecommerce
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: order-service
+  name: auth-service
   namespace: ecommerce
   labels:
-    app: order-service
+    app: auth-service
+    experiment: b1-underprovisioned
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: order-service
+      app: auth-service
   template:
     metadata:
       labels:
-        app: order-service
+        app: auth-service
     spec:
       containers:
-        - name: order-service
-          image: ecommerce.azurecr.io/order-service:latest
+        - name: auth-service
+          image: ecommerce.azurecr.io/auth-service:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8004
+            - containerPort: 8001
           env:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: order-secrets
+                  name: auth-secrets
                   key: database-url
-            - name: PRODUCT_SERVICE_URL
-              value: "http://product-service:8002"
-            - name: CART_SERVICE_URL
-              value: "http://cart-service:8003"
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secrets
+                  key: jwt-secret
+            - name: JWT_ALGORITHM
+              value: "HS256"
+            - name: JWT_ACCESS_TOKEN_EXPIRE_MINUTES
+              value: "30"
+            - name: JWT_REFRESH_TOKEN_EXPIRE_DAYS
+              value: "7"
             - name: ENVIRONMENT
               value: "production"
+            - name: LOG_LEVEL
+              value: "info"
             - name: INTERNAL_GATEWAY_SECRET
               valueFrom:
                 secretKeyRef:
@@ -48,12 +65,12 @@ spec:
           livenessProbe:
             httpGet:
               path: /health
-              port: 8004
+              port: 8001
             initialDelaySeconds: 10
             periodSeconds: 15
           readinessProbe:
             httpGet:
               path: /ready
-              port: 8004
+              port: 8001
             initialDelaySeconds: 5
             periodSeconds: 10

@@ -1,0 +1,49 @@
+# H2: HPA Tuned (Aggressive Scaling) — auth-service
+# CPU-based HPA with optimized threshold and aggressive scaling policy
+# targetCPU: 50%, scaleUp: immediate (0s stabilization, 5 pods/15s)
+# scaleDown: 30s stabilization, 100%/15s
+# minReplicas: 1, maxReplicas: 5
+#
+# Purpose: Best-case HPA with CPU metric — optimized threshold + fast policy
+# Expected: Faster reaction than H1 for auth-service's CPU-bound workload
+#
+# Usage:
+#   kubectl apply -f b1-underprovisioned.yaml -n ecommerce   # Reset to 1 replica first
+#   kubectl apply -f h2-hpa-tuned.yaml -n ecommerce
+# Cleanup:
+#   kubectl delete hpa auth-service-hpa-tuned -n ecommerce
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: auth-service-hpa-tuned
+  namespace: ecommerce
+  labels:
+    experiment: h2-hpa-tuned
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: auth-service
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Pods
+          value: 5
+          periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15

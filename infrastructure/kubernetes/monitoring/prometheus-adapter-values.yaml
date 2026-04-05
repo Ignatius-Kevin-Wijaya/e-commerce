@@ -1,0 +1,46 @@
+# prometheus-adapter Helm values for H3 experiment configuration
+# Installs via: helm install prometheus-adapter prometheus-community/prometheus-adapter \
+#   --namespace monitoring -f prometheus-adapter-values.yaml
+#
+# This bridges Prometheus metrics into the Kubernetes Custom Metrics API,
+# enabling HPA to scale based on HTTP request rate (H3 configuration).
+#
+# PREREQUISITE: Prometheus must use kubernetes_sd_configs (not static_configs)
+# so that metrics have pod and namespace labels. See monitoring/prometheus.yaml.
+prometheus:
+  url: http://prometheus.monitoring.svc.cluster.local
+  port: 9090
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "250m"
+    memory: "256Mi"
+
+rules:
+  custom:
+    - seriesQuery: 'http_requests_total{namespace="ecommerce"}'
+      resources:
+        overrides:
+          namespace: {resource: "namespace"}
+          pod: {resource: "pod"}
+      name:
+        matches: "^(.*)_total$"
+        as: "${1}_per_second"
+      metricsQuery: 'sum(rate(<<.Series>>{<<.LabelMatchers>>}[1m])) by (<<.GroupBy>>)'
+  # NOTE: The above rule converts http_requests_total → http_requests_per_second.
+  # Prometheus must expose http_requests_total with labels: namespace, pod.
+  # The kubernetes_sd_configs in prometheus.yaml provides these labels.
+  #
+  # How it works:
+  #   1. prometheus-adapter finds series matching 'http_requests_total{namespace="ecommerce"}'
+  #   2. For each pod, it computes rate(http_requests_total{pod="xxx"}[1m])
+  #   3. HPA queries: kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/ecommerce/pods/*/http_requests_per_second"
+  #   4. HPA gets per-pod values, averages them, computes desired replicas
+  #
+  # Verification after install:
+  #   kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 | jq .
+  #   kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/ecommerce/pods/*/http_requests_per_second" | jq .
+  #   kubectl get hpa -n ecommerce  # TARGETS column should show current/target, NOT <unknown>/target

@@ -1,4 +1,5 @@
-.PHONY: help dev down build test lint migrate seed deploy clean logs kind-up kind-down kind-load kind-secrets kind-monitoring kind-load-test kind-status
+.PHONY: help dev down build test lint migrate seed deploy clean logs kind-up kind-down kind-load kind-secrets kind-monitoring kind-load-test kind-status \
+       experiment experiment-dry-run experiment-resume experiment-pilot experiment-validate experiment-status experiment-product experiment-auth
 
 # ──── Image Registry ───────────────────────────────────────
 # Override via env: IMAGE_REGISTRY=ghcr.io/myorg make kind-load
@@ -97,3 +98,73 @@ kind-status: ## Show status of all pods in ecommerce and monitoring namespaces
 	@kubectl get pods,svc,hpa,ingress -n ecommerce
 	@echo "\n📊 Monitoring Namespace:"
 	@kubectl get pods,svc -n monitoring
+
+# ──── Thesis Experiment ────────────────────────────────────
+# Run experiments inside tmux to survive terminal disconnects:
+#   tmux new -s experiment
+#   make experiment
+#   Ctrl+B, D to detach
+
+experiment: ## Run ALL 180 experiment runs (~45 hours)
+	@echo "🧪 Starting full experiment (180 runs, ~45 hours)"
+	@echo "   Tip: Run inside tmux to survive disconnects"
+	@echo ""
+	bash scripts/run-experiment.sh
+
+experiment-dry-run: ## Preview the full 180-run execution plan
+	bash scripts/run-experiment.sh --dry-run
+
+experiment-resume: ## Resume experiment from last completed run
+	bash scripts/run-experiment.sh --resume
+
+experiment-first: ## Run exactly 1 repetition of all 36 configurations to test output validity
+	@echo "🧪 Starting first sweep (1 Repetition across all Configs & Patterns, 36 runs)"
+	bash scripts/run-experiment.sh --first
+
+experiment-pilot: ## Pilot run: product-service B1 only (15 runs, ~4 hours)
+	@echo "🧪 Starting pilot run (product-service, B1 config, 15 runs)"
+	bash scripts/run-experiment.sh --service product-service --config b1
+
+experiment-product: ## Run all product-service experiments (90 runs, ~22 hours)
+	bash scripts/run-experiment.sh --service product-service
+
+experiment-auth: ## Run all auth-service experiments (90 runs, ~22 hours)
+	bash scripts/run-experiment.sh --service auth-service
+
+experiment-validate: ## Validate all completed experiment results for anomalies
+	bash scripts/validate-results.sh
+
+experiment-validate-product: ## Validate product-service results only
+	bash scripts/validate-results.sh product-service
+
+experiment-validate-auth: ## Validate auth-service results only
+	bash scripts/validate-results.sh auth-service
+
+experiment-status: ## Show experiment progress
+	@echo "=== Experiment Progress ==="
+	@if [ -f experiment-results/.experiment-state ]; then \
+		DONE=$$(grep -c "^DONE:" experiment-results/.experiment-state 2>/dev/null || echo 0); \
+		echo "  Completed runs: $$DONE / 180"; \
+		echo "  Remaining:      $$(( 180 - $$DONE ))"; \
+		echo "  Est. time left: $$(( (180 - $$DONE) * 15 / 60 )) hours"; \
+		echo ""; \
+		echo "  Last completed:"; \
+		tail -3 experiment-results/.experiment-state | sed 's/DONE://'; \
+	else \
+		echo "  No experiment state found. Run 'make experiment' to start."; \
+	fi
+
+experiment-clean: ## Delete all experiment results (⚠️ destructive!)
+	@echo "⚠️  This will delete ALL experiment results!"
+	@read -p "Are you sure? (y/N): " confirm; \
+	if [ "$$confirm" = "y" ]; then \
+		rm -rf experiment-results/; \
+		echo "✅ Experiment results deleted."; \
+	else \
+		echo "Cancelled."; \
+	fi
+
+experiment-k6-apply: ## Apply k6 ConfigMaps and Job templates to the cluster
+	kubectl apply -f infrastructure/kubernetes/load-testing/k6-job.yaml -n ecommerce
+	kubectl apply -f infrastructure/kubernetes/load-testing/k6-auth-job.yaml -n ecommerce
+	@echo "✅ k6 ConfigMaps and Job templates applied"

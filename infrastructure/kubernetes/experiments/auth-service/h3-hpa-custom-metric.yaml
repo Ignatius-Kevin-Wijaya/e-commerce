@@ -1,0 +1,55 @@
+# H3: HPA Custom Metric (Request-Rate via prometheus-adapter) — auth-service
+# HPA using HTTP request rate per second as scaling metric
+# Same metric as K1 (KEDA) but via HPA engine — THE FAIRNESS CONTROL
+# threshold: 50 RPS/pod (must match K1 exactly for fair comparison)
+# Uses same aggressive behavior as H2
+#
+# PREREQUISITE: prometheus-adapter must be installed:
+#   helm install prometheus-adapter prometheus-community/prometheus-adapter \
+#     --namespace monitoring -f prometheus-adapter-values.yaml
+#
+# Purpose: Isolates metric-type effect from engine-architecture effect
+# Expected: For CPU-bound auth-service, H3 may show minimal improvement over H1/H2
+#   since CPU already correlates with load — this is a valid finding.
+#
+# Usage:
+#   kubectl apply -f b1-underprovisioned.yaml -n ecommerce   # Reset to 1 replica first
+#   kubectl apply -f h3-hpa-custom-metric.yaml -n ecommerce
+# Cleanup:
+#   kubectl delete hpa auth-service-hpa-custom -n ecommerce
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: auth-service-hpa-custom
+  namespace: ecommerce
+  labels:
+    experiment: h3-hpa-custom-metric
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: auth-service
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Pods
+      pods:
+        metric:
+          name: http_requests_per_second
+        target:
+          type: AverageValue
+          averageValue: "50"    # Same threshold as K1 KEDA — critical for fairness
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Pods
+          value: 5
+          periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15

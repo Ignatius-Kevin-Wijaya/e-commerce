@@ -2,10 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: auth-service
+  namespace: ecommerce
   labels:
     app: auth-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: auth-service
@@ -16,7 +17,7 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: ghcr.io/your-org/ecommerce-auth-service:latest
+          image: ecommerce.azurecr.io/auth-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8001

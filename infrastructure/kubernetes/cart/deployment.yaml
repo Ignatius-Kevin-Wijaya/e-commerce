@@ -2,10 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cart-service
+  namespace: ecommerce
   labels:
     app: cart-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: cart-service
@@ -16,7 +17,7 @@ spec:
     spec:
       containers:
         - name: cart-service
-          image: ghcr.io/your-org/ecommerce-cart-service:latest
+          image: ecommerce.azurecr.io/cart-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8003

@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
+  namespace: ecommerce
   labels:
     app: frontend
 spec:
@@ -16,7 +17,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ghcr.io/your-org/ecommerce-frontend:latest
+          image: ecommerce.azurecr.io/frontend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000

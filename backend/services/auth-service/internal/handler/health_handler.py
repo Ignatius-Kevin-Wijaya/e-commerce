@@ -9,6 +9,7 @@ LEARNING NOTES:
 """
 
 from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
 router = APIRouter(tags=["Health"])
@@ -16,7 +17,6 @@ router = APIRouter(tags=["Health"])
 
 @router.get("/health")
 async def health_check():
-    """Liveness probe — always returns 200 if the process is running."""
     return {"status": "healthy", "service": "auth-service"}
 
 
@@ -28,4 +28,7 @@ async def readiness_check(request: Request):
         await db.execute(text("SELECT 1"))
         return {"status": "ready", "service": "auth-service", "database": "connected"}
     except Exception as e:
-        return {"status": "not_ready", "service": "auth-service", "error": str(e)}
+        return JSONResponse(
+            status_code=503,
+            content={"status": "not_ready", "service": "auth-service", "error": str(e)}
+        )

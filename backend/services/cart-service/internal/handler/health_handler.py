@@ -1,6 +1,7 @@
 """Health check handler for cart service."""
 
 from fastapi import APIRouter
+from fastapi.responses import JSONResponse
 from internal.cache.redis_client import get_redis
 
 router = APIRouter(tags=["Health"])
@@ -18,4 +19,7 @@ async def readiness_check():
         await r.ping()
         return {"status": "ready", "service": "cart-service", "redis": "connected"}
     except Exception as e:
-        return {"status": "not_ready", "service": "cart-service", "error": str(e)}
+        return JSONResponse(
+            status_code=503,
+            content={"status": "not_ready", "service": "cart-service", "error": str(e)}
+        )

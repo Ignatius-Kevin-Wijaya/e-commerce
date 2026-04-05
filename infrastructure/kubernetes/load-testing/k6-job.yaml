@@ -1,0 +1,323 @@
+# k6 Load Test Scripts — Three load patterns for thesis experiments
+# Blueprint Section 4, Layer 6: cpu 200m/500m, memory 256Mi/512Mi
+# Blueprint Section 6: gradual ramp, sudden spike, oscillating
+#
+# Usage:
+#   kubectl apply -f k6-job.yaml                          # Creates ConfigMap
+#   kubectl create job k6-gradual --from=cronjob/dummy ... # Or use the Job templates below
+#
+# To run a specific pattern, apply the ConfigMap then one of the Job manifests.
+# Delete the completed Job before running the next:
+#   kubectl delete job k6-load-test -n ecommerce
+
+---
+# ── k6 Script: Gradual Ramp ─────────────────────────────────────────────────
+# Linear increase from 20 → 200 RPS over 5 minutes
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-script-gradual
+  namespace: ecommerce
+data:
+  load-test.js: |
+    import http from 'k6/http';
+    import { check, sleep } from 'k6';
+
+    export const options = {
+      scenarios: {
+        gradual_ramp: {
+          executor: 'ramping-arrival-rate',
+          startRate: 20,
+          timeUnit: '1s',
+          preAllocatedVUs: 300,
+          maxVUs: 500,
+          stages: [
+            { duration: '2m', target: 20 },   // Warm-up (excluded from analysis)
+            { duration: '5m', target: 200 },   // Gradual ramp: 20 → 200 RPS
+            { duration: '2m', target: 200 },   // Sustain peak
+            { duration: '3m', target: 0 },     // Cooldown observation
+          ],
+        },
+      },
+      thresholds: {
+        http_req_duration: ['p(95)<2000'],
+        http_req_failed: ['rate<0.05'],
+      },
+    };
+
+    const BASE_URL = __ENV.TARGET_URL || 'http://api-gateway.ecommerce.svc.cluster.local:80';
+    const TARGET_ENDPOINT = __ENV.TARGET_ENDPOINT || '/products';
+    const GATEWAY_SECRET = __ENV.INTERNAL_GATEWAY_SECRET || '';
+
+    const params = {
+      headers: {
+        'X-Internal-Gateway-Secret': GATEWAY_SECRET,
+      },
+    };
+
+    export default function () {
+      const res = http.get(`${BASE_URL}${TARGET_ENDPOINT}`, params);
+      check(res, {
+        'status is 200': (r) => r.status === 200,
+        'response time < 2000ms': (r) => r.timings.duration < 2000,
+      });
+    }
+
+---
+# ── k6 Script: Sudden Spike ─────────────────────────────────────────────────
+# 50 RPS baseline → instant jump to 200 RPS at t=2min
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-script-spike
+  namespace: ecommerce
+data:
+  load-test.js: |
+    import http from 'k6/http';
+    import { check, sleep } from 'k6';
+
+    export const options = {
+      scenarios: {
+        sudden_spike: {
+          executor: 'ramping-arrival-rate',
+          startRate: 50,
+          timeUnit: '1s',
+          preAllocatedVUs: 300,
+          maxVUs: 500,
+          stages: [
+            { duration: '2m', target: 50 },    // Warm-up at baseline (excluded)
+            { duration: '10s', target: 200 },   // Sudden spike to 200 RPS
+            { duration: '4m50s', target: 200 }, // Sustain spike
+            { duration: '2m', target: 200 },    // Continue peak
+            { duration: '3m', target: 0 },      // Cooldown observation
+          ],
+        },
+      },
+      thresholds: {
+        http_req_duration: ['p(95)<2000'],
+        http_req_failed: ['rate<0.05'],
+      },
+    };
+
+    const BASE_URL = __ENV.TARGET_URL || 'http://api-gateway.ecommerce.svc.cluster.local:80';
+    const TARGET_ENDPOINT = __ENV.TARGET_ENDPOINT || '/products';
+    const GATEWAY_SECRET = __ENV.INTERNAL_GATEWAY_SECRET || '';
+
+    const params = {
+      headers: {
+        'X-Internal-Gateway-Secret': GATEWAY_SECRET,
+      },
+    };
+
+    export default function () {
+      const res = http.get(`${BASE_URL}${TARGET_ENDPOINT}`, params);
+      check(res, {
+        'status is 200': (r) => r.status === 200,
+        'response time < 2000ms': (r) => r.timings.duration < 2000,
+      });
+    }
+
+---
+# ── k6 Script: Oscillating ──────────────────────────────────────────────────
+# Alternating between 50 and 200 RPS every 90 seconds
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-script-oscillating
+  namespace: ecommerce
+data:
+  load-test.js: |
+    import http from 'k6/http';
+    import { check, sleep } from 'k6';
+
+    export const options = {
+      scenarios: {
+        oscillating: {
+          executor: 'ramping-arrival-rate',
+          startRate: 50,
+          timeUnit: '1s',
+          preAllocatedVUs: 300,
+          maxVUs: 500,
+          stages: [
+            { duration: '2m', target: 50 },    // Warm-up (excluded)
+            { duration: '10s', target: 200 },   // Spike up
+            { duration: '1m20s', target: 200 }, // Hold high (90s total)
+            { duration: '10s', target: 50 },    // Drop down
+            { duration: '1m20s', target: 50 },  // Hold low (90s total)
+            { duration: '10s', target: 200 },   // Spike up
+            { duration: '1m20s', target: 200 }, // Hold high (90s total)
+            { duration: '10s', target: 50 },    // Drop down
+            { duration: '1m20s', target: 50 },  // Hold low (90s total)
+            { duration: '10s', target: 200 },   // Final spike
+            { duration: '50s', target: 200 },   // Hold high
+            { duration: '3m', target: 0 },      // Cooldown observation
+          ],
+        },
+      },
+      thresholds: {
+        http_req_duration: ['p(95)<2000'],
+        http_req_failed: ['rate<0.05'],
+      },
+    };
+
+    const BASE_URL = __ENV.TARGET_URL || 'http://api-gateway.ecommerce.svc.cluster.local:80';
+    const TARGET_ENDPOINT = __ENV.TARGET_ENDPOINT || '/products';
+    const GATEWAY_SECRET = __ENV.INTERNAL_GATEWAY_SECRET || '';
+
+    const params = {
+      headers: {
+        'X-Internal-Gateway-Secret': GATEWAY_SECRET,
+      },
+    };
+
+    export default function () {
+      const res = http.get(`${BASE_URL}${TARGET_ENDPOINT}`, params);
+      check(res, {
+        'status is 200': (r) => r.status === 200,
+        'response time < 2000ms': (r) => r.timings.duration < 2000,
+      });
+    }
+
+---
+# ── k6 Job Template: Gradual Ramp ───────────────────────────────────────────
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k6-load-test-gradual
+  namespace: ecommerce
+spec:
+  template:
+    metadata:
+      labels:
+        app: k6
+    spec:
+      containers:
+        - name: k6
+          image: grafana/k6:latest
+          command: ["k6", "run", "--out", "json=/results/results.json", "/scripts/load-test.js"]
+          env:
+            - name: TARGET_URL
+              value: "http://api-gateway.ecommerce.svc.cluster.local:80"
+            - name: TARGET_ENDPOINT
+              value: "/products"
+            - name: INTERNAL_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: internal-gateway-secret
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          volumeMounts:
+            - name: k6-script
+              mountPath: /scripts
+            - name: k6-results
+              mountPath: /results
+      volumes:
+        - name: k6-script
+          configMap:
+            name: k6-script-gradual
+        - name: k6-results
+          emptyDir: {}
+      restartPolicy: Never
+  backoffLimit: 0
+
+---
+# ── k6 Job Template: Sudden Spike ───────────────────────────────────────────
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k6-load-test-spike
+  namespace: ecommerce
+spec:
+  template:
+    metadata:
+      labels:
+        app: k6
+    spec:
+      containers:
+        - name: k6
+          image: grafana/k6:latest
+          command: ["k6", "run", "--out", "json=/results/results.json", "/scripts/load-test.js"]
+          env:
+            - name: TARGET_URL
+              value: "http://api-gateway.ecommerce.svc.cluster.local:80"
+            - name: TARGET_ENDPOINT
+              value: "/products"
+            - name: INTERNAL_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: internal-gateway-secret
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          volumeMounts:
+            - name: k6-script
+              mountPath: /scripts
+            - name: k6-results
+              mountPath: /results
+      volumes:
+        - name: k6-script
+          configMap:
+            name: k6-script-spike
+        - name: k6-results
+          emptyDir: {}
+      restartPolicy: Never
+  backoffLimit: 0
+
+---
+# ── k6 Job Template: Oscillating ────────────────────────────────────────────
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k6-load-test-oscillating
+  namespace: ecommerce
+spec:
+  template:
+    metadata:
+      labels:
+        app: k6
+    spec:
+      containers:
+        - name: k6
+          image: grafana/k6:latest
+          command: ["k6", "run", "--out", "json=/results/results.json", "/scripts/load-test.js"]
+          env:
+            - name: TARGET_URL
+              value: "http://api-gateway.ecommerce.svc.cluster.local:80"
+            - name: TARGET_ENDPOINT
+              value: "/products"
+            - name: INTERNAL_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: internal-gateway-secret
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          volumeMounts:
+            - name: k6-script
+              mountPath: /scripts
+            - name: k6-results
+              mountPath: /results
+      volumes:
+        - name: k6-script
+          configMap:
+            name: k6-script-oscillating
+        - name: k6-results
+          emptyDir: {}
+      restartPolicy: Never
+  backoffLimit: 0
