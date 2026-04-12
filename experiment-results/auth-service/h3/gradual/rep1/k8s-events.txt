@@ -1,0 +1,28 @@
+LAST SEEN   TYPE      REASON                         OBJECT                                                        MESSAGE
+44m         Normal    Scheduled                      pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-qbdsz   Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-h3-gradual-rep1-qbdsz to aks-userpool-16719200-vmss00000w
+44m         Normal    SuccessfulCreate               job/k6-auth-test-gradual-auth-service-h3-gradual-rep1         Created pod: k6-auth-test-gradual-auth-service-h3-gradual-rep1-qbdsz
+44m         Normal    Pulling                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-qbdsz   Pulling image "grafana/k6:latest"
+44m         Normal    Started                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-qbdsz   Started container k6
+44m         Normal    Created                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-qbdsz   Created container: k6
+44m         Normal    Pulled                         pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-qbdsz   Successfully pulled image "grafana/k6:latest" in 1.439s (1.439s including waiting). Image size: 36750082 bytes.
+38m         Normal    Pulled                         pod/auth-service-7d65757ddb-p9sz8                             Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 235ms (235ms including waiting). Image size: 129968897 bytes.
+37m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/auth-service-hpa-custom               invalid metrics (1 invalid out of 1), first error is: failed to get pods metric value: unable to get metric http_requests_per_second: no metrics returned from custom metrics API
+35m         Warning   FailedGetPodsMetric            horizontalpodautoscaler/auth-service-hpa-custom               unable to get metric http_requests_per_second: no metrics returned from custom metrics API
+31m         Warning   BackoffLimitExceeded           job/k6-auth-test-gradual-auth-service-h3-gradual-rep1         Job has reached the specified backoff limit
+18m         Normal    SuccessfulCreate               job/k6-auth-test-gradual-auth-service-h3-gradual-rep1         Created pod: k6-auth-test-gradual-auth-service-h3-gradual-rep1-n6qhv
+18m         Normal    Scheduled                      pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-n6qhv   Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-h3-gradual-rep1-n6qhv to aks-userpool-16719200-vmss00000w
+18m         Normal    Pulling                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-n6qhv   Pulling image "grafana/k6:latest"
+18m         Normal    Started                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-n6qhv   Started container k6
+18m         Normal    Pulled                         pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-n6qhv   Successfully pulled image "grafana/k6:latest" in 1.459s (1.459s including waiting). Image size: 36750082 bytes.
+18m         Normal    Created                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-n6qhv   Created container: k6
+16m         Warning   Unhealthy                      pod/auth-service-7d65757ddb-p9sz8                             Readiness probe failed: Get "http://10.244.1.85:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+12m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/auth-service-hpa-custom               invalid metrics (1 invalid out of 1), first error is: failed to get pods metric value: unable to get metric http_requests_per_second: no metrics returned from custom metrics API
+9m25s       Normal    Pulled                         pod/auth-service-7d65757ddb-p9sz8                             Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 221ms (221ms including waiting). Image size: 129968897 bytes.
+8m8s        Warning   Unhealthy                      pod/auth-service-7d65757ddb-p9sz8                             Liveness probe failed: Get "http://10.244.1.85:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+7m8s        Normal    Killing                        pod/auth-service-7d65757ddb-p9sz8                             Container auth-service failed liveness probe, will be restarted
+7m6s        Normal    Pulling                        pod/auth-service-7d65757ddb-p9sz8                             Pulling image "ecommerce.azurecr.io/auth-service:latest"
+7m6s        Normal    Started                        pod/auth-service-7d65757ddb-p9sz8                             Started container auth-service
+7m6s        Normal    Created                        pod/auth-service-7d65757ddb-p9sz8                             Created container: auth-service
+7m6s        Normal    Pulled                         pod/auth-service-7d65757ddb-p9sz8                             Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 162ms (162ms including waiting). Image size: 129968897 bytes.
+6m31s       Warning   FailedGetPodsMetric            horizontalpodautoscaler/auth-service-hpa-custom               unable to get metric http_requests_per_second: no metrics returned from custom metrics API
+5m40s       Warning   BackoffLimitExceeded           job/k6-auth-test-gradual-auth-service-h3-gradual-rep1         Job has reached the specified backoff limit

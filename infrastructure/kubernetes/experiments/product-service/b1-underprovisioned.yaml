@@ -29,7 +29,7 @@ spec:
       containers:
         - name: product-service
           image: ecommerce.azurecr.io/product-service:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8002
           env:
@@ -60,9 +60,13 @@ spec:
               port: 8002
             initialDelaySeconds: 10
             periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 6
           readinessProbe:
             httpGet:
               path: /ready
               port: 8002
             initialDelaySeconds: 5
             periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3

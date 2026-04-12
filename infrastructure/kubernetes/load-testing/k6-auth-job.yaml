@@ -1,24 +1,18 @@
-# k6 Auth-Service Load Test Scripts — Three load patterns for thesis experiments
-# Targets auth-service DIRECTLY (bypasses gateway rate limiter)
-# Uses POST /auth/login (bcrypt verification) for CPU-bound workload
-#
-# How it works:
-#   1. setup() registers N test users via POST /auth/register
-#   2. Each VU picks a random user and does POST /auth/login (triggers bcrypt)
-#   3. bcrypt verify_password() is CPU-intensive — this is what makes auth-service "CPU-bound"
+# k6 Auth-Service Load Test Scripts — thesis recovery experiments
+# Updated for the thesis recovery plan:
+#   - Mixed auth traffic: 70% GET /auth/me + 30% POST /auth/login
+#   - Token-pool setup retained for the /auth/me slice
+#   - Env-driven BASE_RPS / PEAK_RPS for calibration ladders
+#   - Higher k6 resources to avoid client-side A1 false failures
 #
 # Usage:
-#   kubectl apply -f k6-auth-job.yaml -n ecommerce    # Creates ConfigMaps + Jobs
-#
-# For each experiment run:
-#   1. Apply the experiment config (B1/B2/H1/H2/H3/K1)
-#   2. kubectl create job k6-auth-gradual-run1 --from=job/k6-auth-test-gradual -n ecommerce
-#   3. Wait for completion: kubectl logs -f job/k6-auth-gradual-run1 -n ecommerce
-#   4. Delete before next run: kubectl delete job k6-auth-gradual-run1 -n ecommerce
+#   kubectl apply -f k6-auth-job.yaml                     # Creates ConfigMaps + Jobs
+#   The experiment runner only applies the ConfigMaps, then clones the Job
+#   templates locally to create per-run Jobs with calibrated env overrides.
 
 ---
 # ── k6 Script: Auth Gradual Ramp ────────────────────────────────────────────
-# Linear increase from 20 → 200 RPS over 5 minutes
+# Linear increase from BASE_RPS → PEAK_RPS over 5 minutes.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -27,22 +21,32 @@ metadata:
 data:
   load-test.js: |
     import http from 'k6/http';
-    import { check, sleep } from 'k6';
+    import { check } from 'k6';
     import { SharedArray } from 'k6/data';
+
+    const BASE_RPS = parseInt(__ENV.BASE_RPS || '20', 10);
+    const PEAK_RPS = parseInt(__ENV.PEAK_RPS || '120', 10);
+    const NUM_USERS = parseInt(__ENV.NUM_TEST_USERS || '120', 10);
+    const AUTH_ME_PERCENT = parseInt(__ENV.AUTH_ME_PERCENT || '70', 10);
+    const AUTH_LOGIN_PERCENT = parseInt(__ENV.AUTH_LOGIN_PERCENT || '30', 10);
+    const MIX_TOTAL = Math.max(AUTH_ME_PERCENT + AUTH_LOGIN_PERCENT, 1);
+    const AUTH_ME_THRESHOLD = AUTH_ME_PERCENT / MIX_TOTAL;
+    const PREALLOCATED_VUS = Math.max(400, PEAK_RPS * 3);
+    const MAX_VUS = Math.max(1000, PEAK_RPS * 6);
 
     export const options = {
       scenarios: {
         gradual_ramp: {
           executor: 'ramping-arrival-rate',
-          startRate: 20,
+          startRate: BASE_RPS,
           timeUnit: '1s',
-          preAllocatedVUs: 300,
-          maxVUs: 500,
+          preAllocatedVUs: PREALLOCATED_VUS,
+          maxVUs: MAX_VUS,
           stages: [
-            { duration: '2m', target: 20 },   // Warm-up (excluded from analysis)
-            { duration: '5m', target: 200 },   // Gradual ramp: 20 → 200 RPS
-            { duration: '2m', target: 200 },   // Sustain peak
-            { duration: '3m', target: 0 },     // Cooldown observation
+            { duration: '2m', target: BASE_RPS },
+            { duration: '5m', target: PEAK_RPS },
+            { duration: '2m', target: PEAK_RPS },
+            { duration: '3m', target: 0 },
           ],
         },
       },
@@ -54,16 +58,11 @@ data:
 
     const BASE_URL = __ENV.TARGET_URL || 'http://auth-service.ecommerce.svc.cluster.local:8001';
     const GATEWAY_SECRET = __ENV.INTERNAL_GATEWAY_SECRET || '';
-    const NUM_USERS = parseInt(__ENV.NUM_TEST_USERS || '50');
-
-    const params = {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Internal-Gateway-Secret': GATEWAY_SECRET,
-      },
+    const JSON_HEADERS = {
+      'Content-Type': 'application/json',
+      'X-Internal-Gateway-Secret': GATEWAY_SECRET,
     };
 
-    // Pre-generate user list (shared across VUs, created once)
     const testUsers = new SharedArray('users', function () {
       const users = [];
       for (let i = 0; i < NUM_USERS; i++) {
@@ -76,15 +75,18 @@ data:
       return users;
     });
 
-    // setup() runs ONCE before the test — registers test users
+    function randomUser() {
+      return testUsers[Math.floor(Math.random() * testUsers.length)];
+    }
+
     export function setup() {
-      console.log(`Seeding ${NUM_USERS} test users...`);
-      let seeded = 0;
-      let skipped = 0;
+      console.log(`Seeding and pre-authenticating ${NUM_USERS} users...`);
+      const tokens = [];
 
       for (let i = 0; i < NUM_USERS; i++) {
         const user = testUsers[i];
-        const res = http.post(
+
+        http.post(
           `${BASE_URL}/auth/register`,
           JSON.stringify({
             email: user.email,
@@ -92,48 +94,92 @@ data:
             password: user.password,
             full_name: `Load Test User ${i}`,
           }),
-          params
+          { headers: JSON_HEADERS }
         );
 
-        if (res.status === 201) {
-          seeded++;
-        } else if (res.status === 400 || res.status === 409) {
-          // User already exists from a previous run — this is fine
-          skipped++;
+        const loginRes = http.post(
+          `${BASE_URL}/auth/login`,
+          JSON.stringify({ email: user.email, password: user.password }),
+          { headers: JSON_HEADERS }
+        );
+
+        if (loginRes.status === 200) {
+          try {
+            const body = JSON.parse(loginRes.body);
+            if (body.access_token) {
+              tokens.push(body.access_token);
+            }
+          } catch (e) {
+            console.warn(`Failed to parse login response for user ${i}`);
+          }
         } else {
-          console.warn(`Failed to seed user ${i}: ${res.status} ${res.body}`);
+          console.warn(`Login failed for user ${i}: ${loginRes.status}`);
         }
       }
-      console.log(`Seeding complete: ${seeded} created, ${skipped} already existed`);
-      return { ready: true };
+
+      if (tokens.length === 0) {
+        throw new Error('No tokens obtained during setup');
+      }
+
+      console.log(`Pre-auth complete: ${tokens.length}/${NUM_USERS} tokens obtained`);
+      return { tokens };
     }
 
-    // Main test function — each VU iteration picks a random user and logs in
-    export default function (data) {
-      const user = testUsers[Math.floor(Math.random() * testUsers.length)];
+    function runAuthMe(data) {
+      const token = data.tokens[Math.floor(Math.random() * data.tokens.length)];
+      const res = http.get(
+        `${BASE_URL}/auth/me`,
+        {
+          headers: {
+            'X-Internal-Gateway-Secret': GATEWAY_SECRET,
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      check(res, {
+        'me status is 200': (r) => r.status === 200,
+        'me returns user data': (r) => {
+          try {
+            return JSON.parse(r.body).email !== undefined;
+          } catch (e) {
+            return false;
+          }
+        },
+        'me response time < 500ms': (r) => r.timings.duration < 500,
+      });
+    }
 
+    function runLogin() {
+      const user = randomUser();
       const res = http.post(
         `${BASE_URL}/auth/login`,
-        JSON.stringify({
-          email: user.email,
-          password: user.password,
-        }),
-        params
+        JSON.stringify({ email: user.email, password: user.password }),
+        { headers: JSON_HEADERS }
       );
-
       check(res, {
         'login status is 200': (r) => r.status === 200,
-        'has access_token': (r) => {
-          try { return JSON.parse(r.body).access_token !== undefined; }
-          catch(e) { return false; }
+        'login returns access token': (r) => {
+          try {
+            return JSON.parse(r.body).access_token !== undefined;
+          } catch (e) {
+            return false;
+          }
         },
-        'response time < 2000ms': (r) => r.timings.duration < 2000,
+        'login response time < 1000ms': (r) => r.timings.duration < 1000,
       });
+    }
+
+    export default function (data) {
+      if (Math.random() < AUTH_ME_THRESHOLD) {
+        runAuthMe(data);
+        return;
+      }
+      runLogin();
     }
 
 ---
 # ── k6 Script: Auth Sudden Spike ────────────────────────────────────────────
-# 50 RPS baseline → instant jump to 200 RPS at t=2min
+# BASE_RPS warm-up → instant jump to PEAK_RPS at t=2min.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -142,23 +188,33 @@ metadata:
 data:
   load-test.js: |
     import http from 'k6/http';
-    import { check, sleep } from 'k6';
+    import { check } from 'k6';
     import { SharedArray } from 'k6/data';
+
+    const BASE_RPS = parseInt(__ENV.BASE_RPS || '20', 10);
+    const PEAK_RPS = parseInt(__ENV.PEAK_RPS || '120', 10);
+    const NUM_USERS = parseInt(__ENV.NUM_TEST_USERS || '120', 10);
+    const AUTH_ME_PERCENT = parseInt(__ENV.AUTH_ME_PERCENT || '70', 10);
+    const AUTH_LOGIN_PERCENT = parseInt(__ENV.AUTH_LOGIN_PERCENT || '30', 10);
+    const MIX_TOTAL = Math.max(AUTH_ME_PERCENT + AUTH_LOGIN_PERCENT, 1);
+    const AUTH_ME_THRESHOLD = AUTH_ME_PERCENT / MIX_TOTAL;
+    const PREALLOCATED_VUS = Math.max(400, PEAK_RPS * 3);
+    const MAX_VUS = Math.max(1000, PEAK_RPS * 6);
 
     export const options = {
       scenarios: {
         sudden_spike: {
           executor: 'ramping-arrival-rate',
-          startRate: 50,
+          startRate: BASE_RPS,
           timeUnit: '1s',
-          preAllocatedVUs: 300,
-          maxVUs: 500,
+          preAllocatedVUs: PREALLOCATED_VUS,
+          maxVUs: MAX_VUS,
           stages: [
-            { duration: '2m', target: 50 },    // Warm-up at baseline (excluded)
-            { duration: '10s', target: 200 },   // Sudden spike to 200 RPS
-            { duration: '4m50s', target: 200 }, // Sustain spike
-            { duration: '2m', target: 200 },    // Continue peak
-            { duration: '3m', target: 0 },      // Cooldown observation
+            { duration: '2m', target: BASE_RPS },
+            { duration: '10s', target: PEAK_RPS },
+            { duration: '4m50s', target: PEAK_RPS },
+            { duration: '2m', target: PEAK_RPS },
+            { duration: '3m', target: 0 },
           ],
         },
       },
@@ -170,13 +226,9 @@ data:
 
     const BASE_URL = __ENV.TARGET_URL || 'http://auth-service.ecommerce.svc.cluster.local:8001';
     const GATEWAY_SECRET = __ENV.INTERNAL_GATEWAY_SECRET || '';
-    const NUM_USERS = parseInt(__ENV.NUM_TEST_USERS || '50');
-
-    const params = {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Internal-Gateway-Secret': GATEWAY_SECRET,
-      },
+    const JSON_HEADERS = {
+      'Content-Type': 'application/json',
+      'X-Internal-Gateway-Secret': GATEWAY_SECRET,
     };
 
     const testUsers = new SharedArray('users', function () {
@@ -191,13 +243,18 @@ data:
       return users;
     });
 
+    function randomUser() {
+      return testUsers[Math.floor(Math.random() * testUsers.length)];
+    }
+
     export function setup() {
-      console.log(`Seeding ${NUM_USERS} test users...`);
-      let seeded = 0;
-      let skipped = 0;
+      console.log(`Seeding and pre-authenticating ${NUM_USERS} users...`);
+      const tokens = [];
+
       for (let i = 0; i < NUM_USERS; i++) {
         const user = testUsers[i];
-        const res = http.post(
+
+        http.post(
           `${BASE_URL}/auth/register`,
           JSON.stringify({
             email: user.email,
@@ -205,36 +262,92 @@ data:
             password: user.password,
             full_name: `Load Test User ${i}`,
           }),
-          params
+          { headers: JSON_HEADERS }
         );
-        if (res.status === 201) seeded++;
-        else if (res.status === 400 || res.status === 409) skipped++;
-        else console.warn(`Failed to seed user ${i}: ${res.status} ${res.body}`);
+
+        const loginRes = http.post(
+          `${BASE_URL}/auth/login`,
+          JSON.stringify({ email: user.email, password: user.password }),
+          { headers: JSON_HEADERS }
+        );
+
+        if (loginRes.status === 200) {
+          try {
+            const body = JSON.parse(loginRes.body);
+            if (body.access_token) {
+              tokens.push(body.access_token);
+            }
+          } catch (e) {
+            console.warn(`Failed to parse login response for user ${i}`);
+          }
+        } else {
+          console.warn(`Login failed for user ${i}: ${loginRes.status}`);
+        }
       }
-      console.log(`Seeding complete: ${seeded} created, ${skipped} already existed`);
-      return { ready: true };
+
+      if (tokens.length === 0) {
+        throw new Error('No tokens obtained during setup');
+      }
+
+      console.log(`Pre-auth complete: ${tokens.length}/${NUM_USERS} tokens obtained`);
+      return { tokens };
     }
 
-    export default function (data) {
-      const user = testUsers[Math.floor(Math.random() * testUsers.length)];
+    function runAuthMe(data) {
+      const token = data.tokens[Math.floor(Math.random() * data.tokens.length)];
+      const res = http.get(
+        `${BASE_URL}/auth/me`,
+        {
+          headers: {
+            'X-Internal-Gateway-Secret': GATEWAY_SECRET,
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      check(res, {
+        'me status is 200': (r) => r.status === 200,
+        'me returns user data': (r) => {
+          try {
+            return JSON.parse(r.body).email !== undefined;
+          } catch (e) {
+            return false;
+          }
+        },
+        'me response time < 500ms': (r) => r.timings.duration < 500,
+      });
+    }
+
+    function runLogin() {
+      const user = randomUser();
       const res = http.post(
         `${BASE_URL}/auth/login`,
         JSON.stringify({ email: user.email, password: user.password }),
-        params
+        { headers: JSON_HEADERS }
       );
       check(res, {
         'login status is 200': (r) => r.status === 200,
-        'has access_token': (r) => {
-          try { return JSON.parse(r.body).access_token !== undefined; }
-          catch(e) { return false; }
+        'login returns access token': (r) => {
+          try {
+            return JSON.parse(r.body).access_token !== undefined;
+          } catch (e) {
+            return false;
+          }
         },
-        'response time < 2000ms': (r) => r.timings.duration < 2000,
+        'login response time < 1000ms': (r) => r.timings.duration < 1000,
       });
+    }
+
+    export default function (data) {
+      if (Math.random() < AUTH_ME_THRESHOLD) {
+        runAuthMe(data);
+        return;
+      }
+      runLogin();
     }
 
 ---
 # ── k6 Script: Auth Oscillating ─────────────────────────────────────────────
-# Alternating between 50 and 200 RPS every 90 seconds
+# Alternating between BASE_RPS and PEAK_RPS every 90 seconds.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -243,30 +356,40 @@ metadata:
 data:
   load-test.js: |
     import http from 'k6/http';
-    import { check, sleep } from 'k6';
+    import { check } from 'k6';
     import { SharedArray } from 'k6/data';
+
+    const BASE_RPS = parseInt(__ENV.BASE_RPS || '20', 10);
+    const PEAK_RPS = parseInt(__ENV.PEAK_RPS || '120', 10);
+    const NUM_USERS = parseInt(__ENV.NUM_TEST_USERS || '120', 10);
+    const AUTH_ME_PERCENT = parseInt(__ENV.AUTH_ME_PERCENT || '70', 10);
+    const AUTH_LOGIN_PERCENT = parseInt(__ENV.AUTH_LOGIN_PERCENT || '30', 10);
+    const MIX_TOTAL = Math.max(AUTH_ME_PERCENT + AUTH_LOGIN_PERCENT, 1);
+    const AUTH_ME_THRESHOLD = AUTH_ME_PERCENT / MIX_TOTAL;
+    const PREALLOCATED_VUS = Math.max(400, PEAK_RPS * 3);
+    const MAX_VUS = Math.max(1000, PEAK_RPS * 6);
 
     export const options = {
       scenarios: {
         oscillating: {
           executor: 'ramping-arrival-rate',
-          startRate: 50,
+          startRate: BASE_RPS,
           timeUnit: '1s',
-          preAllocatedVUs: 300,
-          maxVUs: 500,
+          preAllocatedVUs: PREALLOCATED_VUS,
+          maxVUs: MAX_VUS,
           stages: [
-            { duration: '2m', target: 50 },    // Warm-up (excluded)
-            { duration: '10s', target: 200 },   // Spike up
-            { duration: '1m20s', target: 200 }, // Hold high (90s total)
-            { duration: '10s', target: 50 },    // Drop down
-            { duration: '1m20s', target: 50 },  // Hold low (90s total)
-            { duration: '10s', target: 200 },   // Spike up
-            { duration: '1m20s', target: 200 }, // Hold high (90s total)
-            { duration: '10s', target: 50 },    // Drop down
-            { duration: '1m20s', target: 50 },  // Hold low (90s total)
-            { duration: '10s', target: 200 },   // Final spike
-            { duration: '50s', target: 200 },   // Hold high
-            { duration: '3m', target: 0 },      // Cooldown observation
+            { duration: '2m', target: BASE_RPS },
+            { duration: '10s', target: PEAK_RPS },
+            { duration: '1m20s', target: PEAK_RPS },
+            { duration: '10s', target: BASE_RPS },
+            { duration: '1m20s', target: BASE_RPS },
+            { duration: '10s', target: PEAK_RPS },
+            { duration: '1m20s', target: PEAK_RPS },
+            { duration: '10s', target: BASE_RPS },
+            { duration: '1m20s', target: BASE_RPS },
+            { duration: '10s', target: PEAK_RPS },
+            { duration: '50s', target: PEAK_RPS },
+            { duration: '3m', target: 0 },
           ],
         },
       },
@@ -278,13 +401,9 @@ data:
 
     const BASE_URL = __ENV.TARGET_URL || 'http://auth-service.ecommerce.svc.cluster.local:8001';
     const GATEWAY_SECRET = __ENV.INTERNAL_GATEWAY_SECRET || '';
-    const NUM_USERS = parseInt(__ENV.NUM_TEST_USERS || '50');
-
-    const params = {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Internal-Gateway-Secret': GATEWAY_SECRET,
-      },
+    const JSON_HEADERS = {
+      'Content-Type': 'application/json',
+      'X-Internal-Gateway-Secret': GATEWAY_SECRET,
     };
 
     const testUsers = new SharedArray('users', function () {
@@ -299,13 +418,18 @@ data:
       return users;
     });
 
+    function randomUser() {
+      return testUsers[Math.floor(Math.random() * testUsers.length)];
+    }
+
     export function setup() {
-      console.log(`Seeding ${NUM_USERS} test users...`);
-      let seeded = 0;
-      let skipped = 0;
+      console.log(`Seeding and pre-authenticating ${NUM_USERS} users...`);
+      const tokens = [];
+
       for (let i = 0; i < NUM_USERS; i++) {
         const user = testUsers[i];
-        const res = http.post(
+
+        http.post(
           `${BASE_URL}/auth/register`,
           JSON.stringify({
             email: user.email,
@@ -313,31 +437,87 @@ data:
             password: user.password,
             full_name: `Load Test User ${i}`,
           }),
-          params
+          { headers: JSON_HEADERS }
         );
-        if (res.status === 201) seeded++;
-        else if (res.status === 400 || res.status === 409) skipped++;
-        else console.warn(`Failed to seed user ${i}: ${res.status} ${res.body}`);
+
+        const loginRes = http.post(
+          `${BASE_URL}/auth/login`,
+          JSON.stringify({ email: user.email, password: user.password }),
+          { headers: JSON_HEADERS }
+        );
+
+        if (loginRes.status === 200) {
+          try {
+            const body = JSON.parse(loginRes.body);
+            if (body.access_token) {
+              tokens.push(body.access_token);
+            }
+          } catch (e) {
+            console.warn(`Failed to parse login response for user ${i}`);
+          }
+        } else {
+          console.warn(`Login failed for user ${i}: ${loginRes.status}`);
+        }
       }
-      console.log(`Seeding complete: ${seeded} created, ${skipped} already existed`);
-      return { ready: true };
+
+      if (tokens.length === 0) {
+        throw new Error('No tokens obtained during setup');
+      }
+
+      console.log(`Pre-auth complete: ${tokens.length}/${NUM_USERS} tokens obtained`);
+      return { tokens };
     }
 
-    export default function (data) {
-      const user = testUsers[Math.floor(Math.random() * testUsers.length)];
+    function runAuthMe(data) {
+      const token = data.tokens[Math.floor(Math.random() * data.tokens.length)];
+      const res = http.get(
+        `${BASE_URL}/auth/me`,
+        {
+          headers: {
+            'X-Internal-Gateway-Secret': GATEWAY_SECRET,
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      check(res, {
+        'me status is 200': (r) => r.status === 200,
+        'me returns user data': (r) => {
+          try {
+            return JSON.parse(r.body).email !== undefined;
+          } catch (e) {
+            return false;
+          }
+        },
+        'me response time < 500ms': (r) => r.timings.duration < 500,
+      });
+    }
+
+    function runLogin() {
+      const user = randomUser();
       const res = http.post(
         `${BASE_URL}/auth/login`,
         JSON.stringify({ email: user.email, password: user.password }),
-        params
+        { headers: JSON_HEADERS }
       );
       check(res, {
         'login status is 200': (r) => r.status === 200,
-        'has access_token': (r) => {
-          try { return JSON.parse(r.body).access_token !== undefined; }
-          catch(e) { return false; }
+        'login returns access token': (r) => {
+          try {
+            return JSON.parse(r.body).access_token !== undefined;
+          } catch (e) {
+            return false;
+          }
         },
-        'response time < 2000ms': (r) => r.timings.duration < 2000,
+        'login response time < 1000ms': (r) => r.timings.duration < 1000,
       });
+    }
+
+    export default function (data) {
+      if (Math.random() < AUTH_ME_THRESHOLD) {
+        runAuthMe(data);
+        return;
+      }
+      runLogin();
     }
 
 ---
@@ -361,8 +541,16 @@ spec:
           env:
             - name: TARGET_URL
               value: "http://auth-service.ecommerce.svc.cluster.local:8001"
+            - name: BASE_RPS
+              value: "20"
+            - name: PEAK_RPS
+              value: "120"
+            - name: AUTH_ME_PERCENT
+              value: "70"
+            - name: AUTH_LOGIN_PERCENT
+              value: "30"
             - name: NUM_TEST_USERS
-              value: "50"
+              value: "120"
             - name: INTERNAL_GATEWAY_SECRET
               valueFrom:
                 secretKeyRef:
@@ -370,11 +558,11 @@ spec:
                   key: internal-gateway-secret
           resources:
             requests:
-              cpu: "200m"
-              memory: "256Mi"
-            limits:
               cpu: "500m"
               memory: "512Mi"
+            limits:
+              cpu: "1500m"
+              memory: "1Gi"
           volumeMounts:
             - name: k6-script
               mountPath: /scripts
@@ -410,8 +598,16 @@ spec:
           env:
             - name: TARGET_URL
               value: "http://auth-service.ecommerce.svc.cluster.local:8001"
+            - name: BASE_RPS
+              value: "20"
+            - name: PEAK_RPS
+              value: "120"
+            - name: AUTH_ME_PERCENT
+              value: "70"
+            - name: AUTH_LOGIN_PERCENT
+              value: "30"
             - name: NUM_TEST_USERS
-              value: "50"
+              value: "120"
             - name: INTERNAL_GATEWAY_SECRET
               valueFrom:
                 secretKeyRef:
@@ -419,11 +615,11 @@ spec:
                   key: internal-gateway-secret
           resources:
             requests:
-              cpu: "200m"
-              memory: "256Mi"
-            limits:
               cpu: "500m"
               memory: "512Mi"
+            limits:
+              cpu: "1500m"
+              memory: "1Gi"
           volumeMounts:
             - name: k6-script
               mountPath: /scripts
@@ -459,8 +655,16 @@ spec:
           env:
             - name: TARGET_URL
               value: "http://auth-service.ecommerce.svc.cluster.local:8001"
+            - name: BASE_RPS
+              value: "20"
+            - name: PEAK_RPS
+              value: "120"
+            - name: AUTH_ME_PERCENT
+              value: "70"
+            - name: AUTH_LOGIN_PERCENT
+              value: "30"
             - name: NUM_TEST_USERS
-              value: "50"
+              value: "120"
             - name: INTERNAL_GATEWAY_SECRET
               valueFrom:
                 secretKeyRef:
@@ -468,11 +672,11 @@ spec:
                   key: internal-gateway-secret
           resources:
             requests:
-              cpu: "200m"
-              memory: "256Mi"
-            limits:
               cpu: "500m"
               memory: "512Mi"
+            limits:
+              cpu: "1500m"
+              memory: "1Gi"
           volumeMounts:
             - name: k6-script
               mountPath: /scripts

@@ -1,0 +1,23 @@
+LAST SEEN   TYPE      REASON                 OBJECT                                                                MESSAGE
+18m         Normal    Scheduled              pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep1-hzht8   Successfully assigned ecommerce/k6-auth-test-oscillating-auth-service-b1-oscillating-rep1-hzht8 to aks-userpool-16719200-vmss00000f
+40m         Normal    Scheduled              pod/k6-auth-test-spike-auth-service-b1-spike-rep1-kvx4n               Successfully assigned ecommerce/k6-auth-test-spike-auth-service-b1-spike-rep1-kvx4n to aks-userpool-16719200-vmss00000h
+52m         Warning   Unhealthy              pod/auth-service-b78f95fd4-pgvnk                                      Readiness probe failed: Get "http://10.244.2.81:8001/ready": dial tcp 10.244.2.81:8001: connect: connection refused
+49m         Warning   BackoffLimitExceeded   job/k6-auth-test-gradual-auth-service-b1-gradual-rep1                 Job has reached the specified backoff limit
+40m         Normal    SuccessfulCreate       job/k6-auth-test-spike-auth-service-b1-spike-rep1                     Created pod: k6-auth-test-spike-auth-service-b1-spike-rep1-kvx4n
+40m         Normal    Pulling                pod/k6-auth-test-spike-auth-service-b1-spike-rep1-kvx4n               Pulling image "grafana/k6:latest"
+40m         Normal    Created                pod/k6-auth-test-spike-auth-service-b1-spike-rep1-kvx4n               Created container: k6
+40m         Normal    Pulled                 pod/k6-auth-test-spike-auth-service-b1-spike-rep1-kvx4n               Successfully pulled image "grafana/k6:latest" in 1.428s (1.428s including waiting). Image size: 36750082 bytes.
+40m         Normal    Started                pod/k6-auth-test-spike-auth-service-b1-spike-rep1-kvx4n               Started container k6
+27m         Warning   BackoffLimitExceeded   job/k6-auth-test-spike-auth-service-b1-spike-rep1                     Job has reached the specified backoff limit
+18m         Normal    SuccessfulCreate       job/k6-auth-test-oscillating-auth-service-b1-oscillating-rep1         Created pod: k6-auth-test-oscillating-auth-service-b1-oscillating-rep1-hzht8
+18m         Normal    Pulling                pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep1-hzht8   Pulling image "grafana/k6:latest"
+18m         Normal    Pulled                 pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep1-hzht8   Successfully pulled image "grafana/k6:latest" in 1.451s (1.451s including waiting). Image size: 36750082 bytes.
+18m         Normal    Started                pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep1-hzht8   Started container k6
+18m         Normal    Created                pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep1-hzht8   Created container: k6
+15m         Normal    Pulled                 pod/auth-service-b78f95fd4-pgvnk                                      Container image "ecommerce.azurecr.io/auth-service:latest" already present on machine
+15m         Normal    Started                pod/auth-service-b78f95fd4-pgvnk                                      Started container auth-service
+15m         Normal    Created                pod/auth-service-b78f95fd4-pgvnk                                      Created container: auth-service
+12m         Warning   Unhealthy              pod/auth-service-b78f95fd4-pgvnk                                      Readiness probe failed: Get "http://10.244.2.81:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+8m8s        Normal    Killing                pod/auth-service-b78f95fd4-pgvnk                                      Container auth-service failed liveness probe, will be restarted
+7m8s        Warning   Unhealthy              pod/auth-service-b78f95fd4-pgvnk                                      Liveness probe failed: Get "http://10.244.2.81:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+5m34s       Warning   BackoffLimitExceeded   job/k6-auth-test-oscillating-auth-service-b1-oscillating-rep1         Job has reached the specified backoff limit

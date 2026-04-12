@@ -1,0 +1,17 @@
+LAST SEEN   TYPE      REASON                 OBJECT                                                                MESSAGE
+40m         Normal    Scheduled              pod/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd            Successfully assigned ecommerce/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd to aks-userpool-16719200-vmss00000h
+18m         Normal    Scheduled              pod/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg   Successfully assigned ecommerce/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg to aks-userpool-16719200-vmss00000h
+50m         Warning   BackoffLimitExceeded   job/k6-load-test-gradual-product-service-b1-gradual-rep1              Job has reached the specified backoff limit
+40m         Normal    SuccessfulCreate       job/k6-load-test-spike-product-service-b1-spike-rep1                  Created pod: k6-load-test-spike-product-service-b1-spike-rep1-mhqqd
+40m         Normal    Pulling                pod/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd            Pulling image "grafana/k6:latest"
+40m         Normal    Started                pod/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd            Started container k6
+40m         Normal    Pulled                 pod/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd            Successfully pulled image "grafana/k6:latest" in 1.473s (1.473s including waiting). Image size: 36750082 bytes.
+40m         Normal    Created                pod/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd            Created container: k6
+28m         Warning   BackoffLimitExceeded   job/k6-load-test-spike-product-service-b1-spike-rep1                  Job has reached the specified backoff limit
+18m         Normal    SuccessfulCreate       job/k6-load-test-oscillating-product-service-b1-oscillating-rep1      Created pod: k6-load-test-oscillating-product-service-b1-oscillating-re8blxg
+18m         Normal    Pulling                pod/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg   Pulling image "grafana/k6:latest"
+18m         Normal    Started                pod/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg   Started container k6
+18m         Normal    Created                pod/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg   Created container: k6
+18m         Normal    Pulled                 pod/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg   Successfully pulled image "grafana/k6:latest" in 1.436s (1.436s including waiting). Image size: 36750082 bytes.
+9m15s       Warning   Unhealthy              pod/product-service-75f4ddbd56-6nv6h                                  Readiness probe failed: Get "http://10.244.2.80:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+6m3s        Warning   BackoffLimitExceeded   job/k6-load-test-oscillating-product-service-b1-oscillating-rep1      Job has reached the specified backoff limit

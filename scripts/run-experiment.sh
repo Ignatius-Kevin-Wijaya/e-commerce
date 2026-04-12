@@ -41,10 +41,23 @@ PATTERNS=("gradual" "spike" "oscillating")
 REPETITIONS=5
 
 # Timing (seconds)
-RESET_WAIT=60        # Wait after cleanup for stabilization
+RESET_WAIT=120       # Wait after cleanup for stabilization
 STABILIZE_WAIT=90    # Wait after config apply for metrics baseline
 K6_TIMEOUT=900       # 15 min max per k6 job (12 min test + buffer)
 EXPORT_WAIT=180       # Wait before data export (3 mins for cooldown capture)
+
+# Load profile knobs (override via env for calibration ladders)
+PRODUCT_BASE_RPS="${PRODUCT_BASE_RPS:-20}"
+PRODUCT_PEAK_RPS="${PRODUCT_PEAK_RPS:-200}"
+PRODUCT_PAGE_SIZE="${PRODUCT_PAGE_SIZE:-100}"
+PRODUCT_MAX_PAGE="${PRODUCT_MAX_PAGE:-12}"
+PRODUCT_SEARCH_TERMS="${PRODUCT_SEARCH_TERMS:-Laptop,Phone,Camera,Headphones,Keyboard,Monitor,Speaker,Charger}"
+
+AUTH_BASE_RPS="${AUTH_BASE_RPS:-20}"
+AUTH_PEAK_RPS="${AUTH_PEAK_RPS:-120}"
+AUTH_ME_PERCENT="${AUTH_ME_PERCENT:-70}"
+AUTH_LOGIN_PERCENT="${AUTH_LOGIN_PERCENT:-30}"
+NUM_TEST_USERS="${NUM_TEST_USERS:-120}"
 
 # ── Color Output ──────────────────────────────────────────────────────────────
 
@@ -119,35 +132,78 @@ get_k6_job_file() {
   fi
 }
 
-# Create a k6 job by reading the local YAML template and patching the name.
-# This avoids `kubectl create --from` which fails on completed Job objects.
+# Create a k6 job by reading the local YAML template and patching the name
+# plus per-service calibration env vars.
 create_k6_job_from_yaml() {
-  local yaml_file=$1 template_name=$2 new_name=$3
-  python3 - <<PYEOF
+  local yaml_file=$1 template_name=$2 new_name=$3 service=$4
+  K6_YAML_FILE="${yaml_file}" \
+  K6_TEMPLATE_NAME="${template_name}" \
+  K6_NEW_NAME="${new_name}" \
+  K6_SERVICE="${service}" \
+  PRODUCT_BASE_RPS="${PRODUCT_BASE_RPS}" \
+  PRODUCT_PEAK_RPS="${PRODUCT_PEAK_RPS}" \
+  PRODUCT_PAGE_SIZE="${PRODUCT_PAGE_SIZE}" \
+  PRODUCT_MAX_PAGE="${PRODUCT_MAX_PAGE}" \
+  PRODUCT_SEARCH_TERMS="${PRODUCT_SEARCH_TERMS}" \
+  AUTH_BASE_RPS="${AUTH_BASE_RPS}" \
+  AUTH_PEAK_RPS="${AUTH_PEAK_RPS}" \
+  AUTH_ME_PERCENT="${AUTH_ME_PERCENT}" \
+  AUTH_LOGIN_PERCENT="${AUTH_LOGIN_PERCENT}" \
+  NUM_TEST_USERS="${NUM_TEST_USERS}" \
+  python3 - <<'PYEOF'
+import os
 import sys
+
 try:
     import yaml
 except ImportError:
-    # Fallback: parse with basic sed-like approach if pyyaml not available
     sys.exit(1)
 
-with open('${yaml_file}') as f:
-    content = f.read()
 
-docs = list(yaml.safe_load_all(content))
+def set_env(env_list, name, value):
+    for item in env_list:
+        if item.get("name") == name:
+            item["value"] = str(value)
+            item.pop("valueFrom", None)
+            return
+    env_list.append({"name": name, "value": str(value)})
+
+
+yaml_file = os.environ["K6_YAML_FILE"]
+template_name = os.environ["K6_TEMPLATE_NAME"]
+new_name = os.environ["K6_NEW_NAME"]
+service = os.environ["K6_SERVICE"]
+
+with open(yaml_file) as f:
+    docs = list(yaml.safe_load_all(f))
+
 for doc in docs:
-    if doc and doc.get('kind') == 'Job' and doc.get('metadata', {}).get('name') == '${template_name}':
-        doc['metadata']['name'] = '${new_name}'
-        # Strip cluster-managed fields that would cause conflicts
-        for field in ('resourceVersion', 'uid', 'creationTimestamp', 'generation',
-                      'selfLink', 'annotations'):
-            doc['metadata'].pop(field, None)
-        if 'status' in doc:
-            del doc['status']
-        print(yaml.dump(doc, default_flow_style=False))
+    if doc and doc.get("kind") == "Job" and doc.get("metadata", {}).get("name") == template_name:
+        doc["metadata"]["name"] = new_name
+        for field in ("resourceVersion", "uid", "creationTimestamp", "generation", "selfLink", "annotations"):
+            doc["metadata"].pop(field, None)
+        doc.pop("status", None)
+
+        container = doc["spec"]["template"]["spec"]["containers"][0]
+        env_list = container.setdefault("env", [])
+
+        if service == "product-service":
+            set_env(env_list, "BASE_RPS", os.environ["PRODUCT_BASE_RPS"])
+            set_env(env_list, "PEAK_RPS", os.environ["PRODUCT_PEAK_RPS"])
+            set_env(env_list, "PRODUCT_PAGE_SIZE", os.environ["PRODUCT_PAGE_SIZE"])
+            set_env(env_list, "PRODUCT_MAX_PAGE", os.environ["PRODUCT_MAX_PAGE"])
+            set_env(env_list, "PRODUCT_SEARCH_TERMS", os.environ["PRODUCT_SEARCH_TERMS"])
+        else:
+            set_env(env_list, "BASE_RPS", os.environ["AUTH_BASE_RPS"])
+            set_env(env_list, "PEAK_RPS", os.environ["AUTH_PEAK_RPS"])
+            set_env(env_list, "AUTH_ME_PERCENT", os.environ["AUTH_ME_PERCENT"])
+            set_env(env_list, "AUTH_LOGIN_PERCENT", os.environ["AUTH_LOGIN_PERCENT"])
+            set_env(env_list, "NUM_TEST_USERS", os.environ["NUM_TEST_USERS"])
+
+        print(yaml.dump(doc, default_flow_style=False, sort_keys=False))
         sys.exit(0)
 
-print(f"ERROR: Job template '${template_name}' not found in ${yaml_file}", file=sys.stderr)
+print(f"ERROR: Job template '{template_name}' not found in {yaml_file}", file=sys.stderr)
 sys.exit(1)
 PYEOF
 }
@@ -184,36 +240,132 @@ config_type() {
   esac
 }
 
+expected_replicas() {
+  local config=$1
+  if [[ "${config}" == "b2" ]]; then
+    echo 5
+  else
+    echo 1
+  fi
+}
+
+service_port() {
+  local service=$1
+  case "${service}" in
+    auth-service) echo 8001 ;;
+    product-service) echo 8002 ;;
+    cart-service) echo 8003 ;;
+    order-service) echo 8004 ;;
+    payment-service) echo 8005 ;;
+    api-gateway) echo 8080 ;;
+    *)
+      log_error "Unknown service port mapping for ${service}"
+      return 1
+      ;;
+  esac
+}
+
+service_base_rps() {
+  local service=$1
+  if [[ "${service}" == "product-service" ]]; then
+    echo "${PRODUCT_BASE_RPS}"
+  else
+    echo "${AUTH_BASE_RPS}"
+  fi
+}
+
+service_peak_rps() {
+  local service=$1
+  if [[ "${service}" == "product-service" ]]; then
+    echo "${PRODUCT_PEAK_RPS}"
+  else
+    echo "${AUTH_PEAK_RPS}"
+  fi
+}
+
+wait_for_expected_replicas() {
+  local service=$1 expected=$2 timeout=${3:-180} phase=${4:-"verification"}
+  local deadline=$((SECONDS + timeout))
+
+  while (( SECONDS < deadline )); do
+    local spec_replicas ready_replicas available_replicas bad_pods
+    spec_replicas=$(kubectl get deployment "${service}" -n "${NAMESPACE}" -o jsonpath='{.spec.replicas}' 2>/dev/null || echo 0)
+    ready_replicas=$(kubectl get deployment "${service}" -n "${NAMESPACE}" -o jsonpath='{.status.readyReplicas}' 2>/dev/null || echo 0)
+    available_replicas=$(kubectl get deployment "${service}" -n "${NAMESPACE}" -o jsonpath='{.status.availableReplicas}' 2>/dev/null || echo 0)
+    bad_pods=$(kubectl get pods -n "${NAMESPACE}" -l "app=${service}" --no-headers 2>/dev/null | awk 'NF > 0 && $3 !~ /Running|Completed/ {count++} END {print count+0}')
+
+    if [[ "${spec_replicas}" == "${expected}" && "${ready_replicas:-0}" == "${expected}" && "${available_replicas:-0}" == "${expected}" && "${bad_pods}" == "0" ]]; then
+      log_success "${service} reached ${expected}/${expected} ready replicas during ${phase}"
+      return 0
+    fi
+
+    sleep 5
+  done
+
+  log_error "${service} failed ${phase}: expected ${expected} ready replicas"
+  kubectl get deployment "${service}" -n "${NAMESPACE}" -o wide >&2 || true
+  kubectl get pods -n "${NAMESPACE}" -l "app=${service}" -o wide >&2 || true
+  return 1
+}
+
+delete_k6_jobs() {
+  log_step "Deleting leftover k6 jobs..."
+  kubectl delete job -n "${NAMESPACE}" -l app=k6 --ignore-not-found &>/dev/null || true
+  kubectl wait --for=delete job -n "${NAMESPACE}" -l app=k6 --timeout=120s &>/dev/null || true
+}
+
+apply_k6_configmaps() {
+  log_step "Refreshing k6 ConfigMaps from local manifests..."
+
+  local k6_files=(
+    "infrastructure/kubernetes/load-testing/k6-job.yaml"
+    "infrastructure/kubernetes/load-testing/k6-auth-job.yaml"
+  )
+
+  local k6_file
+  for k6_file in "${k6_files[@]}"; do
+    K6_YAML_FILE="${k6_file}" python3 - <<'PYEOF' | kubectl apply -f - -n "${NAMESPACE}" >&2
+import os
+from pathlib import Path
+
+content = Path(os.environ["K6_YAML_FILE"]).read_text()
+docs = [doc.strip() for doc in content.split("---") if doc.strip()]
+
+for doc in docs:
+    if "\nkind: ConfigMap" in f"\n{doc}\n":
+        print("---")
+        print(doc)
+PYEOF
+  done
+}
+
 # ── Cluster Reset ─────────────────────────────────────────────────────────────
 
 cleanup_autoscalers() {
   local service=$1
   log_step "Cleaning up all autoscalers for ${service}..."
 
-  # Delete ANY existing HPA for this service
-  kubectl delete hpa -n "${NAMESPACE}" -l app="${service}" --ignore-not-found &>/dev/null || true
-  # Also delete by known names
-  kubectl delete hpa "${service}-hpa-default" -n "${NAMESPACE}" --ignore-not-found &>/dev/null || true
-  kubectl delete hpa "${service}-hpa-tuned" -n "${NAMESPACE}" --ignore-not-found &>/dev/null || true
-  kubectl delete hpa "${service}-hpa-custom" -n "${NAMESPACE}" --ignore-not-found &>/dev/null || true
+  local hpas=(
+    "${service}-hpa-default"
+    "${service}-hpa-tuned"
+    "${service}-hpa-custom"
+    "keda-hpa-${service}-keda"
+  )
+  local hpa
+  for hpa in "${hpas[@]}"; do
+    kubectl delete hpa "${hpa}" -n "${NAMESPACE}" --ignore-not-found &>/dev/null || true
+    kubectl wait --for=delete "hpa/${hpa}" -n "${NAMESPACE}" --timeout=60s &>/dev/null || true
+  done
 
-  # Delete ANY existing KEDA ScaledObject for this service
   kubectl delete scaledobject "${service}-keda" -n "${NAMESPACE}" --ignore-not-found &>/dev/null || true
+  kubectl wait --for=delete "scaledobject/${service}-keda" -n "${NAMESPACE}" --timeout=60s &>/dev/null || true
 
   # Reset deployment to 1 replica
   kubectl scale deployment "${service}" -n "${NAMESPACE}" --replicas=1 &>/dev/null || true
 
-  # Wait for scale-down to complete
-  log_step "Waiting for ${service} to scale down to 1 replica..."
-  kubectl rollout status deployment/"${service}" -n "${NAMESPACE}" --timeout=120s &>/dev/null || true
-
-  # Verify pod count
-  local pod_count
-  pod_count=$(kubectl get pods -n "${NAMESPACE}" -l "app=${service}" --field-selector=status.phase=Running --no-headers 2>/dev/null | wc -l)
-  if [[ "${pod_count}" -gt 1 ]]; then
-    log_warn "Expected 1 pod for ${service}, found ${pod_count}. Waiting extra 30s..."
-    sleep 30
-  fi
+  log_step "Waiting for ${service} to return to the 1-replica baseline..."
+  kubectl rollout status deployment/"${service}" -n "${NAMESPACE}" --timeout=180s &>/dev/null
+  wait_for_expected_replicas "${service}" 1 180 "cleanup"
 }
 
 reset_cluster_state() {
@@ -221,29 +373,12 @@ reset_cluster_state() {
   log_step "Resetting cluster state for ${service}..."
 
   cleanup_autoscalers "${service}"
-
-  # Delete leftover EXPERIMENT k6 jobs only (NOT the base templates)
-  # Template jobs have short names like "k6-load-test-gradual"
-  # Experiment jobs have long names like "k6-load-test-gradual-product-service-b1-gradual-rep1"
-  local templates=("k6-load-test-gradual" "k6-load-test-spike" "k6-load-test-oscillating"
-                   "k6-auth-test-gradual" "k6-auth-test-spike" "k6-auth-test-oscillating")
-  local all_jobs
-  all_jobs=$(kubectl get jobs -n "${NAMESPACE}" -l app=k6 --no-headers -o custom-columns=":metadata.name" 2>/dev/null || true)
-  for job in ${all_jobs}; do
-    local is_template=false
-    for tmpl in "${templates[@]}"; do
-      if [[ "${job}" == "${tmpl}" ]]; then
-        is_template=true
-        break
-      fi
-    done
-    if ! ${is_template}; then
-      kubectl delete job "${job}" -n "${NAMESPACE}" --ignore-not-found &>/dev/null || true
-    fi
-  done
+  delete_k6_jobs
 
   log_step "Waiting ${RESET_WAIT}s for cluster stabilization..."
   sleep "${RESET_WAIT}"
+
+  wait_for_expected_replicas "${service}" 1 180 "post-reset stabilization"
 
   log_success "Cluster state reset complete for ${service}"
 }
@@ -259,6 +394,8 @@ apply_config() {
   local config_path="${config_dir}/${config_filename}"
   local ctype
   ctype=$(config_type "${config}")
+  local expected
+  expected=$(expected_replicas "${config}")
 
   log_step "Applying configuration: ${config} (${config_filename}) for ${service}"
 
@@ -266,26 +403,29 @@ apply_config() {
     deployment)
       # B1/B2: Apply the deployment override (replicas:1 or replicas:5)
       kubectl apply -f "${config_path}" -n "${NAMESPACE}" &>/dev/null
-      kubectl rollout status deployment/"${service}" -n "${NAMESPACE}" --timeout=120s &>/dev/null
+      kubectl rollout status deployment/"${service}" -n "${NAMESPACE}" --timeout=180s &>/dev/null
       ;;
     hpa)
       # H1/H2/H3: First ensure replicas=1, then apply HPA
       local b1_path="${config_dir}/b1-underprovisioned.yaml"
       kubectl apply -f "${b1_path}" -n "${NAMESPACE}" &>/dev/null
-      kubectl rollout status deployment/"${service}" -n "${NAMESPACE}" --timeout=120s &>/dev/null
+      kubectl rollout status deployment/"${service}" -n "${NAMESPACE}" --timeout=180s &>/dev/null
       kubectl apply -f "${config_path}" -n "${NAMESPACE}" &>/dev/null
       ;;
     keda)
       # K1: First ensure replicas=1, then apply ScaledObject
       local b1_path="${config_dir}/b1-underprovisioned.yaml"
       kubectl apply -f "${b1_path}" -n "${NAMESPACE}" &>/dev/null
-      kubectl rollout status deployment/"${service}" -n "${NAMESPACE}" --timeout=120s &>/dev/null
+      kubectl rollout status deployment/"${service}" -n "${NAMESPACE}" --timeout=180s &>/dev/null
       kubectl apply -f "${config_path}" -n "${NAMESPACE}" &>/dev/null
       ;;
   esac
 
+  wait_for_expected_replicas "${service}" "${expected}" 180 "config apply (${config})"
+
   log_step "Waiting ${STABILIZE_WAIT}s for metrics to baseline..."
   sleep "${STABILIZE_WAIT}"
+  wait_for_expected_replicas "${service}" "${expected}" 180 "post-config stabilization (${config})"
 
   log_success "Configuration ${config} applied for ${service}"
 }
@@ -294,38 +434,33 @@ apply_config() {
 
 verify_readiness() {
   local service=$1
-  log_step "Pre-flight: verifying api-gateway and ${service} are ready..."
+  local port
+  port=$(service_port "${service}")
+  log_step "Pre-flight: verifying ${service} is ready on /ready..."
 
-  # 1. Ensure the api-gateway deployment is fully rolled out
-  if ! kubectl rollout status deployment/api-gateway -n "${NAMESPACE}" --timeout=120s &>/dev/null; then
-    log_warn "api-gateway did not become ready within 120s — test results may be affected"
-  fi
+  kubectl rollout status deployment/"${service}" -n "${NAMESPACE}" --timeout=180s &>/dev/null
 
-  # 2. Ensure the target service deployment is fully rolled out
-  if ! kubectl rollout status deployment/"${service}" -n "${NAMESPACE}" --timeout=120s &>/dev/null; then
-    log_warn "${service} did not become ready within 120s — test results may be affected"
-  fi
-
-  # 3. Active health check: hit the api-gateway /health endpoint from inside the cluster
-  local gw_healthy=false
+  local svc_healthy=false
   local retries=0
-  local max_retries=12  # 12 × 5s = 60s max
+  local max_retries=12
   while [[ ${retries} -lt ${max_retries} ]]; do
-    if kubectl exec -n "${NAMESPACE}" deploy/api-gateway -- \
-        wget -q -O /dev/null --timeout=5 http://localhost:8080/health &>/dev/null; then
-      gw_healthy=true
+    if kubectl exec -n "${NAMESPACE}" deploy/"${service}" -- \
+        python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:${port}/ready', timeout=5)" &>/dev/null; then
+      svc_healthy=true
       break
     fi
     retries=$((retries + 1))
-    log_step "  api-gateway health check attempt ${retries}/${max_retries}..."
+    log_step "  ${service} /ready check attempt ${retries}/${max_retries}..."
     sleep 5
   done
 
-  if ${gw_healthy}; then
-    log_success "Pre-flight passed: api-gateway and ${service} are healthy"
-  else
-    log_warn "api-gateway health check failed after ${max_retries} attempts — proceeding anyway"
+  if ! ${svc_healthy}; then
+    log_error "${service} failed /ready verification after ${max_retries} attempts"
+    kubectl get pods -n "${NAMESPACE}" -l "app=${service}" -o wide >&2 || true
+    return 1
   fi
+
+  log_success "Pre-flight passed: ${service} is ready"
 }
 
 # ── Run k6 Load Test ──────────────────────────────────────────────────────────
@@ -352,7 +487,7 @@ run_k6_test() {
   k6_yaml_file=$(get_k6_job_file "${service}")
   local job_created=false
 
-  if create_k6_job_from_yaml "${k6_yaml_file}" "${job_base_name}" "${job_run_name}" \
+  if create_k6_job_from_yaml "${k6_yaml_file}" "${job_base_name}" "${job_run_name}" "${service}" \
       | kubectl apply -f - -n "${NAMESPACE}" >&2; then
     job_created=true
   else
@@ -476,8 +611,11 @@ execute_single_run() {
   local rid
   rid=$(run_id "${service}" "${config}" "${pattern}" "${rep}")
 
-  # Create results directory
-  local results_dir="${RESULTS_BASE_DIR}/${service}/${config}/${pattern}/rep${rep}"
+  # Write to a temporary directory first so interrupted runs cannot corrupt
+  # a previously valid result set for the same run id.
+  local final_results_dir="${RESULTS_BASE_DIR}/${service}/${config}/${pattern}/rep${rep}"
+  local temp_results_root="${RESULTS_BASE_DIR}/.tmp"
+  local results_dir="${temp_results_root}/${rid}-$(date +%s)"
   mkdir -p "${results_dir}"
 
   # Record start time
@@ -528,9 +666,24 @@ execute_single_run() {
   "end_epoch": ${run_end},
   "duration_seconds": ${run_duration},
   "k6_job_name": "${job_name}",
+  "target_url": "http://${service}.${NAMESPACE}.svc.cluster.local:$(service_port "${service}")",
+  "load_profile": {
+    "version": "recovery-v2",
+    "base_rps": $(service_base_rps "${service}"),
+    "peak_rps": $(service_peak_rps "${service}")$(if [[ "${service}" == "product-service" ]]; then
+      printf ',\n    "page_size": %s,\n    "max_page": %s,\n    "search_terms": "%s"' "${PRODUCT_PAGE_SIZE}" "${PRODUCT_MAX_PAGE}" "${PRODUCT_SEARCH_TERMS}"
+    else
+      printf ',\n    "auth_me_percent": %s,\n    "auth_login_percent": %s,\n    "num_test_users": %s' "${AUTH_ME_PERCENT}" "${AUTH_LOGIN_PERCENT}" "${NUM_TEST_USERS}"
+    fi)
+  },
   "timestamp": "$(date -Iseconds)"
 }
 EOF
+
+  mkdir -p "$(dirname "${final_results_dir}")"
+  rm -rf "${final_results_dir}"
+  mv "${results_dir}" "${final_results_dir}"
+  results_dir="${final_results_dir}"
 
   # Step 7: Cleanup k6 job
   kubectl delete job "${job_name}" -n "${NAMESPACE}" --ignore-not-found 2>/dev/null || true
@@ -547,6 +700,7 @@ EOF
 main() {
   local filter_service=""
   local filter_config=""
+  local filter_pattern=""
   local resume=false
   local dry_run=false
 
@@ -555,6 +709,7 @@ main() {
     case $1 in
       --service)    filter_service="$2"; shift 2 ;;
       --config)     filter_config="$2"; shift 2 ;;
+      --pattern)    filter_pattern="$2"; shift 2 ;;
       --resume)     resume=true; shift ;;
       --first)      REPETITIONS=1; shift ;;
       --dry-run)    dry_run=true; shift ;;
@@ -564,6 +719,7 @@ main() {
         echo "Options:"
         echo "  --service NAME     Only run for specific service (product-service|auth-service)"
         echo "  --config  NAME     Only run specific config (b1|b2|h1|h2|h3|k1)"
+        echo "  --pattern NAME     Only run specific pattern (gradual|spike|oscillating)"
         echo "  --resume           Resume from last completed run"
         echo "  --first            Run only the 1st repetition for everything (override)"
         echo "  --dry-run          Print execution plan without running"
@@ -593,6 +749,7 @@ main() {
     for config in "${CONFIGS[@]}"; do
       [[ -n "${filter_config}" && "${config}" != "${filter_config}" ]] && continue
       for pattern in "${PATTERNS[@]}"; do
+        [[ -n "${filter_pattern}" && "${pattern}" != "${filter_pattern}" ]] && continue
         for ((rep=1; rep<=REPETITIONS; rep++)); do
           local rid
           rid=$(run_id "${service}" "${config}" "${pattern}" "${rep}")
@@ -618,6 +775,8 @@ main() {
   log "  Already done:   ${skipped_runs}"
   log "  Pending:        ${pending_runs}"
   log "  Estimated time: ${est_time}"
+  log "  Product load:   base=${PRODUCT_BASE_RPS} peak=${PRODUCT_PEAK_RPS} page_size=${PRODUCT_PAGE_SIZE} max_page=${PRODUCT_MAX_PAGE}"
+  log "  Auth load:      base=${AUTH_BASE_RPS} peak=${AUTH_PEAK_RPS} me=${AUTH_ME_PERCENT}% login=${AUTH_LOGIN_PERCENT}% users=${NUM_TEST_USERS}"
   log ""
 
   if ${dry_run}; then
@@ -643,17 +802,8 @@ main() {
     exit 1
   fi
 
-  # Verify k6 job templates exist
-  for service in "${SERVICES[@]}"; do
-    [[ -n "${filter_service}" && "${service}" != "${filter_service}" ]] && continue
-    local k6_file
-    k6_file=$(get_k6_job_file "${service}")
-    if ! kubectl get configmap -n "${NAMESPACE}" "k6-script-gradual" &>/dev/null && \
-       ! kubectl get configmap -n "${NAMESPACE}" "k6-auth-script-gradual" &>/dev/null; then
-      log_warn "k6 ConfigMaps not found. Applying k6 job templates..."
-      kubectl apply -f "${k6_file}" -n "${NAMESPACE}"
-    fi
-  done
+  delete_k6_jobs
+  apply_k6_configmaps
   log_success "Cluster connectivity verified"
 
   # Execute runs

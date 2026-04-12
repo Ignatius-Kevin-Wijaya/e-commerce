@@ -5,21 +5,23 @@ LEARNING NOTES:
 - NEVER store passwords in plaintext!
 - bcrypt automatically handles salting (random data mixed into the hash).
 - The "rounds" parameter controls how slow hashing is — slower = harder to brute-force.
-- passlib wraps bcrypt and provides a clean verify API.
+- We use native bcrypt directly instead of passlib to avoid compatibility bugs.
 """
 
-from passlib.context import CryptContext
-
-# schemes=["bcrypt"] means we use bcrypt for hashing
-# deprecated="auto" means old schemes auto-upgrade on next login
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+import bcrypt
 
 
 def hash_password(plain_password: str) -> str:
     """Hash a plaintext password. Returns a bcrypt hash string."""
-    return pwd_context.hash(plain_password)
+    # rounds=6 gives ~8ms hash time, perfect for generating 65% CPU load at test target RPS
+    salt = bcrypt.gensalt(rounds=6)
+    hashed_bytes = bcrypt.hashpw(plain_password.encode('utf-8'), salt)
+    return hashed_bytes.decode('utf-8')
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Check if a plaintext password matches a stored hash."""
-    return pwd_context.verify(plain_password, hashed_password)
+    return bcrypt.checkpw(
+        plain_password.encode('utf-8'),
+        hashed_password.encode('utf-8')
+    )

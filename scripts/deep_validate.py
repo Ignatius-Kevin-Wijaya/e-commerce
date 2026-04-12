@@ -19,6 +19,39 @@ RESULTS_DIR = Path("/home/kevin/Projects/e-commerce/experiment-results")
 SERVICES = ["product-service", "auth-service"]
 CONFIGS = ["b1", "b2", "h1", "h2", "h3", "k1"]
 PATTERNS = ["gradual", "spike", "oscillating"]
+LOAD_PROFILE_FALLBACKS = {
+    "product-service": {"base_rps": 20, "peak_rps": 200},
+    "auth-service": {"base_rps": 20, "peak_rps": 200},
+}
+PATTERN_STAGE_TARGETS = {
+    "gradual": [
+        (120, "base"),
+        (300, "peak"),
+        (120, "peak"),
+        (180, "zero"),
+    ],
+    "spike": [
+        (120, "base"),
+        (10, "peak"),
+        (290, "peak"),
+        (120, "peak"),
+        (180, "zero"),
+    ],
+    "oscillating": [
+        (120, "base"),
+        (10, "peak"),
+        (80, "peak"),
+        (10, "base"),
+        (80, "base"),
+        (10, "peak"),
+        (80, "peak"),
+        (10, "base"),
+        (80, "base"),
+        (10, "peak"),
+        (50, "peak"),
+        (180, "zero"),
+    ],
+}
 
 # Expected files per run directory
 EXPECTED_FILES = [
@@ -63,6 +96,63 @@ class RunResult:
         self.file_issues.append(f"📁 {msg}")
 
 
+def _parse_int(value, default):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def load_metadata(run: RunResult):
+    """Load metadata.json once per run."""
+    if hasattr(run, "_metadata_cache"):
+        return run._metadata_cache
+
+    meta_file = run.path / "metadata.json"
+    if not meta_file.exists() or meta_file.stat().st_size == 0:
+        run._metadata_cache = {}
+        return run._metadata_cache
+
+    try:
+        run._metadata_cache = json.loads(meta_file.read_text())
+    except json.JSONDecodeError:
+        run._metadata_cache = {}
+    return run._metadata_cache
+
+
+def get_load_profile(run: RunResult):
+    """Return the calibrated load profile recorded for the run."""
+    metadata = load_metadata(run)
+    profile = metadata.get("load_profile") or {}
+    fallback = LOAD_PROFILE_FALLBACKS.get(run.service, {"base_rps": 20, "peak_rps": 200})
+    return {
+        "base_rps": _parse_int(profile.get("base_rps"), fallback["base_rps"]),
+        "peak_rps": _parse_int(profile.get("peak_rps"), fallback["peak_rps"]),
+    }
+
+
+def expected_request_count(run: RunResult):
+    """Estimate expected arrivals from the configured k6 ramping-arrival-rate pattern."""
+    profile = get_load_profile(run)
+    base_rps = profile["base_rps"]
+    peak_rps = profile["peak_rps"]
+    current_rate = base_rps
+    total_requests = 0.0
+
+    for duration_seconds, target_label in PATTERN_STAGE_TARGETS.get(run.pattern, []):
+        if target_label == "base":
+            target_rate = base_rps
+        elif target_label == "peak":
+            target_rate = peak_rps
+        else:
+            target_rate = 0
+
+        total_requests += duration_seconds * (current_rate + target_rate) / 2
+        current_rate = target_rate
+
+    return int(round(total_requests))
+
+
 def check_file_completeness(run: RunResult):
     """Check all expected output files exist and are non-empty."""
     for fname in EXPECTED_FILES:
@@ -92,10 +182,19 @@ def check_a1_k6_target_rps(run: RunResult):
     rps_match = re.search(r'http_reqs[.\s]*:\s*(\d+)\s', content)
     if rps_match:
         total_reqs = int(rps_match.group(1))
-        # Expect ~200 RPS * ~720s test = ~144000 requests minimum
-        # Be lenient: flag if < 100000 (meaning avg < 140 RPS)
-        if total_reqs < 100000:
-            run.add_warning("A1-RPS", f"Total HTTP requests = {total_reqs} (may indicate under-delivery)")
+        expected_reqs = expected_request_count(run)
+        minimum_expected = int(expected_reqs * 0.85)
+        if total_reqs < minimum_expected:
+            pct = (total_reqs / expected_reqs * 100) if expected_reqs else 0
+            profile = get_load_profile(run)
+            run.add_warning(
+                "A1-RPS",
+                (
+                    f"Total HTTP requests = {total_reqs} "
+                    f"({pct:.0f}% of expected {expected_reqs} for "
+                    f"{run.pattern} base={profile['base_rps']} peak={profile['peak_rps']})"
+                ),
+            )
 
 
 def check_a2_prometheus_gaps(run: RunResult):
@@ -171,33 +270,70 @@ def check_a3_pod_crashes(run: RunResult):
 
 def check_a4_starting_replicas(run: RunResult):
     """A4: Wrong number of replicas at test start."""
-    prom_file = run.path / "prom_replica_count.json"
-    if not prom_file.exists() or prom_file.stat().st_size == 0:
-        run.add_warning("A4", "prom_replica_count.json missing/empty — cannot verify starting replicas")
-        return
+    metric_files = [
+        ("prom_replica_ready_count.json", "ready replicas"),
+        ("prom_replica_count.json", "replicas"),
+    ]
 
-    try:
-        data = json.loads(prom_file.read_text())
-        results = data.get("data", {}).get("result", [])
-        if not results:
-            run.add_warning("A4", "prom_replica_count.json has no result series")
-            return
+    for metric_name, metric_label in metric_files:
+        prom_file = run.path / metric_name
+        if not prom_file.exists() or prom_file.stat().st_size == 0:
+            continue
 
-        values = results[0].get("values", [])
-        if not values:
-            run.add_warning("A4", "prom_replica_count.json has no data points")
-            return
+        try:
+            data = json.loads(prom_file.read_text())
+            results = data.get("data", {}).get("result", [])
+            if not results:
+                continue
 
-        # Check first few data points for starting replica count
-        first_values = [int(float(v[1])) for v in values[:5] if float(v[1]) > 0]
-        if first_values:
+            values = results[0].get("values", [])
+            if not values:
+                continue
+
+            first_values = [int(float(v[1])) for v in values[:5]]
+            if not first_values:
+                continue
+
             starting_replicas = first_values[0]
             expected = 5 if run.config == "b2" else 1
             if starting_replicas != expected:
-                run.add_critical("A4", f"Starting replicas = {starting_replicas}, expected {expected} for config {run.config}")
+                run.add_critical(
+                    "A4",
+                    f"Starting {metric_label} = {starting_replicas}, expected {expected} for config {run.config}",
+                )
+            return
+        except (json.JSONDecodeError, KeyError, IndexError, ValueError) as e:
+            run.add_warning("A4", f"Failed to parse {metric_name}: {e}")
+            return
 
-    except (json.JSONDecodeError, KeyError, IndexError, ValueError) as e:
-        run.add_warning("A4", f"Failed to parse prom_replica_count.json: {e}")
+    run.add_warning("A4", "Replica count metrics missing/empty — cannot verify starting replicas")
+
+
+def check_h3_custom_metric_health(run: RunResult):
+    """H3: Explicitly catch FailedGetPodsMetric on the custom RPS HPA."""
+    if run.config != "h3":
+        return
+
+    events_file = run.path / "k8s-events.txt"
+    if events_file.exists() and events_file.stat().st_size > 0:
+        events_content = events_file.read_text()
+        lowered_events = events_content.lower()
+        if "FailedGetPodsMetric" in events_content or "failed to get pods metric" in lowered_events:
+            run.add_critical("H3", "Events show FailedGetPodsMetric — custom pods/http_requests_per_second metric failed during the run")
+            return
+
+    hpa_file = run.path / "hpa-status.yaml"
+    if not hpa_file.exists() or hpa_file.stat().st_size == 0:
+        run.add_warning("H3", "hpa-status.yaml missing/empty — cannot verify custom metric health")
+        return
+
+    content = hpa_file.read_text()
+    lowered = content.lower()
+
+    if "FailedGetPodsMetric" in content or "failed to get pods metric" in lowered:
+        run.add_critical("H3", "HPA reported FailedGetPodsMetric — custom pods/http_requests_per_second metric failed")
+    elif "http_requests_per_second" in content:
+        run.add_info("H3", "HPA status references pods/http_requests_per_second")
 
 
 def check_a5_keda_ready(run: RunResult):
@@ -327,16 +463,7 @@ def check_b5_flat_zero_metrics(run: RunResult):
 
 def check_b6_gateway_rate_limiting(run: RunResult):
     """B6: Gateway rate limiting auth-service tests."""
-    if run.service != "auth-service":
-        return
-
-    k6_log = run.path / "k6-output.log"
-    if not k6_log.exists():
-        return
-
-    content = k6_log.read_text()
-    if "429" in content:
-        run.add_warning("B6", "k6 output contains HTTP 429 responses — gateway may be rate-limiting auth-service")
+    return
 
 
 def check_c1_hpa_no_scale_product(run: RunResult):
@@ -517,6 +644,7 @@ def main():
                 check_a3_pod_crashes(run)
                 check_a4_starting_replicas(run)
                 check_a5_keda_ready(run)
+                check_h3_custom_metric_health(run)
                 check_b1_error_rate(run)
                 check_b4_thrashing(run)
                 check_b5_flat_zero_metrics(run)

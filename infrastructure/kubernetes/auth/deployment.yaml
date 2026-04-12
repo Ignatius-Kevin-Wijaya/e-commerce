@@ -18,7 +18,7 @@ spec:
       containers:
         - name: auth-service
           image: ecommerce.azurecr.io/auth-service:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8001
           env:
@@ -59,10 +59,18 @@ spec:
               path: /health
               port: 8001
             initialDelaySeconds: 10
-            periodSeconds: 15
+            # periodSeconds=20, timeoutSeconds=10: gives /health enough time to
+            # respond when the event loop is busy processing bcrypt (9.7ms each).
+            # At 80 RPS peak / 1 pod (~155% CPU), probe can still complete in <10s.
+            # failureThreshold=6 = 120s tolerance before restart (prevents false kills).
+            periodSeconds: 20
+            timeoutSeconds: 10
+            failureThreshold: 6
           readinessProbe:
             httpGet:
               path: /ready
               port: 8001
             initialDelaySeconds: 5
             periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3

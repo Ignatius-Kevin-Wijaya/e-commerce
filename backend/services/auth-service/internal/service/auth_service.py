@@ -8,6 +8,7 @@ LEARNING NOTES:
 - This separation lets you reuse the same logic in CLI tools, workers, etc.
 """
 
+import asyncio
 from datetime import datetime, timedelta
 from typing import Optional
 from uuid import UUID
@@ -57,11 +58,12 @@ class AuthService:
         if len(password) < 8:
             raise AuthServiceError("Password must be at least 8 characters")
 
-        # Create user with hashed password
+        # Create user with hashed password (offloaded to thread to unblock event loop)
+        hashed = await asyncio.to_thread(hash_password, password)
         user = User(
             email=email,
             username=username,
-            hashed_password=hash_password(password),
+            hashed_password=hashed,
             full_name=full_name,
         )
         return await self.user_repo.create(user)
@@ -78,7 +80,7 @@ class AuthService:
         Returns: {"access_token": "...", "refresh_token": "...", "token_type": "bearer"}
         """
         user = await self.user_repo.find_by_email(email)
-        if not user or not verify_password(password, user.hashed_password):
+        if not user or not await asyncio.to_thread(verify_password, password, user.hashed_password):
             raise AuthServiceError("Invalid email or password", 401)
 
         if not user.is_active:

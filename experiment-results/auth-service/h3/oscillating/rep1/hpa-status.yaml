@@ -1,0 +1,141 @@
+apiVersion: v1
+items:
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"labels":{"experiment":"h3-hpa-custom-metric"},"name":"auth-service-hpa-custom","namespace":"ecommerce"},"spec":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":15,"type":"Percent","value":100}],"stabilizationWindowSeconds":30},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Pods","value":5}],"stabilizationWindowSeconds":0}},"maxReplicas":5,"metrics":[{"pods":{"metric":{"name":"http_requests_per_second"},"target":{"averageValue":"50","type":"AverageValue"}},"type":"Pods"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"auth-service"}}}
+    creationTimestamp: "2026-04-07T18:20:26Z"
+    labels:
+      experiment: h3-hpa-custom-metric
+    name: auth-service-hpa-custom
+    namespace: ecommerce
+    resourceVersion: "1142560"
+    uid: 537c948c-f425-4413-9523-f7704a6083cb
+  spec:
+    behavior:
+      scaleDown:
+        policies:
+        - periodSeconds: 15
+          type: Percent
+          value: 100
+        selectPolicy: Max
+        stabilizationWindowSeconds: 30
+      scaleUp:
+        policies:
+        - periodSeconds: 15
+          type: Pods
+          value: 5
+        selectPolicy: Max
+        stabilizationWindowSeconds: 0
+    maxReplicas: 5
+    metrics:
+    - pods:
+        metric:
+          name: http_requests_per_second
+        target:
+          averageValue: "50"
+          type: AverageValue
+      type: Pods
+    minReplicas: 1
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: auth-service
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-07T18:20:41Z"
+      message: the HPA controller was able to get the target's current scale
+      reason: SucceededGetScale
+      status: "True"
+      type: AbleToScale
+    - lastTransitionTime: "2026-04-07T18:20:41Z"
+      message: 'the HPA was unable to compute the replica count: unable to get metric
+        http_requests_per_second: unable to fetch metrics from custom metrics API:
+        the server could not find the metric http_requests_per_second for pods'
+      reason: FailedGetPodsMetric
+      status: "False"
+      type: ScalingActive
+    currentMetrics:
+    - type: ""
+    currentReplicas: 1
+    desiredReplicas: 0
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"labels":{"experiment":"k1-keda"},"name":"product-service-keda","namespace":"ecommerce"},"spec":{"cooldownPeriod":30,"maxReplicaCount":5,"minReplicaCount":1,"pollingInterval":15,"scaleTargetRef":{"name":"product-service"},"triggers":[{"metadata":{"metricName":"http_requests_per_second","query":"sum(rate(http_requests_total{job=\"product-service\"}[1m]))\n","serverAddress":"http://prometheus.monitoring.svc.cluster.local:9090","threshold":"50"},"type":"prometheus"}]}}
+    creationTimestamp: "2026-04-07T12:49:58Z"
+    labels:
+      app.kubernetes.io/managed-by: keda-operator
+      app.kubernetes.io/name: keda-hpa-product-service-keda
+      app.kubernetes.io/part-of: product-service-keda
+      app.kubernetes.io/version: main
+      experiment: k1-keda
+      scaledobject.keda.sh/name: product-service-keda
+    name: keda-hpa-product-service-keda
+    namespace: ecommerce
+    ownerReferences:
+    - apiVersion: keda.sh/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ScaledObject
+      name: product-service-keda
+      uid: a46d66b1-8001-4339-b541-a5b09f0ae527
+    resourceVersion: "1149167"
+    uid: f07cfc82-1b9a-4b2c-8d68-db77a8a37e3e
+  spec:
+    maxReplicas: 5
+    metrics:
+    - external:
+        metric:
+          name: s0-prometheus
+          selector:
+            matchLabels:
+              scaledobject.keda.sh/name: product-service-keda
+        target:
+          averageValue: "50"
+          type: AverageValue
+      type: External
+    minReplicas: 1
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: product-service
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-07T12:50:13Z"
+      message: recommended size matches current size
+      reason: ReadyForNewScale
+      status: "True"
+      type: AbleToScale
+    - lastTransitionTime: "2026-04-07T17:00:26Z"
+      message: 'the HPA was able to successfully calculate a replica count from external
+        metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name:
+        product-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},})'
+      reason: ValidMetricFound
+      status: "True"
+      type: ScalingActive
+    - lastTransitionTime: "2026-04-07T12:50:13Z"
+      message: the desired count is within the acceptable range
+      reason: DesiredWithinRange
+      status: "False"
+      type: ScalingLimited
+    currentMetrics:
+    - external:
+        current:
+          averageValue: 222m
+        metric:
+          name: s0-prometheus
+          selector:
+            matchLabels:
+              scaledobject.keda.sh/name: product-service-keda
+      type: External
+    currentReplicas: 1
+    desiredReplicas: 1
+    lastScaleTime: "2026-04-07T13:09:30Z"
+kind: List
+metadata:
+  resourceVersion: ""

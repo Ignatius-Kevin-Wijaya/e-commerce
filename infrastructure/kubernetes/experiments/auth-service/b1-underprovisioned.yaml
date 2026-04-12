@@ -26,7 +26,7 @@ spec:
       containers:
         - name: auth-service
           image: ecommerce.azurecr.io/auth-service:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8001
           env:
@@ -67,10 +67,14 @@ spec:
               path: /health
               port: 8001
             initialDelaySeconds: 10
-            periodSeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 10
+            failureThreshold: 6
           readinessProbe:
             httpGet:
               path: /ready
               port: 8001
             initialDelaySeconds: 5
             periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3

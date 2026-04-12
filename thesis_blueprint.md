@@ -1,0 +1,1980 @@
+# Definitive Thesis Blueprint: HPA vs KEDA Comparative Study
+
+---
+
+## 1. Re-analysis of the Current Thesis Direction
+
+### What changed since the prior analyses
+
+The thesis has evolved through four iterations:
+1. **Original outline** (5.5/10): HPA-on vs HPA-off — confirmation experiment, no novelty
+2. **Revised scope** (8/10): HPA threshold × scaling policy matrix — added depth but remained within reactive scaling paradigm
+3. **First KEDA blueprint** (8.5/10): HPA vs KEDA — paradigm comparison, but had a fairness flaw (changing two variables at once: engine AND metric type)
+4. **Current direction** (this blueprint, 9/10): HPA (CPU) vs HPA (request-rate via prometheus-adapter) vs KEDA (request-rate) — **controlled factorial design** that isolates the metric-type effect from the engine-architecture effect, resolving the fairness argument completely
+
+### What is good about the HPA vs KEDA theme
+
+1. **It asks a fundamentally better question.** Instead of "which HPA setting is best?" (optimization within one tool), it asks "which autoscaling paradigm is better for which workload type?" (strategic architectural comparison). This is a senior-engineer-level question, not a config-tuning exercise.
+
+2. **It directly addresses the #1 HPA limitation.** CPU-based HPA fails for I/O-bound services because CPU doesn't correlate with load. KEDA with request-rate scaling addresses this directly. Your product-service is the perfect demonstration: I/O-bound, CPU stays flat under load, HPA sits idle while the service degrades.
+
+3. **KEDA is industry-relevant.** KEDA is a CNCF graduated project and a standard AKS add-on. Comparing it against native HPA is practical research that practitioners care about.
+
+4. **Your infrastructure already supports it.** Your FastAPI services use `prometheus_fastapi_instrumentator`, which exposes `http_requests_total` and `http_request_duration_seconds`. KEDA's Prometheus scaler can consume these directly — no code changes needed.
+
+### What is weak or risky
+
+1. **KEDA adds engineering complexity.** Setting up KEDA's Prometheus scaler requires understanding `ScaledObject`, trigger queries, metric naming, polling intervals, and cooldown periods. If the Prometheus query returns unexpected values, KEDA won't scale — and debugging this under a thesis deadline is stressful.
+
+2. **~~The comparison must be fair.~~** ✅ **RESOLVED in this revision.** The prior blueprint compared HPA (CPU-based) against KEDA (request-rate-based), which changed TWO variables at once (engine AND metric type). A reviewer could argue the improvement comes from the metric, not KEDA. **This revision adds H3 (HPA + request-rate via prometheus-adapter)**, creating a proper 2×2 factorial design that isolates each variable. See Section 6 for the full controlled comparison matrix.
+
+3. **KEDA's scale-to-zero adds a confound.** KEDA can scale to zero replicas during idle periods. HPA cannot go below `minReplicas`. If you enable scale-to-zero, KEDA tests include cold-start latency that HPA tests don't face. You must either disable scale-to-zero (simpler comparison) or measure it separately (more interesting but more complex).
+
+4. **prometheus-adapter adds engineering complexity.** Bridging Prometheus metrics into the Kubernetes Custom Metrics API requires configuring metric naming rules, API registration, and debugging "custom metric not found" errors. This is the second-highest-risk component after KEDA itself. Budget 3-5 days for setup and debugging.
+
+### What must be fixed from previous analyses
+
+| Issue from Prior Analysis | Status | Resolution |
+|--------------------------|--------|------------|
+| No statistical methodology | ✅ Fixed | 5 repetitions, Wilcoxon signed-rank, 95% CI |
+| Unrealistic k6 load test | 🔄 Must still do | Rewrite k6 for multi-endpoint weighted scenarios |
+| Monitoring pods have no resource requests | 🔄 Must still do | Add requests/limits to Prometheus, Grafana, Loki |
+| Identical HPA configs across all services | ✅ Resolved by design | Only 2 services tested, each independently |
+| maxReplicas conflict (outline vs code) | 🔄 Must fix | Standardize to `maxReplicas: 5` |
+| AKS node sizing with KEDA overhead | 🔧 New | Addressed in Section 4 |
+| Fairness argument (2 variables changed) | ✅ Fixed | Added H3 (HPA + request-rate via prometheus-adapter) — isolates metric type from engine |
+
+---
+
+## 2. Final Thesis Theme and Title Recommendation
+
+### Final Recommended Title
+
+> **"Analisis Pengaruh Jenis Metrik Penskalaan dan Mekanisme Autoscaler (HPA vs KEDA) terhadap Responsivitas dan Efisiensi Biaya Aplikasi Microservices pada Kubernetes"**
+
+### Title Evolution
+
+This title has been refined through 4 iterations:
+
+| Iteration | Title Approach | Issue |
+|-----------|---------------|-------|
+| v1 | "...HPA-on vs HPA-off..." | Binary, no novelty |
+| v2 | "...Konfigurasi Threshold dan Scaling Policy pada HPA..." | HPA-only, narrow scope |
+| v3 | "...Penskalaan Reaktif Berbasis CPU (HPA) dan Event-Driven Berbasis Request Rate (KEDA)...pada Azure Kubernetes Service" | Framed as 2-way HPA vs KEDA comparison — doesn't reflect H3 (HPA + request-rate), 27 words, double parenthetical, over-specifies platform |
+| **v4 (current)** | "...Jenis Metrik Penskalaan dan Mekanisme Autoscaler (HPA vs KEDA)...pada Kubernetes" | ✅ Reflects factorial design (two independent variables), 18 words, clean, generalizable |
+
+### Why This Title — Decision by Decision
+
+**1. "Analisis Pengaruh" instead of "Analisis Komparatif"**
+
+"Analisis Komparatif" (comparative analysis) implies a simple A-vs-B comparison — which is what this thesis USED to be before H3 was added. Now the thesis studies the **effect** of two independent variables (metric type and engine mechanism) through a controlled factorial design. "Analisis Pengaruh" (effect analysis) correctly signals: "we are measuring the effect of X on Y," which is what factorial experiments do. It's more scientifically precise.
+
+**2. "Jenis Metrik Penskalaan" — the first independent variable**
+
+This phrase captures the metric-type factor: CPU utilization (H1/H2) vs request rate (H3/K1). It tells the reader: "this thesis tests whether the CHOICE of scaling metric matters." Without this, H3's existence would be invisible from the title.
+
+"Penskalaan" (scaling) is added to clarify these are metrics used FOR autoscaling decisions — not general application metrics.
+
+**3. "Mekanisme Autoscaler (HPA vs KEDA)" — the second independent variable**
+
+This captures the engine factor: HPA controller vs KEDA operator. The parenthetical "(HPA vs KEDA)" names the specific tools, which is critical — these are the keywords examiners and indexers will search for.
+
+"Mekanisme" (mechanism) is more precise than "Arsitektur" (architecture) for what's being compared. The thesis compares HOW each autoscaler works (controller-loop vs event-driven polling), not system architecture in general.
+
+**4. Two output dimensions, not three**
+
+The previous title had "Responsivitas, Efisiensi Resource, dan Biaya Operasional" — three outputs. But "Efisiensi Resource" (are pods wasting CPU?) and "Biaya Operasional" (how much does it cost in dollars?) are closely related: wasting resources IS the cause of high cost. They can be merged into **"Efisiensi Biaya"** (cost efficiency) without losing meaning. The thesis still MEASURES all three things (latency, utilization, dollar cost) — the title just groups them into two clean categories:
+- **Responsivitas** = p95 latency, error rate, time-to-scale (performance)
+- **Efisiensi Biaya** = Resource Cost Index, pod utilization ratio (cost/efficiency)
+
+**5. "Aplikasi Microservices" instead of "Layanan Microservices"**
+
+"Layanan" means "services." "Microservices" already means "micro-services." So "Layanan Microservices" = "microservices services" — redundant. "Aplikasi Microservices" (microservices application) is correct and refers to the e-commerce application being tested.
+
+**6. "pada Kubernetes" instead of "pada Azure Kubernetes Service"**
+
+AKS is the experiment environment, not a research variable. Every core component of the thesis — HPA algorithm, KEDA operator, prometheus-adapter, Prometheus, k6 — works identically on GKE, EKS, or bare-metal Kubernetes. Including "Azure" in the title:
+- Misleads about scope (readers may think findings are Azure-specific)
+- Wastes 2 words of title budget
+- Limits generalizability claims in BAB 5
+- Over-emphasizes the hosting choice when the thesis is about autoscaling behavior
+
+"Kubernetes" IS essential because HPA and KEDA are Kubernetes-specific concepts. A reader needs to know this is about K8s autoscaling.
+
+AKS is still properly credited in BAB 3.2.1 (research environment description) and BAB 4.1 (system specifications) — where it belongs.
+
+**7. Single parenthetical, not double**
+
+The v3 title had two parentheticals: `(CPU Utilization vs Request Rate)` and `(HPA vs KEDA)`. This is visually cluttered. The current title has one: `(HPA vs KEDA)`. The metric specifics (CPU vs request rate) are implied by "Jenis Metrik Penskalaan" and explicitly detailed in BAB 1.2 (Rumusan Masalah).
+
+### Title Scorecard
+
+| Criteria | Score |
+|----------|-------|
+| Reflects factorial design (two independent variables)? | ✅ "Jenis Metrik" + "Mekanisme Autoscaler" |
+| Reflects H3's existence (the key innovation)? | ✅ Two separate factors imply a crossover config |
+| Mentions HPA and KEDA by name? | ✅ "(HPA vs KEDA)" |
+| Mentions what's measured? | ✅ "Responsivitas dan Efisiensi Biaya" |
+| Mentions the domain? | ✅ "Aplikasi Microservices" |
+| Mentions the platform? | ✅ "Kubernetes" |
+| Not too long? | ✅ 18 words (ideal: 15-22) |
+| Not too vague? | ✅ HPA/KEDA named, scaling metrics referenced |
+| Generalizable? | ✅ All Kubernetes, not vendor-locked |
+| Searchable keywords? | ✅ HPA, KEDA, Microservices, Kubernetes, Autoscaler |
+
+**Overall: 9.5/10.** The 0.5 it loses: doesn't explicitly mention workload-type contrast (I/O-bound vs CPU-bound). Adding "dengan Karakteristik Beban Berbeda" would push to 22 words — acceptable but less punchy. This contrast is better introduced in BAB 1.
+
+### Alternative Titles
+
+**Alt 1 (Adding workload-type contrast — 22 words):**
+> "Analisis Pengaruh Jenis Metrik Penskalaan dan Mekanisme Autoscaler (HPA vs KEDA) terhadap Responsivitas dan Efisiensi Biaya Aplikasi Microservices dengan Karakteristik Beban Berbeda pada Kubernetes"
+
+*Adds "dengan Karakteristik Beban Berbeda" to signal the I/O-bound vs CPU-bound contrast. Longer but more complete. Use this if your advisor values completeness over conciseness.*
+
+**Alt 2 (Emphasizing the experimental methodology — 20 words):**
+> "Studi Eksperimental Pengaruh Jenis Metrik dan Mekanisme Autoscaling terhadap Performa Penskalaan Horizontal Aplikasi Microservices CPU-Bound dan I/O-Bound pada Kubernetes"
+
+*Starts with "Studi Eksperimental" to immediately signal quantitative research. Mentions both workload types. Doesn't name HPA/KEDA in the title (they'd be in BAB 1). Use this if your department values methodology framing over tool specificity.*
+
+**Alt 3 (Shorter, punchier — 16 words):**
+> "Analisis Pengaruh Jenis Metrik Autoscaling pada HPA dan KEDA terhadap Performa Penskalaan Microservices pada Kubernetes"
+
+*Shortest option at 16 words. Sacrifices the cost dimension ("Efisiensi Biaya") and focuses solely on performance. Use this if your advisor prefers concise titles, with the cost analysis positioned as a secondary contribution in BAB 1.*
+
+---
+
+## 3. Scope Definition
+
+### In Scope
+
+| Item | Detail |
+|------|--------|
+| Autoscaling methods compared | HPA (CPU-based), HPA (request-rate via prometheus-adapter), KEDA (request-rate, Prometheus scaler) |
+| Services tested | product-service (I/O-bound), auth-service (CPU-bound) |
+| Platform | Azure Kubernetes Service, Free Tier |
+| Load patterns | Gradual ramp, sudden spike, oscillating |
+| Baselines | Fixed under-provisioned (1 replica), fixed over-provisioned (5 replicas) |
+| KPIs | Latency (p95), error rate, scaling speed, resource cost, pod-count stability |
+| Statistical method | 5 repetitions, Wilcoxon signed-rank, 95% CI |
+| Cost analysis | Pod-seconds × CPU-request × AKS pricing → dollar-cost per scenario |
+
+### Out of Scope
+
+| Item | Why excluded |
+|------|-------------|
+| Cluster Autoscaler | Confounds HPA/KEDA analysis — isolate pod-level scaling only |
+| Vertical Pod Autoscaler (VPA) | Different scaling dimension (vertical vs horizontal) — separate thesis |
+| Memory-based HPA | Adds a third variable; CPU vs request-rate is sufficient contrast |
+| Custom Kubernetes controller/operator | Too much engineering for S1; use existing tools |
+| Predictive/ML-based scaling | Requires ML expertise and custom implementation — out of S1 scope |
+| Scale-to-zero (KEDA) | Powerful feature but introduces cold-start confound; mentioned as future work |
+| All 5 services simultaneously | Cascading HPA/KEDA confounds — test one service at a time |
+| Multi-cluster or federation | Irrelevant at this scale |
+
+### Assumptions
+
+1. Kubernetes metrics-server provides accurate CPU utilization data at 15-second resolution
+2. Prometheus scrape interval (15s) provides sufficient time resolution for request-rate metrics
+3. AKS node hardware (D4as_v5) provides consistent, non-burstable CPU performance
+4. Inter-service communication latency within AKS is representative of production microservices
+5. The e-commerce application workload is representative of typical web-based microservices
+
+### Boundaries
+
+- **One service under autoscaling at a time.** Other services run at fixed `replicas: 1`. This isolates the variable.
+- **minReplicas ≥ 1** for both HPA and KEDA. No scale-to-zero. This ensures fair comparison (both start from same baseline).
+- **maxReplicas = 5** for both methods. Same scaling ceiling.
+- **Cluster Autoscaler disabled.** Node count is fixed at 3. If pods go `Pending`, this is a finding (capacity limit), not an error.
+- **Each experiment run: 12 minutes** (2 min warm-up, 7 min test, 3 min cooldown). Consistent across all configurations.
+
+---
+
+## 4. AKS Architecture Decision
+
+### Recommendation: **3× Standard_D4as_v5** ✅
+
+### Why D4as_v5, not D2as_v5
+
+The prior analysis recommended D2as_v5 for a pure HPA experiment. The shift to HPA vs KEDA changes the resource equation — more infrastructure pods are required (KEDA, prometheus-adapter), and the D4as_v5 provides the headroom needed for unbiased benchmarking.
+
+### Cluster Capacity
+
+| Per Node (D4as_v5) | Value |
+|---------------------|-------|
+| Total CPU | 4000m |
+| kubelet reserved | ~100m |
+| System reserved | ~40m |
+| **Allocatable CPU** | **~3860m** |
+| **3 Nodes Total Allocatable** | **~11580m** |
+
+**AKS Free Tier control plane** (API server, etcd, scheduler, controller-manager) runs on Azure's managed infrastructure — NOT on your nodes. Zero CPU cost to you.
+
+### Complete Pod Inventory — Verified from Codebase Manifests
+
+Every pod listed below is sourced from the actual YAML files in your repository. Estimated values (for components installed at runtime) are marked with `~`.
+
+#### Layer 1: AKS System Pods (Managed by AKS, always running)
+
+These pods are automatically deployed by AKS and consume from the allocatable pool.
+
+| Pod | Replicas | CPU Request | CPU Limit | Source |
+|-----|----------|-----------|---------|--------|
+| kube-proxy | 3 (DaemonSet) | 100m × 3 = 300m | — | AKS default |
+| CoreDNS | 2 | ~100m × 2 = ~200m | — | AKS default |
+| CoreDNS autoscaler | 1 | ~20m | — | AKS default |
+| metrics-server | 1 | ~100m | ~200m | AKS default |
+| cloud-node-manager | 3 (DaemonSet) | ~50m × 3 = ~150m | — | AKS default (Azure CNI) |
+| **Subtotal** | | **~770m** | | |
+
+*Note: Exact values may vary by AKS/Kubernetes version. Verify after cluster creation with `kubectl top pods -n kube-system`.*
+
+#### Layer 2: Databases (Always running, 1 replica each)
+
+| Pod | CPU Request | CPU Limit | Memory Request | Source |
+|-----|-----------|---------|---------------|--------|
+| auth-db (PostgreSQL) | 250m | 500m | 256Mi | [`postgres/auth-db.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/postgres/auth-db.yaml) |
+| product-db (PostgreSQL) | 250m | 500m | 256Mi | [`postgres/product-db.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/postgres/product-db.yaml) |
+| order-db (PostgreSQL) | 250m | 500m | 256Mi | [`postgres/order-db.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/postgres/order-db.yaml) |
+| redis | 100m | 250m | 128Mi | [`redis/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/redis/deployment.yaml) |
+| **Subtotal** | **850m** | **1750m** | **896Mi** | |
+
+#### Layer 3: Application Services (Fixed at 1 replica during experiments)
+
+During experiments, only ONE service is under autoscaling. All others run at `replicas: 1`.
+
+| Pod | CPU Request | CPU Limit | Memory Request | Source |
+|-----|-----------|---------|---------------|--------|
+| api-gateway | 200m | 1000m | 256Mi | [`gateway/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/gateway/deployment.yaml) |
+| auth-service | 100m | 500m | 128Mi | [`auth/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/auth/deployment.yaml) |
+| product-service | 100m | 500m | 128Mi | [`product/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/product/deployment.yaml) |
+| cart-service | 100m | 500m | 128Mi | [`cart/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/cart/deployment.yaml) |
+| order-service | 100m | 500m | 128Mi | [`order/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/order/deployment.yaml) |
+| payment-service | 100m | 500m | 128Mi | [`payment/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/payment/deployment.yaml) |
+| frontend | 100m | 500m | 128Mi | [`frontend/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/frontend/deployment.yaml) |
+| **Subtotal (all 7 at 1 replica)** | **800m** | **4000m** | **1024Mi** | |
+
+*Note: Current manifests set `replicas: 2` for backend services. Change to `replicas: 1` for experiments to isolate the autoscaling variable.*
+
+#### Layer 4: Monitoring Stack (Always running)
+
+| Pod | CPU Request | CPU Limit | Memory Request | Source |
+|-----|-----------|---------|---------------|--------|
+| prometheus | ⚠️ **0m** (BestEffort) | ⚠️ **0m** | ⚠️ **0Mi** | [`monitoring/prometheus.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kind/monitoring/prometheus.yaml) |
+| grafana | ⚠️ **0m** (BestEffort) | ⚠️ **0m** | ⚠️ **0Mi** | [`monitoring/grafana.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kind/monitoring/grafana.yaml) |
+| loki | ⚠️ **0m** (BestEffort) | ⚠️ **0m** | ⚠️ **0Mi** | [`monitoring/loki.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kind/monitoring/loki.yaml) |
+| promtail | 50m × 3 = 150m | 200m × 3 = 600m | 64Mi × 3 = 192Mi | [`monitoring/promtail.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kind/monitoring/promtail.yaml) (DaemonSet, 3 pods) |
+| **Subtotal (current)** | **150m** | **600m** | **192Mi** | |
+
+**⚠️ Action Required:** Prometheus, Grafana, and Loki have NO resource requests — they're BestEffort and can be evicted/throttled under load. Add resource requests before experiments (see Risk 5 in Section 8):
+
+| Pod | Add CPU Request | Add CPU Limit | Add Memory Request |
+|-----|----------------|--------------|-------------------|
+| prometheus | 100m | 500m | 256Mi |
+| grafana | 50m | 200m | 128Mi |
+| loki | 50m | 200m | 128Mi |
+| **Monitoring subtotal (after fix)** | **350m** | **1500m** | **704Mi** |
+
+#### Layer 5: Thesis Infrastructure (KEDA + prometheus-adapter)
+
+These are installed at runtime and their resource requests are estimated from default Helm/AKS-addon values.
+
+| Pod | CPU Request | CPU Limit | Memory Request | Source |
+|-----|-----------|---------|---------------|--------|
+| keda-operator | ~200m | ~500m | ~256Mi | AKS KEDA add-on |
+| keda-metrics-apiserver | ~100m | ~300m | ~128Mi | AKS KEDA add-on |
+| keda-admission-webhooks | ~50m | ~100m | ~64Mi | AKS KEDA add-on |
+| prometheus-adapter | ~100m | ~250m | ~128Mi | Helm chart |
+| **Subtotal** | **~450m** | **~1150m** | **~576Mi** | |
+
+#### Layer 6: Load Test Tool (Temporary — only during test runs)
+
+| Pod | CPU Request | CPU Limit | Memory Request | Source |
+|-----|-----------|---------|---------------|--------|
+| k6 Job | 200m | 500m | 256Mi | Planned (not yet in codebase) |
+
+#### Layer 7: Autoscaled Pods (Peak — tested service scales to 5 replicas)
+
+The tested service starts at 1 replica (already counted in Layer 3) and can scale to 5. The additional 4 pods are:
+
+| Additional Pods | CPU Request | CPU Limit | Memory Request |
+|----------------|-----------|---------|---------------|
+| +4 pods of tested service (100m each) | 400m | 2000m | 512Mi |
+
+### Peak Resource Budget (Worst Case)
+
+This is the total when the tested service is at maxReplicas (5), k6 is running, and all other pods are active. Monitoring uses the fixed values (after adding resource requests).
+
+| Category | CPU Requests | CPU Limits |
+|----------|------------|----------|
+| AKS system pods | ~770m | ~1200m |
+| Databases (3× PostgreSQL + Redis) | 850m | 1750m |
+| App services (7 pods at 1 replica, baseline) | 800m | 4000m |
+| Monitoring stack (after fix) | 350m | 1500m |
+| KEDA + prometheus-adapter | ~450m | ~1150m |
+| k6 Job | 200m | 500m |
+| Autoscaled pods (+4 additional) | 400m | 2000m |
+| **TOTAL** | **~3820m** | **~12100m** |
+
+### Headroom Analysis
+
+| Metric | Value | Status |
+|--------|-------|--------|
+| Cluster allocatable | 11580m | |
+| Total CPU requests (peak) | ~3820m | |
+| **Request headroom** | **~7760m (67%)** | ✅ Excellent — scheduler has no trouble placing pods |
+| Total CPU limits (peak) | ~12100m | |
+| **Limit oversubscription** | **~520m (4.5%)** | ✅ Normal — not all pods burst simultaneously |
+
+**What the numbers mean:**
+
+1. **Request headroom of 67%** means the Kubernetes scheduler can place every pod without any `Pending` issues. Even if you doubled the autoscaled replicas to `maxReplicas: 10`, you'd still have ~3760m headroom.
+
+2. **Limit oversubscription of 4.5%** means that in the theoretical worst case where every single pod hits its CPU limit simultaneously, there would be minor throttling. In practice, this never happens because:
+   - Databases are idle unless queried (~50m actual usage, not 500m)
+   - Non-tested services at 1 replica with no traffic use ~10-20m each
+   - Monitoring tools use ~30-50m actual each
+   - Only the tested service + k6 are CPU-active during tests
+
+3. **vs D2as_v5 (3 nodes × 1900m = 5700m allocatable):** Requests alone (3820m) would consume 67% of the total capacity, leaving only 1880m headroom — tight for burst. Limit oversubscription would be 6400m (>100%), causing severe throttling during spike tests. **D2as_v5 is not viable for this experiment.**
+
+### Why This Math Matters for Fair Comparison
+
+1. **Fair comparison requires equal resource availability.** If HPA tests run fine but KEDA tests suffer because KEDA's operator pods consume CPU that causes throttling, the comparison is biased against KEDA.
+2. **KEDA's metrics-apiserver must be responsive.** If it's CPU-starved, metric delivery to KEDA's controller is delayed, making KEDA appear slower than it actually is.
+3. **Prometheus must not miss scrapes.** Both H3 (HPA + custom metric) and K1 (KEDA) depend on Prometheus data. If Prometheus is BestEffort and gets throttled, both methods receive stale data — invalidating the comparison.
+
+### Cost Analysis
+
+```
+3× D4as_v5 at $0.172/hr each = $0.516/hr total
+
+Setup/debugging (KEDA + prometheus-adapter):  40 hours = $20.64
+Experiment runs:                              45 hours = $23.22 (180 runs × 15 min)
+Pilot runs & calibration:                     15 hours = $7.74
+Re-runs (30% buffer):                         14 hours = $7.22
+Extra analysis/debug:                         20 hours = $10.32
+──────────────────────────────────────────────────────────────
+Total compute:                               ~134 hours = $69.14
+Fixed costs (PVC: 3×5Gi + 10Gi + 1Gi):                   ~$5.00
+ACR Basic (container registry):                            $5.00
+──────────────────────────────────────────────────────────────
+GRAND TOTAL:                                             ~$80
+Remaining from $150/month credit:                        ~$70
+```
+
+**$80 is well within budget.** You have ~$70 of buffer for mistakes, extended debugging sessions, or additional experiment configurations.
+
+### AKS Create Command
+
+```bash
+az aks create \
+  --resource-group thesis-rg \
+  --name thesis-aks \
+  --node-count 3 \
+  --node-vm-size Standard_D4as_v5 \
+  --node-osdisk-type Ephemeral \
+  --tier free \
+  --location southeastasia \
+  --network-plugin azure \
+  --generate-ssh-keys \
+  --no-wait
+```
+
+After creation, install KEDA and prometheus-adapter:
+```bash
+# Step 1: Install KEDA via AKS add-on (simplest, Microsoft-managed)
+az aks update --resource-group thesis-rg --name thesis-aks --enable-keda
+
+# Step 2: Install prometheus-adapter via Helm (required for H3 config)
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install prometheus-adapter prometheus-community/prometheus-adapter \
+  --namespace monitoring \
+  --set prometheus.url=http://prometheus.monitoring.svc.cluster.local \
+  --set prometheus.port=9090
+```
+
+After cluster creation, verify AKS system pod resource usage:
+```bash
+# Check what AKS system pods are consuming
+kubectl top pods -n kube-system
+kubectl get pods -n kube-system -o custom-columns="NAME:.metadata.name,CPU_REQ:.spec.containers[*].resources.requests.cpu"
+```
+
+Recommend **AKS add-on for KEDA** (simplicity, thesis credibility) and **Helm for prometheus-adapter** (only installation method available).
+
+---
+
+## 5. Platform and Tooling Decisions
+
+### Decision 1: PostgreSQL — **In-cluster pods** ✅
+
+| Factor | Azure Database for PostgreSQL | PostgreSQL in Pods |
+|--------|------------------------------|-------------------|
+| Cost | $25–100/month | $0 extra |
+| Experiment relevance | DB is NOT the variable under test | Same |
+| Reproducibility | Shared resource, can have latency variance | Fully controlled within cluster |
+| Thesis credibility | Slightly more "real" | Sufficient — DB is constant across all experiments |
+| Complexity | SKU selection, firewall rules, connection strings | Already configured and working |
+
+**Decision:** PostgreSQL in pods. The database is a **constant** in this experiment (same DB for all autoscaling methods). Using managed DB adds cost and latency variance without improving the comparison. In-cluster DB ensures the only variable is the autoscaling method.
+
+### Decision 2: Container Registry — **ACR** ✅
+
+| Factor | ACR (Azure Container Registry) | GHCR (GitHub Container Registry) |
+|--------|-------------------------------|----------------------------------|
+| Cost | $5/month (Basic) — covered by $150/month Azure credit | Free (public or private repos) |
+| Pull speed from AKS | ✅ Fast (same Azure network, no cross-cloud egress) | Slightly slower (cross-cloud pull) |
+| AKS integration | ✅ Native: `az aks update --attach-acr` — one command | Requires imagePullSecret configuration |
+| Experiment impact | Faster pod startup = faster reset between runs | Slightly slower resets |
+| Setup | `az acr create` + `az aks update --attach-acr` | Already configured in your CI |
+
+**Decision:** ACR. With $150/month Azure credit, the $5/month ACR Basic cost is negligible. ACR provides same-network pull speed (faster pod startups during the 180-run experiment), native AKS integration with a single `az aks update --attach-acr` command (no imagePullSecret needed), and keeps the entire infrastructure within Azure — simpler to manage and debug.
+
+```bash
+# Create ACR
+az acr create --resource-group thesis-rg --name thesisacr --sku Basic
+
+# Attach ACR to AKS (allows AKS to pull images without secrets)
+az aks update --resource-group thesis-rg --name thesis-aks --attach-acr thesisacr
+
+# Build and push images
+az acr login --name thesisacr
+docker tag product-service thesisacr.azurecr.io/product-service:latest
+docker push thesisacr.azurecr.io/product-service:latest
+```
+
+### Decision 3: Load Testing — **k6 inside the cluster** ✅
+
+| Factor | External k6 (your laptop / separate VM) | k6 as Kubernetes Job |
+|--------|----------------------------------------|---------------------|
+| Network path | External → AKS Load Balancer → Service | Internal → Service DNS |
+| Load Balancer needed? | Yes ($18+/month) | No |
+| Network latency | Adds internet/LB latency to measurements | Measures pure service latency |
+| Experiment control | Affected by your internet connection | Fully controlled within cluster |
+| Cost | LB cost + egress | $0 — runs on existing nodes |
+
+**Decision:** k6 inside the cluster as a Kubernetes Job. This eliminates the Load Balancer cost, removes external network variance from measurements, and provides the cleanest latency data. You already have `k6-job.yaml` configured for this.
+
+**Important:** Assign resource requests to the k6 pod (`200m CPU, 256Mi memory`) to prevent it from being CPU-starved during peak load.
+
+### Decision 4: Observability — **Prometheus + Grafana in-cluster** ✅
+
+| Factor | Azure Monitor | Prometheus + Grafana in pods |
+|--------|---------------|------------------------------|
+| Cost | $50+/month (ingestion-based) | $0 — already deployed |
+| Metric granularity | 1-minute minimum | 15-second scrape interval |
+| Custom queries | Kusto (learning curve) | PromQL (already known) |
+| KEDA integration | Requires Azure Monitor scaler | Native Prometheus scaler |
+| Data export | Complex (Log Analytics → CSV) | Direct PromQL → JSON/CSV |
+
+**Decision:** Prometheus + Grafana in-cluster. This is mandatory — KEDA's Prometheus scaler needs an in-cluster Prometheus instance to read metrics from. Azure Monitor would require a different KEDA scaler (azure-monitor), which is less documented and adds complexity. Your existing Prometheus setup is already scraping all services.
+
+**Critical fix needed:** Add resource requests to monitoring pods (Prometheus: 100m CPU, Grafana: 50m, Loki: 50m). Without requests, they can be evicted under load, corrupting experiment data.
+
+### Decision Summary
+
+| Component | Choice | Why |
+|-----------|--------|-----|
+| Database | PostgreSQL in pods | Constant (not the variable), free, already working |
+| Registry | GHCR | Free, already configured, pull speed irrelevant |
+| Load testing | k6 in-cluster Job | Eliminates LB cost and network noise |
+| Observability | Prometheus + Grafana in pods | Required for KEDA, better resolution, free |
+| KEDA installation | AKS add-on | Simplest, officially supported |
+| prometheus-adapter | Helm chart | Required for H3 (HPA + custom request-rate metric) |
+| Access to Grafana | `kubectl port-forward` | No public IP or LB needed |
+
+---
+
+## 6. Experimental Methodology
+
+### Experiment Design Overview
+
+The experiment compares **6 autoscaling configurations** across **3 load patterns** on **2 services** with distinct workload profiles, using a **controlled factorial design** that isolates the metric-type effect from the engine-architecture effect.
+
+### The Controlled Factorial Design
+
+The prior blueprint's weakness was comparing HPA (CPU) vs KEDA (request-rate), which changed two variables simultaneously. This revision isolates them:
+
+```
+                       CPU metric          Request-rate metric
+                 ┌───────────────────┬──────────────────────────┐
+  HPA engine     │  H1 (default)     │  H3 (custom metric       │
+                 │  H2 (tuned)       │      via prometheus-      │
+                 │                   │      adapter)             │
+                 ├───────────────────┼──────────────────────────┤
+  KEDA engine    │  (not applicable) │  K1 (Prometheus scaler)  │
+                 └───────────────────┴──────────────────────────┘
+```
+
+This enables three isolated comparisons:
+
+| Comparison | What It Isolates | Research Question |
+|-----------|-----------------|-------------------|
+| **H1/H2 vs H3** | Same engine (HPA), different metric | "Does switching from CPU to request-rate improve HPA's scaling behavior?" |
+| **H3 vs K1** | Same metric (request-rate), different engine | "Does KEDA's architecture provide benefits beyond the metric type advantage?" |
+| **H1/H2 vs K1** | Different engine AND metric | "What is the combined real-world improvement when switching from default HPA to KEDA?" |
+
+A reviewer **cannot** argue that the improvement is "just the metric" — because H3 directly tests that claim.
+
+### Autoscaling Configurations (Independent Variable #1)
+
+| Config | Method | Metric | Key Settings | Rationale |
+|--------|--------|--------|-------------|-----------|
+| **B1: Under-provisioned** | Fixed | — | `replicas: 1` | Lower-bound baseline: shows degradation without scaling |
+| **B2: Over-provisioned** | Fixed | — | `replicas: 5` | Upper-bound baseline: shows maximum performance at maximum cost |
+| **H1: HPA Default** | HPA | CPU utilization | `targetCPU: 70%`, default behavior policy | How HPA performs "out of the box" — the most common production config |
+| **H2: HPA Tuned** | HPA | CPU utilization | `targetCPU: 50%`, aggressive scaling behavior | Best-case HPA with CPU: optimized threshold + fast scaling policy |
+| **H3: HPA Custom Metric** | HPA | HTTP request rate (via prometheus-adapter) | `type: Pods`, `averageValue: 50` (calibrated) | **The fairness control** — same metric as KEDA, but using HPA engine. Isolates metric effect from engine effect. |
+| **K1: KEDA** | KEDA | HTTP request rate (via Prometheus scaler) | `trigger: prometheus`, `threshold: 50` (calibrated) | Event-driven scaling based on actual traffic |
+
+**Why this 6-config structure?**
+- **B1 + B2:** Baselines — frame the performance envelope (worst case to best case)
+- **H1 + H2:** HPA with CPU — tests the "default" and "best possible" CPU-based scaling
+- **H3:** HPA with request-rate — isolates whether the metric type is what matters, not the engine
+- **K1:** KEDA with request-rate — the full event-driven paradigm
+
+**The three possible experimental outcomes:**
+1. **H3 ≈ K1 >> H1/H2** → "The metric type is what matters. HPA with the right metric matches KEDA."
+2. **K1 > H3 >> H1/H2** → "Both the metric AND the engine matter. KEDA's architecture provides additional benefit."
+3. **H3 ≈ H1/H2 ≈ K1** (for auth-service/CPU-bound) → "For CPU-bound services, all methods perform similarly — CPU is an adequate metric."
+
+**Every outcome is a valid, publishable finding.** The experiment cannot "fail."
+
+**Threshold calibration (for H3 and K1):**
+Both H3 and K1 use request-rate as the scaling metric. Their thresholds must be calibrated identically:
+1. Run a low-load test (50 RPS total, 1 pod)
+2. Measure actual requests/second reaching each pod
+3. Set threshold at ~70% of single-pod saturation point
+4. Apply the SAME threshold value to both H3 (`averageValue`) and K1 (`threshold`)
+5. This ensures any performance difference is due to the engine, not the threshold
+
+### HPA Configurations
+
+```yaml
+# H1: HPA Default
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: product-service-hpa-default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: product-service
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  # No behavior field — uses Kubernetes defaults
+```
+
+```yaml
+# H2: HPA Tuned (aggressive scaling)
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: product-service-hpa-tuned
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: product-service
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Pods
+        value: 5
+        periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 30
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+```
+
+### H3: HPA with Custom Metric (via prometheus-adapter)
+
+**prometheus-adapter configuration** (makes Prometheus metrics available to HPA via the Custom Metrics API):
+
+```yaml
+# prometheus-adapter rules ConfigMap
+rules:
+  custom:
+  - seriesQuery: 'http_requests_total{namespace="ecommerce"}'
+    resources:
+      overrides:
+        namespace: {resource: "namespace"}
+        pod: {resource: "pod"}
+    name:
+      matches: "^(.*)_total$"
+      as: "${1}_per_second"
+    metricsQuery: 'sum(rate(<<.Series>>{<<.LabelMatchers>>}[1m])) by (<<.GroupBy>>)'
+```
+
+```yaml
+# H3: HPA with request-rate custom metric
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: product-service-hpa-custom
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: product-service
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Pods
+    pods:
+      metric:
+        name: http_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "50"   # Same threshold as K1 KEDA — critical for fairness
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Pods
+        value: 5
+        periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 30
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+```
+
+**Note:** H3 uses the same aggressive scaling behavior as H2. This ensures any performance difference between H3 and K1 is due to the autoscaling engine architecture, not the scaling policy.
+
+### KEDA Configuration
+
+```yaml
+# K1: KEDA with Prometheus trigger
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: product-service-keda
+spec:
+  scaleTargetRef:
+    name: product-service
+  minReplicaCount: 1      # Match HPA minReplicas for fair comparison
+  maxReplicaCount: 5       # Match HPA maxReplicas for fair comparison
+  cooldownPeriod: 30
+  pollingInterval: 15      # Match HPA control loop interval for fairness
+  triggers:
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus.monitoring.svc.cluster.local:9090
+      metricName: http_requests_per_second
+      query: |
+        sum(rate(http_requests_total{service="product-service"}[1m]))
+        / count(kube_pod_info{pod=~"product-service.*",phase="Running"})
+      threshold: "50"      # Same threshold as H3 — critical for fairness
+```
+
+**Fairness note:** H3 and K1 use the same threshold (50 RPS/pod), the same Prometheus data source, and the same scaling policy aggressiveness. The ONLY difference is the autoscaling engine (HPA controller vs KEDA operator). This is what makes the comparison scientifically controlled.
+
+### Load Patterns (Independent Variable #2)
+
+| Pattern | Description | k6 Configuration | Why |
+|---------|-------------|-------------------|-----|
+| **Gradual Ramp** | Linear increase from 20 → 200 RPS over 5 minutes | `ramping-arrival-rate` with 1 ramp stage | Tests how smoothly autoscaling follows predictable growth |
+| **Sudden Spike** | 50 RPS baseline → instant jump to 200 RPS at t=2min | Step function with `constant-arrival-rate` | Tests reaction speed — the worst case for reactive HPA |
+| **Oscillating** | Alternating between 50 and 200 RPS every 90 seconds | Multiple ramp stages with sharp transitions | Tests scaling stability — does the system thrash (scale up/down repeatedly)? |
+
+### Services Under Test (Independent Variable #3)
+
+| Service | Workload Type | Why It's Different for This Experiment |
+|---------|--------------|---------------------------------------|
+| **product-service** | I/O-bound (PostgreSQL reads) | CPU stays flat even under load → HPA likely fails → KEDA should excel. This is the "KEDA wins" scenario. |
+| **auth-service** | CPU-bound (bcrypt hashing) | CPU correlates with load → HPA works well → KEDA may offer no advantage. This is the "control" scenario. |
+
+**Hypothesis:** KEDA significantly outperforms HPA for product-service (I/O-bound) but shows comparable or marginal improvement for auth-service (CPU-bound). If confirmed, this produces the thesis's central finding: **the choice of autoscaling method should depend on service workload characteristics.**
+
+### Experimental Protocol
+
+1. **Cluster state reset:** Before each run, delete the previous autoscaler (HPA or ScaledObject), set deployment to `replicas: 1`, wait 60 seconds for stabilization, verify no residual pods
+2. **Apply configuration:** Deploy the test config (HPA/KEDA/fixed replicas)
+3. **Wait for stabilization:** 30 seconds for metrics to baseline
+4. **Warm-up:** 2 minutes at low load (20 RPS), data excluded from analysis
+5. **Test execution:** 7 minutes of the designated load pattern
+6. **Cooldown observation:** 3 minutes at 0 RPS, observe scale-down behavior
+7. **Data export:** Pull Prometheus metrics via PromQL, export k6 results to JSON
+8. **Total per run:** ~12 minutes active + ~2 minutes setup = ~14 minutes
+
+### Total Experiment Runs
+
+| Component | Count |
+|-----------|-------|
+| Autoscaling configs | 6 (B1, B2, H1, H2, H3, K1) |
+| Load patterns | 3 (gradual, spike, oscillating) |
+| Repetitions | 5 |
+| Services | 2 |
+| **Total runs** | **6 × 3 × 5 × 2 = 180** |
+| **Time per run** | ~15 minutes (including setup/reset) |
+| **Total experiment time** | ~45 hours |
+| **AKS cost** | 45 × $0.516 = ~$23.22 |
+
+With 30% buffer for re-runs: **~59 hours, ~$30 AKS compute cost.**
+
+With 7-8 months available, you can spread experiments across multiple sessions (e.g., 4-5 hours per day over 10-12 days), reducing fatigue and allowing same-day analysis of anomalies.
+
+---
+
+## 7. KPI / Metrics Design
+
+### Primary KPIs (Must Report For Every Configuration)
+
+| KPI | Definition | Unit | Source | Why It's Primary |
+|-----|-----------|------|--------|-----------------|
+| **p95 Response Latency** | 95th percentile of successful request duration during the test window | ms | k6 `http_req_duration{p(95)}` | The single most important performance indicator; directly reflects user experience |
+| **Error Rate** | Percentage of requests returning HTTP 4xx/5xx during the test window | % | k6 `http_req_failed` | A service that's fast but returns errors is worse than one that's slow but correct |
+| **Time-to-Scale** | Seconds from load increase to new pod serving traffic (passing readiness probe) | seconds | Prometheus `kube_pod_status_ready` timestamps correlated with load start | Measures how quickly each method reacts — the core comparison |
+| **Resource Cost Index** | `Σ(active_pods × duration_seconds × cpu_request) × price_per_cpu_second` over the test window | $ equivalent | Prometheus `kube_deployment_status_replicas` sampled every 15s | Converts resource usage to dollar cost — enables Pareto analysis |
+
+### Secondary KPIs (Report For Key Configurations)
+
+| KPI | Definition | Unit | Source | Why It Matters |
+|-----|-----------|------|--------|---------------|
+| **Scaling Event Count** | Total number of scale-up + scale-down decisions during test | count | HPA events / KEDA events via `kubectl get events` | High count = instability (thrashing); low count = smooth scaling |
+| **Recovery Time** | Seconds from load decrease to p95 latency returning to ≤ 1.5× warm-up baseline | seconds | k6 latency timeline correlated with load timeline | Measures how well the system recovers — important for oscillating loads |
+| **Average CPU Utilization** | Mean CPU usage across all pods of the tested service during the test | % | Prometheus `container_cpu_usage_seconds_total` | Shows resource efficiency — low utilization with many pods = waste |
+| **Latency Degradation Ratio** | (p95 during peak load) / (p95 during warm-up) | ratio | k6 data | Normalized metric that's comparable across services with different baseline latencies |
+
+### Optional KPIs (Report If Interesting Results Emerge)
+
+| KPI | Definition | Why Optional |
+|-----|-----------|-------------|
+| **Pod Utilization Ratio** | actual_CPU_used / total_CPU_requested | Shows how efficiently scheduled resources are used; interesting if HPA overprovisions |
+| **Scale-down Completeness** | Final pod count 3 min after load stops, relative to minReplicas | Shows whether aggressive scaling leaves behind orphan pods |
+| **Metric Detection Latency** | Seconds from actual load change to metric reflecting it in Prometheus | Only measurable with precise correlation; interesting for understanding WHY one method reacts faster |
+
+### How KPIs Are Interpreted
+
+The central analysis combines primary KPIs into a **trade-off assessment:**
+
+- **Performance winner:** Lowest p95 latency + lowest error rate + fastest time-to-scale
+- **Cost winner:** Lowest resource cost index while meeting SLO thresholds
+- **Balanced winner:** Best position on the Pareto frontier (latency vs cost)
+
+If HPA and KEDA produce similar latency but KEDA uses fewer pod-minutes (because it scales more precisely), KEDA wins on efficiency. If HPA (CPU) never triggers for product-service (I/O-bound, CPU stays low) but H3 (HPA with request-rate) DOES trigger, the conclusion is definitive: **the metric type is the problem, not the HPA engine itself.** If KEDA still outperforms H3 despite using the same metric, KEDA's architecture provides additional value.
+
+---
+
+## 8. Risk Deep-Dive: What Can Actually Go Wrong
+
+### Risk Priority Summary
+
+| Risk | Worry Level | Budget Time | When to Tackle |
+|------|------------|------------|----------------|
+| **prometheus-adapter setup** | 🔴 **High** | 5 days | Week 8 |
+| **KEDA Prometheus scaler** | 🟡 **Medium** | 3 days | Week 7 |
+| **k6 script rewrite** | 🟡 **Medium** | 1 week | Week 5 |
+| **Forgot `az aks stop`** | 🟡 **Medium** | Day 1 setup | Week 3 (cluster creation) |
+| **Threshold calibration** | 🟡 **Medium** | 2-3 days | Week 9 |
+| **Prometheus scrape gaps** | 🟢 **Low** | 1 hour | Week 6 (add resource requests) |
+| **k6 CPU-starvation** | 🟢 **Low** | 1 hour | Week 5 (set resource requests) |
+| **HPA never triggers (product-service)** | 🟢 **It's a feature** | — | Embrace it as the central finding |
+
+---
+
+### Risk 1: KEDA Prometheus Scaler Doesn't Trigger
+
+**Probability:** Medium | **Impact:** 🔴 High — experiment blocked | **Budget:** 3 days
+
+**What happens technically:**
+
+KEDA's Prometheus scaler works by periodically running a PromQL query against your Prometheus instance. If the query returns a value above the threshold, KEDA scales up. Sounds simple. Here's where it breaks:
+
+Your KEDA config has this query:
+```
+sum(rate(http_requests_total{service="product-service"}[1m]))
+/ count(kube_pod_info{pod=~"product-service.*",phase="Running"})
+```
+
+**How it could break for YOU specifically:**
+
+1. **Label mismatch.** Your FastAPI instrumentator exposes `http_requests_total`, but the label might not be `service="product-service"`. It might be `job="product-service"` or `app="product-service"` or even `kubernetes_name="product-service"` — depending on how Prometheus relabeling works in your `prometheus.yaml`. If the label doesn't match, the query returns `0` or `NaN`, KEDA sees "no load", and never scales. You stare at the dashboard seeing 200 RPS hitting the service but KEDA does nothing.
+
+2. **The `kube_pod_info` metric doesn't exist.** This metric comes from `kube-state-metrics`, which you may not have installed. Without it, the denominator of your PromQL query is empty, the division produces `NaN`, KEDA reads `NaN` as "no data", and never triggers. You'd see: `"ScaledObject" failed to get metric: "prometheus query returned NaN"` in KEDA operator logs.
+
+3. **Prometheus is in the `monitoring` namespace, KEDA is in `keda` namespace.** KEDA's operator needs to reach `http://prometheus.monitoring.svc.cluster.local:9090`. If there's a NetworkPolicy blocking cross-namespace traffic (unlikely in your setup, but possible if AKS installs default policies), the connection times out silently.
+
+4. **The query returns the right value but as a string, not a float.** Some PromQL edge cases with `NaN` or `Inf` values cause KEDA to reject the result. This happens when there are zero pods (division by zero) or when Prometheus has a scrape gap.
+
+**How you'd notice:** You'd run your k6 load test, see latency climbing, check `kubectl get scaledobject` and see `READY: False` or scaling metrics stuck at 0. Then you'd spend hours reading KEDA operator logs trying to figure out WHY.
+
+**How to avoid it — step by step:**
+
+```bash
+# Step 1: BEFORE configuring KEDA, verify your actual Prometheus labels
+# Port-forward to Prometheus
+kubectl port-forward -n monitoring svc/prometheus 9090:9090
+
+# Step 2: Open http://localhost:9090 and run these queries:
+# Query A: Check what labels http_requests_total actually has
+http_requests_total
+
+# Look at the labels carefully. Note the exact label names and values.
+# Example result might show: http_requests_total{method="GET", handler="/products", job="product-service"}
+# If the label is "job" not "service", you need to update the KEDA query.
+
+# Query B: Check if kube_pod_info exists
+kube_pod_info
+
+# If this returns "no data", you need to install kube-state-metrics:
+# helm install kube-state-metrics prometheus-community/kube-state-metrics -n monitoring
+
+# Step 3: Test your EXACT KEDA query in Prometheus UI BEFORE putting it in the ScaledObject
+# Paste the full query and verify it returns a number (not NaN, not empty)
+
+# Step 4: After deploying ScaledObject, verify KEDA can read the metric
+kubectl get scaledobject product-service-keda -o yaml
+# Check: status.conditions should show "Ready: True"
+
+# Step 5: If KEDA isn't triggering, check operator logs
+kubectl logs -n keda deployment/keda-operator --tail=50
+
+# Look for errors like:
+# - "failed to get metric" → query/connection issue
+# - "prometheus returned NaN" → query math issue (division by zero)
+# - "connection refused" → Prometheus URL wrong
+```
+
+**Fallback if unresolvable:** Use KEDA's built-in `cpu` trigger type instead of `prometheus`. This makes KEDA behave like HPA (CPU-based), which defeats the purpose of the comparison — but at least proves the KEDA pipeline works. Then debug the Prometheus query separately.
+
+---
+
+### Risk 2: prometheus-adapter Doesn't Register Custom Metric
+
+**Probability:** Medium | **Impact:** 🔴 High — H3 config blocked | **Budget:** 5 days
+
+**What happens technically:**
+
+prometheus-adapter bridges Prometheus metrics into Kubernetes' Custom Metrics API. HPA can only use custom metrics if they appear in this API. The adapter runs a set of "rules" that convert PromQL queries into Kubernetes API endpoints.
+
+**How it could break for YOU specifically:**
+
+1. **The metric naming rule doesn't match your metric.** Your rule says:
+   ```yaml
+   seriesQuery: 'http_requests_total{namespace="ecommerce"}'
+   ```
+   But what if your pods are in namespace `default` instead of `ecommerce`? Or what if the metric is called `http_request_total` (singular) instead of `http_requests_total` (plural)? The query matches zero series, prometheus-adapter registers zero custom metrics, and HPA says:
+   ```
+   unable to fetch metrics from custom metrics API:
+   the server could not find the requested resource (get pods.custom.metrics.k8s.io)
+   ```
+   You'd see this event on the HPA object and have no idea why.
+
+2. **prometheus-adapter can't reach Prometheus.** The Helm install defaults might set the wrong Prometheus URL. If you install with `--set prometheus.url=http://prometheus.monitoring.svc.cluster.local` but your Prometheus service is actually called `prometheus-server` or is on port `9091`, the adapter silently fails to scrape and registers zero metrics.
+
+3. **The adapter conflicts with metrics-server.** Both metrics-server (for CPU/memory) and prometheus-adapter (for custom metrics) register with the Kubernetes API aggregation layer. If configured wrong, prometheus-adapter could shadow metrics-server, breaking H1 and H2 (CPU-based HPA) while trying to fix H3. Now you've broken your working configs trying to add a new one.
+
+4. **The `rate()` window is too short/long.** Your rule uses `rate(...[1m])`. If Prometheus scrapes every 15 seconds but there's a scrape gap (missed one scrape), `rate()` over 1 minute might return 0 for a brief period, causing HPA to scale down prematurely during a test. Worse — the metric flickers between 0 and the real value, making HPA scale up and down erratically.
+
+**How to avoid it — step by step:**
+
+```bash
+# Step 1: BEFORE installing prometheus-adapter, verify your Prometheus metric format
+kubectl port-forward -n monitoring svc/prometheus 9090:9090
+# Open http://localhost:9090
+# Query: http_requests_total
+# Note the EXACT metric name and namespace label
+
+# Step 2: Install prometheus-adapter with correct Prometheus URL
+helm install prometheus-adapter prometheus-community/prometheus-adapter \
+  --namespace monitoring \
+  --set prometheus.url=http://prometheus.monitoring.svc.cluster.local \
+  --set prometheus.port=9090
+
+# Step 3: Wait 2-3 minutes for the adapter to discover metrics, then verify
+kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1
+# Should return a list of available metrics
+# If it returns 404 or empty: adapter isn't registered or found no metrics
+
+# Step 4: Check if YOUR specific metric is available
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/ecommerce/pods/*/http_requests_per_second"
+# Should return metric values for each pod
+# If 404: the naming rule didn't match. Check adapter logs:
+kubectl logs -n monitoring deployment/prometheus-adapter --tail=50
+
+# Step 5: If metric doesn't appear, debug the adapter config
+# Export the current config:
+kubectl get configmap -n monitoring prometheus-adapter -o yaml
+# Compare the seriesQuery against what Prometheus actually has
+
+# Step 6: Verify metrics-server still works (H1/H2 dependency)
+kubectl top pods -n ecommerce
+# If this breaks after installing prometheus-adapter, you have an API conflict
+# Fix: ensure prometheus-adapter uses custom.metrics.k8s.io, NOT metrics.k8s.io
+
+# Step 7: Test H3 HPA end-to-end
+kubectl apply -f h3-hpa-custom-metric.yaml
+kubectl get hpa product-service-hpa-custom
+# Check the TARGETS column: should show "current/target" like "35/50"
+# If it shows "<unknown>/50": the custom metric is not being read
+```
+
+**Fallback if unresolvable after 5 days:** Drop H3, revert to 5-config design (B1, B2, H1, H2, K1). The thesis is still 8.5/10. Acknowledge the metric-vs-engine isolation as a limitation, and reference it as future work. prometheus-adapter is the only 9→8.5 downgrade risk.
+
+---
+
+### Risk 3: CPU-based HPA Never Triggers for product-service
+
+**Probability:** Medium | **Impact:** 🟢 This IS the finding | **Budget:** 0 days (don't try to fix it)
+
+**What happens technically:**
+
+Your product-service handles `GET /products` by:
+1. Receiving HTTP request (minimal CPU)
+2. Sending SQL query to PostgreSQL (network I/O — CPU is idle, just waiting)
+3. Receiving response from PostgreSQL (minimal CPU)
+4. Serializing response to JSON (brief CPU spike)
+
+Total CPU per request: maybe 5-10ms of actual CPU work. At 200 RPS, that might translate to 20-30% CPU utilization — well below the 50-70% HPA threshold. The service is overloaded (requests queuing, latency climbing, errors appearing), but CPU looks fine.
+
+**How it plays out for YOU:**
+
+- k6 ramps from 50 to 200 RPS
+- product-service starts queuing requests — response time climbs from 50ms → 500ms → 2000ms → timeouts
+- `kubectl top pod product-service` shows CPU at 25%
+- HPA checks every 15 seconds: "25% < 70% target? No scaling needed."
+- 7 minutes later, the test ends. HPA never activated. product-service was degraded the entire time.
+- Meanwhile, H3 (HPA with request-rate) and K1 (KEDA) saw the traffic, scaled up, and maintained good latency.
+
+**This is literally your thesis's central finding.** Don't try to "fix" it. Document it, visualize it, and build your argument on it.
+
+**The only actual risk:** If this also happens for auth-service (CPU-bound with bcrypt), your control scenario breaks. auth-service SHOULD trigger CPU-based HPA because bcrypt hashing is heavily CPU-intensive. If bcrypt doesn't push CPU above 50%, something is wrong with your resource limits or load test intensity.
+
+**How to verify auth-service behaves correctly:**
+```bash
+# During pilot, run a quick load test against auth-service (POST /auth/login)
+# Then check CPU
+kubectl top pod -n ecommerce -l app=auth-service
+# CPU should be near or exceeding the 50% target at high load
+# If CPU is low: check if bcrypt rounds are too few (should be 12)
+# or if the load test isn't actually hitting the login endpoint
+```
+
+---
+
+### Risk 4: k6 Pod Gets CPU-Starved
+
+**Probability:** Low | **Impact:** 🔴 High — invalidates load pattern | **Budget:** 1 hour setup
+
+**What happens technically:**
+
+k6 generates HTTP requests at a specified rate. To generate 200 RPS, k6 needs CPU to: maintain 200 concurrent HTTP connections, serialize request/response bodies, record per-request metrics, and compute timing statistics in real-time.
+
+If k6 doesn't get enough CPU, it can't sustain 200 RPS. It might only achieve 140 RPS. Your "200 RPS spike" test quietly becomes a "140 RPS gradual ramp" test — and you don't realize it.
+
+**How it could happen to YOU:**
+
+During a spike test, your 5 scaled-up pods + 3 PostgreSQL instances + Prometheus + KEDA operator are all consuming CPU. If k6 has no resource request (which is the current state — your `k6-job.yaml` doesn't set resource requests), the Kubernetes scheduler might place it on a node where CPU is already contended. Linux's CFS scheduler gives k6 whatever scraps are left over. During peak load — when you need k6 to maintain 200 RPS most — it gets starved most.
+
+The nasty part: k6 doesn't crash. It just silently under-delivers. It reports `iterations: 200/s` because that's what was configured, but the actual achieved rate was lower. Your latency measurements are subtly wrong (lower actual RPS = lower actual latency than a true 200 RPS test would produce), and you'd never know without checking k6's own metrics.
+
+**How to avoid it:**
+
+```yaml
+# In your k6-job.yaml, add resource requests/limits:
+spec:
+  template:
+    spec:
+      containers:
+      - name: k6
+        image: grafana/k6:latest
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+```
+
+```bash
+# During pilot runs, verify k6 actually achieves target RPS:
+# Check k6 output for "http_reqs" counter — should match target rate
+# Also monitor k6 pod CPU during the test:
+kubectl top pod -n ecommerce -l app=k6 --containers
+# If k6 is hitting its CPU limit (500m), increase the limit or schedule it
+# on a specific node with kubectl label + nodeSelector
+```
+
+---
+
+### Risk 5: Prometheus Misses Scrapes Under Load
+
+**Probability:** Low (after fix) | **Impact:** 🟡 Medium — data gaps at critical moments | **Budget:** 1 hour
+
+**What happens technically:**
+
+Prometheus scrapes your services every 15 seconds. Each scrape is an HTTP GET to `/metrics`. Under heavy load, two things happen:
+1. Prometheus itself needs CPU to fetch, parse, and store metrics
+2. Your services are CPU-busy and might respond slowly to the `/metrics` endpoint
+
+Your Prometheus currently has **no resource requests** — Kubernetes treats it as BestEffort, meaning it gets evicted or CPU-throttled first when nodes are under pressure.
+
+**How it could happen to YOU:**
+
+During a spike test (200 RPS, 5 pods scaled up, all bursting):
+1. All service pods + PostgreSQL pods are consuming CPU
+2. Prometheus (BestEffort) gets CPU-throttled by the Linux scheduler
+3. A scrape attempt to product-service takes 3 seconds instead of 100ms
+4. Prometheus marks the scrape as "timed out" and drops it
+5. For the next 15-30 seconds, there's NO metric data for product-service
+
+**The insidious part:** Your KEDA and H3 both rely on Prometheus data. During the gap:
+- KEDA runs its query: `rate(http_requests_total[1m])` — but the last data point is 30 seconds stale
+- KEDA sees a LOWER rate than reality (stale data) and doesn't scale up
+- You'd conclude "KEDA was slow to react" — but the real cause was Prometheus data loss, not KEDA
+
+You'd only discover this weeks later when analyzing data: "Why is there no data point at t=125s, right when the spike started?"
+
+**How to avoid it:**
+
+```yaml
+# In your prometheus.yaml deployment, add resource requests:
+containers:
+  - name: prometheus
+    image: prom/prometheus:v2.45.0
+    resources:
+      requests:
+        cpu: "100m"       # Guarantees CPU won't be stolen
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+```
+
+```bash
+# During pilot runs, check for scrape failures:
+# Open Prometheus UI → Status → Targets
+# All targets should show "State: UP" with scrape duration < 1s
+# If any target shows "State: DOWN" during load tests, Prometheus is CPU-starved
+
+# Also verify data continuity after a pilot run:
+# Query: rate(http_requests_total{job="product-service"}[1m])
+# Graph it over the test window. Look for gaps or sudden drops to zero.
+```
+
+---
+
+### Risk 6: Threshold Calibration Affects H3 vs K1 Comparison
+
+**Probability:** Medium | **Impact:** 🟡 Medium — subtle bias in results | **Budget:** 2-3 days
+
+**What happens technically:**
+
+H3 (HPA + custom metric) and K1 (KEDA) both use request-rate as their metric with the same "50 RPS/pod" threshold. But "50 RPS/pod" means slightly different things in each system.
+
+**How it could affect YOUR results:**
+
+1. **Timing offset.** HPA's control loop runs every 15 seconds. KEDA's polling interval is also 15 seconds. But they don't synchronize. HPA might poll at t=0, t=15, t=30... while KEDA polls at t=3, t=18, t=33. If a spike hits at t=5:
+   - HPA detects it at t=15 (10s delay)
+   - KEDA detects it at t=18 (13s delay)
+
+   Or KEDA polls at t=7 and detects it in 2 seconds while HPA waits until t=15. This random 0-15 second offset adds noise to "time-to-scale" measurements. Over 5 repetitions, it may average out — but if it doesn't, you might conclude "KEDA is 5 seconds faster" when it's actually random polling alignment.
+
+2. **Rate window mismatch.** prometheus-adapter computes `rate()[1m]` when IT scrapes. KEDA computes `rate()[1m]` when IT scrapes. They scrape at different times, so the 1-minute windows cover slightly different time ranges, giving different values for the "same" metric. During a sharp spike, the value difference can be significant.
+
+3. **Pod count disagreement.** HPA knows pod count from the Kubernetes API (authoritative, real-time). KEDA's query counts pods via `kube_pod_info` from Prometheus (which could be 15 seconds stale). If HPA has already scaled to 3 pods but Prometheus still shows 2 pods, KEDA computes a higher per-pod rate — KEDA might scale more aggressively than H3 for the same actual load.
+
+**How to minimize it:**
+
+```bash
+# Step 1: During calibration (Week 9), run H3 and K1 pilot tests back-to-back
+# on the same load pattern, same day, same cluster state
+# Compare the time-to-scale measurements
+
+# Step 2: Verify both systems are reading similar values
+# During a test, simultaneously check:
+kubectl get hpa product-service-hpa-custom -o yaml | grep -A5 "currentMetrics"
+kubectl get scaledobject product-service-keda -o yaml | grep -A5 "metrics"
+# The "current" values should be within 10% of each other
+# If they diverge significantly, investigate the rate() window or pod count source
+
+# Step 3: If timing offset is a concern, document it honestly
+# In BAB 3, write: "Both HPA and KEDA poll metrics at 15-second intervals.
+# The polling phases are not synchronized, introducing ±15 seconds of
+# measurement variance in time-to-scale. This variance is expected to
+# average out across 5 repetitions per configuration."
+
+# Step 4: Consider using a longer rate window (2 minutes instead of 1)
+# to smooth out timing differences:
+# KEDA: rate(http_requests_total[2m])
+# prometheus-adapter: rate(<<.Series>>{<<.LabelMatchers>>}[2m])
+# Trade-off: longer window = smoother but slower to detect spikes
+```
+
+---
+
+### Risk 7: Forgot to `az aks stop`
+
+**Probability:** Medium (it WILL happen at least once) | **Impact:** 🟡 $4-87 per occurrence | **Budget:** 30 min setup on Day 1
+
+**What happens:**
+
+3× D4as_v5 at $0.516/hour. You finish experimenting at 11pm, go to bed, forget to stop.
+
+| Scenario | Cost Burned |
+|----------|------------|
+| 8 hours overnight | $4.13 |
+| Full weekend forgot | $24.77 |
+| Holiday week forgot | $86.69 |
+
+**How it WILL happen to YOU:**
+
+The most common scenario: you finish a debugging session at 10pm, think "I'll run one more test tomorrow morning," leave the cluster running, then get busy with classes or homework and don't open your laptop for 2 days. $24.77 gone.
+
+**How to prevent it:**
+
+```bash
+# Option 1: Azure Automation (set once, works forever)
+# Create a Logic App or Automation Runbook that runs 'az aks stop' at midnight daily
+# Azure Automation → Create Runbook → PowerShell:
+#   Stop-AzAksCluster -ResourceGroupName "thesis-rg" -Name "thesis-aks"
+#   Schedule: daily at 00:00 WIB
+
+# Option 2: Simple cron reminder (less reliable but still helpful)
+# On your phone: set a DAILY alarm at 11pm: "STOP AKS CLUSTER"
+
+# Option 3: Check-before-sleep script
+# Save this as ~/stop-aks.sh
+az aks stop --resource-group thesis-rg --name thesis-aks --no-wait
+echo "Cluster stopping. Goodnight. 💤"
+
+# Before bed, run: bash ~/stop-aks.sh
+
+# Option 4: Azure Budget Alert
+# Azure Portal → Cost Management → Budgets → Create
+# Set $100 budget, alert at $50 (50%), $75 (75%), $100 (100%)
+# You'll get email/SMS when spending crosses thresholds
+```
+
+**Set up Option 4 (Budget Alert) on the FIRST DAY you create the cluster.** It's non-negotiable.
+
+---
+
+### Risk 8: k6 Script Rewrite Is Harder Than Expected
+
+**Probability:** Medium | **Impact:** 🟡 +3-5 days | **Budget:** 1 full week
+
+**What happens technically:**
+
+Your current k6 test does simple `GET /products`. The realistic thesis test needs to simulate a user journey:
+1. Register → POST /auth/register (needs unique email each run)
+2. Login → POST /auth/login (get JWT token)
+3. Browse products → GET /products (needs seeded product data)
+4. Add to cart → POST /cart (needs valid product ID from step 3)
+5. Create order → POST /orders (needs items in cart from step 4)
+
+Each step depends on the previous one. This is inherently complex.
+
+**How it could break for YOU specifically:**
+
+1. **State dependency chains.** If registration fails (duplicate email because you already created that user in a previous run), login fails, which means no JWT, which means all subsequent requests return 401 Unauthorized. One failure cascades into 100% error rate.
+
+2. **Seeded data missing.** Your product database must have products before the test starts. Fresh cluster → empty database → `GET /products` returns `[]` → `POST /cart` fails (no product ID) → the entire flow produces 400/404 errors instead of measuring real performance.
+
+3. **JWT token handling.** k6 must extract the JWT from the login response body and set it in the `Authorization: Bearer <token>` header for all subsequent requests. If your API changes the response format (e.g., `{token: "..."}` vs `{access_token: "..."}`) or if the token expires mid-test, requests silently fail.
+
+4. **Concurrency race conditions.** At 200 RPS with the full flow, you might trigger bugs in your own code. Two concurrent requests adding to the same cart, or two order-creation requests for the same cart items — these produce sporadic 500 errors that add noise to your error rate KPI. Are those errors from "autoscaling failure" or "application bugs"? You won't know unless you test the flow at high concurrency before the thesis experiments.
+
+5. **Bcrypt latency bottleneck.** The login endpoint uses bcrypt with 12 rounds (~200-400ms per hash). At 200 RPS, if every virtual user logs in, auth-service needs to process 200 bcrypt operations per second. That's 40-80 seconds of CPU per second — absolutely crushing. You'll need to either pre-authenticate users and reuse tokens, or limit the login rate in your k6 script.
+
+**How to approach the rewrite:**
+
+```javascript
+// Simplified k6 structure (not the full script, but the pattern):
+import http from 'k6/http';
+
+// SETUP: runs once before the test — seed data, create test users
+export function setup() {
+  // 1. Seed product data (run migration/seed script)
+  // 2. Create N test users with unique emails
+  // 3. Login each user, store JWT tokens
+  // 4. Return tokens array for use in test
+  const tokens = [];
+  for (let i = 0; i < 50; i++) {
+    const register = http.post(`${BASE_URL}/auth/register`, JSON.stringify({
+      email: `test-user-${i}-${Date.now()}@test.com`,
+      password: 'testpassword123'
+    }));
+    const login = http.post(`${BASE_URL}/auth/login`, JSON.stringify({
+      email: `test-user-${i}-${Date.now()}@test.com`,
+      password: 'testpassword123'
+    }));
+    tokens.push(login.json('token'));
+  }
+  return { tokens };
+}
+
+// TEST: each virtual user picks a pre-created token and makes requests
+export default function(data) {
+  const token = data.tokens[__VU % data.tokens.length];
+  const headers = { Authorization: `Bearer ${token}` };
+
+  // Weighted scenario: 70% browse, 20% add-to-cart, 10% order
+  const roll = Math.random();
+  if (roll < 0.7) {
+    http.get(`${BASE_URL}/products`, { headers });        // Most common action
+  } else if (roll < 0.9) {
+    http.post(`${BASE_URL}/cart`, JSON.stringify({...}), { headers });
+  } else {
+    http.post(`${BASE_URL}/orders`, JSON.stringify({...}), { headers });
+  }
+}
+```
+
+**Key insight:** Don't have every virtual user register+login on every iteration. Do registration and login ONCE in the `setup()` function, create a pool of JWT tokens, and have virtual users pick from the pool. This avoids the bcrypt bottleneck and the duplicate-email problem.
+
+---
+
+### Risk 9: Advisor Requests Scope Change Mid-Project
+
+**Probability:** Low-Medium | **Impact:** 🟡 +1-2 weeks | **Budget:** 1 meeting
+
+**What happens:** You've built everything, started experiments, and your advisor says "Why don't you also test VPA?" or "Add 3 more services" or "Compare with GKE too." Any of these would add 3-6 weeks of work.
+
+**How to prevent it:** Present your experiment design (this blueprint's Section 6) to your advisor for explicit approval BEFORE building anything. Get agreement on the scope, the 6 configurations, the 2 services, and the metrics. Ideally get this in writing (email confirmation).
+
+**When it happens anyway:** If the request is small (add one more metric, adjust a threshold), accommodate it. If it's large (add VPA, test on GKE), explain the time/budget constraint and propose it as "Saran untuk Penelitian Selanjutnya" in BAB 5. Most advisors accept this framing.
+
+---
+
+## 9. Make-It-Stand-Out Strategy
+
+### Strategy 1: The "Metric Mismatch" Narrative + Controlled Proof
+
+Frame the entire thesis around one central story:
+
+> "CPU-based autoscaling is the Kubernetes default, but it is fundamentally mismatched with I/O-bound microservices. This thesis demonstrates the mismatch empirically, proves it is the metric type — not the autoscaling engine — that causes the failure, and shows that switching to request-rate-based scaling resolves it regardless of whether HPA or KEDA is used."
+
+This narrative is more nuanced and academically stronger than simply "KEDA beats HPA." The thesis structure becomes:
+
+1. **BAB 1:** There's a problem — CPU-based HPA doesn't work for all service types
+2. **BAB 2:** Literature confirms this limitation but few studies isolate WHY (metric? engine? both?)
+3. **BAB 3:** We design a controlled factorial experiment that isolates the variables
+4. **BAB 4:** Results reveal the relative contribution of metric type vs engine architecture
+5. **BAB 5:** Practitioners should select autoscaling *metric* based on service workload profile, and *engine* based on operational requirements
+
+The H3 config is what makes this narrative possible. Without it, you can only say "KEDA is better." With it, you can say "here's exactly WHY and WHICH FACTOR contributes HOW MUCH."
+
+### Strategy 2: Cost-Performance Pareto Analysis
+
+For every configuration, compute the resource cost index. Then plot:
+
+```
+X-axis: Resource Cost Index ($)
+Y-axis: p95 Latency (ms)
+
+Each point = one configuration (average of 5 runs)
+Color = method (blue=HPA-CPU, orange=HPA-RPS, green=KEDA, gray=baseline)
+Shape = load pattern (circle=gradual, triangle=spike, square=oscillating)
+```
+
+Draw the **Pareto frontier**: configurations where no other config is both cheaper AND faster. With 6 configs × 3 load patterns = 18 data points per service, the Pareto plot will clearly show clusters:
+- H1/H2 (HPA-CPU) clustering with B1 (under-provisioned) for product-service — proof of metric mismatch
+- H3 and K1 clustering together (or K1 slightly dominant) — proof of metric superiority
+- All methods clustering similarly for auth-service — proof that CPU works for CPU-bound services
+
+This is academically impressive (multi-objective optimization vocabulary) and practically useful (a decision-maker can pick their cost-performance preference).
+
+### Strategy 3: Annotated Scaling Timeline Visualization
+
+For the most interesting runs (spike load pattern, product-service), create synchronized multi-panel time-series showing ALL 4 autoscaling methods on the same chart:
+
+```
+Panel 1: Incoming RPS (from k6) — same for all
+Panel 2: Active Pod Count — 4 overlaid lines (H1, H2, H3, K1)
+Panel 3: p95 Latency — 4 overlaid lines
+Panel 4: CPU Utilization — 4 overlaid lines
+```
+
+The visual story becomes undeniable:
+- **H1/H2 lines** (blue): Pod count stays at 1. CPU stays at 25%. Latency explodes to 3000ms. HPA never triggers.
+- **H3 line** (orange): Pod count increases at t=135s. Latency recovers by t=155s. HPA + request-rate works.
+- **K1 line** (green): Pod count increases at t=130s (5s faster?). Latency recovers by t=150s. KEDA + request-rate works.
+
+An examiner sees this ONE chart and immediately understands the entire thesis. It's the most compelling evidence you can produce.
+
+### Strategy 4: The "Decomposition Table" (Unique Deliverable)
+
+Produce a summary table that no other S1 thesis has:
+
+| Service Type | Metric Effect (H3 vs H1) | Engine Effect (K1 vs H3) | Combined Effect (K1 vs H1) |
+|-------------|------------------------|-------------------------|---------------------------|
+| I/O-bound (product) | -60% latency | -10% latency | -65% latency |
+| CPU-bound (auth) | -5% latency | -3% latency | -8% latency |
+
+*(Numbers are hypothetical — replace with actual measured values)*
+
+This table answers definitively: "How much improvement comes from the metric? How much from the engine?" No other thesis at this level performs this decomposition.
+
+---
+
+## 10. Realistic Timeline (7-8 Months)
+
+With 7-8 months available, the timeline shifts from "compressed sprint" to "deliberate, high-quality execution." This extra time is valuable — it allows thorough piloting, careful debugging, iterative analysis, and multiple advisor review cycles.
+
+### Phase 1: Foundation & Literature (Weeks 1-6)
+
+| Week | Activities | Deliverables |
+|------|-----------|-------------|
+| 1-2 | Literature review: HPA, KEDA, autoscaling in Kubernetes. Read 15-20 papers. Draft BAB 2 skeleton. | Annotated bibliography, BAB 2 outline |
+| 3 | AKS cluster creation, GHCR image push, verify all deployments work on AKS | Working cluster with all 5 services |
+| 4 | Install KEDA (AKS add-on) + prometheus-adapter (Helm). Verify both are running. | KEDA + adapter operational |
+| 5 | Rewrite k6 load test script (multi-endpoint weighted scenarios, auth flow, data seeding) | Validated k6 script |
+| 6 | Add resource requests to monitoring pods. Present experiment design to advisor for approval. | Advisor approval on scope |
+
+### Phase 2: Pilot & Calibration (Weeks 7-10)
+
+| Week | Activities | Deliverables |
+|------|-----------|-------------|
+| 7 | Configure KEDA ScaledObject, test Prometheus scaler triggers. Debug any query issues. | Working KEDA scaling |
+| 8 | Configure prometheus-adapter rules, verify H3 custom metric appears in Kubernetes API. Debug. | Working `kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1` |
+| 9 | Calibrate thresholds: run baseline tests at various RPS, determine saturation point, set H3 and K1 thresholds to the same value. | Documented calibration results |
+| 10 | Full pilot runs: 6-12 experiments across all configs and both services. Validate data collection pipeline. Check for anomalies. | Validated experiment pipeline |
+
+### Phase 3: Experiments (Weeks 11-16)
+
+| Week | Activities | Deliverables |
+|------|-----------|-------------|
+| 11-12 | Run product-service experiments: 90 runs (6 configs × 3 patterns × 5 reps). ~4-5 hours/day over 5-6 days. | 90 raw data files |
+| 13-14 | Run auth-service experiments: 90 runs. Same schedule. | 90 raw data files |
+| 15 | Review all data. Re-run failed/anomalous runs. Run additional repetitions if any config shows high variance. | Clean, complete dataset (180+ files) |
+| 16 | Buffer week for unexpected issues, additional re-runs, or extended debugging. | Finalized dataset |
+
+### Phase 4: Analysis & Visualization (Weeks 17-20)
+
+| Week | Activities | Deliverables |
+|------|-----------|-------------|
+| 17 | Descriptive statistics (mean, median, SD, CI) for all KPIs across all configs. | Summary statistics tables |
+| 18 | Statistical testing (Wilcoxon signed-rank: H1 vs H3, H3 vs K1, H1 vs K1). Compute effect sizes. | Significance test results |
+| 19 | Pareto frontier computation and cost analysis. Build the decomposition table (metric effect vs engine effect). | Pareto plots, decomposition table |
+| 20 | Create annotated timeline visualizations. Create comparison bar charts and recommendation matrix. | All thesis figures |
+
+### Phase 5: Writing (Weeks 21-28)
+
+| Week | Activities | Deliverables |
+|------|-----------|-------------|
+| 21-22 | BAB 1 (Introduction) + BAB 3 (Methodology) | Draft chapters 1, 3 |
+| 23-24 | BAB 4 (Results and Analysis) — the heaviest chapter, with all figures and tables | Draft chapter 4 |
+| 25 | BAB 2 (Literature Review) — finalize based on experiment insights | Draft chapter 2 |
+| 26 | BAB 5 (Conclusions, Recommendations, Future Work) | Draft chapter 5 |
+| 27 | Advisor review — submit full draft, receive feedback | Advisor feedback |
+| 28 | Final revisions, formatting, reference checking, abstract | Final thesis |
+
+**Total: ~28 weeks (7 months).** Leaves 1 month buffer if on 8-month schedule.
+
+**Key advantages of the extended timeline:**
+1. **2 full weeks for prometheus-adapter** (Week 8-9) — the highest-risk component gets dedicated time
+2. **4 weeks for experiments** — no rushing, spread across multiple sessions
+3. **4 weeks for analysis** — thorough statistical work, not rushed calculations
+4. **8 weeks for writing** — multiple advisor review cycles, professional quality
+5. **Multiple buffer weeks** — absorbs any slippage without cascading
+
+---
+
+## 11. Final Assessment
+
+### Rating: **9 / 10**
+
+### Why 9
+
+**What makes it strong:**
+
+1. **Controlled factorial design.** The H3 config (HPA + request-rate via prometheus-adapter) transforms this from a simple tool comparison into a proper scientific experiment. The 2×2 design (engine × metric) isolates each variable's contribution. This is the single most important improvement — it makes the thesis methodologically defensible against any reviewer objection.
+
+2. **Paradigm comparison, not parameter tuning.** Comparing reactive CPU-based scaling against event-driven request-rate scaling is a fundamentally more interesting research question than tuning thresholds.
+
+3. **The "metric mismatch" finding is genuine and practical.** The experiment will empirically demonstrate that CPU-based HPA fails for I/O-bound services. More importantly, the factorial design reveals WHETHER the fix is the metric (H3 vs H1) or the engine (K1 vs H3) — a nuanced finding that no other S1 thesis provides.
+
+4. **The decomposition table is a unique deliverable.** Quantifying "60% of the improvement comes from the metric, 10% from the engine" is something industry practitioners can directly act on. It's also something examiners have never seen from an S1 student.
+
+5. **Multi-dimensional analysis.** Combining performance, efficiency, and cost into a Pareto analysis with Pareto frontiers and dollar-cost equivalents elevates this above descriptive empiricism.
+
+6. **Real application, real cloud.** Testing on an actual microservices app on AKS (not a synthetic benchmark) gives external validity.
+
+7. **Statistical rigor.** 5 repetitions, Wilcoxon signed-rank significance testing, 95% confidence intervals. This is uncommon at S1 level.
+
+8. **Annotated timeline visualizations.** The synchronized multi-panel charts with H1/H2/H3/K1 overlaid on the same plot produce undeniable visual evidence. Examiners remember these.
+
+**What prevents it from being 10:**
+
+1. **No new tool or algorithm.** You are comparing and decomposing existing tools' behavior, not creating something new. The contribution is empirical analysis with controlled methodology, not algorithmic invention. This is the hard ceiling for empirical S1 work — reaching 10 would require building a custom autoscaler or proposing a novel scaling algorithm.
+
+2. **Single application domain.** The findings are validated on one e-commerce application. Generalizability to other domains (streaming, batch processing, ML inference) would require additional experiments beyond S1 scope.
+
+### Concise Summary
+
+This thesis compares Kubernetes autoscaling strategies using a controlled factorial design: HPA with CPU metric, HPA with request-rate metric (via prometheus-adapter), and KEDA with request-rate metric. By testing on two microservices with distinct workload profiles (I/O-bound vs CPU-bound) on AKS, it isolates the contribution of **metric type** from **engine architecture** to scaling effectiveness. Across 180 controlled experiments with statistical rigor, it measures latency, error rate, scaling speed, and resource cost, producing a decomposition of improvement factors and a Pareto-optimal cost-performance analysis.
+
+**Budget:** ~$75 | **Timeline:** 28 weeks (7 months) | **Risk:** Medium (prometheus-adapter + KEDA setup) | **Score:** 9/10
+
+### Final Recommendation
+
+**Proceed with this plan.** The thesis is well-scoped, well-budgeted, methodologically rigorous, technically deep, and career-relevant. The 7-8 month timeline provides ample buffer for the two highest-risk components (KEDA setup in Weeks 7-8, prometheus-adapter in Weeks 8-9).
+
+**Fallback strategy** (if prometheus-adapter proves unworkable after 1 week of debugging):
+- Drop H3, revert to 5-config design → still 8.5/10
+- The thesis still compares HPA vs KEDA effectively; you just acknowledge the metric-vs-engine question as a limitation and future work
+- This fallback is low-probability (prometheus-adapter is mature and well-documented) but having it means you can never end up with nothing
+
+---
+
+## 12. Thesis Chapter Outline — Struktur Perancangan Jaringan
+
+This section maps every BAB and sub-section from your university's "Perancangan Jaringan" thesis structure to the specific content from this blueprint. Use this as your writing guide — when you sit down to write a section, this tells you exactly what goes there.
+
+---
+
+### BAB 1 PENDAHULUAN
+
+#### 1.1 Latar Belakang
+
+**What to write:** Build the narrative in this order:
+
+1. **Microservices adoption is growing** — organizations are migrating from monolithic architectures to microservices for scalability and independent deployment (cite 2-3 industry reports or papers).
+
+2. **Kubernetes is the standard orchestration platform** — it automates deployment, scaling, and management of containerized applications. HPA (Horizontal Pod Autoscaler) is Kubernetes' built-in autoscaling mechanism (cite Kubernetes documentation, 1-2 papers).
+
+3. **The problem: HPA uses CPU as default scaling metric** — but not all microservices are CPU-bound. I/O-bound services (database reads, network calls) can be overloaded while CPU stays low. HPA misses the overload and doesn't scale. This is the "metric mismatch" problem.
+
+4. **KEDA as an alternative** — KEDA (Kubernetes Event-Driven Autoscaling) is a CNCF graduated project that enables scaling based on event sources including HTTP request rate via Prometheus. It addresses the metric mismatch by using application-level signals instead of resource-level signals.
+
+5. **The research gap** — few studies compare HPA and KEDA on real applications with controlled methodology. Even fewer isolate WHETHER the improvement comes from the metric type or the autoscaling engine itself. This thesis addresses that gap using a controlled factorial experiment design.
+
+6. **Why this matters** — choosing the wrong autoscaling strategy wastes cloud resources (over-provisioning) or degrades user experience (under-provisioning). A systematic comparison helps practitioners make informed decisions.
+
+**Length:** 2-3 pages.
+
+#### 1.2 Rumusan Masalah
+
+**What to write:** 3 research questions derived from the gap:
+
+1. Bagaimana perbandingan responsivitas (p95 latency, error rate, time-to-scale) antara penskalaan berbasis CPU (HPA) dan penskalaan berbasis request rate (KEDA) pada layanan microservices dengan karakteristik beban I/O-bound dan CPU-bound?
+
+2. Seberapa besar kontribusi relatif dari jenis metrik (CPU vs request rate) dibandingkan dengan arsitektur engine autoscaling (HPA vs KEDA) terhadap efektivitas penskalaan, diuji melalui desain faktorial terkontrol dengan HPA + custom metric (prometheus-adapter) sebagai variabel kontrol?
+
+3. Bagaimana trade-off antara biaya resource dan performa (Pareto frontier) pada masing-masing konfigurasi autoscaling untuk kedua jenis layanan?
+
+#### 1.3 Hipotesis (Skripsi penelitian)
+
+**What to write:**
+
+1. Penskalaan berbasis request rate (H3 dan K1) secara signifikan mengungguli penskalaan berbasis CPU (H1 dan H2) pada layanan I/O-bound (product-service), tetapi menunjukkan perbedaan yang tidak signifikan pada layanan CPU-bound (auth-service).
+
+2. Jenis metrik (CPU vs request rate) memberikan kontribusi yang lebih besar terhadap peningkatan responsivitas dibandingkan arsitektur engine autoscaling (HPA vs KEDA).
+
+3. Terdapat konfigurasi autoscaling yang Pareto-optimal (biaya terendah untuk performa tertinggi), dan konfigurasi tersebut berbeda tergantung karakteristik beban layanan.
+
+#### 1.4 Ruang Lingkup
+
+**What to write:** Summarize from blueprint Section 3 (Scope Definition):
+- Platform: Azure Kubernetes Service (AKS), Free Tier, Southeast Asia region
+- Cluster: 3× Standard_D4as_v5 (4 vCPU, 16GB RAM each)
+- Application: E-commerce microservices (5 services, 3 databases)
+- Services under test: product-service (I/O-bound), auth-service (CPU-bound)
+- Autoscaling methods: HPA (CPU), HPA (request-rate via prometheus-adapter), KEDA (request-rate via Prometheus scaler)
+- Baselines: Fixed 1 replica, Fixed 5 replicas
+- Load patterns: Gradual ramp, Sudden spike, Oscillating
+- Exclusions: Cluster Autoscaler, VPA, memory-based HPA, scale-to-zero, all 5 services simultaneously
+
+#### 1.5 Tujuan dan Manfaat
+
+**What to write:**
+
+**Tujuan:**
+1. Mengukur dan membandingkan responsivitas HPA (CPU-based) dan KEDA (request-rate-based) pada layanan microservices dengan karakteristik beban yang berbeda.
+2. Mengisolasi kontribusi jenis metrik vs arsitektur engine autoscaling terhadap efektivitas penskalaan melalui desain eksperimen faktorial terkontrol.
+3. Menganalisis trade-off biaya-performa dan mengidentifikasi konfigurasi Pareto-optimal untuk setiap jenis layanan.
+
+**Manfaat:**
+- *Praktis:* Memberikan panduan bagi DevOps/SRE dalam memilih strategi autoscaling berdasarkan karakteristik beban layanan.
+- *Akademis:* Mengisi gap penelitian tentang perbandingan terkontrol antara reactive dan event-driven autoscaling pada aplikasi cloud-native.
+
+#### 1.6 Metode Penelitian
+
+**What to write:** Brief summary (1 paragraph, details in BAB 3):
+- Metode: Eksperimental kuantitatif dengan desain faktorial terkontrol
+- Teori: dari BAB 2 (Kubernetes autoscaling, KEDA, Prometheus metrics)
+- Penerapan: dibahas mendetail di BAB 3
+- Reference the 6-config × 3-pattern × 5-rep × 2-service design (180 runs)
+
+#### 1.7 Sistematika Penulisan
+
+**What to write:** Standard table of contents summary — 1 paragraph per BAB explaining what it covers.
+
+---
+
+### BAB 2 TINJAUAN REFERENSI
+
+#### 2.1 Teori yang Berkaitan dengan Jaringan
+
+##### 2.1.1 Teori Jaringan Komputer → **Teori Container Orchestration dan Kubernetes**
+
+**What to write:**
+- Container technology (Docker): what it is, how it isolates processes, image model
+- Kubernetes architecture: control plane (API server, scheduler, controller-manager, etcd), data plane (kubelet, kube-proxy, container runtime)
+- Key concepts: Pod, Deployment, Service, Namespace, ReplicaSet
+- How Kubernetes manages containerized applications at scale
+- **Length:** 2-3 pages with architecture diagram
+
+##### 2.1.2 Teori OSI dan TCP/IP Layers → **Teori Komunikasi Antar-Service pada Kubernetes**
+
+**What to write:**
+- Kubernetes networking model: every Pod gets its own IP, pods can communicate directly
+- Service types: ClusterIP, NodePort, LoadBalancer
+- DNS-based service discovery in Kubernetes (CoreDNS)
+- How HTTP/REST communication works between microservices (product-service → PostgreSQL, gateway → services)
+- Network policies and traffic flow within a cluster
+- **Length:** 1-2 pages
+
+##### 2.1.3 Teori Protokol yang Digunakan → **Teori Protokol HTTP/REST, Prometheus, dan Kubernetes API**
+
+**What to write:**
+- HTTP/REST: the protocol your microservices use for inter-service communication
+- Prometheus scraping protocol: how Prometheus pulls metrics via HTTP GET to `/metrics` endpoint
+- Kubernetes API: how HPA and KEDA interact with the API server to read metrics and adjust replica counts
+- Custom Metrics API: how prometheus-adapter bridges Prometheus metrics into the Kubernetes metrics pipeline
+- **Length:** 1-2 pages
+
+##### 2.1.4 Teori Devais yang Digunakan → **Teori Virtual Machine dan Node pada Cloud Kubernetes**
+
+**What to write:**
+- Azure Virtual Machines: what D-series VMs are, vCPU vs physical CPU, non-burstable vs burstable (B-series)
+- Specifically: Standard_D4as_v5 specifications (4 vCPU, 16GB RAM, AMD EPYC, ephemeral OS disk)
+- Why non-burstable VMs are critical for benchmarking (B-series credit system would invalidate CPU measurements)
+- AKS node pools: how Kubernetes maps VMs to nodes, allocatable vs total resources (kubelet + system reservation)
+- **Length:** 1-2 pages with specification table
+
+##### 2.1.5 Teori dan Metode Perancangan Jaringan → **Teori Perancangan Arsitektur Kubernetes Cluster**
+
+**What to write:**
+- How to design a Kubernetes cluster: node sizing methodology (resource requests + limits + system overhead)
+- Resource management concepts: requests vs limits, QoS classes (Guaranteed, Burstable, BestEffort)
+- Capacity planning: calculating total allocatable CPU/memory, headroom for burst traffic
+- AKS-specific design considerations: Free tier vs Standard, node OS disk types, network plugin selection
+- **Length:** 1-2 pages
+
+##### 2.1.6 Teori dan Metode Analisis untuk Menganalisis Hasil Pengukuran → **Metode Analisis Statistik**
+
+**What to write:**
+- Descriptive statistics: mean, median, standard deviation, percentiles (p50, p95, p99)
+- Confidence intervals: 95% CI interpretation for experimental measurements
+- Non-parametric significance testing: Wilcoxon signed-rank test — why non-parametric (can't assume normal distribution of latency data), how it works, when to reject H0
+- Effect size measurement: how to quantify the magnitude of difference (not just "is it significant" but "how much")
+- Multi-objective optimization: Pareto frontier definition, dominance relation, how to identify Pareto-optimal configurations
+- **Length:** 2-3 pages (this is critical methodology — examiners will scrutinize this)
+
+##### 2.1.7 Teori dan Metode Fact Finding → **Studi Literatur dan Identifikasi Masalah**
+
+**What to write:**
+- Literature review methodology: how you searched for prior studies (keywords, databases, selection criteria)
+- Key findings from literature: HPA limitations documented in prior work, KEDA studies, autoscaling comparison papers
+- Gap identification: what prior studies covered (HPA tuning, KEDA features) vs what they missed (controlled factorial comparison, metric-type isolation, cost analysis)
+- **Length:** 1-2 pages
+
+##### 2.1.8 Teori dan Metode Pengukuran dan Tools → **Tools Pengukuran dan Monitoring**
+
+**What to write (detailed per tool):**
+
+**k6 (Load Testing Tool):**
+- What it is: open-source load testing tool by Grafana Labs
+- How it works: scenario-based testing with JavaScript, supports ramping-arrival-rate, constant-arrival-rate
+- Metrics it produces: `http_req_duration`, `http_req_failed`, `http_reqs`, `vus`
+- Why chosen: runs as Kubernetes Job (in-cluster), eliminates network variance, scriptable
+
+**Prometheus (Metrics Collection):**
+- What it is: CNCF graduated time-series database for monitoring
+- How it works: pull-based scraping at configurable intervals (15s)
+- Key metrics: `container_cpu_usage_seconds_total`, `kube_pod_status_ready`, `kube_deployment_status_replicas`, `http_requests_total`
+- PromQL: the query language for aggregating and analyzing metrics
+
+**Grafana (Visualization):**
+- What it is: observability platform for dashboards
+- How it's used: creating the annotated scaling timeline visualizations (Strategy 3)
+
+**prometheus-adapter:**
+- What it is: bridges Prometheus metrics into Kubernetes Custom Metrics API
+- Why needed: allows HPA to use request-rate as a scaling metric (H3 config)
+
+**kubectl + metrics-server:**
+- What it is: Kubernetes CLI + built-in resource metrics pipeline
+- How it's used: monitoring CPU/memory utilization via `kubectl top`
+
+**Length:** 3-4 pages (cover each tool with purpose, mechanism, and role in your experiment)
+
+#### 2.2 Teori yang Terkait Tema Penelitian (Tematik) → **Teori Autoscaling pada Kubernetes**
+
+**What to write:**
+- **Horizontal Pod Autoscaler (HPA):**
+  - Architecture: metrics-server → API server → HPA controller → deployment
+  - Control loop: 15-second default interval
+  - Scaling algorithm: `desiredReplicas = ceil(currentReplicas × (currentMetric / desiredMetric))`
+  - Metric types: Resource (CPU/memory), Pods (custom), Object (external)
+  - Behavior policies: stabilizationWindowSeconds, scaling policies (Pods, Percent)
+  - Limitations: reactive only, CPU-centric by default, requires prometheus-adapter for custom metrics
+
+- **KEDA (Kubernetes Event-Driven Autoscaling):**
+  - Architecture: KEDA operator → ScaledObject → external event source → deployment
+  - How it differs from HPA: event-driven polling, Prometheus scaler reads PromQL directly, scale-to-zero capability
+  - ScaledObject specification: triggers, pollingInterval, cooldownPeriod, thresholds
+  - Prometheus scaler: how it queries Prometheus and maps results to scaling decisions
+  - KEDA as CNCF graduated project: maturity, adoption, AKS native integration
+
+- **Comparison framework:**
+  - Reactive (HPA) vs Event-driven (KEDA)
+  - Resource metrics vs Application metrics
+  - The theoretical basis for why metric type matters for different workload profiles
+
+**Length:** 4-5 pages (this is your core theoretical framework — must be thorough)
+
+#### 2.3 Teori dan Metode Evaluasi yang Digunakan → **Metode Evaluasi Cost-Performance**
+
+**What to write:**
+- Resource Cost Index formula: `Σ(active_pods × duration_seconds × cpu_request) × price_per_cpu_second`
+- How AKS pricing translates to per-pod-second cost
+- Pareto frontier analysis: theory and application to multi-objective optimization
+- The decomposition methodology: isolating metric effect (H3 vs H1) from engine effect (K1 vs H3)
+- What constitutes a "better" configuration: SLO-based evaluation (e.g., p95 < 500ms AND error rate < 1%)
+- **Length:** 2-3 pages
+
+#### 2.4 Studi Hasil Penelitian yang Berkaitan → **Penelitian Terdahulu tentang Autoscaling Kubernetes**
+
+**What to write:**
+- Review 5-8 prior studies on Kubernetes autoscaling
+- For each: cite, summarize methodology, summarize findings, identify limitations
+- Show the gap: no study does all of (a) controlled factorial design, (b) real application, (c) metric-type isolation, (d) cost analysis
+- Conclude with how YOUR study addresses each gap
+- **Format:** Table comparing prior studies on dimensions: method, application type, metrics compared, statistical rigor, cost analysis
+- **Length:** 3-4 pages
+
+---
+
+### BAB 3 METODE PENELITIAN
+
+#### 3.1 Kerangka Berpikir
+
+**What to write:** A visual flowchart showing:
+
+```
+[Masalah: CPU-based HPA fails for I/O-bound services]
+         ↓
+[Pertanyaan: Is it the metric type or the engine?]
+         ↓
+[Desain: Controlled factorial experiment (2×2 + baselines)]
+         ↓
+[Implementasi: 6 configs × 3 loads × 5 reps × 2 services = 180 runs]
+         ↓
+[Pengukuran: Latency, Error Rate, Time-to-Scale, Cost]
+         ↓
+[Analisis: Statistical tests + Pareto + Decomposition]
+         ↓
+[Hasil: Metric effect vs Engine effect quantified per workload type]
+```
+
+Include 1-2 paragraphs explaining the logical flow. **Length:** 1 page.
+
+#### 3.2 Analisis Masalah
+
+##### 3.2.1 Deskripsi Singkat Mengenai Tempat Penelitian → **Lingkungan Azure Kubernetes Service**
+
+**What to write:**
+- Azure Student Subscription: $150/month credit, limitations
+- AKS Free Tier: what's included, what limitations exist
+- Region: Southeast Asia (closest to Indonesia, lowest latency)
+- Cluster specification: 3× Standard_D4as_v5, Ephemeral OS disk, Azure CNI networking
+- Why AKS over local (KIND): consistent non-burstable CPU, eliminates laptop variance, realistic multi-node topology
+- **Length:** 1 page
+
+##### 3.2.2 Analisis Kebutuhan → **Analisis Kebutuhan Autoscaling pada Aplikasi E-Commerce**
+
+**What to write:**
+- The e-commerce application description: 5 microservices (auth, product, cart, order, payment), 3 PostgreSQL databases, API gateway, frontend
+- Workload characteristics: variable traffic (browsing peaks, flash sales, idle periods)
+- Why autoscaling is needed: fixed replicas either waste resources (over-provisioned) or degrade performance (under-provisioned)
+- Specific needs: fast scale-up during traffic spikes, cost-efficient scale-down during idle, different scaling requirements per service type
+- **Length:** 1-2 pages
+
+##### 3.2.3 Topologi Saat Ini → **Arsitektur Aplikasi dan Deployment Saat Ini**
+
+**What to write:**
+- Current architecture diagram: all 5 services, databases, gateway, monitoring stack (Prometheus, Grafana, Loki)
+- Current deployment configuration: `replicas: 1` for all services, no autoscaling
+- Current resource requests/limits from your actual deployment YAML files
+- Current monitoring setup: Prometheus scrape config, FastAPI instrumentator, existing metrics
+- **Include:** architecture diagram showing service communication flow
+- **Length:** 2-3 pages with diagrams
+
+##### 3.2.4 Observasi yang Dilakukan Termasuk Pengukuran → **Pengukuran Baseline Tanpa Autoscaling**
+
+**What to write:**
+- Pilot test results: what happens to product-service under load WITHOUT autoscaling
+- Baseline metrics: p95 latency at 50 RPS, 100 RPS, 200 RPS with fixed 1 replica
+- CPU utilization observations: product-service CPU stays low under load (I/O-bound evidence), auth-service CPU rises linearly (CPU-bound evidence)
+- Resource utilization of infrastructure pods (Prometheus, Grafana, KEDA, prometheus-adapter)
+- **Include:** baseline measurement tables and CPU utilization graphs from pilot runs
+- **Length:** 2-3 pages with data tables
+
+##### 3.2.5 Identifikasi Masalah
+
+**What to write:**
+From observation data (3.2.4), identify:
+1. **Masalah 1:** product-service degrades under load but HPA (CPU) doesn't trigger because CPU stays below threshold — the metric mismatch problem
+2. **Masalah 2:** Fixed replicas lead to either wasted resources (over-provisioning) or degraded performance (under-provisioning) — no optimal static configuration exists
+3. **Masalah 3:** It is unclear whether the solution is changing the scaling metric (to request rate) or changing the scaling engine (to KEDA) — this needs controlled experimentation
+- **Length:** 1 page
+
+##### 3.2.6 Usulan Pemecahan Masalah → **Desain Eksperimen Faktorial Terkontrol**
+
+**What to write:**
+- The controlled factorial design: 2×2 matrix (engine × metric) + 2 baselines
+- The 6 configurations: B1, B2, H1, H2, H3, K1 — describe each with rationale
+- The 3 load patterns: gradual ramp, sudden spike, oscillating — describe each with rationale
+- The 2 services: product-service (I/O-bound), auth-service (CPU-bound) — why these two
+- Repetitions: 5 per configuration — why 5 (statistical minimum)
+- Total: 6 × 3 × 5 × 2 = 180 experiment runs
+- **Include:** the factorial matrix diagram from blueprint Section 6
+- **Include:** flowchart of the experimental protocol (reset → apply → warm-up → test → cooldown → export)
+- **Length:** 3-4 pages
+
+#### 3.3 Perancangan
+
+##### 3.3.1 Rancangan Topologi Jaringan → **Rancangan Arsitektur Kubernetes Cluster**
+
+**What to write:**
+- AKS cluster topology diagram: 3 nodes, pod placement strategy
+- Node specification: D4as_v5 with resource calculations (total allocatable: 11580m CPU, overhead breakdown)
+- Pod placement: where each component runs (monitoring on which node, app pods distributed, k6 Job)
+- Resource budget table: total CPU requests vs allocatable per node (from blueprint Section 4)
+- **Include:** cluster architecture diagram showing all 3 nodes with pod distribution
+- **Length:** 2-3 pages with diagrams and resource tables
+
+##### 3.3.2 Rancangan Distribusi IP → **Rancangan Kubernetes Networking**
+
+**What to write:**
+- AKS networking: Azure CNI plugin, VNet configuration
+- Pod CIDR and Service CIDR allocation
+- How services discover each other: ClusterIP + DNS (e.g., `product-service.ecommerce.svc.cluster.local`)
+- Internal communication paths: k6 → service (in-cluster, no LoadBalancer needed), service → PostgreSQL (internal DNS), KEDA → Prometheus (cross-namespace)
+- Port mappings for each service
+- **Length:** 1-2 pages with network diagram
+
+##### 3.3.3 Rancangan yang Berkaitan dengan Topik Skripsi → **Rancangan Konfigurasi Autoscaling**
+
+**What to write (this is the longest and most important section of BAB 3):**
+
+**A. Rancangan Konfigurasi HPA Default (H1):**
+- Full YAML manifest with explanation of each field
+- `targetCPU: 70%`, default behavior policy, why these values
+
+**B. Rancangan Konfigurasi HPA Tuned (H2):**
+- Full YAML manifest with explanation
+- `targetCPU: 50%`, aggressive scaling behavior — explain `stabilizationWindowSeconds: 0`, why aggressive
+
+**C. Rancangan Konfigurasi HPA Custom Metric (H3):**
+- prometheus-adapter rules ConfigMap — full YAML with explanation
+- HPA manifest using `type: Pods` with `http_requests_per_second`
+- Explain the adapter pipeline: Prometheus → prometheus-adapter → Custom Metrics API → HPA
+
+**D. Rancangan Konfigurasi KEDA (K1):**
+- ScaledObject manifest — full YAML with explanation
+- Explain: `pollingInterval: 15` to match HPA, `cooldownPeriod: 30`, the PromQL query
+
+**E. Rancangan Baseline (B1 dan B2):**
+- B1: Fixed `replicas: 1` — explain as lower bound
+- B2: Fixed `replicas: 5` — explain as upper bound
+
+**F. Rancangan Load Test (k6):**
+- k6 Job YAML manifest with resource requests
+- k6 test script structure: `setup()` for token pooling, weighted scenario distribution
+- 3 load pattern configurations: ramping-arrival-rate (gradual), constant-arrival-rate (spike), multi-stage (oscillating)
+
+**G. Rancangan Threshold Calibration:**
+- Calibration procedure: how H3 and K1 thresholds are set to the same value
+- Why calibration is critical for the H3 vs K1 comparison fairness
+
+**Length:** 6-8 pages with all YAML manifests and explanations. All YAML is already in blueprint Section 6 — copy and add Indonesian explanations.
+
+---
+
+### BAB 4 HASIL DAN PEMBAHASAN
+
+#### 4.1 Spesifikasi Devais yang Digunakan → **Spesifikasi Sistem**
+
+**What to write:**
+
+| Komponen | Spesifikasi |
+|----------|------------|
+| Cloud Platform | Azure Kubernetes Service (AKS), Free Tier |
+| Region | Southeast Asia |
+| Node VM | Standard_D4as_v5 (4 vCPU AMD EPYC, 16GB RAM, Ephemeral OS Disk) |
+| Node Count | 3 |
+| Kubernetes Version | (version used) |
+| Container Runtime | containerd |
+| Network Plugin | Azure CNI |
+| KEDA Version | (version used, AKS add-on) |
+| prometheus-adapter Version | (Helm chart version) |
+| Prometheus Version | (version used) |
+| k6 Version | (version used) |
+| Application Framework | Python FastAPI |
+| Database | PostgreSQL (in-cluster) |
+
+**Length:** 1-2 pages
+
+#### 4.2 Konfigurasi Devais → **Implementasi Konfigurasi Autoscaling**
+
+**What to write:**
+- AKS cluster creation command (`az aks create ...`) and verification
+- KEDA installation (`az aks update --enable-keda`) and verification
+- prometheus-adapter installation (Helm) and verification (`kubectl get --raw ...`)
+- All deployed YAML configurations with narration for each section:
+  - H1 HPA manifest → show `kubectl apply` → show `kubectl get hpa` output
+  - H2 HPA manifest → show the behavior policy differences
+  - H3 HPA manifest → show custom metric working (`TARGETS` column shows values)
+  - K1 ScaledObject → show `kubectl get scaledobject` → show `READY: True`
+  - prometheus-adapter config → show registered custom metrics
+  - k6 Job configuration → show resource requests
+  - Monitoring pods resource requests → show the fix applied
+- **Approach:** For each configuration, show the YAML, then show the `kubectl` verification output proving it works. This follows the template's instruction: "Pendekatan dengan menggunakan script konfigurasi lebih direkomendasikan."
+- **Length:** 5-8 pages (heavy on configuration scripts and verification output)
+
+#### 4.3 Simulasi → **Eksekusi Load Test**
+
+**What to write:**
+- Simulation environment description: how k6 runs inside the cluster, how load patterns map to k6 stages
+- Execution protocol: the 8-step procedure (reset → apply → stabilize → warm-up → test → cooldown → export → next)
+- Execution log: summary of 180 runs — how many sessions, hours per session, dates, any anomalies encountered
+- Example raw output: show a sample k6 summary output for one run (what the terminal looks like after a test completes)
+- Data collection: how Prometheus data is exported (PromQL queries used, JSON/CSV format), how k6 results are stored
+- **Use real data from your actual experiments** — this cannot be written before experiments
+- **Length:** 3-4 pages
+
+#### 4.4 Hasil Implementasi dan Pengukuran → **Hasil Eksperimen 180 Run**
+
+**What to write:** This is the RAW RESULTS section — present data before analysis.
+
+**For each service (product-service, then auth-service):**
+
+**Table format for each configuration × load pattern combination:**
+
+| Konfigurasi | Load Pattern | p95 Latency (ms) | Error Rate (%) | Time-to-Scale (s) | Resource Cost Index ($) | Scaling Events |
+|-------------|-------------|-------------------|----------------|-------------------|------------------------|----------------|
+| B1 (Fixed 1) | Gradual | mean ± SD | mean ± SD | N/A | mean ± SD | 0 |
+| B1 (Fixed 1) | Spike | mean ± SD | mean ± SD | N/A | mean ± SD | 0 |
+| ... | ... | ... | ... | ... | ... | ... |
+| K1 (KEDA) | Oscillating | mean ± SD | mean ± SD | mean ± SD | mean ± SD | mean ± SD |
+
+- Include 95% confidence intervals
+- Include the annotated scaling timeline visualizations (Strategy 3) for 3-5 most interesting runs
+- Show the synchronized multi-panel charts: RPS, Pod Count, p95 Latency, CPU — with H1/H2/H3/K1 overlaid
+- **Length:** 8-12 pages (tables + figures — this is the heaviest section)
+
+#### 4.5 Analisis Perbandingan → **Analisis Komparatif HPA vs KEDA**
+
+**What to write:** This is the ANALYSIS section — interpret the data.
+
+**A. Perbandingan Langsung (H1/H2 vs K1):**
+- For each load pattern × service combination: which method performed better on each KPI?
+- Statistical significance: Wilcoxon signed-rank test results (p-values, reject/accept H0)
+- Effect sizes: how large is the difference?
+
+**B. Isolasi Faktor — Dekomposisi (the unique deliverable):**
+
+| Service Type | Metric Effect (H3 vs H1) | Engine Effect (K1 vs H3) | Combined Effect (K1 vs H1) |
+|-------------|------------------------|-------------------------|---------------------------|
+| product-service | measured improvement | measured improvement | measured improvement |
+| auth-service | measured improvement | measured improvement | measured improvement |
+
+- Interpret: "X% of the improvement comes from the metric type, Y% from the engine"
+- Discuss what this means practically
+
+**C. Perbandingan per Load Pattern:**
+- Which autoscaling method handles gradual ramp best? Spike? Oscillating?
+- Does one method show more stability (fewer scaling events) during oscillating loads?
+
+**D. Perbandingan per Service Type:**
+- Confirm or refute the hypothesis: KEDA excels for I/O-bound, HPA-CPU works for CPU-bound
+- What does the crossover look like? Is there a service type where HPA-CPU is actually *better* than KEDA?
+
+**Length:** 5-7 pages with comparison tables and statistical test results
+
+#### 4.6 Analisis Evaluasi → **Evaluasi Cost-Performance dan Rekomendasi**
+
+**What to write:**
+
+**A. Pareto Frontier Analysis:**
+- The Pareto plot (Strategy 2): Cost vs Latency scatterplot with Pareto frontier drawn
+- Identify which configurations are Pareto-optimal for each service type
+- Interpret: "For product-service, K1 and H3 dominate. For auth-service, H2 and K1 are comparable."
+
+**B. Recommendation Matrix:**
+
+| Workload Type | Recommended Autoscaling | Recommended Metric | Why |
+|--------------|------------------------|--------------------|----|
+| I/O-bound (DB reads, network calls) | KEDA or HPA + custom metric | Request rate | CPU doesn't correlate with load |
+| CPU-bound (crypto, compression) | HPA (default) | CPU | CPU correlates with load, simpler setup |
+| Mixed | KEDA | Request rate | Handles both; marginal CPU overhead acceptable |
+
+**C. Evaluation Against User Needs (from 3.2.2):**
+- Does autoscaling meet the fast scale-up requirement? → Compare time-to-scale across methods
+- Does autoscaling meet cost efficiency? → Compare Resource Cost Index vs baseline
+- Which configuration best balances both? → Point to Pareto frontier
+
+**Length:** 4-5 pages with Pareto plots and recommendation table
+
+---
+
+### BAB 5 SIMPULAN DAN SARAN
+
+#### 5.1 Simpulan
+
+**What to write:**
+- Answer each research question from 1.2 with data:
+  1. "Perbandingan menunjukkan bahwa K1 (KEDA) memiliki p95 latency X% lebih rendah dari H1 (HPA-CPU) pada product-service (p < 0.05), sementara pada auth-service perbedaan tidak signifikan (p = Y)."
+  2. "Dekomposisi menunjukkan bahwa Z% peningkatan berasal dari jenis metrik dan W% dari arsitektur engine."
+  3. "Konfigurasi Pareto-optimal untuk layanan I/O-bound adalah [H3/K1], sedangkan untuk CPU-bound adalah [H2], berdasarkan analisis trade-off biaya-performa."
+- Confirm or refute each hypothesis from 1.3
+- **Critical rule from template:** "Tidak boleh membuat kesimpulan hanya berisi sistem yang telah berjalan tanpa memberikan bukti data yang kuat." → Every conclusion must reference specific measured values and statistical test results.
+- **Length:** 1-2 pages
+
+#### 5.2 Saran
+
+**What to write:**
+
+**Saran untuk Praktisi:**
+- Use request-rate-based scaling (KEDA or HPA + custom metric) for I/O-bound services
+- CPU-based HPA is sufficient for CPU-bound services
+- Consider operational complexity: KEDA requires less configuration for request-rate scaling than HPA + prometheus-adapter
+
+**Saran untuk Penelitian Selanjutnya:**
+1. Penambahan Vertical Pod Autoscaler (VPA) sebagai variabel perbandingan
+2. Pengujian fitur scale-to-zero pada KEDA dan dampaknya terhadap cold-start latency
+3. Perbandingan pada platform cloud lain (GKE, EKS) untuk validasi generalizability
+4. Penggunaan predictive/ML-based autoscaling sebagai alternatif reactive scaling
+5. Pengujian pada domain aplikasi lain (streaming, batch processing, ML inference)
+
+**Length:** 1 page

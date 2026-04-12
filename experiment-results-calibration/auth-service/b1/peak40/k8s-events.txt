@@ -1,0 +1,25 @@
+LAST SEEN   TYPE      REASON                 OBJECT                                                        MESSAGE
+47m         Normal    Scheduled              pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6r6kz   Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6r6kz to aks-userpool-16719200-vmss00000w
+47m         Normal    SuccessfulCreate       job/k6-auth-test-gradual-auth-service-b1-gradual-rep1         Created pod: k6-auth-test-gradual-auth-service-b1-gradual-rep1-6r6kz
+47m         Normal    Pulling                pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6r6kz   Pulling image "grafana/k6:latest"
+47m         Normal    Started                pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6r6kz   Started container k6
+47m         Normal    Created                pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6r6kz   Created container: k6
+47m         Normal    Pulled                 pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6r6kz   Successfully pulled image "grafana/k6:latest" in 1.539s (1.539s including waiting). Image size: 36750082 bytes.
+40m         Normal    Pulled                 pod/auth-service-7d65757ddb-sndlk                             Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 239ms (239ms including waiting). Image size: 129968897 bytes.
+36m         Normal    Pulled                 pod/auth-service-7d65757ddb-sndlk                             Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 209ms (209ms including waiting). Image size: 129968897 bytes.
+35m         Warning   BackoffLimitExceeded   job/k6-auth-test-gradual-auth-service-b1-gradual-rep1         Job has reached the specified backoff limit
+18m         Normal    Scheduled              pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-lzbzs   Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-b1-gradual-rep1-lzbzs to aks-userpool-16719200-vmss00000w
+18m         Normal    SuccessfulCreate       job/k6-auth-test-gradual-auth-service-b1-gradual-rep1         Created pod: k6-auth-test-gradual-auth-service-b1-gradual-rep1-lzbzs
+18m         Normal    Pulling                pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-lzbzs   Pulling image "grafana/k6:latest"
+18m         Normal    Started                pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-lzbzs   Started container k6
+18m         Normal    Pulled                 pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-lzbzs   Successfully pulled image "grafana/k6:latest" in 1.463s (1.463s including waiting). Image size: 36750082 bytes.
+18m         Normal    Created                pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-lzbzs   Created container: k6
+16m         Warning   Unhealthy              pod/auth-service-7d65757ddb-sndlk                             Liveness probe failed: Get "http://10.244.1.253:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+8m44s       Normal    Pulled                 pod/auth-service-7d65757ddb-sndlk                             Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 204ms (204ms including waiting). Image size: 129968897 bytes.
+8m11s       Warning   Unhealthy              pod/auth-service-7d65757ddb-sndlk                             Readiness probe failed: Get "http://10.244.1.253:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+6m22s       Normal    Killing                pod/auth-service-7d65757ddb-sndlk                             Container auth-service failed liveness probe, will be restarted
+6m11s       Normal    Started                pod/auth-service-7d65757ddb-sndlk                             Started container auth-service
+6m11s       Normal    Pulling                pod/auth-service-7d65757ddb-sndlk                             Pulling image "ecommerce.azurecr.io/auth-service:latest"
+6m11s       Normal    Created                pod/auth-service-7d65757ddb-sndlk                             Created container: auth-service
+6m11s       Normal    Pulled                 pod/auth-service-7d65757ddb-sndlk                             Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 172ms (172ms including waiting). Image size: 129968897 bytes.
+5m39s       Warning   BackoffLimitExceeded   job/k6-auth-test-gradual-auth-service-b1-gradual-rep1         Job has reached the specified backoff limit

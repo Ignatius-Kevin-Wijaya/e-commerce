@@ -1,0 +1,73 @@
+LAST SEEN   TYPE      REASON                         OBJECT                                                                MESSAGE
+56m         Normal    Scheduled                      pod/product-service-75f4ddbd56-77nbr                                  Successfully assigned ecommerce/product-service-75f4ddbd56-77nbr to aks-userpool-16719200-vmss00000f
+56m         Normal    Scheduled                      pod/product-service-75f4ddbd56-45vq6                                  Successfully assigned ecommerce/product-service-75f4ddbd56-45vq6 to aks-userpool-16719200-vmss00000h
+58m         Normal    Scheduled                      pod/product-service-75f4ddbd56-j85hg                                  Successfully assigned ecommerce/product-service-75f4ddbd56-j85hg to aks-userpool-16719200-vmss00000h
+56m         Normal    Scheduled                      pod/product-service-75f4ddbd56-5xxkf                                  Successfully assigned ecommerce/product-service-75f4ddbd56-5xxkf to aks-userpool-16719200-vmss00000f
+40m         Normal    Scheduled                      pod/k6-load-test-gradual-product-service-h3-gradual-rep1-gfbmx        Successfully assigned ecommerce/k6-load-test-gradual-product-service-h3-gradual-rep1-gfbmx to aks-userpool-16719200-vmss00000h
+53m         Normal    Scheduled                      pod/product-service-75f4ddbd56-gw4wk                                  Successfully assigned ecommerce/product-service-75f4ddbd56-gw4wk to aks-userpool-16719200-vmss00000h
+18m         Normal    Scheduled                      pod/k6-load-test-spike-product-service-h3-spike-rep1-hdxc6            Successfully assigned ecommerce/k6-load-test-spike-product-service-h3-spike-rep1-hdxc6 to aks-userpool-16719200-vmss00000h
+59m         Normal    Scheduled                      pod/k6-load-test-oscillating-product-service-h2-oscillating-rec4p9n   Successfully assigned ecommerce/k6-load-test-oscillating-product-service-h2-oscillating-rec4p9n to aks-userpool-16719200-vmss00000h
+59m         Normal    SuccessfulCreate               job/k6-load-test-oscillating-product-service-h2-oscillating-rep1      Created pod: k6-load-test-oscillating-product-service-h2-oscillating-rec4p9n
+59m         Normal    Pulling                        pod/k6-load-test-oscillating-product-service-h2-oscillating-rec4p9n   Pulling image "grafana/k6:latest"
+59m         Normal    Pulled                         pod/k6-load-test-oscillating-product-service-h2-oscillating-rec4p9n   Successfully pulled image "grafana/k6:latest" in 1.464s (1.464s including waiting). Image size: 36750082 bytes.
+59m         Normal    Created                        pod/k6-load-test-oscillating-product-service-h2-oscillating-rec4p9n   Created container: k6
+59m         Normal    Started                        pod/k6-load-test-oscillating-product-service-h2-oscillating-rec4p9n   Started container k6
+58m         Normal    SuccessfulCreate               replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-j85hg
+58m         Normal    SuccessfulRescale              horizontalpodautoscaler/product-service-hpa-tuned                     New size: 2; reason: cpu resource utilization (percentage of request) above target
+58m         Normal    ScalingReplicaSet              deployment/product-service                                            Scaled up replica set product-service-75f4ddbd56 from 1 to 2
+58m         Normal    Created                        pod/product-service-75f4ddbd56-j85hg                                  Created container: product-service
+58m         Normal    Started                        pod/product-service-75f4ddbd56-j85hg                                  Started container product-service
+58m         Normal    Pulled                         pod/product-service-75f4ddbd56-j85hg                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+56m         Normal    SuccessfulCreate               replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-45vq6
+56m         Normal    SuccessfulCreate               replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-5xxkf
+56m         Normal    ScalingReplicaSet              deployment/product-service                                            Scaled up replica set product-service-75f4ddbd56 from 2 to 5
+56m         Normal    SuccessfulCreate               replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-77nbr
+56m         Normal    Started                        pod/product-service-75f4ddbd56-5xxkf                                  Started container product-service
+56m         Normal    Started                        pod/product-service-75f4ddbd56-45vq6                                  Started container product-service
+56m         Normal    Created                        pod/product-service-75f4ddbd56-45vq6                                  Created container: product-service
+56m         Normal    Pulled                         pod/product-service-75f4ddbd56-5xxkf                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+56m         Normal    Created                        pod/product-service-75f4ddbd56-5xxkf                                  Created container: product-service
+56m         Normal    Created                        pod/product-service-75f4ddbd56-77nbr                                  Created container: product-service
+56m         Normal    Pulled                         pod/product-service-75f4ddbd56-45vq6                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+56m         Normal    Started                        pod/product-service-75f4ddbd56-77nbr                                  Started container product-service
+56m         Normal    Pulled                         pod/product-service-75f4ddbd56-77nbr                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+54m         Normal    SuccessfulRescale              horizontalpodautoscaler/product-service-hpa-tuned                     New size: 4; reason: All metrics below target
+54m         Normal    Killing                        pod/product-service-75f4ddbd56-45vq6                                  Stopping container product-service
+54m         Normal    ScalingReplicaSet              deployment/product-service                                            Scaled down replica set product-service-75f4ddbd56 from 5 to 4
+54m         Normal    SuccessfulDelete               replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-45vq6
+53m         Normal    SuccessfulRescale              horizontalpodautoscaler/product-service-hpa-tuned                     New size: 5; reason: cpu resource utilization (percentage of request) above target
+53m         Normal    SuccessfulCreate               replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-gw4wk
+53m         Normal    Pulled                         pod/product-service-75f4ddbd56-gw4wk                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+53m         Normal    Created                        pod/product-service-75f4ddbd56-gw4wk                                  Created container: product-service
+53m         Normal    Started                        pod/product-service-75f4ddbd56-gw4wk                                  Started container product-service
+53m         Normal    ScalingReplicaSet              deployment/product-service                                            Scaled up replica set product-service-75f4ddbd56 from 4 to 5
+47m         Normal    Completed                      job/k6-load-test-oscillating-product-service-h2-oscillating-rep1      Job completed
+46m         Normal    SuccessfulDelete               replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-twqrq
+46m         Normal    SuccessfulDelete               replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-77nbr
+46m         Normal    Killing                        pod/product-service-75f4ddbd56-j85hg                                  Stopping container product-service
+46m         Normal    Killing                        pod/product-service-75f4ddbd56-twqrq                                  Stopping container product-service
+46m         Normal    Killing                        pod/product-service-75f4ddbd56-77nbr                                  Stopping container product-service
+46m         Normal    Killing                        pod/product-service-75f4ddbd56-gw4wk                                  Stopping container product-service
+46m         Normal    SuccessfulDelete               replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-j85hg
+46m         Normal    SuccessfulRescale              horizontalpodautoscaler/product-service-hpa-tuned                     New size: 1; reason: All metrics below target
+46m         Normal    SuccessfulDelete               replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-gw4wk
+46m         Normal    ScalingReplicaSet              deployment/product-service                                            Scaled down replica set product-service-75f4ddbd56 from 5 to 1
+41m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/product-service-hpa-custom                    invalid metrics (1 invalid out of 1), first error is: failed to get pods metric value: unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server is currently unable to handle the request (get pods.custom.metrics.k8s.io *)
+41m         Warning   FailedGetPodsMetric            horizontalpodautoscaler/product-service-hpa-custom                    unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server is currently unable to handle the request (get pods.custom.metrics.k8s.io *)
+40m         Normal    SuccessfulCreate               job/k6-load-test-gradual-product-service-h3-gradual-rep1              Created pod: k6-load-test-gradual-product-service-h3-gradual-rep1-gfbmx
+40m         Normal    Pulling                        pod/k6-load-test-gradual-product-service-h3-gradual-rep1-gfbmx        Pulling image "grafana/k6:latest"
+40m         Normal    Started                        pod/k6-load-test-gradual-product-service-h3-gradual-rep1-gfbmx        Started container k6
+40m         Normal    Created                        pod/k6-load-test-gradual-product-service-h3-gradual-rep1-gfbmx        Created container: k6
+40m         Normal    Pulled                         pod/k6-load-test-gradual-product-service-h3-gradual-rep1-gfbmx        Successfully pulled image "grafana/k6:latest" in 1.51s (1.51s including waiting). Image size: 36750082 bytes.
+39m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/product-service-hpa-custom                    invalid metrics (1 invalid out of 1), first error is: failed to get pods metric value: unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server could not find the metric http_requests_per_second for pods
+28m         Warning   BackoffLimitExceeded           job/k6-load-test-gradual-product-service-h3-gradual-rep1              Job has reached the specified backoff limit
+22m         Warning   FailedGetPodsMetric            horizontalpodautoscaler/product-service-hpa-custom                    unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server could not find the metric http_requests_per_second for pods
+18m         Normal    SuccessfulCreate               job/k6-load-test-spike-product-service-h3-spike-rep1                  Created pod: k6-load-test-spike-product-service-h3-spike-rep1-hdxc6
+18m         Normal    Pulling                        pod/k6-load-test-spike-product-service-h3-spike-rep1-hdxc6            Pulling image "grafana/k6:latest"
+18m         Normal    Pulled                         pod/k6-load-test-spike-product-service-h3-spike-rep1-hdxc6            Successfully pulled image "grafana/k6:latest" in 1.892s (1.892s including waiting). Image size: 36750082 bytes.
+18m         Normal    Created                        pod/k6-load-test-spike-product-service-h3-spike-rep1-hdxc6            Created container: k6
+18m         Normal    Started                        pod/k6-load-test-spike-product-service-h3-spike-rep1-hdxc6            Started container k6
+17m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/product-service-hpa-custom                    invalid metrics (1 invalid out of 1), first error is: failed to get pods metric value: unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server could not find the metric http_requests_per_second for pods
+8m35s       Warning   Unhealthy                      pod/product-service-75f4ddbd56-5xxkf                                  Readiness probe failed: Get "http://10.244.1.120:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+6m2s        Warning   BackoffLimitExceeded           job/k6-load-test-spike-product-service-h3-spike-rep1                  Job has reached the specified backoff limit
+33s         Warning   FailedGetPodsMetric            horizontalpodautoscaler/product-service-hpa-custom                    unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server could not find the metric http_requests_per_second for pods

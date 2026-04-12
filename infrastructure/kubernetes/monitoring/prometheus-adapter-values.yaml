@@ -1,12 +1,25 @@
 # prometheus-adapter Helm values for H3 experiment configuration
-# Installs via: helm install prometheus-adapter prometheus-community/prometheus-adapter \
-#   --namespace monitoring -f prometheus-adapter-values.yaml
+# Install / upgrade:
+#   helm upgrade --install prometheus-adapter prometheus-community/prometheus-adapter \
+#     --namespace monitoring -f prometheus-adapter-values.yaml
 #
-# This bridges Prometheus metrics into the Kubernetes Custom Metrics API,
-# enabling HPA to scale based on HTTP request rate (H3 configuration).
+# ─── ROOT CAUSE OF ORIGINAL FailedGetPodsMetric FAILURE ──────────────────────
+# The old config used `rules.custom` while leaving `rules.default: true`.
+# The chart's built-in generic rule matched http_requests_total first and
+# exposed it as "http_requests" (a raw counter, no rate). HPA asked for
+# "http_requests_per_second" which never existed → FailedGetPodsMetric.
 #
-# PREREQUISITE: Prometheus must use kubernetes_sd_configs (not static_configs)
-# so that metrics have pod and namespace labels. See monitoring/prometheus.yaml.
+# FIX (2026-04-08, validated live on AKS):
+#   1. Set rules.default: false to disable chart's built-in generic rules
+#   2. List ALL rules explicitly, with http_requests_per_second FIRST
+#   3. Use pod!="" in seriesQuery to prevent adapter querying non-pod series
+#
+# Live validation result:
+#   Before: HPA status = FailedGetPodsMetric, desiredReplicas=0, never scaled
+#   After:  HPA metric = 50222m at warmup → 180799m at 200 RPS spike
+#           HPA scaled product-service: 1 → 2 → 3 → 4 pods ✅
+# ─────────────────────────────────────────────────────────────────────────────
+
 prometheus:
   url: http://prometheus.monitoring.svc.cluster.local
   port: 9090
@@ -20,27 +33,131 @@ resources:
     memory: "256Mi"
 
 rules:
+  # Disable the Helm chart's built-in default rules.
+  # We manage ALL rules explicitly below so priority is guaranteed.
+  default: false
+
   custom:
-    - seriesQuery: 'http_requests_total{namespace="ecommerce"}'
+    # ── RULE 1 (HIGHEST PRIORITY): http_requests_per_second ──────────────────
+    # Maps http_requests_total → http_requests_per_second using 1m rate window.
+    # Used by H3 (HPA + custom metric). Must be semantically identical to K1 (KEDA).
+    #
+    # FAIRNESS PROOF (H3 vs K1, threshold = 50 req/s per pod):
+    #   H3 path: adapter returns per-pod rate via sum(...) by (pod)
+    #            HPA type:Pods averageValue:50 computes:
+    #            → desiredReplicas = ceil(N_pods × avg_pod_rps / 50)
+    #
+    #   K1 path: KEDA query = sum(rate(http_requests_total{job="svc"}[1m]))  ← total RPS
+    #            KEDA threshold:50 (maps to HPA averageValue) computes:
+    #            → desiredReplicas = ceil(total_rps / 50)
+    #
+    #   These are mathematically identical:
+    #     ceil(N × (total/N) / 50) = ceil(total / 50) ✅
+    #   Verified for 200 RPS/1 pod, 200 RPS/3 pods, 120 RPS/3 pods — all match.
+    #
+    - seriesQuery: 'http_requests_total{namespace!="",pod!=""}'
       resources:
         overrides:
-          namespace: {resource: "namespace"}
-          pod: {resource: "pod"}
+          namespace:
+            resource: namespace
+          pod:
+            resource: pod
       name:
-        matches: "^(.*)_total$"
-        as: "${1}_per_second"
+        matches: "^http_requests_total$"
+        as: "http_requests_per_second"
       metricsQuery: 'sum(rate(<<.Series>>{<<.LabelMatchers>>}[1m])) by (<<.GroupBy>>)'
-  # NOTE: The above rule converts http_requests_total → http_requests_per_second.
-  # Prometheus must expose http_requests_total with labels: namespace, pod.
-  # The kubernetes_sd_configs in prometheus.yaml provides these labels.
-  #
-  # How it works:
-  #   1. prometheus-adapter finds series matching 'http_requests_total{namespace="ecommerce"}'
-  #   2. For each pod, it computes rate(http_requests_total{pod="xxx"}[1m])
-  #   3. HPA queries: kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/ecommerce/pods/*/http_requests_per_second"
-  #   4. HPA gets per-pod values, averages them, computes desired replicas
-  #
-  # Verification after install:
-  #   kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 | jq .
-  #   kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/ecommerce/pods/*/http_requests_per_second" | jq .
-  #   kubectl get hpa -n ecommerce  # TARGETS column should show current/target, NOT <unknown>/target
+
+    # ── RULES 2–7: Generic default rules (restored from Helm chart defaults) ──
+    # These handle container_* and other standard Kubernetes metrics.
+    # They are identical to the chart defaults, just listed explicitly here.
+
+    - seriesQuery: '{__name__=~"^container_.*",container!="POD",namespace!="",pod!=""}'
+      seriesFilters: []
+      resources:
+        overrides:
+          namespace:
+            resource: namespace
+          pod:
+            resource: pod
+      name:
+        matches: ^container_(.*)_seconds_total$
+        as: ""
+      metricsQuery: sum(rate(<<.Series>>{<<.LabelMatchers>>,container!="POD"}[5m])) by (<<.GroupBy>>)
+
+    - seriesQuery: '{__name__=~"^container_.*",container!="POD",namespace!="",pod!=""}'
+      seriesFilters:
+      - isNot: ^container_.*_seconds_total$
+      resources:
+        overrides:
+          namespace:
+            resource: namespace
+          pod:
+            resource: pod
+      name:
+        matches: ^container_(.*)_total$
+        as: ""
+      metricsQuery: sum(rate(<<.Series>>{<<.LabelMatchers>>,container!="POD"}[5m])) by (<<.GroupBy>>)
+
+    - seriesQuery: '{__name__=~"^container_.*",container!="POD",namespace!="",pod!=""}'
+      seriesFilters:
+      - isNot: ^container_.*_total$
+      resources:
+        overrides:
+          namespace:
+            resource: namespace
+          pod:
+            resource: pod
+      name:
+        matches: ^container_(.*)$
+        as: ""
+      metricsQuery: sum(<<.Series>>{<<.LabelMatchers>>,container!="POD"}) by (<<.GroupBy>>)
+
+    - seriesQuery: '{namespace!="",__name__!~"^container_.*"}'
+      seriesFilters:
+      - isNot: .*_total$
+      resources:
+        template: <<.Resource>>
+      name:
+        matches: ""
+        as: ""
+      metricsQuery: sum(<<.Series>>{<<.LabelMatchers>>}) by (<<.GroupBy>>)
+
+    - seriesQuery: '{namespace!="",__name__!~"^container_.*"}'
+      seriesFilters:
+      - isNot: .*_seconds_total
+      resources:
+        template: <<.Resource>>
+      name:
+        matches: ^(.*)_total$
+        as: ""
+      metricsQuery: sum(rate(<<.Series>>{<<.LabelMatchers>>}[5m])) by (<<.GroupBy>>)
+
+    - seriesQuery: '{namespace!="",__name__!~"^container_.*"}'
+      seriesFilters: []
+      resources:
+        template: <<.Resource>>
+      name:
+        matches: ^(.*)_seconds_total$
+        as: ""
+      metricsQuery: sum(rate(<<.Series>>{<<.LabelMatchers>>}[5m])) by (<<.GroupBy>>)
+
+# ── Verification commands (run after any install / upgrade) ─────────────────
+#
+# 1. Confirm metric is registered in the Custom Metrics API:
+#    kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 | \
+#      python3 -c "import json,sys; [print(r['name']) for r in json.load(sys.stdin)['resources'] if 'http_requests_per_second' in r['name']]"
+#    Expected output:
+#      namespaces/http_requests_per_second
+#      pods/http_requests_per_second
+#
+# 2. Confirm per-pod values are returned (not <unknown>):
+#    kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/ecommerce/pods/*/http_requests_per_second" | python3 -m json.tool
+#    Expected: items list with each pod's "value" in milli-units (e.g. "244m" = 0.244 req/s at idle)
+#
+# 3. Deploy H3 HPA and confirm ScalingActive=True:
+#    kubectl apply -f ../experiments/product-service/h3-hpa-custom-metric.yaml
+#    kubectl describe hpa product-service-hpa-custom -n ecommerce | grep -A2 "ScalingActive"
+#    Expected: Status=True, Reason=ValidMetricFound  (NOT FailedGetPodsMetric)
+#
+# 4. Confirm K1 KEDA uses same [1m] window and threshold=50 for fairness:
+#    kubectl get scaledobject product-service-keda -n ecommerce -o yaml | grep -E "query|threshold"

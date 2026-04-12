@@ -1,18 +1,17 @@
-# k6 Load Test Scripts — Three load patterns for thesis experiments
-# Blueprint Section 4, Layer 6: cpu 200m/500m, memory 256Mi/512Mi
-# Blueprint Section 6: gradual ramp, sudden spike, oscillating
+# k6 Load Test Scripts — product-service thesis experiments
+# Updated for the thesis recovery plan:
+#   - Search/pagination-heavy traffic against /products
+#   - Env-driven BASE_RPS / PEAK_RPS for calibration ladders
+#   - Higher k6 resources to avoid client-side A1 false failures
 #
 # Usage:
-#   kubectl apply -f k6-job.yaml                          # Creates ConfigMap
-#   kubectl create job k6-gradual --from=cronjob/dummy ... # Or use the Job templates below
-#
-# To run a specific pattern, apply the ConfigMap then one of the Job manifests.
-# Delete the completed Job before running the next:
-#   kubectl delete job k6-load-test -n ecommerce
+#   kubectl apply -f k6-job.yaml                          # Creates ConfigMaps + Jobs
+#   The experiment runner only applies the ConfigMaps, then clones the Job
+#   templates locally to create per-run Jobs with calibrated env overrides.
 
 ---
 # ── k6 Script: Gradual Ramp ─────────────────────────────────────────────────
-# Linear increase from 20 → 200 RPS over 5 minutes
+# Linear increase from BASE_RPS → PEAK_RPS over 5 minutes.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -21,21 +20,32 @@ metadata:
 data:
   load-test.js: |
     import http from 'k6/http';
-    import { check, sleep } from 'k6';
+    import { check } from 'k6';
+
+    const BASE_RPS = parseInt(__ENV.BASE_RPS || '20', 10);
+    const PEAK_RPS = parseInt(__ENV.PEAK_RPS || '200', 10);
+    const PAGE_SIZE = parseInt(__ENV.PRODUCT_PAGE_SIZE || '100', 10);
+    const MAX_PAGE = parseInt(__ENV.PRODUCT_MAX_PAGE || '12', 10);
+    const SEARCH_TERMS = (__ENV.PRODUCT_SEARCH_TERMS || 'Laptop,Phone,Camera,Headphones,Keyboard,Monitor,Speaker,Charger')
+      .split(',')
+      .map((term) => term.trim())
+      .filter(Boolean);
+    const PREALLOCATED_VUS = Math.max(400, PEAK_RPS * 2);
+    const MAX_VUS = Math.max(1000, PEAK_RPS * 4);
 
     export const options = {
       scenarios: {
         gradual_ramp: {
           executor: 'ramping-arrival-rate',
-          startRate: 20,
+          startRate: BASE_RPS,
           timeUnit: '1s',
-          preAllocatedVUs: 300,
-          maxVUs: 500,
+          preAllocatedVUs: PREALLOCATED_VUS,
+          maxVUs: MAX_VUS,
           stages: [
-            { duration: '2m', target: 20 },   // Warm-up (excluded from analysis)
-            { duration: '5m', target: 200 },   // Gradual ramp: 20 → 200 RPS
-            { duration: '2m', target: 200 },   // Sustain peak
-            { duration: '3m', target: 0 },     // Cooldown observation
+            { duration: '2m', target: BASE_RPS },
+            { duration: '5m', target: PEAK_RPS },
+            { duration: '2m', target: PEAK_RPS },
+            { duration: '3m', target: 0 },
           ],
         },
       },
@@ -55,17 +65,27 @@ data:
       },
     };
 
+    function buildUrl() {
+      const search = SEARCH_TERMS[Math.floor(Math.random() * SEARCH_TERMS.length)];
+      const page = 1 + Math.floor(Math.random() * MAX_PAGE);
+      return `${BASE_URL}${TARGET_ENDPOINT}?page_size=${PAGE_SIZE}&search=${encodeURIComponent(search)}&page=${page}`;
+    }
+
     export default function () {
-      const res = http.get(`${BASE_URL}${TARGET_ENDPOINT}`, params);
+      const res = http.get(buildUrl(), params);
       check(res, {
         'status is 200': (r) => r.status === 200,
+        'returns paginated items': (r) => {
+          try { return Array.isArray(JSON.parse(r.body).items); }
+          catch (e) { return false; }
+        },
         'response time < 2000ms': (r) => r.timings.duration < 2000,
       });
     }
 
 ---
 # ── k6 Script: Sudden Spike ─────────────────────────────────────────────────
-# 50 RPS baseline → instant jump to 200 RPS at t=2min
+# BASE_RPS warm-up → instant jump to PEAK_RPS at t=2min.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -74,22 +94,33 @@ metadata:
 data:
   load-test.js: |
     import http from 'k6/http';
-    import { check, sleep } from 'k6';
+    import { check } from 'k6';
+
+    const BASE_RPS = parseInt(__ENV.BASE_RPS || '20', 10);
+    const PEAK_RPS = parseInt(__ENV.PEAK_RPS || '200', 10);
+    const PAGE_SIZE = parseInt(__ENV.PRODUCT_PAGE_SIZE || '100', 10);
+    const MAX_PAGE = parseInt(__ENV.PRODUCT_MAX_PAGE || '12', 10);
+    const SEARCH_TERMS = (__ENV.PRODUCT_SEARCH_TERMS || 'Laptop,Phone,Camera,Headphones,Keyboard,Monitor,Speaker,Charger')
+      .split(',')
+      .map((term) => term.trim())
+      .filter(Boolean);
+    const PREALLOCATED_VUS = Math.max(400, PEAK_RPS * 2);
+    const MAX_VUS = Math.max(1000, PEAK_RPS * 4);
 
     export const options = {
       scenarios: {
         sudden_spike: {
           executor: 'ramping-arrival-rate',
-          startRate: 50,
+          startRate: BASE_RPS,
           timeUnit: '1s',
-          preAllocatedVUs: 300,
-          maxVUs: 500,
+          preAllocatedVUs: PREALLOCATED_VUS,
+          maxVUs: MAX_VUS,
           stages: [
-            { duration: '2m', target: 50 },    // Warm-up at baseline (excluded)
-            { duration: '10s', target: 200 },   // Sudden spike to 200 RPS
-            { duration: '4m50s', target: 200 }, // Sustain spike
-            { duration: '2m', target: 200 },    // Continue peak
-            { duration: '3m', target: 0 },      // Cooldown observation
+            { duration: '2m', target: BASE_RPS },
+            { duration: '10s', target: PEAK_RPS },
+            { duration: '4m50s', target: PEAK_RPS },
+            { duration: '2m', target: PEAK_RPS },
+            { duration: '3m', target: 0 },
           ],
         },
       },
@@ -109,17 +140,27 @@ data:
       },
     };
 
+    function buildUrl() {
+      const search = SEARCH_TERMS[Math.floor(Math.random() * SEARCH_TERMS.length)];
+      const page = 1 + Math.floor(Math.random() * MAX_PAGE);
+      return `${BASE_URL}${TARGET_ENDPOINT}?page_size=${PAGE_SIZE}&search=${encodeURIComponent(search)}&page=${page}`;
+    }
+
     export default function () {
-      const res = http.get(`${BASE_URL}${TARGET_ENDPOINT}`, params);
+      const res = http.get(buildUrl(), params);
       check(res, {
         'status is 200': (r) => r.status === 200,
+        'returns paginated items': (r) => {
+          try { return Array.isArray(JSON.parse(r.body).items); }
+          catch (e) { return false; }
+        },
         'response time < 2000ms': (r) => r.timings.duration < 2000,
       });
     }
 
 ---
 # ── k6 Script: Oscillating ──────────────────────────────────────────────────
-# Alternating between 50 and 200 RPS every 90 seconds
+# Alternating between BASE_RPS and PEAK_RPS every 90 seconds.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -128,29 +169,40 @@ metadata:
 data:
   load-test.js: |
     import http from 'k6/http';
-    import { check, sleep } from 'k6';
+    import { check } from 'k6';
+
+    const BASE_RPS = parseInt(__ENV.BASE_RPS || '20', 10);
+    const PEAK_RPS = parseInt(__ENV.PEAK_RPS || '200', 10);
+    const PAGE_SIZE = parseInt(__ENV.PRODUCT_PAGE_SIZE || '100', 10);
+    const MAX_PAGE = parseInt(__ENV.PRODUCT_MAX_PAGE || '12', 10);
+    const SEARCH_TERMS = (__ENV.PRODUCT_SEARCH_TERMS || 'Laptop,Phone,Camera,Headphones,Keyboard,Monitor,Speaker,Charger')
+      .split(',')
+      .map((term) => term.trim())
+      .filter(Boolean);
+    const PREALLOCATED_VUS = Math.max(400, PEAK_RPS * 2);
+    const MAX_VUS = Math.max(1000, PEAK_RPS * 4);
 
     export const options = {
       scenarios: {
         oscillating: {
           executor: 'ramping-arrival-rate',
-          startRate: 50,
+          startRate: BASE_RPS,
           timeUnit: '1s',
-          preAllocatedVUs: 300,
-          maxVUs: 500,
+          preAllocatedVUs: PREALLOCATED_VUS,
+          maxVUs: MAX_VUS,
           stages: [
-            { duration: '2m', target: 50 },    // Warm-up (excluded)
-            { duration: '10s', target: 200 },   // Spike up
-            { duration: '1m20s', target: 200 }, // Hold high (90s total)
-            { duration: '10s', target: 50 },    // Drop down
-            { duration: '1m20s', target: 50 },  // Hold low (90s total)
-            { duration: '10s', target: 200 },   // Spike up
-            { duration: '1m20s', target: 200 }, // Hold high (90s total)
-            { duration: '10s', target: 50 },    // Drop down
-            { duration: '1m20s', target: 50 },  // Hold low (90s total)
-            { duration: '10s', target: 200 },   // Final spike
-            { duration: '50s', target: 200 },   // Hold high
-            { duration: '3m', target: 0 },      // Cooldown observation
+            { duration: '2m', target: BASE_RPS },
+            { duration: '10s', target: PEAK_RPS },
+            { duration: '1m20s', target: PEAK_RPS },
+            { duration: '10s', target: BASE_RPS },
+            { duration: '1m20s', target: BASE_RPS },
+            { duration: '10s', target: PEAK_RPS },
+            { duration: '1m20s', target: PEAK_RPS },
+            { duration: '10s', target: BASE_RPS },
+            { duration: '1m20s', target: BASE_RPS },
+            { duration: '10s', target: PEAK_RPS },
+            { duration: '50s', target: PEAK_RPS },
+            { duration: '3m', target: 0 },
           ],
         },
       },
@@ -170,10 +222,20 @@ data:
       },
     };
 
+    function buildUrl() {
+      const search = SEARCH_TERMS[Math.floor(Math.random() * SEARCH_TERMS.length)];
+      const page = 1 + Math.floor(Math.random() * MAX_PAGE);
+      return `${BASE_URL}${TARGET_ENDPOINT}?page_size=${PAGE_SIZE}&search=${encodeURIComponent(search)}&page=${page}`;
+    }
+
     export default function () {
-      const res = http.get(`${BASE_URL}${TARGET_ENDPOINT}`, params);
+      const res = http.get(buildUrl(), params);
       check(res, {
         'status is 200': (r) => r.status === 200,
+        'returns paginated items': (r) => {
+          try { return Array.isArray(JSON.parse(r.body).items); }
+          catch (e) { return false; }
+        },
         'response time < 2000ms': (r) => r.timings.duration < 2000,
       });
     }
@@ -190,6 +252,7 @@ spec:
     metadata:
       labels:
         app: k6
+        target: product-service
     spec:
       containers:
         - name: k6
@@ -200,6 +263,16 @@ spec:
               value: "http://product-service.ecommerce.svc.cluster.local:8002"
             - name: TARGET_ENDPOINT
               value: "/products"
+            - name: BASE_RPS
+              value: "20"
+            - name: PEAK_RPS
+              value: "200"
+            - name: PRODUCT_PAGE_SIZE
+              value: "100"
+            - name: PRODUCT_MAX_PAGE
+              value: "12"
+            - name: PRODUCT_SEARCH_TERMS
+              value: "Laptop,Phone,Camera,Headphones,Keyboard,Monitor,Speaker,Charger"
             - name: INTERNAL_GATEWAY_SECRET
               valueFrom:
                 secretKeyRef:
@@ -207,11 +280,11 @@ spec:
                   key: internal-gateway-secret
           resources:
             requests:
-              cpu: "200m"
-              memory: "256Mi"
-            limits:
               cpu: "500m"
               memory: "512Mi"
+            limits:
+              cpu: "1500m"
+              memory: "1Gi"
           volumeMounts:
             - name: k6-script
               mountPath: /scripts
@@ -238,6 +311,7 @@ spec:
     metadata:
       labels:
         app: k6
+        target: product-service
     spec:
       containers:
         - name: k6
@@ -248,6 +322,16 @@ spec:
               value: "http://product-service.ecommerce.svc.cluster.local:8002"
             - name: TARGET_ENDPOINT
               value: "/products"
+            - name: BASE_RPS
+              value: "20"
+            - name: PEAK_RPS
+              value: "200"
+            - name: PRODUCT_PAGE_SIZE
+              value: "100"
+            - name: PRODUCT_MAX_PAGE
+              value: "12"
+            - name: PRODUCT_SEARCH_TERMS
+              value: "Laptop,Phone,Camera,Headphones,Keyboard,Monitor,Speaker,Charger"
             - name: INTERNAL_GATEWAY_SECRET
               valueFrom:
                 secretKeyRef:
@@ -255,11 +339,11 @@ spec:
                   key: internal-gateway-secret
           resources:
             requests:
-              cpu: "200m"
-              memory: "256Mi"
-            limits:
               cpu: "500m"
               memory: "512Mi"
+            limits:
+              cpu: "1500m"
+              memory: "1Gi"
           volumeMounts:
             - name: k6-script
               mountPath: /scripts
@@ -286,6 +370,7 @@ spec:
     metadata:
       labels:
         app: k6
+        target: product-service
     spec:
       containers:
         - name: k6
@@ -296,6 +381,16 @@ spec:
               value: "http://product-service.ecommerce.svc.cluster.local:8002"
             - name: TARGET_ENDPOINT
               value: "/products"
+            - name: BASE_RPS
+              value: "20"
+            - name: PEAK_RPS
+              value: "200"
+            - name: PRODUCT_PAGE_SIZE
+              value: "100"
+            - name: PRODUCT_MAX_PAGE
+              value: "12"
+            - name: PRODUCT_SEARCH_TERMS
+              value: "Laptop,Phone,Camera,Headphones,Keyboard,Monitor,Speaker,Charger"
             - name: INTERNAL_GATEWAY_SECRET
               valueFrom:
                 secretKeyRef:
@@ -303,11 +398,11 @@ spec:
                   key: internal-gateway-secret
           resources:
             requests:
-              cpu: "200m"
-              memory: "256Mi"
-            limits:
               cpu: "500m"
               memory: "512Mi"
+            limits:
+              cpu: "1500m"
+              memory: "1Gi"
           volumeMounts:
             - name: k6-script
               mountPath: /scripts

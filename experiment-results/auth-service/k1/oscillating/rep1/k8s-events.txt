@@ -1,0 +1,32 @@
+LAST SEEN   TYPE      REASON                 OBJECT                                                                MESSAGE
+40m         Normal    Scheduled              pod/k6-auth-test-spike-auth-service-k1-spike-rep1-k98sc               Successfully assigned ecommerce/k6-auth-test-spike-auth-service-k1-spike-rep1-k98sc to aks-userpool-16719200-vmss00000f
+18m         Normal    Scheduled              pod/k6-auth-test-oscillating-auth-service-k1-oscillating-rep1-9b7tb   Successfully assigned ecommerce/k6-auth-test-oscillating-auth-service-k1-oscillating-rep1-9b7tb to aks-userpool-16719200-vmss00000h
+49m         Warning   BackoffLimitExceeded   job/k6-auth-test-gradual-auth-service-k1-gradual-rep1                 Job has reached the specified backoff limit
+43m         Normal    KEDAScalersStopped     scaledobject/auth-service-keda                                        Stopped scalers watch
+43m         Warning   ScaledObjectDeleted    scaledobject/auth-service-keda                                        ScaledObject was deleted
+42m         Normal    ScaledObjectReady      scaledobject/auth-service-keda                                        ScaledObject is ready for scaling
+42m         Normal    KEDAScalersStarted     scaledobject/auth-service-keda                                        Scaler prometheus is built
+42m         Normal    KEDAScalersStarted     scaledobject/auth-service-keda                                        Started scalers watch
+40m         Normal    SuccessfulCreate       job/k6-auth-test-spike-auth-service-k1-spike-rep1                     Created pod: k6-auth-test-spike-auth-service-k1-spike-rep1-k98sc
+40m         Normal    Pulling                pod/k6-auth-test-spike-auth-service-k1-spike-rep1-k98sc               Pulling image "grafana/k6:latest"
+40m         Normal    Started                pod/k6-auth-test-spike-auth-service-k1-spike-rep1-k98sc               Started container k6
+40m         Normal    Pulled                 pod/k6-auth-test-spike-auth-service-k1-spike-rep1-k98sc               Successfully pulled image "grafana/k6:latest" in 1.507s (1.507s including waiting). Image size: 36750082 bytes.
+40m         Normal    Created                pod/k6-auth-test-spike-auth-service-k1-spike-rep1-k98sc               Created container: k6
+32m         Normal    Started                pod/auth-service-b78f95fd4-tzz2x                                      Started container auth-service
+27m         Warning   BackoffLimitExceeded   job/k6-auth-test-spike-auth-service-k1-spike-rep1                     Job has reached the specified backoff limit
+21m         Normal    KEDAScalersStopped     scaledobject/auth-service-keda                                        Stopped scalers watch
+21m         Warning   ScaledObjectDeleted    scaledobject/auth-service-keda                                        ScaledObject was deleted
+20m         Normal    KEDAScalersStarted     scaledobject/auth-service-keda                                        Started scalers watch
+20m         Normal    KEDAScalersStarted     scaledobject/auth-service-keda                                        Scaler prometheus is built
+20m         Normal    ScaledObjectReady      scaledobject/auth-service-keda                                        ScaledObject is ready for scaling
+18m         Normal    SuccessfulCreate       job/k6-auth-test-oscillating-auth-service-k1-oscillating-rep1         Created pod: k6-auth-test-oscillating-auth-service-k1-oscillating-rep1-9b7tb
+18m         Normal    Pulling                pod/k6-auth-test-oscillating-auth-service-k1-oscillating-rep1-9b7tb   Pulling image "grafana/k6:latest"
+18m         Normal    Started                pod/k6-auth-test-oscillating-auth-service-k1-oscillating-rep1-9b7tb   Started container k6
+18m         Normal    Created                pod/k6-auth-test-oscillating-auth-service-k1-oscillating-rep1-9b7tb   Created container: k6
+18m         Normal    Pulled                 pod/k6-auth-test-oscillating-auth-service-k1-oscillating-rep1-9b7tb   Successfully pulled image "grafana/k6:latest" in 1.446s (1.446s including waiting). Image size: 36750082 bytes.
+17m         Warning   Unhealthy              pod/auth-service-b78f95fd4-tzz2x                                      Readiness probe failed: Get "http://10.244.2.200:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+16m         Normal    Pulled                 pod/auth-service-b78f95fd4-tzz2x                                      Container image "ecommerce.azurecr.io/auth-service:latest" already present on machine
+16m         Normal    Created                pod/auth-service-b78f95fd4-tzz2x                                      Created container: auth-service
+9m4s        Warning   Unhealthy              pod/auth-service-b78f95fd4-tzz2x                                      Liveness probe failed: Get "http://10.244.2.200:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+6m34s       Normal    Killing                pod/auth-service-b78f95fd4-tzz2x                                      Container auth-service failed liveness probe, will be restarted
+5m32s       Warning   BackoffLimitExceeded   job/k6-auth-test-oscillating-auth-service-k1-oscillating-rep1         Job has reached the specified backoff limit

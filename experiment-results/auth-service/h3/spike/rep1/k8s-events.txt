@@ -1,0 +1,49 @@
+LAST SEEN   TYPE      REASON                         OBJECT                                                          MESSAGE
+18m         Normal    Scheduled                      pod/k6-auth-test-spike-auth-service-h3-spike-rep1-srtx2         Successfully assigned ecommerce/k6-auth-test-spike-auth-service-h3-spike-rep1-srtx2 to aks-userpool-16719200-vmss00000h
+40m         Normal    Scheduled                      pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-2696v     Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-h3-gradual-rep1-2696v to aks-userpool-16719200-vmss00000f
+57m         Warning   Unhealthy                      pod/auth-service-b78f95fd4-dp5v5                                Readiness probe failed: Get "http://10.244.1.122:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+57m         Warning   Unhealthy                      pod/auth-service-b78f95fd4-652h8                                Liveness probe failed: Get "http://10.244.1.211:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+55m         Warning   Unhealthy                      pod/auth-service-b78f95fd4-trcm2                                Liveness probe failed: Get "http://10.244.1.155:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+54m         Warning   Unhealthy                      pod/auth-service-b78f95fd4-s55mw                                Liveness probe failed: Get "http://10.244.2.89:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+50m         Warning   Unhealthy                      pod/auth-service-b78f95fd4-dp5v5                                Liveness probe failed: Get "http://10.244.1.122:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+50m         Normal    Killing                        pod/auth-service-b78f95fd4-dp5v5                                Container auth-service failed liveness probe, will be restarted
+50m         Warning   Unhealthy                      pod/auth-service-b78f95fd4-trcm2                                Readiness probe failed: Get "http://10.244.1.155:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+50m         Warning   Unhealthy                      pod/auth-service-b78f95fd4-652h8                                Readiness probe failed: Get "http://10.244.1.211:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+50m         Normal    Pulled                         pod/auth-service-b78f95fd4-dp5v5                                Container image "ecommerce.azurecr.io/auth-service:latest" already present on machine
+50m         Normal    Created                        pod/auth-service-b78f95fd4-dp5v5                                Created container: auth-service
+50m         Normal    Started                        pod/auth-service-b78f95fd4-dp5v5                                Started container auth-service
+49m         Warning   Unhealthy                      pod/auth-service-b78f95fd4-s55mw                                Readiness probe failed: Get "http://10.244.2.89:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+49m         Warning   BackoffLimitExceeded           job/k6-auth-test-oscillating-auth-service-h2-oscillating-rep1   Job has reached the specified backoff limit
+47m         Normal    Killing                        pod/auth-service-b78f95fd4-dp5v5                                Stopping container auth-service
+47m         Normal    Killing                        pod/auth-service-b78f95fd4-trcm2                                Stopping container auth-service
+47m         Normal    SuccessfulDelete               replicaset/auth-service-b78f95fd4                               Deleted pod: auth-service-b78f95fd4-652h8
+47m         Normal    ScalingReplicaSet              deployment/auth-service                                         Scaled down replica set auth-service-b78f95fd4 from 5 to 2
+47m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-tuned                  New size: 2; reason: All metrics below target
+47m         Normal    Killing                        pod/auth-service-b78f95fd4-652h8                                Stopping container auth-service
+47m         Normal    SuccessfulDelete               replicaset/auth-service-b78f95fd4                               Deleted pod: auth-service-b78f95fd4-dp5v5
+47m         Normal    SuccessfulDelete               replicaset/auth-service-b78f95fd4                               Deleted pod: auth-service-b78f95fd4-s55mw
+47m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-tuned                  New size: 1; reason: All metrics below target
+47m         Normal    Killing                        pod/auth-service-b78f95fd4-s55mw                                Stopping container auth-service
+47m         Normal    ScalingReplicaSet              deployment/auth-service                                         Scaled down replica set auth-service-b78f95fd4 from 2 to 1
+40m         Normal    SuccessfulCreate               job/k6-auth-test-gradual-auth-service-h3-gradual-rep1           Created pod: k6-auth-test-gradual-auth-service-h3-gradual-rep1-2696v
+40m         Normal    Pulling                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-2696v     Pulling image "grafana/k6:latest"
+40m         Normal    Pulled                         pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-2696v     Successfully pulled image "grafana/k6:latest" in 1.507s (1.507s including waiting). Image size: 36750082 bytes.
+40m         Normal    Created                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-2696v     Created container: k6
+40m         Normal    Started                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-2696v     Started container k6
+39m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/auth-service-hpa-custom                 invalid metrics (1 invalid out of 1), first error is: failed to get pods metric value: unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server could not find the metric http_requests_per_second for pods
+27m         Warning   BackoffLimitExceeded           job/k6-auth-test-gradual-auth-service-h3-gradual-rep1           Job has reached the specified backoff limit
+22m         Warning   FailedGetPodsMetric            horizontalpodautoscaler/auth-service-hpa-custom                 unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server could not find the metric http_requests_per_second for pods
+18m         Normal    SuccessfulCreate               job/k6-auth-test-spike-auth-service-h3-spike-rep1               Created pod: k6-auth-test-spike-auth-service-h3-spike-rep1-srtx2
+18m         Normal    Pulling                        pod/k6-auth-test-spike-auth-service-h3-spike-rep1-srtx2         Pulling image "grafana/k6:latest"
+18m         Normal    Started                        pod/k6-auth-test-spike-auth-service-h3-spike-rep1-srtx2         Started container k6
+18m         Normal    Created                        pod/k6-auth-test-spike-auth-service-h3-spike-rep1-srtx2         Created container: k6
+18m         Normal    Pulled                         pod/k6-auth-test-spike-auth-service-h3-spike-rep1-srtx2         Successfully pulled image "grafana/k6:latest" in 1.461s (1.461s including waiting). Image size: 36750082 bytes.
+18m         Warning   Unhealthy                      pod/auth-service-b78f95fd4-tzz2x                                Readiness probe failed: Get "http://10.244.2.200:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+17m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/auth-service-hpa-custom                 invalid metrics (1 invalid out of 1), first error is: failed to get pods metric value: unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server could not find the metric http_requests_per_second for pods
+8m49s       Normal    Started                        pod/auth-service-b78f95fd4-tzz2x                                Started container auth-service
+6m39s       Normal    Killing                        pod/auth-service-b78f95fd4-tzz2x                                Container auth-service failed liveness probe, will be restarted
+6m13s       Normal    Pulled                         pod/auth-service-b78f95fd4-tzz2x                                Container image "ecommerce.azurecr.io/auth-service:latest" already present on machine
+6m13s       Normal    Created                        pod/auth-service-b78f95fd4-tzz2x                                Created container: auth-service
+5m54s       Warning   Unhealthy                      pod/auth-service-b78f95fd4-tzz2x                                Liveness probe failed: Get "http://10.244.2.200:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+5m33s       Warning   BackoffLimitExceeded           job/k6-auth-test-spike-auth-service-h3-spike-rep1               Job has reached the specified backoff limit
+34s         Warning   FailedGetPodsMetric            horizontalpodautoscaler/auth-service-hpa-custom                 unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server could not find the metric http_requests_per_second for pods

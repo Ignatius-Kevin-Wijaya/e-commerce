@@ -1,0 +1,113 @@
+LAST SEEN   TYPE      REASON                 OBJECT                                                                MESSAGE
+16m         Normal    Scheduled              pod/auth-service-b78f95fd4-jwxwx                                      Successfully assigned ecommerce/auth-service-b78f95fd4-jwxwx to aks-userpool-16719200-vmss00000h
+17m         Normal    Scheduled              pod/auth-service-b78f95fd4-f5mgr                                      Successfully assigned ecommerce/auth-service-b78f95fd4-f5mgr to aks-userpool-16719200-vmss00000f
+39m         Normal    Scheduled              pod/auth-service-b78f95fd4-9mpc7                                      Successfully assigned ecommerce/auth-service-b78f95fd4-9mpc7 to aks-userpool-16719200-vmss00000f
+18m         Normal    Scheduled              pod/k6-auth-test-oscillating-auth-service-h1-oscillating-rep1-v4njm   Successfully assigned ecommerce/k6-auth-test-oscillating-auth-service-h1-oscillating-rep1-v4njm to aks-userpool-16719200-vmss00000h
+16m         Normal    Scheduled              pod/auth-service-b78f95fd4-mjxpf                                      Successfully assigned ecommerce/auth-service-b78f95fd4-mjxpf to aks-userpool-16719200-vmss00000f
+39m         Normal    Scheduled              pod/auth-service-b78f95fd4-kg8wh                                      Successfully assigned ecommerce/auth-service-b78f95fd4-kg8wh to aks-userpool-16719200-vmss00000f
+39m         Normal    Scheduled              pod/auth-service-b78f95fd4-g5qnf                                      Successfully assigned ecommerce/auth-service-b78f95fd4-g5qnf to aks-userpool-16719200-vmss00000f
+16m         Normal    Scheduled              pod/auth-service-b78f95fd4-zhs6m                                      Successfully assigned ecommerce/auth-service-b78f95fd4-zhs6m to aks-userpool-16719200-vmss00000f
+39m         Normal    Scheduled              pod/auth-service-b78f95fd4-j97pg                                      Successfully assigned ecommerce/auth-service-b78f95fd4-j97pg to aks-userpool-16719200-vmss00000h
+40m         Normal    Scheduled              pod/k6-auth-test-spike-auth-service-h1-spike-rep1-l9pk6               Successfully assigned ecommerce/k6-auth-test-spike-auth-service-h1-spike-rep1-l9pk6 to aks-userpool-16719200-vmss00000h
+57m         Warning   Unhealthy              pod/auth-service-b78f95fd4-zchvx                                      Liveness probe failed: Get "http://10.244.1.204:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+54m         Warning   Unhealthy              pod/auth-service-b78f95fd4-mxkgk                                      Readiness probe failed: Get "http://10.244.1.222:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+51m         Warning   Unhealthy              pod/auth-service-b78f95fd4-4gpbl                                      Readiness probe failed: Get "http://10.244.2.103:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+50m         Warning   Unhealthy              pod/auth-service-b78f95fd4-zchvx                                      Readiness probe failed: Get "http://10.244.1.204:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+50m         Warning   Unhealthy              pod/auth-service-b78f95fd4-h75mh                                      Readiness probe failed: Get "http://10.244.1.59:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+50m         Warning   BackoffLimitExceeded   job/k6-auth-test-gradual-auth-service-h1-gradual-rep1                 Job has reached the specified backoff limit
+44m         Normal    SuccessfulDelete       replicaset/auth-service-b78f95fd4                                     Deleted pod: auth-service-b78f95fd4-mxkgk
+44m         Normal    Killing                pod/auth-service-b78f95fd4-zchvx                                      Stopping container auth-service
+44m         Normal    SuccessfulDelete       replicaset/auth-service-b78f95fd4                                     Deleted pod: auth-service-b78f95fd4-4gpbl
+44m         Normal    SuccessfulDelete       replicaset/auth-service-b78f95fd4                                     Deleted pod: auth-service-b78f95fd4-h75mh
+44m         Normal    Killing                pod/auth-service-b78f95fd4-mxkgk                                      Stopping container auth-service
+44m         Warning   Unhealthy              pod/auth-service-b78f95fd4-mxkgk                                      Readiness probe failed: Get "http://10.244.1.222:8001/ready": dial tcp 10.244.1.222:8001: connect: connection refused
+44m         Normal    SuccessfulDelete       replicaset/auth-service-b78f95fd4                                     Deleted pod: auth-service-b78f95fd4-zchvx
+44m         Normal    Killing                pod/auth-service-b78f95fd4-h75mh                                      Stopping container auth-service
+44m         Normal    Killing                pod/auth-service-b78f95fd4-4gpbl                                      Stopping container auth-service
+40m         Normal    SuccessfulCreate       job/k6-auth-test-spike-auth-service-h1-spike-rep1                     Created pod: k6-auth-test-spike-auth-service-h1-spike-rep1-l9pk6
+40m         Normal    Pulling                pod/k6-auth-test-spike-auth-service-h1-spike-rep1-l9pk6               Pulling image "grafana/k6:latest"
+40m         Normal    Created                pod/k6-auth-test-spike-auth-service-h1-spike-rep1-l9pk6               Created container: k6
+40m         Normal    Pulled                 pod/k6-auth-test-spike-auth-service-h1-spike-rep1-l9pk6               Successfully pulled image "grafana/k6:latest" in 1.417s (1.417s including waiting). Image size: 36750082 bytes.
+40m         Normal    Started                pod/k6-auth-test-spike-auth-service-h1-spike-rep1-l9pk6               Started container k6
+40m         Warning   Unhealthy              pod/auth-service-b78f95fd4-zbzt5                                      Liveness probe failed: Get "http://10.244.2.81:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+39m         Normal    Pulled                 pod/auth-service-b78f95fd4-kg8wh                                      Container image "ecommerce.azurecr.io/auth-service:latest" already present on machine
+39m         Normal    SuccessfulCreate       replicaset/auth-service-b78f95fd4                                     Created pod: auth-service-b78f95fd4-9mpc7
+39m         Normal    SuccessfulCreate       replicaset/auth-service-b78f95fd4                                     Created pod: auth-service-b78f95fd4-j97pg
+39m         Normal    SuccessfulCreate       replicaset/auth-service-b78f95fd4                                     Created pod: auth-service-b78f95fd4-kg8wh
+39m         Normal    Pulled                 pod/auth-service-b78f95fd4-9mpc7                                      Container image "ecommerce.azurecr.io/auth-service:latest" already present on machine
+39m         Normal    Killing                pod/auth-service-b78f95fd4-zbzt5                                      Container auth-service failed liveness probe, will be restarted
+39m         Normal    ScalingReplicaSet      deployment/auth-service                                               Scaled up replica set auth-service-b78f95fd4 from 1 to 4
+39m         Normal    SuccessfulRescale      horizontalpodautoscaler/auth-service-hpa-default                      New size: 4; reason: cpu resource utilization (percentage of request) above target
+39m         Normal    Started                pod/auth-service-b78f95fd4-kg8wh                                      Started container auth-service
+39m         Normal    Created                pod/auth-service-b78f95fd4-kg8wh                                      Created container: auth-service
+39m         Normal    Started                pod/auth-service-b78f95fd4-9mpc7                                      Started container auth-service
+39m         Normal    Created                pod/auth-service-b78f95fd4-9mpc7                                      Created container: auth-service
+39m         Normal    SuccessfulCreate       replicaset/auth-service-b78f95fd4                                     Created pod: auth-service-b78f95fd4-g5qnf
+39m         Normal    SuccessfulRescale      horizontalpodautoscaler/auth-service-hpa-default                      New size: 5; reason: cpu resource utilization (percentage of request) above target
+38m         Normal    Created                pod/auth-service-b78f95fd4-zbzt5                                      Created container: auth-service
+38m         Normal    Pulled                 pod/auth-service-b78f95fd4-zbzt5                                      Container image "ecommerce.azurecr.io/auth-service:latest" already present on machine
+38m         Normal    Started                pod/auth-service-b78f95fd4-zbzt5                                      Started container auth-service
+36m         Warning   Unhealthy              pod/auth-service-b78f95fd4-9mpc7                                      Liveness probe failed: Get "http://10.244.1.125:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+36m         Warning   Unhealthy              pod/auth-service-b78f95fd4-kg8wh                                      Liveness probe failed: Get "http://10.244.1.217:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+35m         Warning   Unhealthy              pod/auth-service-b78f95fd4-g5qnf                                      Liveness probe failed: Get "http://10.244.1.191:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+34m         Normal    Killing                pod/auth-service-b78f95fd4-g5qnf                                      Container auth-service failed liveness probe, will be restarted
+34m         Normal    Pulled                 pod/auth-service-b78f95fd4-g5qnf                                      Container image "ecommerce.azurecr.io/auth-service:latest" already present on machine
+34m         Normal    Created                pod/auth-service-b78f95fd4-g5qnf                                      Created container: auth-service
+34m         Normal    Started                pod/auth-service-b78f95fd4-g5qnf                                      Started container auth-service
+33m         Warning   Unhealthy              pod/auth-service-b78f95fd4-g5qnf                                      Readiness probe failed: Get "http://10.244.1.191:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+31m         Warning   Unhealthy              pod/auth-service-b78f95fd4-zbzt5                                      Readiness probe failed: Get "http://10.244.2.81:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+29m         Warning   Unhealthy              pod/auth-service-b78f95fd4-kg8wh                                      Readiness probe failed: Get "http://10.244.1.217:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+29m         Warning   Unhealthy              pod/auth-service-b78f95fd4-9mpc7                                      Readiness probe failed: Get "http://10.244.1.125:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+28m         Warning   BackoffLimitExceeded   job/k6-auth-test-spike-auth-service-h1-spike-rep1                     Job has reached the specified backoff limit
+22m         Normal    ScalingReplicaSet      deployment/auth-service                                               Scaled down replica set auth-service-b78f95fd4 from 5 to 1
+22m         Normal    Killing                pod/auth-service-b78f95fd4-kg8wh                                      Stopping container auth-service
+22m         Normal    SuccessfulDelete       replicaset/auth-service-b78f95fd4                                     Deleted pod: auth-service-b78f95fd4-9mpc7
+22m         Normal    Killing                pod/auth-service-b78f95fd4-g5qnf                                      Stopping container auth-service
+22m         Normal    Killing                pod/auth-service-b78f95fd4-zbzt5                                      Stopping container auth-service
+22m         Normal    SuccessfulDelete       replicaset/auth-service-b78f95fd4                                     Deleted pod: auth-service-b78f95fd4-zbzt5
+22m         Normal    SuccessfulDelete       replicaset/auth-service-b78f95fd4                                     Deleted pod: auth-service-b78f95fd4-kg8wh
+22m         Warning   Unhealthy              pod/auth-service-b78f95fd4-zbzt5                                      Readiness probe failed: Get "http://10.244.2.81:8001/ready": dial tcp 10.244.2.81:8001: connect: connection refused
+22m         Normal    Killing                pod/auth-service-b78f95fd4-9mpc7                                      Stopping container auth-service
+22m         Normal    SuccessfulDelete       replicaset/auth-service-b78f95fd4                                     Deleted pod: auth-service-b78f95fd4-g5qnf
+18m         Normal    SuccessfulCreate       job/k6-auth-test-oscillating-auth-service-h1-oscillating-rep1         Created pod: k6-auth-test-oscillating-auth-service-h1-oscillating-rep1-v4njm
+18m         Normal    Pulling                pod/k6-auth-test-oscillating-auth-service-h1-oscillating-rep1-v4njm   Pulling image "grafana/k6:latest"
+18m         Normal    Started                pod/k6-auth-test-oscillating-auth-service-h1-oscillating-rep1-v4njm   Started container k6
+18m         Normal    Pulled                 pod/k6-auth-test-oscillating-auth-service-h1-oscillating-rep1-v4njm   Successfully pulled image "grafana/k6:latest" in 1.469s (1.469s including waiting). Image size: 36750082 bytes.
+18m         Normal    Created                pod/k6-auth-test-oscillating-auth-service-h1-oscillating-rep1-v4njm   Created container: k6
+17m         Warning   Unhealthy              pod/auth-service-b78f95fd4-j97pg                                      Liveness probe failed: Get "http://10.244.2.248:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+17m         Normal    ScalingReplicaSet      deployment/auth-service                                               Scaled up replica set auth-service-b78f95fd4 from 1 to 2
+17m         Normal    Pulled                 pod/auth-service-b78f95fd4-f5mgr                                      Container image "ecommerce.azurecr.io/auth-service:latest" already present on machine
+17m         Normal    SuccessfulCreate       replicaset/auth-service-b78f95fd4                                     Created pod: auth-service-b78f95fd4-f5mgr
+17m         Normal    SuccessfulRescale      horizontalpodautoscaler/auth-service-hpa-default                      New size: 2; reason: cpu resource utilization (percentage of request) above target
+17m         Normal    Created                pod/auth-service-b78f95fd4-f5mgr                                      Created container: auth-service
+17m         Normal    Started                pod/auth-service-b78f95fd4-f5mgr                                      Started container auth-service
+16m         Normal    Killing                pod/auth-service-b78f95fd4-j97pg                                      Container auth-service failed liveness probe, will be restarted
+16m         Normal    SuccessfulCreate       replicaset/auth-service-b78f95fd4                                     Created pod: auth-service-b78f95fd4-zhs6m
+16m         Normal    ScalingReplicaSet      deployment/auth-service                                               Scaled up replica set auth-service-b78f95fd4 from 2 to 4
+16m         Normal    SuccessfulCreate       replicaset/auth-service-b78f95fd4                                     Created pod: auth-service-b78f95fd4-jwxwx
+16m         Normal    Started                pod/auth-service-b78f95fd4-zhs6m                                      Started container auth-service
+16m         Normal    Created                pod/auth-service-b78f95fd4-zhs6m                                      Created container: auth-service
+16m         Normal    SuccessfulRescale      horizontalpodautoscaler/auth-service-hpa-default                      New size: 4; reason: cpu resource utilization (percentage of request) above target
+16m         Normal    Pulled                 pod/auth-service-b78f95fd4-zhs6m                                      Container image "ecommerce.azurecr.io/auth-service:latest" already present on machine
+16m         Normal    Pulled                 pod/auth-service-b78f95fd4-jwxwx                                      Container image "ecommerce.azurecr.io/auth-service:latest" already present on machine
+16m         Normal    Created                pod/auth-service-b78f95fd4-jwxwx                                      Created container: auth-service
+16m         Normal    Started                pod/auth-service-b78f95fd4-jwxwx                                      Started container auth-service
+16m         Normal    Pulled                 pod/auth-service-b78f95fd4-j97pg                                      Container image "ecommerce.azurecr.io/auth-service:latest" already present on machine
+16m         Normal    Created                pod/auth-service-b78f95fd4-j97pg                                      Created container: auth-service
+16m         Normal    Started                pod/auth-service-b78f95fd4-j97pg                                      Started container auth-service
+16m         Normal    SuccessfulRescale      horizontalpodautoscaler/auth-service-hpa-default                      New size: 5; reason: cpu resource utilization (percentage of request) above target
+16m         Normal    Created                pod/auth-service-b78f95fd4-mjxpf                                      Created container: auth-service
+16m         Normal    Pulled                 pod/auth-service-b78f95fd4-mjxpf                                      Container image "ecommerce.azurecr.io/auth-service:latest" already present on machine
+16m         Normal    ScalingReplicaSet      deployment/auth-service                                               Scaled up replica set auth-service-b78f95fd4 from 4 to 5
+16m         Normal    SuccessfulCreate       replicaset/auth-service-b78f95fd4                                     Created pod: auth-service-b78f95fd4-mjxpf
+16m         Normal    Started                pod/auth-service-b78f95fd4-mjxpf                                      Started container auth-service
+16m         Warning   Unhealthy              pod/auth-service-b78f95fd4-f5mgr                                      Liveness probe failed: Get "http://10.244.1.155:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+14m         Warning   Unhealthy              pod/auth-service-b78f95fd4-zhs6m                                      Liveness probe failed: Get "http://10.244.1.115:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+13m         Warning   Unhealthy              pod/auth-service-b78f95fd4-jwxwx                                      Liveness probe failed: Get "http://10.244.2.250:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+12m         Warning   Unhealthy              pod/auth-service-b78f95fd4-mjxpf                                      Readiness probe failed: Get "http://10.244.1.46:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+10m         Warning   Unhealthy              pod/auth-service-b78f95fd4-mjxpf                                      Liveness probe failed: Get "http://10.244.1.46:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+9m7s        Warning   Unhealthy              pod/auth-service-b78f95fd4-j97pg                                      Readiness probe failed: Get "http://10.244.2.248:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+7m12s       Warning   Unhealthy              pod/auth-service-b78f95fd4-f5mgr                                      Readiness probe failed: Get "http://10.244.1.155:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+6m19s       Warning   Unhealthy              pod/auth-service-b78f95fd4-jwxwx                                      Readiness probe failed: Get "http://10.244.2.250:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+6m17s       Warning   Unhealthy              pod/auth-service-b78f95fd4-zhs6m                                      Readiness probe failed: Get "http://10.244.1.115:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+5m33s       Warning   BackoffLimitExceeded   job/k6-auth-test-oscillating-auth-service-h1-oscillating-rep1         Job has reached the specified backoff limit

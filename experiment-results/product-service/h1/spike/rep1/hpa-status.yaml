@@ -1,0 +1,61 @@
+apiVersion: v1
+items:
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"labels":{"experiment":"h1-hpa-default"},"name":"product-service-hpa-default","namespace":"ecommerce"},"spec":{"maxReplicas":5,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":70,"type":"Utilization"}},"type":"Resource"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"product-service"}}}
+    creationTimestamp: "2026-04-07T09:24:03Z"
+    labels:
+      experiment: h1-hpa-default
+    name: product-service-hpa-default
+    namespace: ecommerce
+    resourceVersion: "972200"
+    uid: bc64a14b-86ba-4e05-b9ed-b9be889b0fb7
+  spec:
+    maxReplicas: 5
+    metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 70
+          type: Utilization
+      type: Resource
+    minReplicas: 1
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: product-service
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-07T09:24:18Z"
+      message: recent recommendations were higher than current one, applying the highest
+        recent recommendation
+      reason: ScaleDownStabilized
+      status: "True"
+      type: AbleToScale
+    - lastTransitionTime: "2026-04-07T09:24:18Z"
+      message: the HPA was able to successfully calculate a replica count from cpu
+        resource utilization (percentage of request)
+      reason: ValidMetricFound
+      status: "True"
+      type: ScalingActive
+    - lastTransitionTime: "2026-04-07T09:30:03Z"
+      message: the desired replica count is more than the maximum replica count
+      reason: TooManyReplicas
+      status: "True"
+      type: ScalingLimited
+    currentMetrics:
+    - resource:
+        current:
+          averageUtilization: 2
+          averageValue: 2m
+        name: cpu
+      type: Resource
+    currentReplicas: 5
+    desiredReplicas: 5
+    lastScaleTime: "2026-04-07T09:30:18Z"
+kind: List
+metadata:
+  resourceVersion: ""

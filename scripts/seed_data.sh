@@ -16,8 +16,10 @@ else
     CMD="docker compose exec -T product-db psql -U ${PRODUCT_DB_USER:-product_user} -d ${PRODUCT_DB_NAME:-product_db}"
 fi
 
-# Seed categories into product DB
+# Seed categories and a large search-heavy catalog into product DB
 $CMD <<'SQL'
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 INSERT INTO categories (name, description, created_at) VALUES
     ('Electronics', 'Gadgets, phones, laptops, and accessories', now()),
     ('Clothing', 'Men and apparel', now()),
@@ -31,31 +33,112 @@ INSERT INTO categories (name, description, created_at) VALUES
     ('Food', 'Snacks, beverages, and gourmet items', now())
 ON CONFLICT DO NOTHING;
 
-INSERT INTO products (id, name, description, price, stock, category_id, image_url, is_deleted, created_at, updated_at) VALUES
-    (gen_random_uuid(), 'Wireless Headphones',   'Noise-cancelling Bluetooth headphones',   149.99, 100, (SELECT id FROM categories WHERE name = 'Electronics'), 'https://placehold.co/400x400?text=Headphones', false, now(), now()),
-    (gen_random_uuid(), 'Laptop Stand',          'Adjustable aluminum laptop stand',         49.99,  200, (SELECT id FROM categories WHERE name = 'Electronics'), 'https://placehold.co/400x400?text=LaptopStand', false, now(), now()),
-    (gen_random_uuid(), 'USB-C Hub',             '7-in-1 USB-C hub with HDMI',              39.99,  150, (SELECT id FROM categories WHERE name = 'Electronics'), 'https://placehold.co/400x400?text=USBHub', false, now(), now()),
-    (gen_random_uuid(), 'Mechanical Keyboard',   'Cherry MX Brown switches, RGB backlit',   129.99,  75, (SELECT id FROM categories WHERE name = 'Electronics'), 'https://placehold.co/400x400?text=Keyboard', false, now(), now()),
-    (gen_random_uuid(), 'Wireless Mouse',        'Ergonomic wireless mouse, 2.4GHz',        29.99,  300, (SELECT id FROM categories WHERE name = 'Electronics'), 'https://placehold.co/400x400?text=Mouse', false, now(), now()),
-    (gen_random_uuid(), 'Cotton T-Shirt',        'Premium cotton crew neck t-shirt',         24.99,  500, (SELECT id FROM categories WHERE name = 'Clothing'), 'https://placehold.co/400x400?text=TShirt', false, now(), now()),
-    (gen_random_uuid(), 'Denim Jeans',           'Slim fit denim jeans',                     59.99,  200, (SELECT id FROM categories WHERE name = 'Clothing'), 'https://placehold.co/400x400?text=Jeans', false, now(), now()),
-    (gen_random_uuid(), 'Running Shoes',         'Lightweight running shoes',                89.99,  150, (SELECT id FROM categories WHERE name = 'Sports'), 'https://placehold.co/400x400?text=Shoes', false, now(), now()),
-    (gen_random_uuid(), 'Yoga Mat',              'Non-slip exercise yoga mat',               34.99,  250, (SELECT id FROM categories WHERE name = 'Sports'), 'https://placehold.co/400x400?text=YogaMat', false, now(), now()),
-    (gen_random_uuid(), 'Python Cookbook',        'Advanced Python recipes and patterns',     44.99,  100, (SELECT id FROM categories WHERE name = 'Books'), 'https://placehold.co/400x400?text=PythonBook', false, now(), now()),
-    (gen_random_uuid(), 'Clean Code',            'Robert C. Martin - Clean Code',            39.99,  120, (SELECT id FROM categories WHERE name = 'Books'), 'https://placehold.co/400x400?text=CleanCode', false, now(), now()),
-    (gen_random_uuid(), 'Coffee Maker',          'Drip coffee maker, 12-cup capacity',      79.99,  80,  (SELECT id FROM categories WHERE name = 'Home & Kitchen'), 'https://placehold.co/400x400?text=CoffeeMaker', false, now(), now()),
-    (gen_random_uuid(), 'Cast Iron Skillet',     '12-inch pre-seasoned cast iron skillet',   34.99,  90,  (SELECT id FROM categories WHERE name = 'Home & Kitchen'), 'https://placehold.co/400x400?text=Skillet', false, now(), now()),
-    (gen_random_uuid(), 'Board Game Set',        'Classic board game collection',            49.99,  60,  (SELECT id FROM categories WHERE name = 'Toys'), 'https://placehold.co/400x400?text=BoardGame', false, now(), now()),
-    (gen_random_uuid(), 'Face Moisturizer',      'Daily hydrating face moisturizer',         19.99,  400, (SELECT id FROM categories WHERE name = 'Beauty'), 'https://placehold.co/400x400?text=Moisturizer', false, now(), now()),
-    (gen_random_uuid(), 'Car Phone Mount',       'Magnetic dashboard phone mount',           14.99,  350, (SELECT id FROM categories WHERE name = 'Automotive'), 'https://placehold.co/400x400?text=PhoneMount', false, now(), now()),
-    (gen_random_uuid(), 'Garden Tool Set',       '5-piece stainless steel garden tools',     29.99,  180, (SELECT id FROM categories WHERE name = 'Garden'), 'https://placehold.co/400x400?text=GardenTools', false, now(), now()),
-    (gen_random_uuid(), 'Organic Coffee Beans',  '1kg premium organic coffee beans',         24.99,  200, (SELECT id FROM categories WHERE name = 'Food'),'https://placehold.co/400x400?text=CoffeeBeans', false, now(), now()),
-    (gen_random_uuid(), 'Smartwatch',            'Fitness tracker with heart rate monitor', 199.99,  100, (SELECT id FROM categories WHERE name = 'Electronics'), 'https://placehold.co/400x400?text=Smartwatch', false, now(), now()),
-    (gen_random_uuid(), 'Backpack',              'Water-resistant laptop backpack',           64.99,  175, (SELECT id FROM categories WHERE name = 'Clothing'), 'https://placehold.co/400x400?text=Backpack', false, now(), now())
-ON CONFLICT DO NOTHING;
+WITH starter_products(name, description, price, stock, category_name, image_url) AS (
+    VALUES
+        ('Wireless Headphones', 'Noise-cancelling Bluetooth headphones', 149.99, 100, 'Electronics', 'https://placehold.co/400x400?text=Headphones'),
+        ('Laptop Stand', 'Adjustable aluminum laptop stand', 49.99, 200, 'Electronics', 'https://placehold.co/400x400?text=LaptopStand'),
+        ('USB-C Hub', '7-in-1 USB-C hub with HDMI', 39.99, 150, 'Electronics', 'https://placehold.co/400x400?text=USBHub'),
+        ('Mechanical Keyboard', 'Cherry MX Brown switches, RGB backlit', 129.99, 75, 'Electronics', 'https://placehold.co/400x400?text=Keyboard'),
+        ('Wireless Mouse', 'Ergonomic wireless mouse, 2.4GHz', 29.99, 300, 'Electronics', 'https://placehold.co/400x400?text=Mouse'),
+        ('Cotton T-Shirt', 'Premium cotton crew neck t-shirt', 24.99, 500, 'Clothing', 'https://placehold.co/400x400?text=TShirt'),
+        ('Denim Jeans', 'Slim fit denim jeans', 59.99, 200, 'Clothing', 'https://placehold.co/400x400?text=Jeans'),
+        ('Running Shoes', 'Lightweight running shoes', 89.99, 150, 'Sports', 'https://placehold.co/400x400?text=Shoes'),
+        ('Yoga Mat', 'Non-slip exercise yoga mat', 34.99, 250, 'Sports', 'https://placehold.co/400x400?text=YogaMat'),
+        ('Python Cookbook', 'Advanced Python recipes and patterns', 44.99, 100, 'Books', 'https://placehold.co/400x400?text=PythonBook'),
+        ('Clean Code', 'Robert C. Martin - Clean Code', 39.99, 120, 'Books', 'https://placehold.co/400x400?text=CleanCode'),
+        ('Coffee Maker', 'Drip coffee maker, 12-cup capacity', 79.99, 80, 'Home & Kitchen', 'https://placehold.co/400x400?text=CoffeeMaker'),
+        ('Cast Iron Skillet', '12-inch pre-seasoned cast iron skillet', 34.99, 90, 'Home & Kitchen', 'https://placehold.co/400x400?text=Skillet'),
+        ('Board Game Set', 'Classic board game collection', 49.99, 60, 'Toys', 'https://placehold.co/400x400?text=BoardGame'),
+        ('Face Moisturizer', 'Daily hydrating face moisturizer', 19.99, 400, 'Beauty', 'https://placehold.co/400x400?text=Moisturizer'),
+        ('Car Phone Mount', 'Magnetic dashboard phone mount', 14.99, 350, 'Automotive', 'https://placehold.co/400x400?text=PhoneMount'),
+        ('Garden Tool Set', '5-piece stainless steel garden tools', 29.99, 180, 'Garden', 'https://placehold.co/400x400?text=GardenTools'),
+        ('Organic Coffee Beans', '1kg premium organic coffee beans', 24.99, 200, 'Food', 'https://placehold.co/400x400?text=CoffeeBeans'),
+        ('Smartwatch', 'Fitness tracker with heart rate monitor', 199.99, 100, 'Electronics', 'https://placehold.co/400x400?text=Smartwatch'),
+        ('Backpack', 'Water-resistant laptop backpack', 64.99, 175, 'Clothing', 'https://placehold.co/400x400?text=Backpack')
+)
+INSERT INTO products (id, name, description, price, stock, category_id, image_url, is_deleted, created_at, updated_at)
+SELECT
+    uuid_generate_v4(),
+    sp.name,
+    sp.description,
+    sp.price,
+    sp.stock,
+    c.id,
+    sp.image_url,
+    false,
+    now(),
+    now()
+FROM starter_products sp
+JOIN categories c ON c.name = sp.category_name
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM products p
+    WHERE p.name = sp.name
+);
+
+WITH search_terms(keyword, term_index) AS (
+    VALUES
+        ('Laptop', 1),
+        ('Phone', 2),
+        ('Camera', 3),
+        ('Headphones', 4),
+        ('Keyboard', 5),
+        ('Monitor', 6),
+        ('Speaker', 7),
+        ('Charger', 8)
+),
+category_pool AS (
+    SELECT id, name, ROW_NUMBER() OVER (ORDER BY id) AS category_index
+    FROM categories
+),
+generated_catalog AS (
+    SELECT
+        cp.id AS category_id,
+        cp.name AS category_name,
+        gs.seq,
+        st.keyword,
+        FORMAT('%s %s Recovery Catalog Item %s', st.keyword, cp.name, gs.seq) AS product_name,
+        FORMAT(
+            '%s %s recovery benchmark item %s. %s',
+            st.keyword,
+            cp.name,
+            gs.seq,
+            repeat(FORMAT('%s autoscaling search workload detail for %s category. ', st.keyword, cp.name), 8)
+        ) AS product_description,
+        ROUND((19.99 + (((gs.seq - 1) % 250) * 3.15) + cp.category_index)::numeric, 2) AS product_price,
+        25 + ((gs.seq * 13 + cp.category_index * 17) % 475) AS product_stock,
+        FORMAT(
+            'https://placehold.co/400x400?text=%s%s%s',
+            regexp_replace(st.keyword, '[[:space:]]+', '', 'g'),
+            regexp_replace(cp.name, '[[:space:]&]+', '', 'g'),
+            gs.seq
+        ) AS product_image
+    FROM category_pool cp
+    CROSS JOIN generate_series(1, 1000) AS gs(seq)
+    JOIN search_terms st
+      ON (((gs.seq + cp.category_index - 2) % 8) + 1) = st.term_index
+)
+INSERT INTO products (id, name, description, price, stock, category_id, image_url, is_deleted, created_at, updated_at)
+SELECT
+    uuid_generate_v4(),
+    gc.product_name,
+    gc.product_description,
+    gc.product_price,
+    gc.product_stock,
+    gc.category_id,
+    gc.product_image,
+    false,
+    now(),
+    now()
+FROM generated_catalog gc
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM products p
+    WHERE p.name = gc.product_name
+);
 SQL
 if [ -n "${PGPASSWORD:-}" ]; then unset PGPASSWORD; fi
 
-echo "✅ Seeded 10 categories + 20 products."
+echo "✅ Seeded 10 categories + starter catalog + recovery dataset (~10,000 products)."
 echo ""
 echo "To create test users, POST to http://localhost:8080/auth/register"

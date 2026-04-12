@@ -1,0 +1,73 @@
+LAST SEEN   TYPE      REASON                 OBJECT                                                                MESSAGE
+18m         Normal    Scheduled              pod/product-service-75f4ddbd56-gggmn                                  Successfully assigned ecommerce/product-service-75f4ddbd56-gggmn to aks-userpool-16719200-vmss00000h
+18m         Normal    Scheduled              pod/product-service-75f4ddbd56-trqkq                                  Successfully assigned ecommerce/product-service-75f4ddbd56-trqkq to aks-userpool-16719200-vmss00000h
+18m         Normal    Scheduled              pod/product-service-75f4ddbd56-mrtfl                                  Successfully assigned ecommerce/product-service-75f4ddbd56-mrtfl to aks-userpool-16719200-vmss00000h
+18m         Normal    Scheduled              pod/product-service-75f4ddbd56-l297w                                  Successfully assigned ecommerce/product-service-75f4ddbd56-l297w to aks-userpool-16719200-vmss00000h
+37m         Normal    Scheduled              pod/product-service-75f4ddbd56-h9d95                                  Successfully assigned ecommerce/product-service-75f4ddbd56-h9d95 to aks-userpool-16719200-vmss00000f
+34m         Normal    Scheduled              pod/k6-load-test-gradual-product-service-b2-gradual-rep1-6q65w        Successfully assigned ecommerce/k6-load-test-gradual-product-service-b2-gradual-rep1-6q65w to aks-userpool-16719200-vmss00000f
+15m         Normal    Scheduled              pod/k6-load-test-spike-product-service-b2-spike-rep1-mzprq            Successfully assigned ecommerce/k6-load-test-spike-product-service-b2-spike-rep1-mzprq to aks-userpool-16719200-vmss00000f
+56m         Normal    Scheduled              pod/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg   Successfully assigned ecommerce/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg to aks-userpool-16719200-vmss00000h
+37m         Normal    Scheduled              pod/product-service-75f4ddbd56-9xj72                                  Successfully assigned ecommerce/product-service-75f4ddbd56-9xj72 to aks-userpool-16719200-vmss00000h
+37m         Normal    Scheduled              pod/product-service-75f4ddbd56-5zh86                                  Successfully assigned ecommerce/product-service-75f4ddbd56-5zh86 to aks-userpool-16719200-vmss00000h
+37m         Normal    Scheduled              pod/product-service-75f4ddbd56-xdd7x                                  Successfully assigned ecommerce/product-service-75f4ddbd56-xdd7x to aks-userpool-16719200-vmss00000h
+56m         Normal    Pulling                pod/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg   Pulling image "grafana/k6:latest"
+56m         Normal    SuccessfulCreate       job/k6-load-test-oscillating-product-service-b1-oscillating-rep1      Created pod: k6-load-test-oscillating-product-service-b1-oscillating-re8blxg
+56m         Normal    Started                pod/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg   Started container k6
+56m         Normal    Created                pod/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg   Created container: k6
+56m         Normal    Pulled                 pod/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg   Successfully pulled image "grafana/k6:latest" in 1.436s (1.436s including waiting). Image size: 36750082 bytes.
+47m         Warning   Unhealthy              pod/product-service-75f4ddbd56-6nv6h                                  Readiness probe failed: Get "http://10.244.2.80:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+44m         Warning   BackoffLimitExceeded   job/k6-load-test-oscillating-product-service-b1-oscillating-rep1      Job has reached the specified backoff limit
+37m         Normal    Pulled                 pod/product-service-75f4ddbd56-9xj72                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+37m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-9xj72
+37m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-h9d95
+37m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-5zh86
+37m         Normal    Pulled                 pod/product-service-75f4ddbd56-5zh86                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+37m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-xdd7x
+37m         Normal    Pulled                 pod/product-service-75f4ddbd56-h9d95                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+37m         Normal    Created                pod/product-service-75f4ddbd56-h9d95                                  Created container: product-service
+37m         Normal    Pulled                 pod/product-service-75f4ddbd56-xdd7x                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+37m         Normal    Started                pod/product-service-75f4ddbd56-h9d95                                  Started container product-service
+37m         Normal    Created                pod/product-service-75f4ddbd56-5zh86                                  Created container: product-service
+37m         Normal    Created                pod/product-service-75f4ddbd56-9xj72                                  Created container: product-service
+37m         Normal    Started                pod/product-service-75f4ddbd56-9xj72                                  Started container product-service
+37m         Normal    Created                pod/product-service-75f4ddbd56-xdd7x                                  Created container: product-service
+37m         Normal    Started                pod/product-service-75f4ddbd56-5zh86                                  Started container product-service
+37m         Normal    Started                pod/product-service-75f4ddbd56-xdd7x                                  Started container product-service
+34m         Normal    SuccessfulCreate       job/k6-load-test-gradual-product-service-b2-gradual-rep1              Created pod: k6-load-test-gradual-product-service-b2-gradual-rep1-6q65w
+34m         Normal    Pulling                pod/k6-load-test-gradual-product-service-b2-gradual-rep1-6q65w        Pulling image "grafana/k6:latest"
+34m         Normal    Created                pod/k6-load-test-gradual-product-service-b2-gradual-rep1-6q65w        Created container: k6
+34m         Normal    Started                pod/k6-load-test-gradual-product-service-b2-gradual-rep1-6q65w        Started container k6
+34m         Normal    Pulled                 pod/k6-load-test-gradual-product-service-b2-gradual-rep1-6q65w        Successfully pulled image "grafana/k6:latest" in 1.488s (1.488s including waiting). Image size: 36750082 bytes.
+22m         Normal    Completed              job/k6-load-test-gradual-product-service-b2-gradual-rep1              Job completed
+19m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-xdd7x
+19m         Normal    Killing                pod/product-service-75f4ddbd56-5zh86                                  Stopping container product-service
+19m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-5zh86
+19m         Normal    Killing                pod/product-service-75f4ddbd56-6nv6h                                  Stopping container product-service
+19m         Normal    Killing                pod/product-service-75f4ddbd56-xdd7x                                  Stopping container product-service
+19m         Normal    Killing                pod/product-service-75f4ddbd56-9xj72                                  Stopping container product-service
+19m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-9xj72
+19m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-6nv6h
+19m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-75f4ddbd56 from 5 to 1
+18m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-75f4ddbd56 from 1 to 5
+18m         Normal    Created                pod/product-service-75f4ddbd56-gggmn                                  Created container: product-service
+18m         Normal    Pulled                 pod/product-service-75f4ddbd56-gggmn                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+18m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-mrtfl
+18m         Normal    Pulled                 pod/product-service-75f4ddbd56-trqkq                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+18m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-trqkq
+18m         Normal    Created                pod/product-service-75f4ddbd56-mrtfl                                  Created container: product-service
+18m         Normal    Pulled                 pod/product-service-75f4ddbd56-mrtfl                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+18m         Normal    Started                pod/product-service-75f4ddbd56-l297w                                  Started container product-service
+18m         Normal    Created                pod/product-service-75f4ddbd56-l297w                                  Created container: product-service
+18m         Normal    Pulled                 pod/product-service-75f4ddbd56-l297w                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+18m         Normal    Started                pod/product-service-75f4ddbd56-gggmn                                  Started container product-service
+18m         Normal    Created                pod/product-service-75f4ddbd56-trqkq                                  Created container: product-service
+18m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-l297w
+18m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-gggmn
+18m         Normal    Started                pod/product-service-75f4ddbd56-mrtfl                                  Started container product-service
+18m         Normal    Started                pod/product-service-75f4ddbd56-trqkq                                  Started container product-service
+15m         Normal    SuccessfulCreate       job/k6-load-test-spike-product-service-b2-spike-rep1                  Created pod: k6-load-test-spike-product-service-b2-spike-rep1-mzprq
+15m         Normal    Pulling                pod/k6-load-test-spike-product-service-b2-spike-rep1-mzprq            Pulling image "grafana/k6:latest"
+15m         Normal    Started                pod/k6-load-test-spike-product-service-b2-spike-rep1-mzprq            Started container k6
+15m         Normal    Created                pod/k6-load-test-spike-product-service-b2-spike-rep1-mzprq            Created container: k6
+15m         Normal    Pulled                 pod/k6-load-test-spike-product-service-b2-spike-rep1-mzprq            Successfully pulled image "grafana/k6:latest" in 1.468s (1.468s including waiting). Image size: 36750082 bytes.
+3m7s        Normal    Completed              job/k6-load-test-spike-product-service-b2-spike-rep1                  Job completed

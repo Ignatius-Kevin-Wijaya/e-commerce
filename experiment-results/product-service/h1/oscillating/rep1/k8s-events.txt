@@ -1,0 +1,135 @@
+LAST SEEN   TYPE      REASON                 OBJECT                                                                MESSAGE
+34m         Normal    Scheduled              pod/k6-load-test-spike-product-service-h1-spike-rep1-4m67s            Successfully assigned ecommerce/k6-load-test-spike-product-service-h1-spike-rep1-4m67s to aks-userpool-16719200-vmss00000h
+30m         Normal    Scheduled              pod/product-service-75f4ddbd56-q8hg2                                  Successfully assigned ecommerce/product-service-75f4ddbd56-q8hg2 to aks-userpool-16719200-vmss00000f
+52m         Normal    Scheduled              pod/product-service-75f4ddbd56-65np9                                  Successfully assigned ecommerce/product-service-75f4ddbd56-65np9 to aks-userpool-16719200-vmss00000h
+14m         Normal    Scheduled              pod/product-service-75f4ddbd56-6hfhz                                  Successfully assigned ecommerce/product-service-75f4ddbd56-6hfhz to aks-userpool-16719200-vmss00000h
+56m         Normal    Scheduled              pod/k6-load-test-gradual-product-service-h1-gradual-rep1-75wrp        Successfully assigned ecommerce/k6-load-test-gradual-product-service-h1-gradual-rep1-75wrp to aks-userpool-16719200-vmss00000h
+12m         Normal    Scheduled              pod/product-service-75f4ddbd56-49m4g                                  Successfully assigned ecommerce/product-service-75f4ddbd56-49m4g to aks-userpool-16719200-vmss00000h
+51m         Normal    Scheduled              pod/product-service-75f4ddbd56-mqf66                                  Successfully assigned ecommerce/product-service-75f4ddbd56-mqf66 to aks-userpool-16719200-vmss00000h
+51m         Normal    Scheduled              pod/product-service-75f4ddbd56-w4dlp                                  Successfully assigned ecommerce/product-service-75f4ddbd56-w4dlp to aks-userpool-16719200-vmss00000f
+31m         Normal    Scheduled              pod/product-service-75f4ddbd56-pmflg                                  Successfully assigned ecommerce/product-service-75f4ddbd56-pmflg to aks-userpool-16719200-vmss00000f
+15m         Normal    Scheduled              pod/k6-load-test-oscillating-product-service-h1-oscillating-respcql   Successfully assigned ecommerce/k6-load-test-oscillating-product-service-h1-oscillating-respcql to aks-userpool-16719200-vmss00000h
+31m         Normal    Scheduled              pod/product-service-75f4ddbd56-h85qz                                  Successfully assigned ecommerce/product-service-75f4ddbd56-h85qz to aks-userpool-16719200-vmss00000h
+11m         Normal    Scheduled              pod/product-service-75f4ddbd56-44jjt                                  Successfully assigned ecommerce/product-service-75f4ddbd56-44jjt to aks-userpool-16719200-vmss00000f
+53m         Normal    Scheduled              pod/product-service-75f4ddbd56-f8lm2                                  Successfully assigned ecommerce/product-service-75f4ddbd56-f8lm2 to aks-userpool-16719200-vmss00000h
+12m         Normal    Scheduled              pod/product-service-75f4ddbd56-dcnlg                                  Successfully assigned ecommerce/product-service-75f4ddbd56-dcnlg to aks-userpool-16719200-vmss00000h
+33m         Normal    Scheduled              pod/product-service-75f4ddbd56-vzrnz                                  Successfully assigned ecommerce/product-service-75f4ddbd56-vzrnz to aks-userpool-16719200-vmss00000h
+60m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-75f4ddbd56 from 5 to 1
+60m         Normal    Killing                pod/product-service-75f4ddbd56-bh7hj                                  Stopping container product-service
+60m         Normal    Killing                pod/product-service-75f4ddbd56-wq5s2                                  Stopping container product-service
+60m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-wq5s2
+60m         Normal    Killing                pod/product-service-75f4ddbd56-z9xqk                                  Stopping container product-service
+60m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-z9xqk
+60m         Normal    Killing                pod/product-service-75f4ddbd56-fttmz                                  Stopping container product-service
+60m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-fttmz
+60m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-bh7hj
+56m         Normal    Pulling                pod/k6-load-test-gradual-product-service-h1-gradual-rep1-75wrp        Pulling image "grafana/k6:latest"
+56m         Normal    SuccessfulCreate       job/k6-load-test-gradual-product-service-h1-gradual-rep1              Created pod: k6-load-test-gradual-product-service-h1-gradual-rep1-75wrp
+56m         Normal    Started                pod/k6-load-test-gradual-product-service-h1-gradual-rep1-75wrp        Started container k6
+56m         Normal    Created                pod/k6-load-test-gradual-product-service-h1-gradual-rep1-75wrp        Created container: k6
+56m         Normal    Pulled                 pod/k6-load-test-gradual-product-service-h1-gradual-rep1-75wrp        Successfully pulled image "grafana/k6:latest" in 1.403s (1.403s including waiting). Image size: 36750082 bytes.
+53m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-default                   New size: 2; reason: cpu resource utilization (percentage of request) above target
+53m         Normal    Pulled                 pod/product-service-75f4ddbd56-f8lm2                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+53m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-f8lm2
+53m         Normal    Started                pod/product-service-75f4ddbd56-f8lm2                                  Started container product-service
+53m         Normal    Created                pod/product-service-75f4ddbd56-f8lm2                                  Created container: product-service
+52m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-75f4ddbd56 from 2 to 3
+52m         Normal    Started                pod/product-service-75f4ddbd56-65np9                                  Started container product-service
+52m         Normal    Pulled                 pod/product-service-75f4ddbd56-65np9                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+52m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-default                   New size: 3; reason: cpu resource utilization (percentage of request) above target
+52m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-65np9
+52m         Normal    Created                pod/product-service-75f4ddbd56-65np9                                  Created container: product-service
+51m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-mqf66
+51m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-default                   New size: 5; reason: cpu resource utilization (percentage of request) above target
+51m         Normal    Started                pod/product-service-75f4ddbd56-mqf66                                  Started container product-service
+51m         Normal    Created                pod/product-service-75f4ddbd56-mqf66                                  Created container: product-service
+51m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-w4dlp
+51m         Normal    Pulled                 pod/product-service-75f4ddbd56-mqf66                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+51m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-75f4ddbd56 from 3 to 5
+51m         Normal    Started                pod/product-service-75f4ddbd56-w4dlp                                  Started container product-service
+51m         Normal    Pulled                 pod/product-service-75f4ddbd56-w4dlp                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+51m         Normal    Created                pod/product-service-75f4ddbd56-w4dlp                                  Created container: product-service
+46m         Warning   Unhealthy              pod/product-service-75f4ddbd56-h9d95                                  Readiness probe failed: Get "http://10.244.1.19:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+44m         Warning   BackoffLimitExceeded   job/k6-load-test-gradual-product-service-h1-gradual-rep1              Job has reached the specified backoff limit
+40m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-75f4ddbd56 from 5 to 4
+40m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-default                   New size: 4; reason: All metrics below target
+40m         Normal    Killing                pod/product-service-75f4ddbd56-mqf66                                  Stopping container product-service
+40m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-mqf66
+39m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-default                   New size: 2; reason: All metrics below target
+39m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-75f4ddbd56 from 4 to 2
+39m         Normal    Killing                pod/product-service-75f4ddbd56-f8lm2                                  Stopping container product-service
+39m         Normal    Killing                pod/product-service-75f4ddbd56-h9d95                                  Stopping container product-service
+39m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-h9d95
+39m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-f8lm2
+38m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-w4dlp
+38m         Normal    Killing                pod/product-service-75f4ddbd56-w4dlp                                  Stopping container product-service
+38m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-75f4ddbd56 from 2 to 1
+38m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-default                   New size: 1; reason: All metrics below target
+34m         Normal    Pulling                pod/k6-load-test-spike-product-service-h1-spike-rep1-4m67s            Pulling image "grafana/k6:latest"
+34m         Normal    SuccessfulCreate       job/k6-load-test-spike-product-service-h1-spike-rep1                  Created pod: k6-load-test-spike-product-service-h1-spike-rep1-4m67s
+34m         Normal    Pulled                 pod/k6-load-test-spike-product-service-h1-spike-rep1-4m67s            Successfully pulled image "grafana/k6:latest" in 1.424s (1.424s including waiting). Image size: 36750082 bytes.
+34m         Normal    Created                pod/k6-load-test-spike-product-service-h1-spike-rep1-4m67s            Created container: k6
+34m         Normal    Started                pod/k6-load-test-spike-product-service-h1-spike-rep1-4m67s            Started container k6
+33m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-vzrnz
+33m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-default                   New size: 2; reason: cpu resource utilization (percentage of request) above target
+33m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-75f4ddbd56 from 1 to 2
+33m         Normal    Pulled                 pod/product-service-75f4ddbd56-vzrnz                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+33m         Normal    Created                pod/product-service-75f4ddbd56-vzrnz                                  Created container: product-service
+33m         Normal    Started                pod/product-service-75f4ddbd56-vzrnz                                  Started container product-service
+31m         Warning   Unhealthy              pod/product-service-75f4ddbd56-65np9                                  Readiness probe failed: Get "http://10.244.2.153:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+31m         Warning   Unhealthy              pod/product-service-75f4ddbd56-vzrnz                                  Readiness probe failed: Get "http://10.244.2.0:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+31m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-h85qz
+31m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-default                   New size: 4; reason: cpu resource utilization (percentage of request) above target
+31m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-pmflg
+31m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-75f4ddbd56 from 2 to 4
+31m         Normal    Created                pod/product-service-75f4ddbd56-h85qz                                  Created container: product-service
+31m         Normal    Started                pod/product-service-75f4ddbd56-h85qz                                  Started container product-service
+31m         Normal    Created                pod/product-service-75f4ddbd56-pmflg                                  Created container: product-service
+31m         Normal    Pulled                 pod/product-service-75f4ddbd56-pmflg                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+31m         Normal    Started                pod/product-service-75f4ddbd56-pmflg                                  Started container product-service
+31m         Normal    Pulled                 pod/product-service-75f4ddbd56-h85qz                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+30m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-75f4ddbd56 from 4 to 5
+30m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-q8hg2
+30m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-default                   New size: 5; reason: cpu resource utilization (percentage of request) above target
+30m         Normal    Started                pod/product-service-75f4ddbd56-q8hg2                                  Started container product-service
+30m         Normal    Created                pod/product-service-75f4ddbd56-q8hg2                                  Created container: product-service
+30m         Normal    Pulled                 pod/product-service-75f4ddbd56-q8hg2                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+22m         Normal    Completed              job/k6-load-test-spike-product-service-h1-spike-rep1                  Job completed
+19m         Normal    Killing                pod/product-service-75f4ddbd56-vzrnz                                  Stopping container product-service
+19m         Normal    Killing                pod/product-service-75f4ddbd56-65np9                                  Stopping container product-service
+19m         Normal    Killing                pod/product-service-75f4ddbd56-pmflg                                  Stopping container product-service
+19m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-75f4ddbd56 from 5 to 1
+19m         Normal    Killing                pod/product-service-75f4ddbd56-h85qz                                  Stopping container product-service
+19m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-65np9
+19m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-vzrnz
+19m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-h85qz
+19m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-pmflg
+15m         Normal    SuccessfulCreate       job/k6-load-test-oscillating-product-service-h1-oscillating-rep1      Created pod: k6-load-test-oscillating-product-service-h1-oscillating-respcql
+15m         Normal    Pulling                pod/k6-load-test-oscillating-product-service-h1-oscillating-respcql   Pulling image "grafana/k6:latest"
+15m         Normal    Pulled                 pod/k6-load-test-oscillating-product-service-h1-oscillating-respcql   Successfully pulled image "grafana/k6:latest" in 1.461s (1.461s including waiting). Image size: 36750082 bytes.
+15m         Normal    Created                pod/k6-load-test-oscillating-product-service-h1-oscillating-respcql   Created container: k6
+15m         Normal    Started                pod/k6-load-test-oscillating-product-service-h1-oscillating-respcql   Started container k6
+14m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-6hfhz
+14m         Normal    Pulled                 pod/product-service-75f4ddbd56-6hfhz                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+14m         Normal    Created                pod/product-service-75f4ddbd56-6hfhz                                  Created container: product-service
+14m         Normal    Started                pod/product-service-75f4ddbd56-6hfhz                                  Started container product-service
+14m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-default                   New size: 2; reason: cpu resource utilization (percentage of request) above target
+14m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-75f4ddbd56 from 1 to 2
+12m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-dcnlg
+12m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-49m4g
+12m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-75f4ddbd56 from 2 to 4
+12m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-default                   New size: 4; reason: cpu resource utilization (percentage of request) above target
+12m         Normal    Started                pod/product-service-75f4ddbd56-dcnlg                                  Started container product-service
+12m         Normal    Created                pod/product-service-75f4ddbd56-dcnlg                                  Created container: product-service
+12m         Normal    Pulled                 pod/product-service-75f4ddbd56-49m4g                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+12m         Normal    Created                pod/product-service-75f4ddbd56-49m4g                                  Created container: product-service
+12m         Normal    Pulled                 pod/product-service-75f4ddbd56-dcnlg                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+12m         Normal    Started                pod/product-service-75f4ddbd56-49m4g                                  Started container product-service
+11m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-44jjt
+11m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-default                   New size: 5; reason: cpu resource utilization (percentage of request) above target
+11m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-75f4ddbd56 from 4 to 5
+11m         Normal    Pulled                 pod/product-service-75f4ddbd56-44jjt                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+11m         Normal    Started                pod/product-service-75f4ddbd56-44jjt                                  Started container product-service
+11m         Normal    Created                pod/product-service-75f4ddbd56-44jjt                                  Created container: product-service
+11m         Warning   Unhealthy              pod/product-service-75f4ddbd56-6hfhz                                  Readiness probe failed: Get "http://10.244.2.105:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+3m8s        Normal    Completed              job/k6-load-test-oscillating-product-service-h1-oscillating-rep1      Job completed

@@ -1,0 +1,90 @@
+LAST SEEN   TYPE      REASON                 OBJECT                                                                MESSAGE
+18m         Normal    Scheduled              pod/k6-load-test-spike-product-service-k1-spike-rep1-gvsg2            Successfully assigned ecommerce/k6-load-test-spike-product-service-k1-spike-rep1-gvsg2 to aks-userpool-16719200-vmss00000h
+33m         Normal    Scheduled              pod/product-service-75f4ddbd56-ntm9t                                  Successfully assigned ecommerce/product-service-75f4ddbd56-ntm9t to aks-userpool-16719200-vmss00000h
+35m         Normal    Scheduled              pod/product-service-75f4ddbd56-v4xn6                                  Successfully assigned ecommerce/product-service-75f4ddbd56-v4xn6 to aks-userpool-16719200-vmss00000h
+15m         Normal    Scheduled              pod/product-service-75f4ddbd56-vbq7n                                  Successfully assigned ecommerce/product-service-75f4ddbd56-vbq7n to aks-userpool-16719200-vmss00000h
+40m         Normal    Scheduled              pod/k6-load-test-gradual-product-service-k1-gradual-rep1-8fd5l        Successfully assigned ecommerce/k6-load-test-gradual-product-service-k1-gradual-rep1-8fd5l to aks-userpool-16719200-vmss00000h
+15m         Normal    Scheduled              pod/product-service-75f4ddbd56-fnzvc                                  Successfully assigned ecommerce/product-service-75f4ddbd56-fnzvc to aks-userpool-16719200-vmss00000h
+36m         Normal    Scheduled              pod/product-service-75f4ddbd56-ncvfh                                  Successfully assigned ecommerce/product-service-75f4ddbd56-ncvfh to aks-userpool-16719200-vmss00000h
+15m         Normal    Scheduled              pod/product-service-75f4ddbd56-8mskk                                  Successfully assigned ecommerce/product-service-75f4ddbd56-8mskk to aks-userpool-16719200-vmss00000f
+62m         Normal    Scheduled              pod/k6-load-test-oscillating-product-service-h3-oscillating-rep74n6   Successfully assigned ecommerce/k6-load-test-oscillating-product-service-h3-oscillating-rep74n6 to aks-userpool-16719200-vmss00000h
+62m         Normal    Pulling                pod/k6-load-test-oscillating-product-service-h3-oscillating-rep74n6   Pulling image "grafana/k6:latest"
+62m         Normal    Created                pod/k6-load-test-oscillating-product-service-h3-oscillating-rep74n6   Created container: k6
+50m         Warning   BackoffLimitExceeded   job/k6-load-test-oscillating-product-service-h3-oscillating-rep1      Job has reached the specified backoff limit
+44m         Warning   FailedGetPodsMetric    horizontalpodautoscaler/product-service-hpa-custom                    unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server could not find the metric http_requests_per_second for pods
+42m         Normal    KEDAScalersStarted     scaledobject/product-service-keda                                     Started scalers watch
+42m         Normal    KEDAScalersStarted     scaledobject/product-service-keda                                     Scaler prometheus is built
+42m         Normal    ScaledObjectReady      scaledobject/product-service-keda                                     ScaledObject is ready for scaling
+40m         Normal    SuccessfulCreate       job/k6-load-test-gradual-product-service-k1-gradual-rep1              Created pod: k6-load-test-gradual-product-service-k1-gradual-rep1-8fd5l
+40m         Normal    Pulling                pod/k6-load-test-gradual-product-service-k1-gradual-rep1-8fd5l        Pulling image "grafana/k6:latest"
+40m         Normal    Pulled                 pod/k6-load-test-gradual-product-service-k1-gradual-rep1-8fd5l        Successfully pulled image "grafana/k6:latest" in 1.505s (1.505s including waiting). Image size: 36750082 bytes.
+40m         Normal    Created                pod/k6-load-test-gradual-product-service-k1-gradual-rep1-8fd5l        Created container: k6
+40m         Normal    Started                pod/k6-load-test-gradual-product-service-k1-gradual-rep1-8fd5l        Started container k6
+36m         Normal    Pulled                 pod/product-service-75f4ddbd56-ncvfh                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+36m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-ncvfh
+36m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 2; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: product-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+36m         Normal    Started                pod/product-service-75f4ddbd56-ncvfh                                  Started container product-service
+36m         Normal    Created                pod/product-service-75f4ddbd56-ncvfh                                  Created container: product-service
+35m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 3; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: product-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+35m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-v4xn6
+35m         Normal    Started                pod/product-service-75f4ddbd56-v4xn6                                  Started container product-service
+35m         Normal    Created                pod/product-service-75f4ddbd56-v4xn6                                  Created container: product-service
+35m         Normal    Pulled                 pod/product-service-75f4ddbd56-v4xn6                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+33m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 4; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: product-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+33m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-ntm9t
+33m         Normal    Started                pod/product-service-75f4ddbd56-ntm9t                                  Started container product-service
+33m         Normal    Created                pod/product-service-75f4ddbd56-ntm9t                                  Created container: product-service
+33m         Normal    Pulled                 pod/product-service-75f4ddbd56-ntm9t                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+33m         Warning   Unhealthy              pod/product-service-75f4ddbd56-5xxkf                                  Readiness probe failed: Get "http://10.244.1.120:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+28m         Warning   BackoffLimitExceeded   job/k6-load-test-gradual-product-service-k1-gradual-rep1              Job has reached the specified backoff limit
+25m         Normal    Killing                pod/product-service-75f4ddbd56-ntm9t                                  Stopping container product-service
+25m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 3; reason: All metrics below target
+25m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-ntm9t
+24m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 2; reason: All metrics below target
+24m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-ncvfh
+24m         Normal    Killing                pod/product-service-75f4ddbd56-ncvfh                                  Stopping container product-service
+23m         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-5xxkf
+23m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 1; reason: All metrics below target
+23m         Normal    Killing                pod/product-service-75f4ddbd56-5xxkf                                  Stopping container product-service
+21m         Warning   ScaledObjectDeleted    scaledobject/product-service-keda                                     ScaledObject was deleted
+21m         Normal    KEDAScalersStopped     scaledobject/product-service-keda                                     Stopped scalers watch
+20m         Normal    KEDAScalersStarted     scaledobject/product-service-keda                                     Started scalers watch
+20m         Normal    ScaledObjectReady      scaledobject/product-service-keda                                     ScaledObject is ready for scaling
+20m         Normal    KEDAScalersStarted     scaledobject/product-service-keda                                     Scaler prometheus is built
+18m         Normal    Pulling                pod/k6-load-test-spike-product-service-k1-spike-rep1-gvsg2            Pulling image "grafana/k6:latest"
+18m         Normal    SuccessfulCreate       job/k6-load-test-spike-product-service-k1-spike-rep1                  Created pod: k6-load-test-spike-product-service-k1-spike-rep1-gvsg2
+18m         Normal    Pulled                 pod/k6-load-test-spike-product-service-k1-spike-rep1-gvsg2            Successfully pulled image "grafana/k6:latest" in 1.466s (1.466s including waiting). Image size: 36750082 bytes.
+18m         Normal    Started                pod/k6-load-test-spike-product-service-k1-spike-rep1-gvsg2            Started container k6
+18m         Normal    Created                pod/k6-load-test-spike-product-service-k1-spike-rep1-gvsg2            Created container: k6
+15m         Normal    Pulled                 pod/product-service-75f4ddbd56-8mskk                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+15m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-75f4ddbd56 from 1 to 2
+15m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-8mskk
+15m         Normal    Created                pod/product-service-75f4ddbd56-8mskk                                  Created container: product-service
+15m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 2; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: product-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+15m         Normal    Started                pod/product-service-75f4ddbd56-8mskk                                  Started container product-service
+15m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-75f4ddbd56 from 2 to 3
+15m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 3; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: product-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+15m         Normal    Created                pod/product-service-75f4ddbd56-vbq7n                                  Created container: product-service
+15m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-vbq7n
+15m         Normal    Pulled                 pod/product-service-75f4ddbd56-vbq7n                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+15m         Normal    Started                pod/product-service-75f4ddbd56-vbq7n                                  Started container product-service
+15m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 4; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: product-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+15m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-fnzvc
+15m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-75f4ddbd56 from 3 to 4
+15m         Normal    Pulled                 pod/product-service-75f4ddbd56-fnzvc                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
+15m         Normal    Created                pod/product-service-75f4ddbd56-fnzvc                                  Created container: product-service
+15m         Normal    Started                pod/product-service-75f4ddbd56-fnzvc                                  Started container product-service
+8m40s       Warning   Unhealthy              pod/product-service-75f4ddbd56-v4xn6                                  Readiness probe failed: Get "http://10.244.2.94:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+6m2s        Warning   BackoffLimitExceeded   job/k6-load-test-spike-product-service-k1-spike-rep1                  Job has reached the specified backoff limit
+2m49s       Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-v4xn6
+2m49s       Normal    Killing                pod/product-service-75f4ddbd56-v4xn6                                  Stopping container product-service
+2m49s       Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 3; reason: All metrics below target
+2m49s       Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-75f4ddbd56 from 4 to 3
+2m4s        Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-fnzvc
+2m4s        Normal    Killing                pod/product-service-75f4ddbd56-fnzvc                                  Stopping container product-service
+2m4s        Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 2; reason: All metrics below target
+2m4s        Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-75f4ddbd56 from 3 to 2
+94s         Normal    SuccessfulDelete       replicaset/product-service-75f4ddbd56                                 Deleted pod: product-service-75f4ddbd56-8mskk
+94s         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 1; reason: All metrics below target
+94s         Normal    Killing                pod/product-service-75f4ddbd56-8mskk                                  Stopping container product-service
+94s         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-75f4ddbd56 from 2 to 1
