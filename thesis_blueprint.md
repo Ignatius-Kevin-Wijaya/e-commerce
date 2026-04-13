@@ -6,17 +6,18 @@
 
 ### What changed since the prior analyses
 
-The thesis has evolved through four iterations:
+The thesis has evolved through five iterations:
 1. **Original outline** (5.5/10): HPA-on vs HPA-off — confirmation experiment, no novelty
 2. **Revised scope** (8/10): HPA threshold × scaling policy matrix — added depth but remained within reactive scaling paradigm
 3. **First KEDA blueprint** (8.5/10): HPA vs KEDA — paradigm comparison, but had a fairness flaw (changing two variables at once: engine AND metric type)
-4. **Current direction** (this blueprint, 9/10): HPA (CPU) vs HPA (request-rate via prometheus-adapter) vs KEDA (request-rate) — **controlled factorial design** that isolates the metric-type effect from the engine-architecture effect, resolving the fairness argument completely
+4. **Factorial-design blueprint** (9/10): HPA (CPU) vs HPA (request-rate via prometheus-adapter) vs KEDA (request-rate) — **controlled factorial design** that isolates the metric-type effect from the engine-architecture effect
+5. **Current validated state** (this revision, 9/10): same factorial design, but now grounded by AKS recovery findings: auth-service has been recalibrated fairly, both tested services now use `250m` CPU request for CPU-HPA fairness, and product-service is reframed as a **mixed read-heavy / DB-backed workload** rather than being assumed to be a perfectly CPU-flat I/O-bound showcase
 
 ### What is good about the HPA vs KEDA theme
 
 1. **It asks a fundamentally better question.** Instead of "which HPA setting is best?" (optimization within one tool), it asks "which autoscaling paradigm is better for which workload type?" (strategic architectural comparison). This is a senior-engineer-level question, not a config-tuning exercise.
 
-2. **It directly addresses the #1 HPA limitation.** CPU-based HPA fails for I/O-bound services because CPU doesn't correlate with load. KEDA with request-rate scaling addresses this directly. Your product-service is the perfect demonstration: I/O-bound, CPU stays flat under load, HPA sits idle while the service degrades.
+2. **It directly addresses the #1 HPA limitation, but now in a more realistic way.** CPU-based HPA can fail when CPU stops correlating with user load, and request-rate scaling addresses that mismatch directly. The updated AKS findings show that product-service is not a perfectly CPU-flat I/O-bound toy example; it is a mixed read-heavy workload where CPU HPA still retains some signal. That makes the thesis more mature, because it studies **when** CPU stops being a good proxy, not just assuming failure in advance.
 
 3. **KEDA is industry-relevant.** KEDA is a CNCF graduated project and a standard AKS add-on. Comparing it against native HPA is practical research that practitioners care about.
 
@@ -37,12 +38,66 @@ The thesis has evolved through four iterations:
 | Issue from Prior Analysis | Status | Resolution |
 |--------------------------|--------|------------|
 | No statistical methodology | ✅ Fixed | 5 repetitions, Wilcoxon signed-rank, 95% CI |
-| Unrealistic k6 load test | 🔄 Must still do | Rewrite k6 for multi-endpoint weighted scenarios |
+| Unrealistic k6 load test | 🟡 Mostly fixed | Auth now uses weighted `/auth/me` + `/auth/login`; product uses search/pagination-heavy `/products`; the 50k-product calibration now shows a promising regime where H1 loses signal and H3/K1 scale, but the full corrected pilot still must be rerun |
 | Monitoring pods have no resource requests | 🔄 Must still do | Add requests/limits to Prometheus, Grafana, Loki |
 | Identical HPA configs across all services | ✅ Resolved by design | Only 2 services tested, each independently |
-| maxReplicas conflict (outline vs code) | 🔄 Must fix | Standardize to `maxReplicas: 5` |
+| maxReplicas conflict (outline vs code) | ✅ Fixed | Standardized to `maxReplicas: 5` |
 | AKS node sizing with KEDA overhead | 🔧 New | Addressed in Section 4 |
 | Fairness argument (2 variables changed) | ✅ Fixed | Added H3 (HPA + request-rate via prometheus-adapter) — isolates metric type from engine |
+
+### What has now been validated on AKS (as of April 14, 2026)
+
+- **Auth-service is now a calibrated CPU-bound control.** The original auth load was too aggressive, the original request-rate threshold was unreachable for H3/K1, and the original `100m` CPU request made CPU HPA unfairly eager. Those issues have now been corrected and verified live on AKS.
+- **Product-service should no longer be described as "guaranteed I/O-bound."** On the smaller seeded dataset it still generated enough CPU for H1/H2 to react after the `250m` fairness fix, but at the heavier `~50k` dataset H1 largely lost signal while request-rate autoscalers still scaled. The better framing is **mixed workload with a DB-intensity-dependent autoscaling regime**, not "CPU stays flat by definition."
+- **Threshold calibration is service-specific, not global.** H3 and K1 must share the same threshold within a given service, but the correct auth threshold and the correct product threshold do not need to be the same number. Both services currently calibrate to `5`, but that equality is an outcome of measurement, not a methodological requirement.
+- **CPU-request fairness matters academically.** HPA CPU scales on `usage / request`, not `usage / limit`, so an unrealistically tiny CPU request can make H1/H2 look stronger than they really are. This is now explicitly part of the methodology.
+- **The thesis remains valid even if the original product hypothesis is refuted.** A result showing that CPU HPA remains partly effective on a mixed DB-backed workload is still a meaningful finding, provided the thesis presents it as a refuted or nuanced hypothesis rather than forcing the old narrative.
+
+### Detailed Confirmed Findings
+
+1. **Auth-service is genuinely CPU-bound.** The bcrypt-heavy auth path drives CPU hard enough that CPU utilization is a valid autoscaling signal. This makes auth-service the thesis control scenario where H1/H2 are expected to remain competitive.
+
+2. **CPU-based HPA was originally helped by configuration, not just by metric suitability.** With `request.cpu: 100m` and `limit.cpu: 500m`, H1 at `70%` effectively reacted around `70m` actual CPU. Raising auth-service and product-service to `250m` removed the biggest fairness confound and made the CPU-trigger points academically defensible.
+
+3. **Request-rate autoscaling can look falsely weak when thresholds are calibrated against offered load instead of observed Prometheus load.** On both auth-service and product-service, the old `50 req/s` threshold was too high relative to the metric Prometheus actually exposed from a saturated single pod. This made H3/K1 appear inactive even when the service was already overloaded.
+
+4. **After proper calibration, H3 and K1 were not fundamentally broken.** On auth-service, lowering the threshold to `5` produced live scale-up. On product-service, the 50k-product calibration showed the same pattern: old `50` was too high, but `5` produced live scale-up for both H3 and K1.
+
+5. **Product-service should be described as a mixed read-heavy / DB-backed workload, not a guaranteed pure I/O-bound example.** Search-heavy PostgreSQL reads matter, but app-side CPU from result materialization and JSON serialization still exists and must be measured rather than assumed away.
+
+6. **Autoscaling behavior changes with workload regime.** On the smaller product dataset, CPU HPA still had enough signal to scale. After the catalog was increased to about `50,020` products, H1 stayed at `1` replica during the spike smoke while request-rate autoscalers scaled, showing that the same service can move into a different autoscaling regime as DB intensity rises.
+
+7. **The deeper thesis finding is metric-to-workload fit, not a simplistic HPA-versus-KEDA winner.** The evidence now supports a more mature conclusion: CPU works well for clearly CPU-bound workloads, can still work on mixed workloads, and becomes weaker as downstream DB intensity grows.
+
+### Recovery and Calibration Timeline (April 7-14, 2026)
+
+| Date | Event | Confirmed Finding / Result |
+|------|-------|----------------------------|
+| **2026-04-07** | First 36-run pilot across both services | Revealed systemic issues: auth-service overload, product-service reset contamination, and broken H3 custom metrics. Data served as pilot validation, not final thesis evidence. |
+| **2026-04-08** | Deep verification report (`thesis_deep_analysis.md`) | Formalized the recovery plan: fix auth load, repair metrics path, fix cluster reset, and re-evaluate product workload realism before any full pilot. |
+| **By 2026-04-13** | Latest recovery commit already present in repo | Auth path improved with mixed `/auth/me` + `/auth/login` workload, bcrypt offloaded in-app, relaxed probes, and experiment reset fixes. Product workload already used search/pagination-heavy `/products` against a seeded larger catalog. |
+| **2026-04-13** | Auth baseline calibration ladder revisited | Single-pod auth baseline remained poor even at modest peak loads: roughly `40.73%` failures at peak `20`, `55.87%` at peak `30`, and `62.73%` at peak `40`, confirming the older auth profile was not suitable as a shared thesis workload. |
+| **2026-04-13** | Auth H3/K1 threshold investigation | Old auth threshold `50 req/s` was shown to be miscalibrated: the `20 -> 40 RPS` auth test could not cross it, and Prometheus only observed roughly `~9-12 req/s` when the pod was already saturated. |
+| **2026-04-13** | Auth fairness fixes applied and verified | Shared auth workload defaults changed to `10 -> 40`, auth H3/K1 threshold changed to `5`, and live AKS H3 smoke scaled `1 -> 5`, proving request-rate scaling was functional once calibrated correctly. |
+| **2026-04-13** | Auth CPU-request fairness fix | Auth CPU request was raised from `100m` to `250m` in deployment and baseline manifests. Live AKS smokes then showed H1, H2, H3, and K1 all scaling sensibly under the same workload, with cluster cleanup verified afterward. |
+| **2026-04-14** | Product-service live re-analysis | Live AKS product DB was confirmed at `10,020` products and about `9.3 MB`. Warm search queries remained relatively fast, showing the workload is real and DB-backed, but not yet a pure downstream-I/O bottleneck. |
+| **2026-04-14** | Product CPU-request fairness fix | Product CPU request was raised from `100m` to `250m`. Live H1 and H2 smokes showed H1 scaling later and H2 scaling earlier, confirming the old `100m` request had been unfair but also confirming CPU HPA still retains signal on the current product workload. |
+| **2026-04-14** | Product seed-intensity calibration implemented | Product seeding was parameterized and used to grow the catalog to `5000` items/category, producing `50,020` total products and about `47 MB` of product data. The heavier dataset increased representative search-query cost to about `86.7 ms` for the count query and about `96.9 ms` cold / `92.7 ms` warm for the page query. |
+| **2026-04-14** | Product H1 smoke on the 50k dataset | Under the same spike smoke, H1 stayed at `1` replica and only showed about `15-26%` of its `70%` CPU target, indicating that CPU HPA had largely lost signal at this higher DB intensity. |
+| **2026-04-14** | Product H3/K1 threshold investigation | The old product request-rate threshold `50 req/s` was also shown to be miscalibrated: H3 stayed at `1` replica while Prometheus exposed only roughly `~10-12 req/s` from the saturated pod. |
+| **2026-04-14** | Product H3/K1 recalibration and live verification | Lowering the product request-rate threshold to `5` caused both H3 and K1 to scale successfully on the same 50k-product dataset, creating the clearest current separation between CPU-based and request-rate-based autoscaling for product-service. |
+| **Current interpretation** | Post-calibration thesis direction | Auth-service is now a defensible CPU-bound control. Product-service now has a confirmed heavier regime (`~50k` products) where CPU HPA loses signal while request-rate autoscalers scale, making it the best current candidate for the thesis's metric-mismatch case. |
+
+### What This Means For The Thesis
+
+- **The original strong claim that "CPU HPA should clearly fail on product-service" is too strong.** It should no longer be written as if the answer were guaranteed in advance.
+- **The stronger thesis contribution is now about workload regime and bottleneck location.** Auth-service validates the CPU-bound control case, while product-service shows that the same service can move from mixed behavior toward a clearer metric-mismatch regime as database intensity rises.
+- **This makes the thesis more credible, not weaker.** A refuted or nuanced hypothesis is still a valid research contribution, especially because the factorial design isolates metric choice from autoscaler engine choice.
+- **Methodological calibration is now part of the contribution.** Fair CPU requests, service-specific request-rate thresholds, and same-workload comparisons explain why earlier results were misleading and why the corrected runs are more defensible.
+
+### One Important Caution
+
+These findings are strong, but they are still **calibration-backed findings**, not the final full experiment matrix. The full `B1/B2/H1/H2/H3/K1` runs for both services must now be rerun from this corrected generation only, and older pre-calibration runs should not be mixed into the final statistical analysis.
 
 ---
 
@@ -150,7 +205,7 @@ The v3 title had two parentheticals: `(CPU Utilization vs Request Rate)` and `(H
 | Item | Detail |
 |------|--------|
 | Autoscaling methods compared | HPA (CPU-based), HPA (request-rate via prometheus-adapter), KEDA (request-rate, Prometheus scaler) |
-| Services tested | product-service (I/O-bound), auth-service (CPU-bound) |
+| Services tested | product-service (mixed read-heavy / DB-backed), auth-service (CPU-bound) |
 | Platform | Azure Kubernetes Service, Free Tier |
 | Load patterns | Gradual ramp, sudden spike, oscillating |
 | Baselines | Fixed under-provisioned (1 replica), fixed over-provisioned (5 replicas) |
@@ -245,13 +300,13 @@ During experiments, only ONE service is under autoscaling. All others run at `re
 | Pod | CPU Request | CPU Limit | Memory Request | Source |
 |-----|-----------|---------|---------------|--------|
 | api-gateway | 200m | 1000m | 256Mi | [`gateway/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/gateway/deployment.yaml) |
-| auth-service | 100m | 500m | 128Mi | [`auth/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/auth/deployment.yaml) |
-| product-service | 100m | 500m | 128Mi | [`product/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/product/deployment.yaml) |
+| auth-service | 250m | 500m | 128Mi | [`auth/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/auth/deployment.yaml) |
+| product-service | 250m | 500m | 128Mi | [`product/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/product/deployment.yaml) |
 | cart-service | 100m | 500m | 128Mi | [`cart/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/cart/deployment.yaml) |
 | order-service | 100m | 500m | 128Mi | [`order/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/order/deployment.yaml) |
 | payment-service | 100m | 500m | 128Mi | [`payment/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/payment/deployment.yaml) |
 | frontend | 100m | 500m | 128Mi | [`frontend/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/frontend/deployment.yaml) |
-| **Subtotal (all 7 at 1 replica)** | **800m** | **4000m** | **1024Mi** | |
+| **Subtotal (all 7 at 1 replica)** | **1100m** | **4000m** | **1024Mi** | |
 
 *Note: Current manifests set `replicas: 2` for backend services. Change to `replicas: 1` for experiments to isolate the autoscaling variable.*
 
@@ -290,7 +345,7 @@ These are installed at runtime and their resource requests are estimated from de
 
 | Pod | CPU Request | CPU Limit | Memory Request | Source |
 |-----|-----------|---------|---------------|--------|
-| k6 Job | 200m | 500m | 256Mi | Planned (not yet in codebase) |
+| k6 Job | 500m | 1500m | 512Mi | [`load-testing/k6-job.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/load-testing/k6-job.yaml), [`load-testing/k6-auth-job.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/load-testing/k6-auth-job.yaml) |
 
 #### Layer 7: Autoscaled Pods (Peak — tested service scales to 5 replicas)
 
@@ -298,7 +353,7 @@ The tested service starts at 1 replica (already counted in Layer 3) and can scal
 
 | Additional Pods | CPU Request | CPU Limit | Memory Request |
 |----------------|-----------|---------|---------------|
-| +4 pods of tested service (100m each) | 400m | 2000m | 512Mi |
+| +4 pods of tested service (`250m` each for auth/product) | 1000m | 2000m | 512Mi |
 
 ### Peak Resource Budget (Worst Case)
 
@@ -308,22 +363,22 @@ This is the total when the tested service is at maxReplicas (5), k6 is running, 
 |----------|------------|----------|
 | AKS system pods | ~770m | ~1200m |
 | Databases (3× PostgreSQL + Redis) | 850m | 1750m |
-| App services (7 pods at 1 replica, baseline) | 800m | 4000m |
+| App services (7 pods at 1 replica, baseline) | 1100m | 4000m |
 | Monitoring stack (after fix) | 350m | 1500m |
 | KEDA + prometheus-adapter | ~450m | ~1150m |
-| k6 Job | 200m | 500m |
-| Autoscaled pods (+4 additional) | 400m | 2000m |
-| **TOTAL** | **~3820m** | **~12100m** |
+| k6 Job | 500m | 1500m |
+| Autoscaled pods (+4 additional) | 1000m | 2000m |
+| **TOTAL** | **~5020m** | **~13100m** |
 
 ### Headroom Analysis
 
 | Metric | Value | Status |
 |--------|-------|--------|
 | Cluster allocatable | 11580m | |
-| Total CPU requests (peak) | ~3820m | |
-| **Request headroom** | **~7760m (67%)** | ✅ Excellent — scheduler has no trouble placing pods |
-| Total CPU limits (peak) | ~12100m | |
-| **Limit oversubscription** | **~520m (4.5%)** | ✅ Normal — not all pods burst simultaneously |
+| Total CPU requests (peak) | ~5020m | |
+| **Request headroom** | **~6560m (57%)** | ✅ Strong — scheduler still has ample room to place pods |
+| Total CPU limits (peak) | ~13100m | |
+| **Limit oversubscription** | **~1520m (13%)** | ✅ Acceptable for bursty workloads, but watch contention during concurrent peaks |
 
 **What the numbers mean:**
 
@@ -455,7 +510,7 @@ docker push thesisacr.azurecr.io/product-service:latest
 
 **Decision:** k6 inside the cluster as a Kubernetes Job. This eliminates the Load Balancer cost, removes external network variance from measurements, and provides the cleanest latency data. You already have `k6-job.yaml` configured for this.
 
-**Important:** Assign resource requests to the k6 pod (`200m CPU, 256Mi memory`) to prevent it from being CPU-starved during peak load.
+**Important:** Assign resource requests to the k6 pod (`500m CPU, 512Mi memory` in the current manifests) to prevent it from being CPU-starved during peak load.
 
 ### Decision 4: Observability — **Prometheus + Grafana in-cluster** ✅
 
@@ -541,12 +596,13 @@ A reviewer **cannot** argue that the improvement is "just the metric" — becaus
 **Every outcome is a valid, publishable finding.** The experiment cannot "fail."
 
 **Threshold calibration (for H3 and K1):**
-Both H3 and K1 use request-rate as the scaling metric. Their thresholds must be calibrated identically:
-1. Run a low-load test (50 RPS total, 1 pod)
-2. Measure actual requests/second reaching each pod
-3. Set threshold at ~70% of single-pod saturation point
-4. Apply the SAME threshold value to both H3 (`averageValue`) and K1 (`threshold`)
-5. This ensures any performance difference is due to the engine, not the threshold
+Both H3 and K1 use request-rate as the scaling metric. Their thresholds must be calibrated identically **within the same service**, but do not need to be identical across different services:
+1. Run a low-load-to-saturation ladder for the target service with `1` pod
+2. Measure the request-rate Prometheus actually observes, not just the RPS k6 tries to send
+3. Set the service's threshold near the point where scale-up should begin
+4. Apply the SAME threshold value to both H3 (`averageValue`) and K1 (`threshold`) for that service
+5. Document service-specific calibration results separately (e.g. auth threshold and product threshold may differ)
+6. This ensures any H3 vs K1 performance difference is due to the engine, not the threshold
 
 ### HPA Configurations
 
@@ -647,7 +703,7 @@ spec:
         name: http_requests_per_second
       target:
         type: AverageValue
-        averageValue: "50"   # Same threshold as K1 KEDA — critical for fairness
+        averageValue: "5"    # Same threshold as K1 KEDA — critical for fairness
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 0
@@ -686,12 +742,11 @@ spec:
       serverAddress: http://prometheus.monitoring.svc.cluster.local:9090
       metricName: http_requests_per_second
       query: |
-        sum(rate(http_requests_total{service="product-service"}[1m]))
-        / count(kube_pod_info{pod=~"product-service.*",phase="Running"})
-      threshold: "50"      # Same threshold as H3 — critical for fairness
+        sum(rate(http_requests_total{job="product-service"}[1m]))
+      threshold: "5"       # Same threshold as H3 — critical for fairness
 ```
 
-**Fairness note:** H3 and K1 use the same threshold (50 RPS/pod), the same Prometheus data source, and the same scaling policy aggressiveness. The ONLY difference is the autoscaling engine (HPA controller vs KEDA operator). This is what makes the comparison scientifically controlled.
+**Fairness note:** H3 and K1 use the same service-specific threshold, the same Prometheus data source, and the same scaling-policy intent. The ONLY difference is the autoscaling engine (HPA controller vs KEDA operator). This is what makes the comparison scientifically controlled.
 
 ### Load Patterns (Independent Variable #2)
 
@@ -705,10 +760,10 @@ spec:
 
 | Service | Workload Type | Why It's Different for This Experiment |
 |---------|--------------|---------------------------------------|
-| **product-service** | I/O-bound (PostgreSQL reads) | CPU stays flat even under load → HPA likely fails → KEDA should excel. This is the "KEDA wins" scenario. |
+| **product-service** | Mixed read-heavy / DB-backed workload | Search-heavy PostgreSQL reads plus ORM/materialization/JSON serialization mean CPU may still correlate with load. Request-rate scaling is still expected to be more robust as DB intensity rises, but CPU-HPA failure cannot be assumed in advance. |
 | **auth-service** | CPU-bound (bcrypt hashing) | CPU correlates with load → HPA works well → KEDA may offer no advantage. This is the "control" scenario. |
 
-**Hypothesis:** KEDA significantly outperforms HPA for product-service (I/O-bound) but shows comparable or marginal improvement for auth-service (CPU-bound). If confirmed, this produces the thesis's central finding: **the choice of autoscaling method should depend on service workload characteristics.**
+**Working hypothesis:** The corrected evidence now suggests a likely split outcome. On product-service, request-rate autoscaling (H3/K1) should outperform CPU-based HPA (H1/H2) once the heavier `~50k` product dataset is used, because CPU HPA already lost most of its signal in the live calibration smoke. On auth-service, CPU-based HPA should remain competitive because the service is genuinely CPU-bound. If the full repeated runs confirm this, the central thesis finding becomes: **autoscaling effectiveness depends on metric-to-workload fit and bottleneck location, not on simplistic assumptions that one autoscaler is universally superior.**
 
 ### Experimental Protocol
 
@@ -776,7 +831,7 @@ The central analysis combines primary KPIs into a **trade-off assessment:**
 - **Cost winner:** Lowest resource cost index while meeting SLO thresholds
 - **Balanced winner:** Best position on the Pareto frontier (latency vs cost)
 
-If HPA and KEDA produce similar latency but KEDA uses fewer pod-minutes (because it scales more precisely), KEDA wins on efficiency. If HPA (CPU) never triggers for product-service (I/O-bound, CPU stays low) but H3 (HPA with request-rate) DOES trigger, the conclusion is definitive: **the metric type is the problem, not the HPA engine itself.** If KEDA still outperforms H3 despite using the same metric, KEDA's architecture provides additional value.
+If HPA and KEDA produce similar latency but KEDA uses fewer pod-minutes (because it scales more precisely), KEDA wins on efficiency. If HPA (CPU) underperforms on product-service while H3 (HPA with request-rate) DOES trigger more appropriately, the conclusion is: **the metric type matters more than the HPA engine alone.** If KEDA still outperforms H3 despite using the same metric, KEDA's architecture provides additional value.
 
 ---
 
@@ -793,7 +848,7 @@ If HPA and KEDA produce similar latency but KEDA uses fewer pod-minutes (because
 | **Threshold calibration** | 🟡 **Medium** | 2-3 days | Week 9 |
 | **Prometheus scrape gaps** | 🟢 **Low** | 1 hour | Week 6 (add resource requests) |
 | **k6 CPU-starvation** | 🟢 **Low** | 1 hour | Week 5 (set resource requests) |
-| **HPA never triggers (product-service)** | 🟢 **It's a feature** | — | Embrace it as the central finding |
+| **Product workload regime shifts during calibration** | 🟡 **Medium** | 1-2 days | Treat as a calibration/interpretation task, not a thesis failure |
 
 ---
 
@@ -805,21 +860,20 @@ If HPA and KEDA produce similar latency but KEDA uses fewer pod-minutes (because
 
 KEDA's Prometheus scaler works by periodically running a PromQL query against your Prometheus instance. If the query returns a value above the threshold, KEDA scales up. Sounds simple. Here's where it breaks:
 
-Your KEDA config has this query:
+Your KEDA config now uses a deliberately simple aggregate query:
 ```
-sum(rate(http_requests_total{service="product-service"}[1m]))
-/ count(kube_pod_info{pod=~"product-service.*",phase="Running"})
+sum(rate(http_requests_total{job="product-service"}[1m]))
 ```
 
 **How it could break for YOU specifically:**
 
-1. **Label mismatch.** Your FastAPI instrumentator exposes `http_requests_total`, but the label might not be `service="product-service"`. It might be `job="product-service"` or `app="product-service"` or even `kubernetes_name="product-service"` — depending on how Prometheus relabeling works in your `prometheus.yaml`. If the label doesn't match, the query returns `0` or `NaN`, KEDA sees "no load", and never scales. You stare at the dashboard seeing 200 RPS hitting the service but KEDA does nothing.
+1. **Label mismatch.** Your FastAPI instrumentator exposes `http_requests_total`, but the label might not be `job="product-service"`. It could be `service="product-service"` or `app="product-service"` depending on how Prometheus relabeling works. If the label doesn't match, the query returns `0`, KEDA sees "no load", and never scales.
 
-2. **The `kube_pod_info` metric doesn't exist.** This metric comes from `kube-state-metrics`, which you may not have installed. Without it, the denominator of your PromQL query is empty, the division produces `NaN`, KEDA reads `NaN` as "no data", and never triggers. You'd see: `"ScaledObject" failed to get metric: "prometheus query returned NaN"` in KEDA operator logs.
+2. **Prometheus is in the `monitoring` namespace, KEDA is in `keda` namespace.** KEDA's operator needs to reach `http://prometheus.monitoring.svc.cluster.local:9090`. If cross-namespace traffic is blocked or the service name is wrong, metric fetches fail and scale-up never happens.
 
-3. **Prometheus is in the `monitoring` namespace, KEDA is in `keda` namespace.** KEDA's operator needs to reach `http://prometheus.monitoring.svc.cluster.local:9090`. If there's a NetworkPolicy blocking cross-namespace traffic (unlikely in your setup, but possible if AKS installs default policies), the connection times out silently.
+3. **Prometheus scrape gaps or stale data.** Even with the correct query, KEDA can react too slowly if Prometheus misses scrapes or returns stale rate values during the spike.
 
-4. **The query returns the right value but as a string, not a float.** Some PromQL edge cases with `NaN` or `Inf` values cause KEDA to reject the result. This happens when there are zero pods (division by zero) or when Prometheus has a scrape gap.
+4. **Threshold mismatch with observed metrics.** This already happened during recovery: a threshold that looks reasonable against offered RPS can still be unreachable from Prometheus' observed single-pod rate. If you skip calibration, KEDA will appear broken again.
 
 **How you'd notice:** You'd run your k6 load test, see latency climbing, check `kubectl get scaledobject` and see `READY: False` or scaling metrics stuck at 0. Then you'd spend hours reading KEDA operator logs trying to figure out WHY.
 
@@ -838,14 +892,14 @@ http_requests_total
 # Example result might show: http_requests_total{method="GET", handler="/products", job="product-service"}
 # If the label is "job" not "service", you need to update the KEDA query.
 
-# Query B: Check if kube_pod_info exists
-kube_pod_info
+# Query B: Test the exact aggregate query directly
+sum(rate(http_requests_total{job="product-service"}[1m]))
 
-# If this returns "no data", you need to install kube-state-metrics:
-# helm install kube-state-metrics prometheus-community/kube-state-metrics -n monitoring
+# If this returns "no data", inspect the real labels and adjust the query before
+# touching the ScaledObject.
 
 # Step 3: Test your EXACT KEDA query in Prometheus UI BEFORE putting it in the ScaledObject
-# Paste the full query and verify it returns a number (not NaN, not empty)
+# Paste the full query and verify it returns a number (not empty, not stale)
 
 # Step 4: After deploying ScaledObject, verify KEDA can read the metric
 kubectl get scaledobject product-service-keda -o yaml
@@ -856,8 +910,8 @@ kubectl logs -n keda deployment/keda-operator --tail=50
 
 # Look for errors like:
 # - "failed to get metric" → query/connection issue
-# - "prometheus returned NaN" → query math issue (division by zero)
 # - "connection refused" → Prometheus URL wrong
+# - stale/zero values while traffic is high → scrape gap or label mismatch
 ```
 
 **Fallback if unresolvable:** Use KEDA's built-in `cpu` trigger type instead of `prometheus`. This makes KEDA behave like HPA (CPU-based), which defeats the purpose of the comparison — but at least proves the KEDA pipeline works. Then debug the Prometheus query separately.
@@ -930,38 +984,38 @@ kubectl top pods -n ecommerce
 # Step 7: Test H3 HPA end-to-end
 kubectl apply -f h3-hpa-custom-metric.yaml
 kubectl get hpa product-service-hpa-custom
-# Check the TARGETS column: should show "current/target" like "35/50"
-# If it shows "<unknown>/50": the custom metric is not being read
+# Check the TARGETS column: should show "current/target" like "3/5" or "4/5"
+# If it shows "<unknown>/5": the custom metric is not being read
 ```
 
 **Fallback if unresolvable after 5 days:** Drop H3, revert to 5-config design (B1, B2, H1, H2, K1). The thesis is still 8.5/10. Acknowledge the metric-vs-engine isolation as a limitation, and reference it as future work. prometheus-adapter is the only 9→8.5 downgrade risk.
 
 ---
 
-### Risk 3: CPU-based HPA Never Triggers for product-service
+### Risk 3: Product-service Does Not Stay in the Same Workload Regime Across Seed Sizes
 
-**Probability:** Medium | **Impact:** 🟢 This IS the finding | **Budget:** 0 days (don't try to fix it)
+**Probability:** Medium | **Impact:** 🟡 Mainly affects interpretation, not thesis validity | **Budget:** 1-2 days for calibration confirmation, not for panic
 
 **What happens technically:**
 
-Your product-service handles `GET /products` by:
-1. Receiving HTTP request (minimal CPU)
-2. Sending SQL query to PostgreSQL (network I/O — CPU is idle, just waiting)
-3. Receiving response from PostgreSQL (minimal CPU)
-4. Serializing response to JSON (brief CPU spike)
+The older assumption was:
+1. Most of the request time is spent waiting on PostgreSQL
+2. CPU stays low
+3. HPA CPU never scales
 
-Total CPU per request: maybe 5-10ms of actual CPU work. At 200 RPS, that might translate to 20-30% CPU utilization — well below the 50-70% HPA threshold. The service is overloaded (requests queuing, latency climbing, errors appearing), but CPU looks fine.
+The newer AKS evidence shows the real path is more mixed:
+1. Search-heavy PostgreSQL reads still matter
+2. The handler also does count queries, result materialization, sorting effects, and JSON serialization
+3. CPU can therefore remain correlated enough with load for H1/H2 to scale, especially before the DB becomes the dominant bottleneck
 
 **How it plays out for YOU:**
 
-- k6 ramps from 50 to 200 RPS
-- product-service starts queuing requests — response time climbs from 50ms → 500ms → 2000ms → timeouts
-- `kubectl top pod product-service` shows CPU at 25%
-- HPA checks every 15 seconds: "25% < 70% target? No scaling needed."
-- 7 minutes later, the test ends. HPA never activated. product-service was degraded the entire time.
-- Meanwhile, H3 (HPA with request-rate) and K1 (KEDA) saw the traffic, scaled up, and maintained good latency.
+- Under the smaller seeded product dataset, H1/H2 may still scale because CPU retains enough signal
+- Under the verified `~50k` product dataset, H1 already stayed at `1` replica while H3/K1 scaled after request-rate recalibration to `5`
+- If an even larger seed pushes the single `product-db` into the true bottleneck role, then scaling the app tier may help less for **all** autoscalers
+- Therefore the real question is not "does HPA always fail?" but "how does autoscaler effectiveness change as the workload moves from mixed to strongly downstream-I/O-bound?"
 
-**This is literally your thesis's central finding.** Don't try to "fix" it. Document it, visualize it, and build your argument on it.
+**This is now a calibrated candidate central finding, not a blind assumption.** Document the workload regime carefully and let the repeated runs decide whether product-service behaves as mixed, mostly I/O-bound, or DB-bottlenecked in the final dataset.
 
 **The only actual risk:** If this also happens for auth-service (CPU-bound with bcrypt), your control scenario breaks. auth-service SHOULD trigger CPU-based HPA because bcrypt hashing is heavily CPU-intensive. If bcrypt doesn't push CPU above 50%, something is wrong with your resource limits or load test intensity.
 
@@ -1086,7 +1140,7 @@ containers:
 
 **What happens technically:**
 
-H3 (HPA + custom metric) and K1 (KEDA) both use request-rate as their metric with the same "50 RPS/pod" threshold. But "50 RPS/pod" means slightly different things in each system.
+H3 (HPA + custom metric) and K1 (KEDA) both use request-rate as their metric with the same service-specific threshold. But the same numeric threshold can still behave slightly differently across the two systems if it is chosen carelessly.
 
 **How it could affect YOUR results:**
 
@@ -1098,7 +1152,7 @@ H3 (HPA + custom metric) and K1 (KEDA) both use request-rate as their metric wit
 
 2. **Rate window mismatch.** prometheus-adapter computes `rate()[1m]` when IT scrapes. KEDA computes `rate()[1m]` when IT scrapes. They scrape at different times, so the 1-minute windows cover slightly different time ranges, giving different values for the "same" metric. During a sharp spike, the value difference can be significant.
 
-3. **Pod count disagreement.** HPA knows pod count from the Kubernetes API (authoritative, real-time). KEDA's query counts pods via `kube_pod_info` from Prometheus (which could be 15 seconds stale). If HPA has already scaled to 3 pods but Prometheus still shows 2 pods, KEDA computes a higher per-pod rate — KEDA might scale more aggressively than H3 for the same actual load.
+3. **Different controller timing and sampling.** HPA and KEDA may read the same Prometheus source at slightly different moments and may reconcile desired replicas on different control-loop ticks. During a sharp spike, that can still create small H3-vs-K1 differences even when the configured threshold is numerically identical.
 
 **How to minimize it:**
 
@@ -1265,11 +1319,11 @@ export default function(data) {
 
 ## 9. Make-It-Stand-Out Strategy
 
-### Strategy 1: The "Metric Mismatch" Narrative + Controlled Proof
+### Strategy 1: The "Metric-Workload Fit" Narrative + Controlled Proof
 
 Frame the entire thesis around one central story:
 
-> "CPU-based autoscaling is the Kubernetes default, but it is fundamentally mismatched with I/O-bound microservices. This thesis demonstrates the mismatch empirically, proves it is the metric type — not the autoscaling engine — that causes the failure, and shows that switching to request-rate-based scaling resolves it regardless of whether HPA or KEDA is used."
+> "CPU-based autoscaling is Kubernetes' default, but its effectiveness depends on how strongly CPU correlates with user load. This thesis shows that the decisive factor is not the autoscaler brand alone, but the fit between workload regime and scaling metric. Using a controlled factorial design, it separates metric-type effects from engine effects and shows when request-rate scaling is necessary, when CPU is sufficient, and when both remain competitive on mixed workloads."
 
 This narrative is more nuanced and academically stronger than simply "KEDA beats HPA." The thesis structure becomes:
 
@@ -1295,8 +1349,8 @@ Shape = load pattern (circle=gradual, triangle=spike, square=oscillating)
 ```
 
 Draw the **Pareto frontier**: configurations where no other config is both cheaper AND faster. With 6 configs × 3 load patterns = 18 data points per service, the Pareto plot will clearly show clusters:
-- H1/H2 (HPA-CPU) clustering with B1 (under-provisioned) for product-service — proof of metric mismatch
-- H3 and K1 clustering together (or K1 slightly dominant) — proof of metric superiority
+- H1/H2 clearly behind H3/K1 for product-service under heavier DB intensity — proof that metric type matters more as CPU decouples from load
+- H1/H2 still partly competitive for product-service under mixed conditions — proof that product-service is not purely CPU-flat
 - All methods clustering similarly for auth-service — proof that CPU works for CPU-bound services
 
 This is academically impressive (multi-objective optimization vocabulary) and practically useful (a decision-maker can pick their cost-performance preference).
@@ -1325,7 +1379,7 @@ Produce a summary table that no other S1 thesis has:
 
 | Service Type | Metric Effect (H3 vs H1) | Engine Effect (K1 vs H3) | Combined Effect (K1 vs H1) |
 |-------------|------------------------|-------------------------|---------------------------|
-| I/O-bound (product) | -60% latency | -10% latency | -65% latency |
+| Mixed / DB-backed (product) | -60% latency | -10% latency | -65% latency |
 | CPU-bound (auth) | -5% latency | -3% latency | -8% latency |
 
 *(Numbers are hypothetical — replace with actual measured values)*
@@ -1409,7 +1463,7 @@ With 7-8 months available, the timeline shifts from "compressed sprint" to "deli
 
 2. **Paradigm comparison, not parameter tuning.** Comparing reactive CPU-based scaling against event-driven request-rate scaling is a fundamentally more interesting research question than tuning thresholds.
 
-3. **The "metric mismatch" finding is genuine and practical.** The experiment will empirically demonstrate that CPU-based HPA fails for I/O-bound services. More importantly, the factorial design reveals WHETHER the fix is the metric (H3 vs H1) or the engine (K1 vs H3) — a nuanced finding that no other S1 thesis provides.
+3. **The workload-fit finding is genuine and practical.** The experiment will empirically show when CPU-based HPA is sufficient, when request-rate scaling is needed, and how much of the improvement comes from the metric versus the engine. The factorial design still reveals WHETHER the fix is the metric (H3 vs H1) or the engine (K1 vs H3) — a nuanced finding that no other S1 thesis provides.
 
 4. **The decomposition table is a unique deliverable.** Quantifying "60% of the improvement comes from the metric, 10% from the engine" is something industry practitioners can directly act on. It's also something examiners have never seen from an S1 student.
 
@@ -1429,7 +1483,7 @@ With 7-8 months available, the timeline shifts from "compressed sprint" to "deli
 
 ### Concise Summary
 
-This thesis compares Kubernetes autoscaling strategies using a controlled factorial design: HPA with CPU metric, HPA with request-rate metric (via prometheus-adapter), and KEDA with request-rate metric. By testing on two microservices with distinct workload profiles (I/O-bound vs CPU-bound) on AKS, it isolates the contribution of **metric type** from **engine architecture** to scaling effectiveness. Across 180 controlled experiments with statistical rigor, it measures latency, error rate, scaling speed, and resource cost, producing a decomposition of improvement factors and a Pareto-optimal cost-performance analysis.
+This thesis compares Kubernetes autoscaling strategies using a controlled factorial design: HPA with CPU metric, HPA with request-rate metric (via prometheus-adapter), and KEDA with request-rate metric. By testing on two microservices with distinct workload profiles (mixed read-heavy / DB-backed vs CPU-bound) on AKS, it isolates the contribution of **metric type** from **engine architecture** to scaling effectiveness. Across 180 controlled experiments with statistical rigor, it measures latency, error rate, scaling speed, and resource cost, producing a decomposition of improvement factors and a Pareto-optimal cost-performance analysis.
 
 **Budget:** ~$75 | **Timeline:** 28 weeks (7 months) | **Risk:** Medium (prometheus-adapter + KEDA setup) | **Score:** 9/10
 
@@ -1460,7 +1514,7 @@ This section maps every BAB and sub-section from your university's "Perancangan 
 
 2. **Kubernetes is the standard orchestration platform** — it automates deployment, scaling, and management of containerized applications. HPA (Horizontal Pod Autoscaler) is Kubernetes' built-in autoscaling mechanism (cite Kubernetes documentation, 1-2 papers).
 
-3. **The problem: HPA uses CPU as default scaling metric** — but not all microservices are CPU-bound. I/O-bound services (database reads, network calls) can be overloaded while CPU stays low. HPA misses the overload and doesn't scale. This is the "metric mismatch" problem.
+3. **The problem: HPA uses CPU as default scaling metric** — but not all microservices maintain a stable relationship between CPU usage and user-perceived load. Strongly I/O-bound services can be overloaded while CPU stays low, while mixed DB-backed services may still keep enough CPU correlation for HPA to remain partly effective. This is the broader "metric-to-workload fit" problem.
 
 4. **KEDA as an alternative** — KEDA (Kubernetes Event-Driven Autoscaling) is a CNCF graduated project that enables scaling based on event sources including HTTP request rate via Prometheus. It addresses the metric mismatch by using application-level signals instead of resource-level signals.
 
@@ -1474,7 +1528,7 @@ This section maps every BAB and sub-section from your university's "Perancangan 
 
 **What to write:** 3 research questions derived from the gap:
 
-1. Bagaimana perbandingan responsivitas (p95 latency, error rate, time-to-scale) antara penskalaan berbasis CPU (HPA) dan penskalaan berbasis request rate (KEDA) pada layanan microservices dengan karakteristik beban I/O-bound dan CPU-bound?
+1. Bagaimana perbandingan responsivitas (p95 latency, error rate, time-to-scale) antara penskalaan berbasis CPU (HPA) dan penskalaan berbasis request rate (KEDA) pada layanan microservices dengan karakteristik beban yang berbeda, yaitu mixed read-heavy / DB-backed dan CPU-bound?
 
 2. Seberapa besar kontribusi relatif dari jenis metrik (CPU vs request rate) dibandingkan dengan arsitektur engine autoscaling (HPA vs KEDA) terhadap efektivitas penskalaan, diuji melalui desain faktorial terkontrol dengan HPA + custom metric (prometheus-adapter) sebagai variabel kontrol?
 
@@ -1484,7 +1538,7 @@ This section maps every BAB and sub-section from your university's "Perancangan 
 
 **What to write:**
 
-1. Penskalaan berbasis request rate (H3 dan K1) secara signifikan mengungguli penskalaan berbasis CPU (H1 dan H2) pada layanan I/O-bound (product-service), tetapi menunjukkan perbedaan yang tidak signifikan pada layanan CPU-bound (auth-service).
+1. Penskalaan berbasis request rate (H3 dan K1) diperkirakan mengungguli penskalaan berbasis CPU (H1 dan H2) pada product-service ketika intensitas beban database meningkat, tetapi H1 dan H2 mungkin tetap menunjukkan efektivitas parsial karena layanan tersebut bersifat mixed read-heavy / DB-backed, bukan I/O-bound murni. Pada auth-service yang CPU-bound, perbedaan diperkirakan tidak signifikan.
 
 2. Jenis metrik (CPU vs request rate) memberikan kontribusi yang lebih besar terhadap peningkatan responsivitas dibandingkan arsitektur engine autoscaling (HPA vs KEDA).
 
@@ -1496,7 +1550,7 @@ This section maps every BAB and sub-section from your university's "Perancangan 
 - Platform: Azure Kubernetes Service (AKS), Free Tier, Southeast Asia region
 - Cluster: 3× Standard_D4as_v5 (4 vCPU, 16GB RAM each)
 - Application: E-commerce microservices (5 services, 3 databases)
-- Services under test: product-service (I/O-bound), auth-service (CPU-bound)
+- Services under test: product-service (mixed read-heavy / DB-backed), auth-service (CPU-bound)
 - Autoscaling methods: HPA (CPU), HPA (request-rate via prometheus-adapter), KEDA (request-rate via Prometheus scaler)
 - Baselines: Fixed 1 replica, Fixed 5 replicas
 - Load patterns: Gradual ramp, Sudden spike, Oscillating
@@ -1681,7 +1735,7 @@ This section maps every BAB and sub-section from your university's "Perancangan 
 **What to write:** A visual flowchart showing:
 
 ```
-[Masalah: CPU-based HPA fails for I/O-bound services]
+[Masalah: CPU-based HPA may misfit services whose CPU weakly correlates with user load]
          ↓
 [Pertanyaan: Is it the metric type or the engine?]
          ↓
@@ -1732,9 +1786,9 @@ Include 1-2 paragraphs explaining the logical flow. **Length:** 1 page.
 ##### 3.2.4 Observasi yang Dilakukan Termasuk Pengukuran → **Pengukuran Baseline Tanpa Autoscaling**
 
 **What to write:**
-- Pilot test results: what happens to product-service under load WITHOUT autoscaling
+- Pilot test results: what happens to product-service and auth-service under load WITHOUT autoscaling
 - Baseline metrics: p95 latency at 50 RPS, 100 RPS, 200 RPS with fixed 1 replica
-- CPU utilization observations: product-service CPU stays low under load (I/O-bound evidence), auth-service CPU rises linearly (CPU-bound evidence)
+- CPU utilization observations: auth-service CPU rises linearly (CPU-bound evidence), while product-service must be interpreted empirically as mixed or more strongly I/O-bound depending on the calibrated seed/query regime
 - Resource utilization of infrastructure pods (Prometheus, Grafana, KEDA, prometheus-adapter)
 - **Include:** baseline measurement tables and CPU utilization graphs from pilot runs
 - **Length:** 2-3 pages with data tables
@@ -1743,7 +1797,7 @@ Include 1-2 paragraphs explaining the logical flow. **Length:** 1 page.
 
 **What to write:**
 From observation data (3.2.4), identify:
-1. **Masalah 1:** product-service degrades under load but HPA (CPU) doesn't trigger because CPU stays below threshold — the metric mismatch problem
+1. **Masalah 1:** It is unclear whether product-service under the calibrated workload will behave as a mixed DB-backed service or as a more strongly I/O-bound service; this must be established empirically before claiming CPU-metric mismatch.
 2. **Masalah 2:** Fixed replicas lead to either wasted resources (over-provisioning) or degraded performance (under-provisioning) — no optimal static configuration exists
 3. **Masalah 3:** It is unclear whether the solution is changing the scaling metric (to request rate) or changing the scaling engine (to KEDA) — this needs controlled experimentation
 - **Length:** 1 page
@@ -1754,7 +1808,7 @@ From observation data (3.2.4), identify:
 - The controlled factorial design: 2×2 matrix (engine × metric) + 2 baselines
 - The 6 configurations: B1, B2, H1, H2, H3, K1 — describe each with rationale
 - The 3 load patterns: gradual ramp, sudden spike, oscillating — describe each with rationale
-- The 2 services: product-service (I/O-bound), auth-service (CPU-bound) — why these two
+- The 2 services: product-service (mixed read-heavy / DB-backed), auth-service (CPU-bound) — why these two
 - Repetitions: 5 per configuration — why 5 (statistical minimum)
 - Total: 6 × 3 × 5 × 2 = 180 experiment runs
 - **Include:** the factorial matrix diagram from blueprint Section 6
@@ -1917,7 +1971,7 @@ From observation data (3.2.4), identify:
 - Does one method show more stability (fewer scaling events) during oscillating loads?
 
 **D. Perbandingan per Service Type:**
-- Confirm or refute the hypothesis: KEDA excels for I/O-bound, HPA-CPU works for CPU-bound
+- Confirm or refute the hypothesis: request-rate scaling is strongest when CPU weakly correlates with load, while HPA-CPU remains strongest for clearly CPU-bound services
 - What does the crossover look like? Is there a service type where HPA-CPU is actually *better* than KEDA?
 
 **Length:** 5-7 pages with comparison tables and statistical test results
@@ -1935,9 +1989,9 @@ From observation data (3.2.4), identify:
 
 | Workload Type | Recommended Autoscaling | Recommended Metric | Why |
 |--------------|------------------------|--------------------|----|
-| I/O-bound (DB reads, network calls) | KEDA or HPA + custom metric | Request rate | CPU doesn't correlate with load |
+| Strongly I/O-bound (CPU weakly correlated with user load) | KEDA or HPA + custom metric | Request rate | CPU no longer reflects overload well |
 | CPU-bound (crypto, compression) | HPA (default) | CPU | CPU correlates with load, simpler setup |
-| Mixed | KEDA | Request rate | Handles both; marginal CPU overhead acceptable |
+| Mixed read-heavy / DB-backed | KEDA or HPA + custom metric preferred, but validate HPA empirically | Usually request rate | CPU may still retain signal, so the correct choice depends on measured workload regime |
 
 **C. Evaluation Against User Needs (from 3.2.2):**
 - Does autoscaling meet the fast scale-up requirement? → Compare time-to-scale across methods
@@ -1956,7 +2010,7 @@ From observation data (3.2.4), identify:
 - Answer each research question from 1.2 with data:
   1. "Perbandingan menunjukkan bahwa K1 (KEDA) memiliki p95 latency X% lebih rendah dari H1 (HPA-CPU) pada product-service (p < 0.05), sementara pada auth-service perbedaan tidak signifikan (p = Y)."
   2. "Dekomposisi menunjukkan bahwa Z% peningkatan berasal dari jenis metrik dan W% dari arsitektur engine."
-  3. "Konfigurasi Pareto-optimal untuk layanan I/O-bound adalah [H3/K1], sedangkan untuk CPU-bound adalah [H2], berdasarkan analisis trade-off biaya-performa."
+  3. "Konfigurasi Pareto-optimal untuk layanan mixed read-heavy / DB-backed adalah [hasil aktual: bisa H3/K1 atau tetap kompetitif dengan H2], sedangkan untuk CPU-bound adalah [H2 atau hasil aktual], berdasarkan analisis trade-off biaya-performa."
 - Confirm or refute each hypothesis from 1.3
 - **Critical rule from template:** "Tidak boleh membuat kesimpulan hanya berisi sistem yang telah berjalan tanpa memberikan bukti data yang kuat." → Every conclusion must reference specific measured values and statistical test results.
 - **Length:** 1-2 pages
@@ -1966,8 +2020,8 @@ From observation data (3.2.4), identify:
 **What to write:**
 
 **Saran untuk Praktisi:**
-- Use request-rate-based scaling (KEDA or HPA + custom metric) for I/O-bound services
-- CPU-based HPA is sufficient for CPU-bound services
+- Use request-rate-based scaling (KEDA or HPA + custom metric) when CPU is shown empirically to be a weak proxy for load
+- CPU-based HPA is sufficient for CPU-bound services and may still be acceptable for some mixed workloads
 - Consider operational complexity: KEDA requires less configuration for request-rate scaling than HPA + prometheus-adapter
 
 **Saran untuk Penelitian Selanjutnya:**

@@ -1,6 +1,9 @@
 # K1: KEDA with Prometheus Trigger — product-service
 # Event-driven scaling based on HTTP request rate via Prometheus
-# threshold: 50 RPS/pod (must match H3 exactly for fair comparison)
+# threshold: 5 RPS/pod (must match H3 exactly for fair comparison)
+# Calibrated on 2026-04-14 against the 50k-product recovery dataset:
+# Prometheus exposed roughly ~10-12 req/s total on a saturated single pod, so 50
+# never triggered. A threshold of 5 produced consistent KEDA scale-up.
 # pollingInterval: 15s (matches HPA control loop interval for fairness)
 # cooldownPeriod: 30s (matches H2/H3 scaleDown stabilization)
 #
@@ -38,7 +41,7 @@ spec:
         metricName: http_requests_per_second
         # IMPORTANT: Query returns TOTAL rate across all pods.
         # KEDA internally computes: desiredReplicas = ceil(queryResult / threshold)
-        # Example: 200 total RPS → ceil(200/50) = 4 replicas
+        # Example after calibration: 12 total RPS → ceil(12/5) = 3 replicas
         query: |
           sum(rate(http_requests_total{job="product-service"}[1m]))
-        threshold: "50"      # Same threshold as H3 — critical for fairness
+        threshold: "5"       # Same threshold as H3 — critical for fairness

@@ -1,6 +1,6 @@
 # K1: KEDA with Prometheus Trigger — auth-service
 # Event-driven scaling based on HTTP request rate via Prometheus
-# threshold: 50 RPS/pod (must match H3 exactly for fair comparison)
+# threshold: 5 RPS/pod (must match H3 exactly for fair comparison)
 # pollingInterval: 15s (matches HPA control loop interval for fairness)
 # cooldownPeriod: 30s (matches H2/H3 scaleDown stabilization)
 #
@@ -8,8 +8,11 @@
 #   az aks update --resource-group thesis-rg --name thesis-aks --enable-keda
 #
 # Purpose: Event-driven autoscaling for CPU-bound service
+# Calibrated note (2026-04-12 recovery baseline):
+#   Prometheus saw only ~9-10 req/s on a single saturated pod before resets/timeouts.
+#   Triggering at 5 req/s lets request-based autoscaling react before the pod collapses.
 # Expected: For CPU-bound auth-service, KEDA may show comparable performance
-#   to HPA since CPU already correlates with load — this is a valid finding.
+#   to HPA once scaling is calibrated to engage before saturation.
 #
 # Usage:
 #   kubectl apply -f b1-underprovisioned.yaml -n ecommerce   # Reset to 1 replica first
@@ -38,7 +41,7 @@ spec:
         metricName: http_requests_per_second
         # IMPORTANT: Query returns TOTAL rate across all pods.
         # KEDA internally computes: desiredReplicas = ceil(queryResult / threshold)
-        # Example: 200 total RPS → ceil(200/50) = 4 replicas
+        # Example: 20 total RPS → ceil(20/5) = 4 replicas
         query: |
           sum(rate(http_requests_total{job="auth-service"}[1m]))
-        threshold: "50"      # Same threshold as H3 — critical for fairness
+        threshold: "5"       # Same threshold as H3 — critical for fairness

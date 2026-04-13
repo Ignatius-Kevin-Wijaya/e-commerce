@@ -1,7 +1,10 @@
 # H3: HPA Custom Metric (Request-Rate via prometheus-adapter) — product-service
 # HPA using HTTP request rate per second as scaling metric
 # Same metric as K1 (KEDA) but via HPA engine — THE FAIRNESS CONTROL
-# threshold: 50 RPS/pod (must match K1 exactly for fair comparison)
+# threshold: 5 RPS/pod (must match K1 exactly for fair comparison)
+# Calibrated on 2026-04-14 against the 50k-product recovery dataset:
+# Prometheus exposed roughly ~10-12 req/s on a saturated single pod, so 50
+# never triggered. A target of 5 scales early enough to separate H3 from H1.
 # Uses same aggressive behavior as H2
 #
 # PREREQUISITE: prometheus-adapter must be installed:
@@ -39,7 +42,7 @@ spec:
           name: http_requests_per_second
         target:
           type: AverageValue
-          averageValue: "50"    # Same threshold as K1 KEDA — critical for fairness
+          averageValue: "5"     # Same threshold as K1 KEDA — critical for fairness
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 0

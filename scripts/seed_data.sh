@@ -6,8 +6,24 @@ AUTH_HOST="${AUTH_DB_HOST:-localhost}"
 AUTH_PORT="${AUTH_DB_PORT:-5433}"
 PRODUCT_HOST="${PRODUCT_DB_HOST:-localhost}"
 PRODUCT_PORT="${PRODUCT_DB_PORT:-5434}"
+PRODUCT_ITEMS_PER_CATEGORY="${PRODUCT_ITEMS_PER_CATEGORY:-1000}"
+PRODUCT_DESCRIPTION_REPEAT="${PRODUCT_DESCRIPTION_REPEAT:-8}"
+
+if ! [[ "${PRODUCT_ITEMS_PER_CATEGORY}" =~ ^[1-9][0-9]*$ ]]; then
+    echo "❌ PRODUCT_ITEMS_PER_CATEGORY must be a positive integer, got: ${PRODUCT_ITEMS_PER_CATEGORY}" >&2
+    exit 1
+fi
+
+if ! [[ "${PRODUCT_DESCRIPTION_REPEAT}" =~ ^[1-9][0-9]*$ ]]; then
+    echo "❌ PRODUCT_DESCRIPTION_REPEAT must be a positive integer, got: ${PRODUCT_DESCRIPTION_REPEAT}" >&2
+    exit 1
+fi
+
+TOTAL_TARGET_PRODUCTS=$((PRODUCT_ITEMS_PER_CATEGORY * 10 + 20))
 
 echo "🌱 Seeding sample data..."
+echo "  Target items per category: ${PRODUCT_ITEMS_PER_CATEGORY}"
+echo "  Description repeat factor: ${PRODUCT_DESCRIPTION_REPEAT}"
 
 if kubectl get pod product-db-0 -n ecommerce >/dev/null 2>&1; then
     echo "  Running in Kubernetes cluster, using kubectl exec..."
@@ -17,7 +33,9 @@ else
 fi
 
 # Seed categories and a large search-heavy catalog into product DB
-$CMD <<'SQL'
+# The generated product names are deterministic, so increasing
+# PRODUCT_ITEMS_PER_CATEGORY grows the catalog idempotently.
+$CMD <<SQL
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 INSERT INTO categories (name, description, created_at) VALUES
@@ -103,7 +121,7 @@ generated_catalog AS (
             st.keyword,
             cp.name,
             gs.seq,
-            repeat(FORMAT('%s autoscaling search workload detail for %s category. ', st.keyword, cp.name), 8)
+            repeat(FORMAT('%s autoscaling search workload detail for %s category. ', st.keyword, cp.name), ${PRODUCT_DESCRIPTION_REPEAT})
         ) AS product_description,
         ROUND((19.99 + (((gs.seq - 1) % 250) * 3.15) + cp.category_index)::numeric, 2) AS product_price,
         25 + ((gs.seq * 13 + cp.category_index * 17) % 475) AS product_stock,
@@ -114,7 +132,7 @@ generated_catalog AS (
             gs.seq
         ) AS product_image
     FROM category_pool cp
-    CROSS JOIN generate_series(1, 1000) AS gs(seq)
+    CROSS JOIN generate_series(1, ${PRODUCT_ITEMS_PER_CATEGORY}) AS gs(seq)
     JOIN search_terms st
       ON (((gs.seq + cp.category_index - 2) % 8) + 1) = st.term_index
 )
@@ -139,6 +157,6 @@ WHERE NOT EXISTS (
 SQL
 if [ -n "${PGPASSWORD:-}" ]; then unset PGPASSWORD; fi
 
-echo "✅ Seeded 10 categories + starter catalog + recovery dataset (~10,000 products)."
+echo "✅ Seeded 10 categories + starter catalog + recovery dataset (target ~${TOTAL_TARGET_PRODUCTS} products)."
 echo ""
 echo "To create test users, POST to http://localhost:8080/auth/register"
