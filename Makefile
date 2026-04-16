@@ -1,5 +1,6 @@
 .PHONY: help dev down build test lint migrate seed deploy clean logs kind-up kind-down kind-load kind-secrets kind-monitoring kind-load-test kind-status \
-       experiment experiment-dry-run experiment-resume experiment-pilot experiment-validate experiment-status experiment-product experiment-auth
+       experiment experiment-dry-run experiment-resume experiment-pilot experiment-validate experiment-status experiment-product experiment-auth experiment-shipping \
+       experiment-validate-product experiment-validate-auth experiment-validate-shipping
 
 # ──── Image Registry ───────────────────────────────────────
 # Override via env: IMAGE_REGISTRY=ghcr.io/myorg make kind-load
@@ -39,9 +40,13 @@ test: ## Run all unit tests
 	docker compose exec order-service pytest tests/ -v || true
 	@echo "🧪 Running payment-service tests..."
 	docker compose exec payment-service pytest tests/ -v || true
+	@echo "🧪 Running shipping-rate-service tests..."
+	docker compose exec shipping-rate-service pytest tests/ -v || true
+	@echo "🧪 Running carrier-mock-service tests..."
+	docker compose exec carrier-mock-service pytest tests/ -v || true
 
 lint: ## Lint all services with ruff
-	@for svc in auth-service product-service cart-service order-service payment-service; do \
+	@for svc in auth-service product-service cart-service order-service payment-service shipping-rate-service carrier-mock-service; do \
 		echo "🔍 Linting $$svc..."; \
 		cd backend/services/$$svc && ruff check . && cd ../../..; \
 	done
@@ -73,7 +78,7 @@ kind-down: ## Destroy the local KIND cluster
 
 kind-load: ## Rebuild all images and load them into KIND
 	@echo "🐳 Rebuilding and loading images into KIND..."
-	@for svc in auth product cart order payment; do \
+	@for svc in auth product cart order payment shipping-rate carrier-mock; do \
 		docker build -q -t $(IMAGE_REGISTRY)/ecommerce-$$svc-service:$(IMAGE_TAG) backend/services/$$svc-service; \
 		kind load docker-image $(IMAGE_REGISTRY)/ecommerce-$$svc-service:$(IMAGE_TAG) --name ecommerce; \
 	done
@@ -121,11 +126,14 @@ experiment-first: ## Run exactly 1 repetition of all 36 configurations to test o
 	@echo "🧪 Starting first sweep (1 Repetition across all Configs & Patterns, 36 runs)"
 	bash scripts/run-experiment.sh --first
 
-experiment-pilot: ## Pilot run: product-service B1 only (15 runs, ~4 hours)
-	@echo "🧪 Starting pilot run (product-service, B1 config, 15 runs)"
-	bash scripts/run-experiment.sh --service product-service --config b1
+experiment-pilot: ## Pilot run: shipping-rate-service B1 only (15 runs, ~4 hours)
+	@echo "🧪 Starting pilot run (shipping-rate-service, B1 config, 15 runs)"
+	bash scripts/run-experiment.sh --service shipping-rate-service --config b1
 
-experiment-product: ## Run all product-service experiments (90 runs, ~22 hours)
+experiment-shipping: ## Run all shipping-rate-service experiments (90 runs, ~22 hours)
+	bash scripts/run-experiment.sh --service shipping-rate-service
+
+experiment-product: ## Run all exploratory product-service experiments (90 runs, ~22 hours)
 	bash scripts/run-experiment.sh --service product-service
 
 experiment-auth: ## Run all auth-service experiments (90 runs, ~22 hours)
@@ -139,6 +147,9 @@ experiment-validate-product: ## Validate product-service results only
 
 experiment-validate-auth: ## Validate auth-service results only
 	bash scripts/validate-results.sh auth-service
+
+experiment-validate-shipping: ## Validate shipping-rate-service results only
+	bash scripts/validate-results.sh shipping-rate-service
 
 experiment-status: ## Show experiment progress
 	@echo "=== Experiment Progress ==="
@@ -167,4 +178,5 @@ experiment-clean: ## Delete all experiment results (⚠️ destructive!)
 experiment-k6-apply: ## Apply k6 ConfigMaps and Job templates to the cluster
 	kubectl apply -f infrastructure/kubernetes/load-testing/k6-job.yaml -n ecommerce
 	kubectl apply -f infrastructure/kubernetes/load-testing/k6-auth-job.yaml -n ecommerce
+	kubectl apply -f infrastructure/kubernetes/load-testing/k6-shipping-job.yaml -n ecommerce
 	@echo "✅ k6 ConfigMaps and Job templates applied"

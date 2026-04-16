@@ -17,7 +17,7 @@
 # Usage:
 #   chmod +x scripts/run-experiment.sh
 #   ./scripts/run-experiment.sh                     # Run ALL 180 experiments
-#   ./scripts/run-experiment.sh --service product   # Only product-service (90 runs)
+#   ./scripts/run-experiment.sh --service shipping-rate-service  # Only shipping experiments (90 runs)
 #   ./scripts/run-experiment.sh --resume            # Resume from last completed run
 #   ./scripts/run-experiment.sh --dry-run           # Print plan without executing
 #
@@ -35,7 +35,7 @@ STATE_FILE="${RESULTS_BASE_DIR}/.experiment-state"
 PROM_URL="http://prometheus.${MONITORING_NS}.svc.cluster.local:9090"
 
 # Experiment matrix
-SERVICES=("product-service" "auth-service")
+SERVICES=("shipping-rate-service" "auth-service")
 CONFIGS=("b1" "b2" "h1" "h2" "h3" "k1")
 PATTERNS=("gradual" "spike" "oscillating")
 REPETITIONS=5
@@ -52,6 +52,13 @@ PRODUCT_PEAK_RPS="${PRODUCT_PEAK_RPS:-200}"
 PRODUCT_PAGE_SIZE="${PRODUCT_PAGE_SIZE:-100}"
 PRODUCT_MAX_PAGE="${PRODUCT_MAX_PAGE:-12}"
 PRODUCT_SEARCH_TERMS="${PRODUCT_SEARCH_TERMS:-Laptop,Phone,Camera,Headphones,Keyboard,Monitor,Speaker,Charger}"
+
+SHIPPING_BASE_RPS="${SHIPPING_BASE_RPS:-10}"
+SHIPPING_PEAK_RPS="${SHIPPING_PEAK_RPS:-60}"
+SHIPPING_MAX_ITEMS="${SHIPPING_MAX_ITEMS:-4}"
+SHIPPING_MIN_WEIGHT_GRAMS="${SHIPPING_MIN_WEIGHT_GRAMS:-200}"
+SHIPPING_MAX_WEIGHT_GRAMS="${SHIPPING_MAX_WEIGHT_GRAMS:-2500}"
+SHIPPING_DESTINATION_ZONES="${SHIPPING_DESTINATION_ZONES:-domestic,regional,remote}"
 
 AUTH_BASE_RPS="${AUTH_BASE_RPS:-10}"
 AUTH_PEAK_RPS="${AUTH_PEAK_RPS:-40}"
@@ -81,7 +88,7 @@ log_warn()    { log "${YELLOW}⚠️  $*${NC}"; }
 log_error()   { log "${RED}❌ $*${NC}"; }
 log_step()    { log "${BLUE}── $*${NC}"; }
 
-# Get run ID: service_config_pattern_repN (e.g., product-service_h1_gradual_rep3)
+# Get run ID: service_config_pattern_repN (e.g., shipping-rate-service_h3_spike_rep2)
 run_id() {
   local service=$1 config=$2 pattern=$3 rep=$4
   echo "${service}_${config}_${pattern}_rep${rep}"
@@ -125,11 +132,11 @@ get_config_dir() {
 
 get_k6_job_file() {
   local service=$1
-  if [[ "${service}" == "product-service" ]]; then
-    echo "infrastructure/kubernetes/load-testing/k6-job.yaml"
-  else
-    echo "infrastructure/kubernetes/load-testing/k6-auth-job.yaml"
-  fi
+  case "${service}" in
+    product-service) echo "infrastructure/kubernetes/load-testing/k6-job.yaml" ;;
+    shipping-rate-service) echo "infrastructure/kubernetes/load-testing/k6-shipping-job.yaml" ;;
+    *) echo "infrastructure/kubernetes/load-testing/k6-auth-job.yaml" ;;
+  esac
 }
 
 # Create a k6 job by reading the local YAML template and patching the name
@@ -145,6 +152,12 @@ create_k6_job_from_yaml() {
   PRODUCT_PAGE_SIZE="${PRODUCT_PAGE_SIZE}" \
   PRODUCT_MAX_PAGE="${PRODUCT_MAX_PAGE}" \
   PRODUCT_SEARCH_TERMS="${PRODUCT_SEARCH_TERMS}" \
+  SHIPPING_BASE_RPS="${SHIPPING_BASE_RPS}" \
+  SHIPPING_PEAK_RPS="${SHIPPING_PEAK_RPS}" \
+  SHIPPING_MAX_ITEMS="${SHIPPING_MAX_ITEMS}" \
+  SHIPPING_MIN_WEIGHT_GRAMS="${SHIPPING_MIN_WEIGHT_GRAMS}" \
+  SHIPPING_MAX_WEIGHT_GRAMS="${SHIPPING_MAX_WEIGHT_GRAMS}" \
+  SHIPPING_DESTINATION_ZONES="${SHIPPING_DESTINATION_ZONES}" \
   AUTH_BASE_RPS="${AUTH_BASE_RPS}" \
   AUTH_PEAK_RPS="${AUTH_PEAK_RPS}" \
   AUTH_ME_PERCENT="${AUTH_ME_PERCENT}" \
@@ -193,6 +206,13 @@ for doc in docs:
             set_env(env_list, "PRODUCT_PAGE_SIZE", os.environ["PRODUCT_PAGE_SIZE"])
             set_env(env_list, "PRODUCT_MAX_PAGE", os.environ["PRODUCT_MAX_PAGE"])
             set_env(env_list, "PRODUCT_SEARCH_TERMS", os.environ["PRODUCT_SEARCH_TERMS"])
+        elif service == "shipping-rate-service":
+            set_env(env_list, "BASE_RPS", os.environ["SHIPPING_BASE_RPS"])
+            set_env(env_list, "PEAK_RPS", os.environ["SHIPPING_PEAK_RPS"])
+            set_env(env_list, "SHIPPING_MAX_ITEMS", os.environ["SHIPPING_MAX_ITEMS"])
+            set_env(env_list, "SHIPPING_MIN_WEIGHT_GRAMS", os.environ["SHIPPING_MIN_WEIGHT_GRAMS"])
+            set_env(env_list, "SHIPPING_MAX_WEIGHT_GRAMS", os.environ["SHIPPING_MAX_WEIGHT_GRAMS"])
+            set_env(env_list, "SHIPPING_DESTINATION_ZONES", os.environ["SHIPPING_DESTINATION_ZONES"])
         else:
             set_env(env_list, "BASE_RPS", os.environ["AUTH_BASE_RPS"])
             set_env(env_list, "PEAK_RPS", os.environ["AUTH_PEAK_RPS"])
@@ -210,11 +230,11 @@ PYEOF
 
 get_k6_job_name() {
   local service=$1 pattern=$2
-  if [[ "${service}" == "product-service" ]]; then
-    echo "k6-load-test-${pattern}"
-  else
-    echo "k6-auth-test-${pattern}"
-  fi
+  case "${service}" in
+    product-service) echo "k6-load-test-${pattern}" ;;
+    shipping-rate-service) echo "k6-shipping-test-${pattern}" ;;
+    *) echo "k6-auth-test-${pattern}" ;;
+  esac
 }
 
 # Map config IDs to YAML filenames
@@ -240,6 +260,26 @@ config_type() {
   esac
 }
 
+hpa_name_for_config() {
+  local service=$1 config=$2
+  case "${config}" in
+    h1) echo "${service}-hpa-default" ;;
+    h2) echo "${service}-hpa-tuned" ;;
+    h3) echo "${service}-hpa-custom" ;;
+    k1) echo "keda-hpa-${service}-keda" ;;
+    *) echo "" ;;
+  esac
+}
+
+scaledobject_name_for_config() {
+  local service=$1 config=$2
+  if [[ "${config}" == "k1" ]]; then
+    echo "${service}-keda"
+  else
+    echo ""
+  fi
+}
+
 expected_replicas() {
   local config=$1
   if [[ "${config}" == "b2" ]]; then
@@ -254,6 +294,7 @@ service_port() {
   case "${service}" in
     auth-service) echo 8001 ;;
     product-service) echo 8002 ;;
+    shipping-rate-service) echo 8006 ;;
     cart-service) echo 8003 ;;
     order-service) echo 8004 ;;
     payment-service) echo 8005 ;;
@@ -267,20 +308,30 @@ service_port() {
 
 service_base_rps() {
   local service=$1
-  if [[ "${service}" == "product-service" ]]; then
-    echo "${PRODUCT_BASE_RPS}"
-  else
-    echo "${AUTH_BASE_RPS}"
-  fi
+  case "${service}" in
+    product-service) echo "${PRODUCT_BASE_RPS}" ;;
+    shipping-rate-service) echo "${SHIPPING_BASE_RPS}" ;;
+    *) echo "${AUTH_BASE_RPS}" ;;
+  esac
 }
 
 service_peak_rps() {
   local service=$1
-  if [[ "${service}" == "product-service" ]]; then
-    echo "${PRODUCT_PEAK_RPS}"
-  else
-    echo "${AUTH_PEAK_RPS}"
-  fi
+  case "${service}" in
+    product-service) echo "${PRODUCT_PEAK_RPS}" ;;
+    shipping-rate-service) echo "${SHIPPING_PEAK_RPS}" ;;
+    *) echo "${AUTH_PEAK_RPS}" ;;
+  esac
+}
+
+service_profile_version() {
+  local service=$1
+  case "${service}" in
+    auth-service) echo "recovery-v2" ;;
+    product-service) echo "product-recovery-v1" ;;
+    shipping-rate-service) echo "wait-bound-v1" ;;
+    *) echo "unknown" ;;
+  esac
 }
 
 wait_for_expected_replicas() {
@@ -320,6 +371,7 @@ apply_k6_configmaps() {
   local k6_files=(
     "infrastructure/kubernetes/load-testing/k6-job.yaml"
     "infrastructure/kubernetes/load-testing/k6-auth-job.yaml"
+    "infrastructure/kubernetes/load-testing/k6-shipping-job.yaml"
   )
 
   local k6_file
@@ -555,8 +607,22 @@ export_k6_results() {
   fi
 }
 
+write_scoped_yaml() {
+  local resource=$1 name=$2 out_file=$3
+
+  if [[ -n "${name}" ]] && kubectl get "${resource}" "${name}" -n "${NAMESPACE}" -o yaml > "${out_file}" 2>/dev/null; then
+    return 0
+  fi
+
+  cat > "${out_file}" <<'EOF'
+apiVersion: v1
+kind: List
+items: []
+EOF
+}
+
 export_prometheus_metrics() {
-  local service=$1 results_dir=$2
+  local service=$1 config=$2 job_name=$3 results_dir=$4
   local prom_pod
   prom_pod=$(kubectl get pods -n "${MONITORING_NS}" -l app=prometheus --no-headers -o custom-columns=":metadata.name" | head -1)
 
@@ -591,12 +657,19 @@ export_prometheus_metrics() {
       > "${results_dir}/prom_${name}.json" 2>/dev/null || log_warn "Failed to export ${name}"
   done
 
-  # Export scaling events (capture all namespace events to ensure HPA/KEDA objects are included)
-  kubectl get events -n "${NAMESPACE}" --sort-by='.lastTimestamp' > "${results_dir}/k8s-events.txt" 2>/dev/null || true
+  local hpa_name scaledobject_name event_pattern
+  hpa_name=$(hpa_name_for_config "${service}" "${config}")
+  scaledobject_name=$(scaledobject_name_for_config "${service}" "${config}")
+  event_pattern=$(printf '%s\n' "${service}" "${job_name}" "${hpa_name}" "${scaledobject_name}" | \
+    python3 -c 'import re, sys; patterns=[line.strip() for line in sys.stdin if line.strip()]; print("|".join(re.escape(p) for p in patterns))')
 
-  # Export HPA/KEDA status
-  kubectl get hpa -n "${NAMESPACE}" -o yaml > "${results_dir}/hpa-status.yaml" 2>/dev/null || true
-  kubectl get scaledobject -n "${NAMESPACE}" -o yaml > "${results_dir}/keda-status.yaml" 2>/dev/null || true
+  # Export only events relevant to the current run's service/job/autoscaler.
+  kubectl get events -n "${NAMESPACE}" --sort-by='.lastTimestamp' 2>/dev/null | \
+    awk -v pat="${event_pattern}" 'NR == 1 || $0 ~ pat' > "${results_dir}/k8s-events.txt" || true
+
+  # Export only the autoscaler objects relevant to the current run.
+  write_scoped_yaml "hpa" "${hpa_name}" "${results_dir}/hpa-status.yaml"
+  write_scoped_yaml "scaledobject" "${scaledobject_name}" "${results_dir}/keda-status.yaml"
 
   # Export pod states
   kubectl get pods -n "${NAMESPACE}" -l "app=${service}" -o wide > "${results_dir}/pod-status.txt" 2>/dev/null || true
@@ -647,7 +720,7 @@ execute_single_run() {
 
   # Step 5: Export data
   export_k6_results "${job_name}" "${results_dir}"
-  export_prometheus_metrics "${service}" "${results_dir}"
+  export_prometheus_metrics "${service}" "${config}" "${job_name}" "${results_dir}"
 
   # Step 6: Record metadata
   local run_end
@@ -668,10 +741,12 @@ execute_single_run() {
   "k6_job_name": "${job_name}",
   "target_url": "http://${service}.${NAMESPACE}.svc.cluster.local:$(service_port "${service}")",
   "load_profile": {
-    "version": "recovery-v2",
+    "version": "$(service_profile_version "${service}")",
     "base_rps": $(service_base_rps "${service}"),
     "peak_rps": $(service_peak_rps "${service}")$(if [[ "${service}" == "product-service" ]]; then
       printf ',\n    "page_size": %s,\n    "max_page": %s,\n    "search_terms": "%s"' "${PRODUCT_PAGE_SIZE}" "${PRODUCT_MAX_PAGE}" "${PRODUCT_SEARCH_TERMS}"
+    elif [[ "${service}" == "shipping-rate-service" ]]; then
+      printf ',\n    "shipping_max_items": %s,\n    "shipping_min_weight_grams": %s,\n    "shipping_max_weight_grams": %s,\n    "shipping_destination_zones": "%s"' "${SHIPPING_MAX_ITEMS}" "${SHIPPING_MIN_WEIGHT_GRAMS}" "${SHIPPING_MAX_WEIGHT_GRAMS}" "${SHIPPING_DESTINATION_ZONES}"
     else
       printf ',\n    "auth_me_percent": %s,\n    "auth_login_percent": %s,\n    "num_test_users": %s' "${AUTH_ME_PERCENT}" "${AUTH_LOGIN_PERCENT}" "${NUM_TEST_USERS}"
     fi)
@@ -717,7 +792,7 @@ main() {
         echo "Usage: $0 [OPTIONS]"
         echo ""
         echo "Options:"
-        echo "  --service NAME     Only run for specific service (product-service|auth-service)"
+        echo "  --service NAME     Only run for specific service (shipping-rate-service|auth-service|product-service)"
         echo "  --config  NAME     Only run specific config (b1|b2|h1|h2|h3|k1)"
         echo "  --pattern NAME     Only run specific pattern (gradual|spike|oscillating)"
         echo "  --resume           Resume from last completed run"

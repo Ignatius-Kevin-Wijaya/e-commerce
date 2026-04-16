@@ -5,7 +5,16 @@ set -euo pipefail
 REGISTRY="${DOCKER_REGISTRY:-localhost:5000}"
 TAG="${IMAGE_TAG:-latest}"
 
-SERVICES=("auth-service" "product-service" "cart-service" "order-service" "payment-service" "api-gateway")
+SERVICES=(
+    "auth-service"
+    "product-service"
+    "cart-service"
+    "order-service"
+    "payment-service"
+    "shipping-rate-service"
+    "carrier-mock-service"
+    "api-gateway"
+)
 
 echo "🔨 Building all service images..."
 

@@ -2,11 +2,11 @@
 """
 Deep Experiment Validation Script
 ==================================
-Checks every single run against ALL anomaly detection criteria from anomaly_detection_guide.md:
-  - Tier 1 (Critical): A1-A5
-  - Tier 2 (Warning): B1-B6
-  - Tier 3 (Informational): C1-C4
-  - File completeness check
+Checks each core-matrix run against anomaly_detection_guide.md plus the
+latest thesis-specific expectations for:
+  - auth-service as the CPU-dominant control
+  - shipping-rate-service as the wait-dominant comparison workload
+  - product-service as a separate exploratory case outside the core matrix
 """
 
 import json
@@ -16,12 +16,12 @@ import sys
 from pathlib import Path
 
 RESULTS_DIR = Path("/home/kevin/Projects/e-commerce/experiment-results")
-SERVICES = ["product-service", "auth-service"]
+SERVICES = ["shipping-rate-service", "auth-service"]
 CONFIGS = ["b1", "b2", "h1", "h2", "h3", "k1"]
 PATTERNS = ["gradual", "spike", "oscillating"]
 LOAD_PROFILE_FALLBACKS = {
-    "product-service": {"base_rps": 20, "peak_rps": 200},
-    "auth-service": {"base_rps": 20, "peak_rps": 200},
+    "shipping-rate-service": {"base_rps": 10, "peak_rps": 60},
+    "auth-service": {"base_rps": 10, "peak_rps": 40},
 }
 PATTERN_STAGE_TARGETS = {
     "gradual": [
@@ -403,8 +403,8 @@ def check_b1_error_rate(run: RunResult):
             run.add_info("B1", f"Error rate {error_rate:.2f}% — EXPECTED for under-provisioned baseline")
         elif cfg == "b2":
             run.add_critical("B1", f"Error rate {error_rate:.2f}% on B2 (5 replicas) — UNEXPECTED, investigate!")
-        elif cfg in ("h1", "h2") and svc == "product-service":
-            run.add_info("B1", f"Error rate {error_rate:.2f}% — EXPECTED (CPU HPA won't trigger for I/O-bound product-service)")
+        elif cfg in ("h1", "h2") and svc == "shipping-rate-service":
+            run.add_warning("B1", f"Error rate {error_rate:.2f}% on {cfg} for shipping-rate-service — CPU HPA may be too weak or too slow for this wait-dominant workload")
         elif cfg in ("h1", "h2") and svc == "auth-service":
             run.add_warning("B1", f"Error rate {error_rate:.2f}% on {cfg} for auth-service — check if CPU threshold was reached")
         elif cfg == "h3":
@@ -466,9 +466,9 @@ def check_b6_gateway_rate_limiting(run: RunResult):
     return
 
 
-def check_c1_hpa_no_scale_product(run: RunResult):
-    """C1: CPU-based HPA should NOT scale product-service (I/O-bound thesis finding)."""
-    if run.service != "product-service" or run.config not in ("h1", "h2"):
+def check_c1_request_autoscalers_scale_shipping(run: RunResult):
+    """C1: Request-based autoscalers should scale the wait-dominant shipping service."""
+    if run.service != "shipping-rate-service" or run.config not in ("h3", "k1"):
         return
 
     prom_file = run.path / "prom_replica_count.json"
@@ -484,10 +484,10 @@ def check_c1_hpa_no_scale_product(run: RunResult):
         values = results[0].get("values", [])
         max_replicas = max(int(float(v[1])) for v in values if float(v[1]) > 0) if values else 1
 
-        if max_replicas > 1:
-            run.add_warning("C1", f"CPU-based HPA SCALED product-service to {max_replicas} replicas — thesis hypothesis may need revision")
+        if max_replicas <= 1:
+            run.add_warning("C1", f"Request-based autoscaler {run.config} did NOT scale shipping-rate-service (max replicas = {max_replicas}) — unexpected for the wait-dominant comparison workload")
         else:
-            run.add_info("C1", f"CPU-based HPA did NOT scale product-service — CONFIRMS thesis hypothesis")
+            run.add_info("C1", f"Request-based autoscaler {run.config} scaled shipping-rate-service to {max_replicas} replicas — expected for the wait-dominant workload")
     except (json.JSONDecodeError, KeyError, ValueError):
         pass
 
@@ -616,7 +616,7 @@ def check_replica_count_data(run: RunResult):
 def main():
     print("=" * 80)
     print("  DEEP EXPERIMENT VALIDATION")
-    print("  Checking all 36 runs against anomaly_detection_guide.md criteria")
+    print("  Checking the 36-run auth-service + shipping-rate-service core sweep")
     print("=" * 80)
     print()
 
@@ -649,7 +649,7 @@ def main():
                 check_b4_thrashing(run)
                 check_b5_flat_zero_metrics(run)
                 check_b6_gateway_rate_limiting(run)
-                check_c1_hpa_no_scale_product(run)
+                check_c1_request_autoscalers_scale_shipping(run)
                 check_c2_all_scale_auth(run)
                 check_c3_b2_lowest_latency(run)
                 check_metadata_duration(run)

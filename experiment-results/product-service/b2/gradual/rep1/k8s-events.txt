@@ -1,44 +1,57 @@
 LAST SEEN   TYPE      REASON                 OBJECT                                                                MESSAGE
-59m         Normal    Scheduled              pod/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd            Successfully assigned ecommerce/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd to aks-userpool-16719200-vmss00000h
-18m         Normal    Scheduled              pod/product-service-75f4ddbd56-xdd7x                                  Successfully assigned ecommerce/product-service-75f4ddbd56-xdd7x to aks-userpool-16719200-vmss00000h
-18m         Normal    Scheduled              pod/product-service-75f4ddbd56-h9d95                                  Successfully assigned ecommerce/product-service-75f4ddbd56-h9d95 to aks-userpool-16719200-vmss00000f
-18m         Normal    Scheduled              pod/product-service-75f4ddbd56-9xj72                                  Successfully assigned ecommerce/product-service-75f4ddbd56-9xj72 to aks-userpool-16719200-vmss00000h
-18m         Normal    Scheduled              pod/product-service-75f4ddbd56-5zh86                                  Successfully assigned ecommerce/product-service-75f4ddbd56-5zh86 to aks-userpool-16719200-vmss00000h
-15m         Normal    Scheduled              pod/k6-load-test-gradual-product-service-b2-gradual-rep1-6q65w        Successfully assigned ecommerce/k6-load-test-gradual-product-service-b2-gradual-rep1-6q65w to aks-userpool-16719200-vmss00000f
-37m         Normal    Scheduled              pod/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg   Successfully assigned ecommerce/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg to aks-userpool-16719200-vmss00000h
-59m         Normal    SuccessfulCreate       job/k6-load-test-spike-product-service-b1-spike-rep1                  Created pod: k6-load-test-spike-product-service-b1-spike-rep1-mhqqd
-59m         Normal    Pulling                pod/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd            Pulling image "grafana/k6:latest"
-59m         Normal    Started                pod/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd            Started container k6
-59m         Normal    Created                pod/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd            Created container: k6
-59m         Normal    Pulled                 pod/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd            Successfully pulled image "grafana/k6:latest" in 1.473s (1.473s including waiting). Image size: 36750082 bytes.
-47m         Warning   BackoffLimitExceeded   job/k6-load-test-spike-product-service-b1-spike-rep1                  Job has reached the specified backoff limit
-37m         Normal    SuccessfulCreate       job/k6-load-test-oscillating-product-service-b1-oscillating-rep1      Created pod: k6-load-test-oscillating-product-service-b1-oscillating-re8blxg
-37m         Normal    Pulling                pod/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg   Pulling image "grafana/k6:latest"
-37m         Normal    Started                pod/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg   Started container k6
-37m         Normal    Created                pod/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg   Created container: k6
-37m         Normal    Pulled                 pod/k6-load-test-oscillating-product-service-b1-oscillating-re8blxg   Successfully pulled image "grafana/k6:latest" in 1.436s (1.436s including waiting). Image size: 36750082 bytes.
-28m         Warning   Unhealthy              pod/product-service-75f4ddbd56-6nv6h                                  Readiness probe failed: Get "http://10.244.2.80:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
-25m         Warning   BackoffLimitExceeded   job/k6-load-test-oscillating-product-service-b1-oscillating-rep1      Job has reached the specified backoff limit
-18m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-75f4ddbd56 from 1 to 5
-18m         Normal    Pulled                 pod/product-service-75f4ddbd56-h9d95                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
-18m         Normal    Pulled                 pod/product-service-75f4ddbd56-5zh86                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
-18m         Normal    Pulled                 pod/product-service-75f4ddbd56-xdd7x                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
-18m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-xdd7x
-18m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-5zh86
-18m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-9xj72
-18m         Normal    Pulled                 pod/product-service-75f4ddbd56-9xj72                                  Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
-18m         Normal    Started                pod/product-service-75f4ddbd56-h9d95                                  Started container product-service
-18m         Normal    Created                pod/product-service-75f4ddbd56-h9d95                                  Created container: product-service
-18m         Normal    SuccessfulCreate       replicaset/product-service-75f4ddbd56                                 Created pod: product-service-75f4ddbd56-h9d95
-18m         Normal    Started                pod/product-service-75f4ddbd56-xdd7x                                  Started container product-service
-18m         Normal    Started                pod/product-service-75f4ddbd56-9xj72                                  Started container product-service
-18m         Normal    Created                pod/product-service-75f4ddbd56-9xj72                                  Created container: product-service
-18m         Normal    Started                pod/product-service-75f4ddbd56-5zh86                                  Started container product-service
-18m         Normal    Created                pod/product-service-75f4ddbd56-5zh86                                  Created container: product-service
-18m         Normal    Created                pod/product-service-75f4ddbd56-xdd7x                                  Created container: product-service
-15m         Normal    SuccessfulCreate       job/k6-load-test-gradual-product-service-b2-gradual-rep1              Created pod: k6-load-test-gradual-product-service-b2-gradual-rep1-6q65w
-15m         Normal    Pulling                pod/k6-load-test-gradual-product-service-b2-gradual-rep1-6q65w        Pulling image "grafana/k6:latest"
-15m         Normal    Pulled                 pod/k6-load-test-gradual-product-service-b2-gradual-rep1-6q65w        Successfully pulled image "grafana/k6:latest" in 1.488s (1.488s including waiting). Image size: 36750082 bytes.
-15m         Normal    Created                pod/k6-load-test-gradual-product-service-b2-gradual-rep1-6q65w        Created container: k6
-15m         Normal    Started                pod/k6-load-test-gradual-product-service-b2-gradual-rep1-6q65w        Started container k6
-3m8s        Normal    Completed              job/k6-load-test-gradual-product-service-b2-gradual-rep1              Job completed
+49m         Warning   BackoffLimitExceeded   job/k6-load-test-spike-product-service-b1-spike-rep1                  Job has reached the specified backoff limit
+40m         Normal    Pulling                pod/k6-load-test-oscillating-product-service-b1-oscillating-reh9bxl   Pulling image "grafana/k6:latest"
+40m         Normal    SuccessfulCreate       job/k6-load-test-oscillating-product-service-b1-oscillating-rep1      Created pod: k6-load-test-oscillating-product-service-b1-oscillating-reh9bxl
+40m         Normal    Scheduled              pod/k6-load-test-oscillating-product-service-b1-oscillating-reh9bxl   Successfully assigned ecommerce/k6-load-test-oscillating-product-service-b1-oscillating-reh9bxl to aks-userpool-16719200-vmss000011
+40m         Normal    Pulled                 pod/k6-load-test-oscillating-product-service-b1-oscillating-reh9bxl   Successfully pulled image "grafana/k6:latest" in 1.397s (1.397s including waiting). Image size: 36750082 bytes.
+40m         Normal    Started                pod/k6-load-test-oscillating-product-service-b1-oscillating-reh9bxl   Started container k6
+40m         Normal    Created                pod/k6-load-test-oscillating-product-service-b1-oscillating-reh9bxl   Created container: k6
+27m         Warning   BackoffLimitExceeded   job/k6-load-test-oscillating-product-service-b1-oscillating-rep1      Job has reached the specified backoff limit
+20m         Normal    Scheduled              pod/product-service-646fd4c8b8-76pq5                                  Successfully assigned ecommerce/product-service-646fd4c8b8-76pq5 to aks-userpool-16719200-vmss000011
+20m         Normal    Scheduled              pod/product-service-646fd4c8b8-npkcq                                  Successfully assigned ecommerce/product-service-646fd4c8b8-npkcq to aks-userpool-16719200-vmss000011
+20m         Normal    Pulling                pod/product-service-646fd4c8b8-z5sbq                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+20m         Normal    Scheduled              pod/product-service-646fd4c8b8-z5sbq                                  Successfully assigned ecommerce/product-service-646fd4c8b8-z5sbq to aks-userpool-16719200-vmss000011
+20m         Normal    Pulling                pod/product-service-646fd4c8b8-npkcq                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+20m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-646fd4c8b8 from 1 to 5
+20m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-npkcq
+20m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-76pq5
+20m         Normal    Scheduled              pod/product-service-646fd4c8b8-77wm6                                  Successfully assigned ecommerce/product-service-646fd4c8b8-77wm6 to aks-userpool-16719200-vmss000010
+20m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-77wm6
+20m         Normal    Pulling                pod/product-service-646fd4c8b8-76pq5                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+20m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-z5sbq
+20m         Normal    Created                pod/product-service-646fd4c8b8-77wm6                                  Created container: product-service
+20m         Normal    Pulling                pod/product-service-646fd4c8b8-77wm6                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+20m         Normal    Created                pod/product-service-646fd4c8b8-z5sbq                                  Created container: product-service
+20m         Normal    Pulled                 pod/product-service-646fd4c8b8-z5sbq                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 508ms (508ms including waiting). Image size: 114682246 bytes.
+20m         Normal    Pulled                 pod/product-service-646fd4c8b8-76pq5                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 483ms (483ms including waiting). Image size: 114682246 bytes.
+20m         Normal    Created                pod/product-service-646fd4c8b8-76pq5                                  Created container: product-service
+20m         Normal    Started                pod/product-service-646fd4c8b8-76pq5                                  Started container product-service
+20m         Normal    Pulled                 pod/product-service-646fd4c8b8-77wm6                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 150ms (150ms including waiting). Image size: 114682246 bytes.
+20m         Normal    Created                pod/product-service-646fd4c8b8-npkcq                                  Created container: product-service
+20m         Normal    Started                pod/product-service-646fd4c8b8-77wm6                                  Started container product-service
+20m         Normal    Pulled                 pod/product-service-646fd4c8b8-npkcq                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 471ms (471ms including waiting). Image size: 114682246 bytes.
+20m         Normal    Started                pod/product-service-646fd4c8b8-z5sbq                                  Started container product-service
+20m         Normal    Started                pod/product-service-646fd4c8b8-npkcq                                  Started container product-service
+18m         Normal    Scheduled              pod/k6-load-test-gradual-product-service-b2-gradual-rep1-mg4bc        Successfully assigned ecommerce/k6-load-test-gradual-product-service-b2-gradual-rep1-mg4bc to aks-userpool-16719200-vmss000010
+18m         Normal    SuccessfulCreate       job/k6-load-test-gradual-product-service-b2-gradual-rep1              Created pod: k6-load-test-gradual-product-service-b2-gradual-rep1-mg4bc
+18m         Normal    Pulling                pod/k6-load-test-gradual-product-service-b2-gradual-rep1-mg4bc        Pulling image "grafana/k6:latest"
+18m         Normal    Started                pod/k6-load-test-gradual-product-service-b2-gradual-rep1-mg4bc        Started container k6
+18m         Normal    Created                pod/k6-load-test-gradual-product-service-b2-gradual-rep1-mg4bc        Created container: k6
+18m         Normal    Pulled                 pod/k6-load-test-gradual-product-service-b2-gradual-rep1-mg4bc        Successfully pulled image "grafana/k6:latest" in 5.883s (5.883s including waiting). Image size: 36750082 bytes.
+17m         Warning   Unhealthy              pod/product-db-0                                                      Readiness probe errored and resulted in unknown state: rpc error: code = Unknown desc = failed to exec in container: failed to start exec "2407717f002b49f90d25ebe36c94d4d32c00b3ed048b1eac62abd88dbd2e1322": OCI runtime exec failed: exec failed: unable to start container process: error executing setns process: signal: killed (possibly OOM-killed); runc init error(s): nsexec-1[143584]: failed to open /proc/10997/ns/ipc: No such file or directory: unknown
+16m         Warning   Unhealthy              pod/product-db-0                                                      Readiness probe errored and resulted in unknown state: rpc error: code = NotFound desc = failed to exec in container: failed to load task: no running task found: task 13d4fb382d8d767bd41cf70f65f3ccb63c599eea30d8b7a1eb7e346d0e0a2828 not found: not found
+15m         Warning   BackOff                pod/product-db-0                                                      Back-off restarting failed container postgres in pod product-db-0_ecommerce(fd67689f-7e28-43d4-8030-f4de40a82e99)
+14m         Normal    Created                pod/product-db-0                                                      Created container: postgres
+14m         Normal    Started                pod/product-db-0                                                      Started container postgres
+14m         Normal    Pulled                 pod/product-db-0                                                      Container image "postgres:15-alpine" already present on machine
+14m         Warning   Unhealthy              pod/product-service-646fd4c8b8-z5sbq                                  Readiness probe failed: HTTP probe failed with statuscode: 503
+14m         Warning   Unhealthy              pod/product-service-646fd4c8b8-npkcq                                  Readiness probe failed: HTTP probe failed with statuscode: 503
+14m         Warning   Unhealthy              pod/product-service-646fd4c8b8-76pq5                                  Readiness probe failed: HTTP probe failed with statuscode: 503
+14m         Warning   Unhealthy              pod/product-service-646fd4c8b8-77wm6                                  Readiness probe failed: HTTP probe failed with statuscode: 503
+9m7s        Warning   Unhealthy              pod/product-service-646fd4c8b8-q7dm4                                  Readiness probe failed: Get "http://10.244.2.183:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+7m42s       Warning   Unhealthy              pod/product-service-646fd4c8b8-npkcq                                  Readiness probe failed: Get "http://10.244.1.108:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+7m38s       Warning   Unhealthy              pod/product-service-646fd4c8b8-77wm6                                  Readiness probe failed: Get "http://10.244.2.114:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+7m38s       Warning   Unhealthy              pod/product-service-646fd4c8b8-76pq5                                  Readiness probe failed: Get "http://10.244.1.160:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+7m37s       Warning   Unhealthy              pod/product-service-646fd4c8b8-z5sbq                                  Readiness probe failed: Get "http://10.244.1.61:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+6m5s        Warning   Unhealthy              pod/product-db-0                                                      Readiness probe failed: command timed out: "pg_isready -U product_user -d product_db" timed out after 1s
+5m27s       Warning   BackoffLimitExceeded   job/k6-load-test-gradual-product-service-b2-gradual-rep1              Job has reached the specified backoff limit

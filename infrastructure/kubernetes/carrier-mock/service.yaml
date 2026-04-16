@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: carrier-mock-service
+  namespace: ecommerce
+spec:
+  selector:
+    app: carrier-mock-service
+  ports:
+    - protocol: TCP
+      port: 8007
+      targetPort: 8007
+  type: ClusterIP

@@ -1,28 +1,162 @@
-LAST SEEN   TYPE      REASON                         OBJECT                                                        MESSAGE
-44m         Normal    Scheduled                      pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-qbdsz   Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-h3-gradual-rep1-qbdsz to aks-userpool-16719200-vmss00000w
-44m         Normal    SuccessfulCreate               job/k6-auth-test-gradual-auth-service-h3-gradual-rep1         Created pod: k6-auth-test-gradual-auth-service-h3-gradual-rep1-qbdsz
-44m         Normal    Pulling                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-qbdsz   Pulling image "grafana/k6:latest"
-44m         Normal    Started                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-qbdsz   Started container k6
-44m         Normal    Created                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-qbdsz   Created container: k6
-44m         Normal    Pulled                         pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-qbdsz   Successfully pulled image "grafana/k6:latest" in 1.439s (1.439s including waiting). Image size: 36750082 bytes.
-38m         Normal    Pulled                         pod/auth-service-7d65757ddb-p9sz8                             Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 235ms (235ms including waiting). Image size: 129968897 bytes.
-37m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/auth-service-hpa-custom               invalid metrics (1 invalid out of 1), first error is: failed to get pods metric value: unable to get metric http_requests_per_second: no metrics returned from custom metrics API
-35m         Warning   FailedGetPodsMetric            horizontalpodautoscaler/auth-service-hpa-custom               unable to get metric http_requests_per_second: no metrics returned from custom metrics API
-31m         Warning   BackoffLimitExceeded           job/k6-auth-test-gradual-auth-service-h3-gradual-rep1         Job has reached the specified backoff limit
-18m         Normal    SuccessfulCreate               job/k6-auth-test-gradual-auth-service-h3-gradual-rep1         Created pod: k6-auth-test-gradual-auth-service-h3-gradual-rep1-n6qhv
-18m         Normal    Scheduled                      pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-n6qhv   Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-h3-gradual-rep1-n6qhv to aks-userpool-16719200-vmss00000w
-18m         Normal    Pulling                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-n6qhv   Pulling image "grafana/k6:latest"
-18m         Normal    Started                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-n6qhv   Started container k6
-18m         Normal    Pulled                         pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-n6qhv   Successfully pulled image "grafana/k6:latest" in 1.459s (1.459s including waiting). Image size: 36750082 bytes.
-18m         Normal    Created                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-n6qhv   Created container: k6
-16m         Warning   Unhealthy                      pod/auth-service-7d65757ddb-p9sz8                             Readiness probe failed: Get "http://10.244.1.85:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
-12m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/auth-service-hpa-custom               invalid metrics (1 invalid out of 1), first error is: failed to get pods metric value: unable to get metric http_requests_per_second: no metrics returned from custom metrics API
-9m25s       Normal    Pulled                         pod/auth-service-7d65757ddb-p9sz8                             Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 221ms (221ms including waiting). Image size: 129968897 bytes.
-8m8s        Warning   Unhealthy                      pod/auth-service-7d65757ddb-p9sz8                             Liveness probe failed: Get "http://10.244.1.85:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
-7m8s        Normal    Killing                        pod/auth-service-7d65757ddb-p9sz8                             Container auth-service failed liveness probe, will be restarted
-7m6s        Normal    Pulling                        pod/auth-service-7d65757ddb-p9sz8                             Pulling image "ecommerce.azurecr.io/auth-service:latest"
-7m6s        Normal    Started                        pod/auth-service-7d65757ddb-p9sz8                             Started container auth-service
-7m6s        Normal    Created                        pod/auth-service-7d65757ddb-p9sz8                             Created container: auth-service
-7m6s        Normal    Pulled                         pod/auth-service-7d65757ddb-p9sz8                             Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 162ms (162ms including waiting). Image size: 129968897 bytes.
-6m31s       Warning   FailedGetPodsMetric            horizontalpodautoscaler/auth-service-hpa-custom               unable to get metric http_requests_per_second: no metrics returned from custom metrics API
-5m40s       Warning   BackoffLimitExceeded           job/k6-auth-test-gradual-auth-service-h3-gradual-rep1         Job has reached the specified backoff limit
+LAST SEEN   TYPE      REASON                         OBJECT                                                                MESSAGE
+59m         Normal    SuccessfulCreate               job/k6-auth-test-spike-auth-service-h2-spike-rep1                     Created pod: k6-auth-test-spike-auth-service-h2-spike-rep1-qpcmn
+59m         Normal    Scheduled                      pod/k6-auth-test-spike-auth-service-h2-spike-rep1-qpcmn               Successfully assigned ecommerce/k6-auth-test-spike-auth-service-h2-spike-rep1-qpcmn to aks-userpool-16719200-vmss000010
+59m         Normal    Pulling                        pod/k6-auth-test-spike-auth-service-h2-spike-rep1-qpcmn               Pulling image "grafana/k6:latest"
+59m         Normal    Started                        pod/k6-auth-test-spike-auth-service-h2-spike-rep1-qpcmn               Started container k6
+59m         Normal    Created                        pod/k6-auth-test-spike-auth-service-h2-spike-rep1-qpcmn               Created container: k6
+59m         Normal    Pulled                         pod/k6-auth-test-spike-auth-service-h2-spike-rep1-qpcmn               Successfully pulled image "grafana/k6:latest" in 1.863s (1.863s including waiting). Image size: 36750082 bytes.
+58m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-tuned                        New size: 4; reason: cpu resource utilization (percentage of request) above target
+58m         Normal    Scheduled                      pod/auth-service-88b4cd688-llnjp                                      Successfully assigned ecommerce/auth-service-88b4cd688-llnjp to aks-userpool-16719200-vmss000011
+58m         Normal    SuccessfulCreate               replicaset/auth-service-88b4cd688                                     Created pod: auth-service-88b4cd688-gls2d
+58m         Normal    SuccessfulCreate               replicaset/auth-service-88b4cd688                                     Created pod: auth-service-88b4cd688-llnjp
+58m         Normal    Scheduled                      pod/auth-service-88b4cd688-hkvdp                                      Successfully assigned ecommerce/auth-service-88b4cd688-hkvdp to aks-userpool-16719200-vmss000010
+58m         Normal    Scheduled                      pod/auth-service-88b4cd688-gls2d                                      Successfully assigned ecommerce/auth-service-88b4cd688-gls2d to aks-userpool-16719200-vmss000011
+58m         Normal    Pulling                        pod/auth-service-88b4cd688-gls2d                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+58m         Normal    Created                        pod/auth-service-88b4cd688-llnjp                                      Created container: auth-service
+58m         Normal    Started                        pod/auth-service-88b4cd688-llnjp                                      Started container auth-service
+58m         Normal    Pulled                         pod/auth-service-88b4cd688-llnjp                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 408ms (408ms including waiting). Image size: 129968897 bytes.
+58m         Normal    Pulling                        pod/auth-service-88b4cd688-llnjp                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+58m         Normal    Started                        pod/auth-service-88b4cd688-hkvdp                                      Started container auth-service
+58m         Normal    Created                        pod/auth-service-88b4cd688-hkvdp                                      Created container: auth-service
+58m         Normal    Pulled                         pod/auth-service-88b4cd688-hkvdp                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 308ms (308ms including waiting). Image size: 129968897 bytes.
+58m         Normal    Pulling                        pod/auth-service-88b4cd688-hkvdp                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+58m         Normal    Started                        pod/auth-service-88b4cd688-gls2d                                      Started container auth-service
+58m         Normal    Created                        pod/auth-service-88b4cd688-gls2d                                      Created container: auth-service
+58m         Normal    Pulled                         pod/auth-service-88b4cd688-gls2d                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 404ms (404ms including waiting). Image size: 129968897 bytes.
+56m         Normal    Scheduled                      pod/auth-service-88b4cd688-7qv9z                                      Successfully assigned ecommerce/auth-service-88b4cd688-7qv9z to aks-userpool-16719200-vmss000011
+56m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-tuned                        New size: 5; reason: cpu resource utilization (percentage of request) above target
+56m         Normal    Started                        pod/auth-service-88b4cd688-7qv9z                                      Started container auth-service
+56m         Normal    Created                        pod/auth-service-88b4cd688-7qv9z                                      Created container: auth-service
+56m         Normal    Pulled                         pod/auth-service-88b4cd688-7qv9z                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 190ms (190ms including waiting). Image size: 129968897 bytes.
+56m         Normal    Pulling                        pod/auth-service-88b4cd688-7qv9z                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+47m         Warning   BackoffLimitExceeded           job/k6-auth-test-spike-auth-service-h2-spike-rep1                     Job has reached the specified backoff limit
+47m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-tuned                        New size: 3; reason: All metrics below target
+47m         Normal    Killing                        pod/auth-service-88b4cd688-gls2d                                      Stopping container auth-service
+47m         Normal    SuccessfulDelete               replicaset/auth-service-88b4cd688                                     Deleted pod: auth-service-88b4cd688-gls2d
+47m         Normal    SuccessfulDelete               replicaset/auth-service-88b4cd688                                     Deleted pod: auth-service-88b4cd688-7qv9z
+47m         Normal    Killing                        pod/auth-service-88b4cd688-7qv9z                                      Stopping container auth-service
+46m         Normal    Killing                        pod/auth-service-88b4cd688-hkvdp                                      Stopping container auth-service
+46m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-tuned                        New size: 2; reason: All metrics below target
+46m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-tuned                        New size: 1; reason: All metrics below target
+46m         Normal    Killing                        pod/auth-service-88b4cd688-llnjp                                      Stopping container auth-service
+37m         Normal    SuccessfulCreate               job/k6-auth-test-oscillating-auth-service-h2-oscillating-rep1         Created pod: k6-auth-test-oscillating-auth-service-h2-oscillating-rep1-2q8sv
+37m         Normal    Scheduled                      pod/k6-auth-test-oscillating-auth-service-h2-oscillating-rep1-2q8sv   Successfully assigned ecommerce/k6-auth-test-oscillating-auth-service-h2-oscillating-rep1-2q8sv to aks-userpool-16719200-vmss000010
+37m         Normal    Pulling                        pod/k6-auth-test-oscillating-auth-service-h2-oscillating-rep1-2q8sv   Pulling image "grafana/k6:latest"
+37m         Normal    Created                        pod/k6-auth-test-oscillating-auth-service-h2-oscillating-rep1-2q8sv   Created container: k6
+37m         Normal    Pulled                         pod/k6-auth-test-oscillating-auth-service-h2-oscillating-rep1-2q8sv   Successfully pulled image "grafana/k6:latest" in 1.47s (1.47s including waiting). Image size: 36750082 bytes.
+37m         Normal    Started                        pod/k6-auth-test-oscillating-auth-service-h2-oscillating-rep1-2q8sv   Started container k6
+36m         Normal    Pulling                        pod/auth-service-88b4cd688-tn5b9                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+36m         Normal    Scheduled                      pod/auth-service-88b4cd688-tn5b9                                      Successfully assigned ecommerce/auth-service-88b4cd688-tn5b9 to aks-userpool-16719200-vmss000010
+36m         Normal    Scheduled                      pod/auth-service-88b4cd688-6l5d2                                      Successfully assigned ecommerce/auth-service-88b4cd688-6l5d2 to aks-userpool-16719200-vmss000011
+36m         Normal    SuccessfulCreate               replicaset/auth-service-88b4cd688                                     Created pod: auth-service-88b4cd688-6l5d2
+36m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-tuned                        New size: 4; reason: cpu resource utilization (percentage of request) above target
+36m         Normal    SuccessfulCreate               replicaset/auth-service-88b4cd688                                     Created pod: auth-service-88b4cd688-s7ssr
+36m         Normal    ScalingReplicaSet              deployment/auth-service                                               Scaled up replica set auth-service-88b4cd688 from 1 to 4
+36m         Normal    Scheduled                      pod/auth-service-88b4cd688-s7ssr                                      Successfully assigned ecommerce/auth-service-88b4cd688-s7ssr to aks-userpool-16719200-vmss000011
+36m         Normal    Started                        pod/auth-service-88b4cd688-6l5d2                                      Started container auth-service
+36m         Normal    Started                        pod/auth-service-88b4cd688-tn5b9                                      Started container auth-service
+36m         Normal    Created                        pod/auth-service-88b4cd688-tn5b9                                      Created container: auth-service
+36m         Normal    Pulled                         pod/auth-service-88b4cd688-tn5b9                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 219ms (219ms including waiting). Image size: 129968897 bytes.
+36m         Normal    Pulling                        pod/auth-service-88b4cd688-6l5d2                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+36m         Normal    Created                        pod/auth-service-88b4cd688-6l5d2                                      Created container: auth-service
+36m         Normal    Pulled                         pod/auth-service-88b4cd688-6l5d2                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 246ms (246ms including waiting). Image size: 129968897 bytes.
+36m         Normal    Started                        pod/auth-service-88b4cd688-s7ssr                                      Started container auth-service
+36m         Normal    Created                        pod/auth-service-88b4cd688-s7ssr                                      Created container: auth-service
+36m         Normal    Pulled                         pod/auth-service-88b4cd688-s7ssr                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 209ms (209ms including waiting). Image size: 129968897 bytes.
+36m         Normal    Pulling                        pod/auth-service-88b4cd688-s7ssr                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+34m         Normal    Pulling                        pod/auth-service-88b4cd688-sxx2b                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+34m         Normal    SuccessfulCreate               replicaset/auth-service-88b4cd688                                     Created pod: auth-service-88b4cd688-sxx2b
+34m         Normal    Scheduled                      pod/auth-service-88b4cd688-sxx2b                                      Successfully assigned ecommerce/auth-service-88b4cd688-sxx2b to aks-userpool-16719200-vmss000011
+34m         Normal    Started                        pod/auth-service-88b4cd688-sxx2b                                      Started container auth-service
+34m         Normal    Created                        pod/auth-service-88b4cd688-sxx2b                                      Created container: auth-service
+34m         Normal    Pulled                         pod/auth-service-88b4cd688-sxx2b                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 178ms (178ms including waiting). Image size: 129968897 bytes.
+32m         Normal    ScalingReplicaSet              deployment/auth-service                                               Scaled down replica set auth-service-88b4cd688 from 5 to 3
+32m         Normal    Killing                        pod/auth-service-88b4cd688-sxx2b                                      Stopping container auth-service
+32m         Normal    Killing                        pod/auth-service-88b4cd688-s7ssr                                      Stopping container auth-service
+31m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-tuned                        New size: 2; reason: All metrics below target
+31m         Normal    Killing                        pod/auth-service-88b4cd688-tn5b9                                      Stopping container auth-service
+31m         Normal    Scheduled                      pod/auth-service-88b4cd688-kwh2x                                      Successfully assigned ecommerce/auth-service-88b4cd688-kwh2x to aks-userpool-16719200-vmss000010
+31m         Normal    Scheduled                      pod/auth-service-88b4cd688-t4m8s                                      Successfully assigned ecommerce/auth-service-88b4cd688-t4m8s to aks-userpool-16719200-vmss000011
+31m         Normal    Scheduled                      pod/auth-service-88b4cd688-rdggz                                      Successfully assigned ecommerce/auth-service-88b4cd688-rdggz to aks-userpool-16719200-vmss000011
+31m         Normal    Started                        pod/auth-service-88b4cd688-kwh2x                                      Started container auth-service
+31m         Normal    Pulled                         pod/auth-service-88b4cd688-kwh2x                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 107ms (107ms including waiting). Image size: 129968897 bytes.
+31m         Normal    Pulling                        pod/auth-service-88b4cd688-rdggz                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+31m         Normal    Pulled                         pod/auth-service-88b4cd688-rdggz                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 256ms (256ms including waiting). Image size: 129968897 bytes.
+31m         Normal    Created                        pod/auth-service-88b4cd688-rdggz                                      Created container: auth-service
+31m         Normal    Pulling                        pod/auth-service-88b4cd688-kwh2x                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+31m         Normal    Created                        pod/auth-service-88b4cd688-kwh2x                                      Created container: auth-service
+31m         Normal    Pulling                        pod/auth-service-88b4cd688-t4m8s                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+31m         Normal    Pulled                         pod/auth-service-88b4cd688-t4m8s                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 205ms (205ms including waiting). Image size: 129968897 bytes.
+31m         Normal    Created                        pod/auth-service-88b4cd688-t4m8s                                      Created container: auth-service
+31m         Normal    Started                        pod/auth-service-88b4cd688-t4m8s                                      Started container auth-service
+31m         Normal    Started                        pod/auth-service-88b4cd688-rdggz                                      Started container auth-service
+30m         Warning   Unhealthy                      pod/auth-service-88b4cd688-t67ms                                      Readiness probe failed: Get "http://10.244.2.139:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+30m         Warning   Unhealthy                      pod/auth-service-88b4cd688-6l5d2                                      Readiness probe failed: Get "http://10.244.1.75:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+28m         Normal    SuccessfulDelete               replicaset/auth-service-88b4cd688                                     Deleted pod: auth-service-88b4cd688-t4m8s
+28m         Normal    Killing                        pod/auth-service-88b4cd688-t4m8s                                      Stopping container auth-service
+28m         Normal    Scheduled                      pod/auth-service-88b4cd688-bgsd8                                      Successfully assigned ecommerce/auth-service-88b4cd688-bgsd8 to aks-userpool-16719200-vmss000011
+28m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-tuned                        New size: 5; reason: cpu resource utilization (percentage of request) above target
+28m         Normal    Pulled                         pod/auth-service-88b4cd688-bgsd8                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 165ms (165ms including waiting). Image size: 129968897 bytes.
+28m         Normal    Created                        pod/auth-service-88b4cd688-bgsd8                                      Created container: auth-service
+28m         Normal    Started                        pod/auth-service-88b4cd688-bgsd8                                      Started container auth-service
+28m         Normal    Pulling                        pod/auth-service-88b4cd688-bgsd8                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+25m         Warning   BackoffLimitExceeded           job/k6-auth-test-oscillating-auth-service-h2-oscillating-rep1         Job has reached the specified backoff limit
+24m         Normal    Killing                        pod/auth-service-88b4cd688-bgsd8                                      Stopping container auth-service
+24m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-tuned                        New size: 4; reason: All metrics below target
+24m         Normal    Killing                        pod/auth-service-88b4cd688-kwh2x                                      Stopping container auth-service
+24m         Normal    SuccessfulDelete               replicaset/auth-service-88b4cd688                                     Deleted pod: auth-service-88b4cd688-kwh2x
+24m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-tuned                        New size: 3; reason: All metrics below target
+23m         Normal    Killing                        pod/auth-service-88b4cd688-6l5d2                                      Stopping container auth-service
+23m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-tuned                        New size: 1; reason: All metrics below target
+23m         Normal    Killing                        pod/auth-service-88b4cd688-rdggz                                      Stopping container auth-service
+16m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/auth-service-hpa-custom                       invalid metrics (1 invalid out of 1), first error is: failed to get pods metric value: unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: no known available metric versions found
+16m         Warning   FailedGetPodsMetric            horizontalpodautoscaler/auth-service-hpa-custom                       unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: no known available metric versions found
+15m         Normal    SuccessfulCreate               job/k6-auth-test-gradual-auth-service-h3-gradual-rep1                 Created pod: k6-auth-test-gradual-auth-service-h3-gradual-rep1-2hth8
+15m         Normal    Scheduled                      pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-2hth8           Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-h3-gradual-rep1-2hth8 to aks-userpool-16719200-vmss000010
+15m         Normal    Pulling                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-2hth8           Pulling image "grafana/k6:latest"
+15m         Normal    Pulled                         pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-2hth8           Successfully pulled image "grafana/k6:latest" in 2.449s (2.449s including waiting). Image size: 36750082 bytes.
+15m         Normal    Created                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-2hth8           Created container: k6
+15m         Normal    Started                        pod/k6-auth-test-gradual-auth-service-h3-gradual-rep1-2hth8           Started container k6
+14m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-custom                       New size: 2; reason: pods metric http_requests_per_second above target
+14m         Normal    Scheduled                      pod/auth-service-88b4cd688-q9bjs                                      Successfully assigned ecommerce/auth-service-88b4cd688-q9bjs to aks-userpool-16719200-vmss000011
+14m         Normal    SuccessfulCreate               replicaset/auth-service-88b4cd688                                     Created pod: auth-service-88b4cd688-q9bjs
+14m         Normal    Pulled                         pod/auth-service-88b4cd688-q9bjs                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 258ms (258ms including waiting). Image size: 129968897 bytes.
+14m         Normal    Created                        pod/auth-service-88b4cd688-q9bjs                                      Created container: auth-service
+14m         Normal    Started                        pod/auth-service-88b4cd688-q9bjs                                      Started container auth-service
+14m         Normal    Pulling                        pod/auth-service-88b4cd688-q9bjs                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+14m         Normal    Scheduled                      pod/auth-service-88b4cd688-765bl                                      Successfully assigned ecommerce/auth-service-88b4cd688-765bl to aks-userpool-16719200-vmss000011
+14m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-custom                       New size: 3; reason: pods metric http_requests_per_second above target
+14m         Normal    SuccessfulCreate               replicaset/auth-service-88b4cd688                                     Created pod: auth-service-88b4cd688-765bl
+14m         Normal    Pulling                        pod/auth-service-88b4cd688-765bl                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+14m         Normal    Started                        pod/auth-service-88b4cd688-765bl                                      Started container auth-service
+14m         Normal    Pulled                         pod/auth-service-88b4cd688-765bl                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 120ms (120ms including waiting). Image size: 129968897 bytes.
+14m         Normal    Created                        pod/auth-service-88b4cd688-765bl                                      Created container: auth-service
+11m         Normal    Pulled                         pod/auth-service-88b4cd688-dgcgx                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 136ms (136ms including waiting). Image size: 129968897 bytes.
+11m         Normal    Pulling                        pod/auth-service-88b4cd688-dgcgx                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+11m         Normal    ScalingReplicaSet              deployment/auth-service                                               Scaled up replica set auth-service-88b4cd688 from 3 to 4
+11m         Normal    Created                        pod/auth-service-88b4cd688-dgcgx                                      Created container: auth-service
+11m         Normal    Started                        pod/auth-service-88b4cd688-dgcgx                                      Started container auth-service
+11m         Normal    Scheduled                      pod/auth-service-88b4cd688-dgcgx                                      Successfully assigned ecommerce/auth-service-88b4cd688-dgcgx to aks-userpool-16719200-vmss000010
+11m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-custom                       New size: 4; reason: pods metric http_requests_per_second above target
+10m         Normal    ScalingReplicaSet              deployment/auth-service                                               Scaled up replica set auth-service-88b4cd688 from 4 to 5
+10m         Normal    Pulling                        pod/auth-service-88b4cd688-lshtd                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+10m         Normal    Scheduled                      pod/auth-service-88b4cd688-lshtd                                      Successfully assigned ecommerce/auth-service-88b4cd688-lshtd to aks-userpool-16719200-vmss000011
+10m         Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-custom                       New size: 5; reason: pods metric http_requests_per_second above target
+10m         Normal    Started                        pod/auth-service-88b4cd688-lshtd                                      Started container auth-service
+10m         Normal    Created                        pod/auth-service-88b4cd688-lshtd                                      Created container: auth-service
+10m         Normal    Pulled                         pod/auth-service-88b4cd688-lshtd                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 154ms (154ms including waiting). Image size: 129968897 bytes.
+3m52s       Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-custom                       New size: 4; reason: All metrics below target
+3m51s       Normal    SuccessfulDelete               replicaset/auth-service-88b4cd688                                     Deleted pod: auth-service-88b4cd688-lshtd
+3m51s       Normal    Killing                        pod/auth-service-88b4cd688-lshtd                                      Stopping container auth-service
+3m51s       Normal    ScalingReplicaSet              deployment/auth-service                                               Scaled down replica set auth-service-88b4cd688 from 5 to 4
+3m21s       Normal    ScalingReplicaSet              deployment/auth-service                                               Scaled down replica set auth-service-88b4cd688 from 4 to 3
+3m21s       Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-custom                       New size: 3; reason: All metrics below target
+3m21s       Normal    SuccessfulDelete               replicaset/auth-service-88b4cd688                                     Deleted pod: auth-service-88b4cd688-dgcgx
+3m21s       Normal    Killing                        pod/auth-service-88b4cd688-dgcgx                                      Stopping container auth-service
+3m8s        Normal    Completed                      job/k6-auth-test-gradual-auth-service-h3-gradual-rep1                 Job completed
+3m6s        Normal    ScalingReplicaSet              deployment/auth-service                                               Scaled down replica set auth-service-88b4cd688 from 3 to 2
+3m6s        Normal    Killing                        pod/auth-service-88b4cd688-765bl                                      Stopping container auth-service
+3m6s        Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-custom                       New size: 2; reason: All metrics below target
+2m51s       Normal    ScalingReplicaSet              deployment/auth-service                                               (combined from similar events): Scaled down replica set auth-service-88b4cd688 from 2 to 1
+2m51s       Normal    SuccessfulRescale              horizontalpodautoscaler/auth-service-hpa-custom                       New size: 1; reason: All metrics below target
+2m51s       Normal    Killing                        pod/auth-service-88b4cd688-q9bjs                                      Stopping container auth-service

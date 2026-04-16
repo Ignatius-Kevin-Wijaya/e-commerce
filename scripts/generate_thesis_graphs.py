@@ -38,20 +38,22 @@ warnings.filterwarnings("ignore")
 # Ordered config list as they appear in the thesis
 CONFIGS = ["b1", "b2", "h1", "h2", "h3", "k1"]
 PATTERNS = ["gradual", "spike", "oscillating"]
-SERVICES = ["product-service", "auth-service"]
+CORE_SERVICES = ["shipping-rate-service", "auth-service"]
+EXPLORATORY_SERVICES = ["product-service"]
+SERVICES = CORE_SERVICES + EXPLORATORY_SERVICES
 REPS = [1, 2, 3, 4, 5]
 
-# AKS D2s_v3 node: $0.096/hour → $0.0000267/second for 1 vCPU
-# Configs request 200m CPU → 0.2 vCPU baseline per pod
-CPU_REQUEST_CORES = 0.2
-PRICE_PER_CPU_SECOND = 0.096 / 3600  # $/second per vCPU core
+# AKS D4as_v5 node: $0.172/hour ÷ 4 vCPU ≈ $0.043/core-hour
+# Core thesis services request 250m CPU → 0.25 vCPU baseline per pod
+CPU_REQUEST_CORES = 0.25
+PRICE_PER_CPU_SECOND = (0.172 / 4) / 3600  # $/second per vCPU core
 
 # Display labels and colors for each config
 CONFIG_LABELS = {
     "b1": "B1 (No Autoscaler)",
     "b2": "B2 (No Autoscaler)",
     "h1": "H1 (HPA CPU)",
-    "h2": "H2 (HPA CPU+Mem)",
+    "h2": "H2 (HPA Tuned CPU)",
     "h3": "H3 (HPA RPS)",
     "k1": "K1 (KEDA RPS)",
 }
@@ -75,6 +77,13 @@ PATTERN_LABELS = {
 }
 
 # ── Utility: Prometheus JSON → DataFrame ───────────────────────────────────
+
+SERVICE_HANDLER_FILTERS = {
+    "product-service": "/products",
+    "auth-service": "/auth/login",
+    "shipping-rate-service": "/shipping/quotes",
+}
+
 
 def load_prom_series(filepath: Path, handler_filter: str = "/products") -> pd.DataFrame:
     """
@@ -193,7 +202,7 @@ def normalize_ts(df: pd.DataFrame, start_epoch: int) -> pd.DataFrame:
 
 # ── Data Loading: single rep ───────────────────────────────────────────────
 
-def load_rep(rep_dir: Path, start_epoch: int = None) -> dict:
+def load_rep(rep_dir: Path, service: str, start_epoch: int = None) -> dict:
     """
     Load all data for a single rep directory.
     Returns a dict with DataFrames and scalar KPIs.
@@ -204,7 +213,7 @@ def load_rep(rep_dir: Path, start_epoch: int = None) -> dict:
             meta = json.load(f)
         start_epoch = meta.get("start_epoch", 0)
 
-    handler = "/products"  # default; auth-service uses /auth/login
+    handler = SERVICE_HANDLER_FILTERS.get(service, "/products")
 
     rps = normalize_ts(
         load_prom_series(rep_dir / "prom_http_requests_rate.json", handler),
@@ -256,7 +265,7 @@ def load_all_data(results_dir: Path) -> dict:
                     if not rep_dir.exists():
                         continue
                     try:
-                        data[service][config][pattern][rep] = load_rep(rep_dir)
+                        data[service][config][pattern][rep] = load_rep(rep_dir, service=service)
                     except Exception as e:
                         print(f"  ⚠️  Skipping {rep_dir.name}: {e}")
 
@@ -699,14 +708,14 @@ def generate_decomposition_table(data: dict, out_dir: Path) -> str:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# GRAPH 5: CPU vs RPS Scatter (product-service diagnostic)
+# GRAPH 5: CPU vs RPS Scatter (product-service exploratory diagnostic)
 # ══════════════════════════════════════════════════════════════════════════════
 
 def plot_cpu_vs_rps(data: dict, out_dir: Path, pattern: str = "spike"):
     """
     Scatterplot: x=RPS, y=CPU %
-    Color encodes time. For product-service b1 (I/O-bound proof).
-    Shows flat CPU despite increasing RPS.
+    Color encodes time for the exploratory product-service run.
+    This is retained as a downstream-bottleneck diagnostic, not a core figure.
     """
     apply_style()
     service = "product-service"
@@ -754,7 +763,7 @@ def plot_cpu_vs_rps(data: dict, out_dir: Path, pattern: str = "spike"):
     ax.set_ylabel("CPU Utilization (%)")
     ax.set_title(
         f"CPU Utilization vs Incoming RPS\n{service} — {PATTERN_LABELS[pattern]}\n"
-        "(Flat CPU despite load increase = I/O-bound bottleneck proof)",
+        "(Exploratory diagnostic for dependency-limited behavior)",
         fontweight="bold"
     )
 
@@ -854,7 +863,7 @@ def main():
 
     if args.dry_run:
         print("🔍 Dry-run mode — data validation only, no graphs rendered.")
-        for service in SERVICES:
+        for service in CORE_SERVICES:
             for config in CONFIGS:
                 for pattern in PATTERNS:
                     reps = data.get(service, {}).get(config, {}).get(pattern, {})
@@ -869,18 +878,18 @@ def main():
 
     # ── Figure 1: Scaling Timeline (all services × patterns) ──────────────
     print("📊 Figure 1: Annotated Scaling Timelines")
-    for service in SERVICES:
+    for service in CORE_SERVICES:
         for pattern in PATTERNS:
             plot_scaling_timeline(data, service, pattern, out_dir)
 
     # ── Figure 2: Pareto Frontier ─────────────────────────────────────────
     print("\n📊 Figure 2: Pareto Frontier Scatterplots")
-    for service in SERVICES:
+    for service in CORE_SERVICES:
         plot_pareto_frontier(data, service, out_dir)
 
     # ── Figure 3: Bar Charts with CI ──────────────────────────────────────
     print("\n📊 Figure 3: Bar Charts with 95% CI Error Bars")
-    for service in SERVICES:
+    for service in CORE_SERVICES:
         plot_bar_charts(data, service, out_dir)
 
     # ── Figure 4: Decomposition Table ────────────────────────────────────
@@ -893,7 +902,7 @@ def main():
 
     # ── Figure 6: Pod Timeline (oscillating) ─────────────────────────────
     print("\n📊 Figure 6: Pod Count Timeline — Oscillating Load")
-    for service in SERVICES:
+    for service in CORE_SERVICES:
         plot_pod_timeline_oscillating(data, service, out_dir)
 
     print(f"\n🎉 Done! All figures saved to ./{out_dir}/")

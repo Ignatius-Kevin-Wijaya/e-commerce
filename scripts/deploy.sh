@@ -23,7 +23,7 @@ kubectl wait --for=condition=ready pod -l app=redis -n "$NAMESPACE" --timeout=12
 
 # Deploy application services
 echo "  🔧 Deploying application services..."
-for svc in auth product cart order payment gateway frontend; do
+for svc in auth product cart order payment shipping carrier-mock gateway frontend; do
     kubectl apply -f "$K8S_DIR/$svc/" -n "$NAMESPACE"
 done
 

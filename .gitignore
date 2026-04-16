@@ -15,7 +15,8 @@ env/
 .env
 .env.local
 .env.*.local
-.env.kind          # KIND local cluster secrets — copy from .env.kind.example
+.env.kind
+# KIND local cluster secrets — copy from .env.kind.example
 
 
 # IDE
@@ -54,3 +55,12 @@ test_output.txt
 
 # Local tooling
 .tools/
+.codex
+.codex-tmp/
+
+# Thesis / generated artifacts
+thesis-figures/
+experiment-results-calibrated/
+*.pdf
+*.md
+!/thesis_blueprint.md

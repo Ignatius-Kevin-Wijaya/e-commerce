@@ -5,8 +5,8 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"labels":{"experiment":"k1-keda"},"name":"product-service-keda","namespace":"ecommerce"},"spec":{"cooldownPeriod":30,"maxReplicaCount":5,"minReplicaCount":1,"pollingInterval":15,"scaleTargetRef":{"name":"product-service"},"triggers":[{"metadata":{"metricName":"http_requests_per_second","query":"sum(rate(http_requests_total{job=\"product-service\"}[1m]))\n","serverAddress":"http://prometheus.monitoring.svc.cluster.local:9090","threshold":"50"},"type":"prometheus"}]}}
-    creationTimestamp: "2026-04-07T12:05:53Z"
+        {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"labels":{"experiment":"k1-keda"},"name":"product-service-keda","namespace":"ecommerce"},"spec":{"cooldownPeriod":30,"maxReplicaCount":5,"minReplicaCount":1,"pollingInterval":15,"scaleTargetRef":{"name":"product-service"},"triggers":[{"metadata":{"metricName":"http_requests_per_second","query":"sum(rate(http_requests_total{job=\"product-service\"}[1m]))\n","serverAddress":"http://prometheus.monitoring.svc.cluster.local:9090","threshold":"5"},"type":"prometheus"}]}}
+    creationTimestamp: "2026-04-14T14:18:27Z"
     finalizers:
     - finalizer.keda.sh
     generation: 1
@@ -15,8 +15,8 @@ items:
       scaledobject.keda.sh/name: product-service-keda
     name: product-service-keda
     namespace: ecommerce
-    resourceVersion: "1024874"
-    uid: aa2fdef2-047a-4186-9dc3-1244cdcdc9ce
+    resourceVersion: "1644946"
+    uid: 433119ef-964c-4829-a0db-cbf7bd357774
   spec:
     cooldownPeriod: 30
     maxReplicaCount: 5
@@ -30,7 +30,7 @@ items:
         query: |
           sum(rate(http_requests_total{job="product-service"}[1m]))
         serverAddress: http://prometheus.monitoring.svc.cluster.local:9090
-        threshold: "50"
+        threshold: "5"
       type: prometheus
   status:
     authenticationsTypes: ""
@@ -52,7 +52,7 @@ items:
     externalMetricNames:
     - s0-prometheus
     hpaName: keda-hpa-product-service-keda
-    lastActiveTime: "2026-04-07T12:26:38Z"
+    lastActiveTime: "2026-04-14T14:38:13Z"
     originalReplicaCount: 1
     scaleTargetGVKR:
       group: apps

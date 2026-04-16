@@ -1,25 +1,103 @@
-LAST SEEN   TYPE      REASON                 OBJECT                                                        MESSAGE
-47m         Normal    Scheduled              pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6r6kz   Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6r6kz to aks-userpool-16719200-vmss00000w
-47m         Normal    SuccessfulCreate       job/k6-auth-test-gradual-auth-service-b1-gradual-rep1         Created pod: k6-auth-test-gradual-auth-service-b1-gradual-rep1-6r6kz
-47m         Normal    Pulling                pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6r6kz   Pulling image "grafana/k6:latest"
-47m         Normal    Started                pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6r6kz   Started container k6
-47m         Normal    Created                pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6r6kz   Created container: k6
-47m         Normal    Pulled                 pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6r6kz   Successfully pulled image "grafana/k6:latest" in 1.539s (1.539s including waiting). Image size: 36750082 bytes.
-40m         Normal    Pulled                 pod/auth-service-7d65757ddb-sndlk                             Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 239ms (239ms including waiting). Image size: 129968897 bytes.
-36m         Normal    Pulled                 pod/auth-service-7d65757ddb-sndlk                             Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 209ms (209ms including waiting). Image size: 129968897 bytes.
-35m         Warning   BackoffLimitExceeded   job/k6-auth-test-gradual-auth-service-b1-gradual-rep1         Job has reached the specified backoff limit
-18m         Normal    Scheduled              pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-lzbzs   Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-b1-gradual-rep1-lzbzs to aks-userpool-16719200-vmss00000w
-18m         Normal    SuccessfulCreate       job/k6-auth-test-gradual-auth-service-b1-gradual-rep1         Created pod: k6-auth-test-gradual-auth-service-b1-gradual-rep1-lzbzs
-18m         Normal    Pulling                pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-lzbzs   Pulling image "grafana/k6:latest"
-18m         Normal    Started                pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-lzbzs   Started container k6
-18m         Normal    Pulled                 pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-lzbzs   Successfully pulled image "grafana/k6:latest" in 1.463s (1.463s including waiting). Image size: 36750082 bytes.
-18m         Normal    Created                pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-lzbzs   Created container: k6
-16m         Warning   Unhealthy              pod/auth-service-7d65757ddb-sndlk                             Liveness probe failed: Get "http://10.244.1.253:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
-8m44s       Normal    Pulled                 pod/auth-service-7d65757ddb-sndlk                             Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 204ms (204ms including waiting). Image size: 129968897 bytes.
-8m11s       Warning   Unhealthy              pod/auth-service-7d65757ddb-sndlk                             Readiness probe failed: Get "http://10.244.1.253:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
-6m22s       Normal    Killing                pod/auth-service-7d65757ddb-sndlk                             Container auth-service failed liveness probe, will be restarted
-6m11s       Normal    Started                pod/auth-service-7d65757ddb-sndlk                             Started container auth-service
-6m11s       Normal    Pulling                pod/auth-service-7d65757ddb-sndlk                             Pulling image "ecommerce.azurecr.io/auth-service:latest"
-6m11s       Normal    Created                pod/auth-service-7d65757ddb-sndlk                             Created container: auth-service
-6m11s       Normal    Pulled                 pod/auth-service-7d65757ddb-sndlk                             Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 172ms (172ms including waiting). Image size: 129968897 bytes.
-5m39s       Warning   BackoffLimitExceeded   job/k6-auth-test-gradual-auth-service-b1-gradual-rep1         Job has reached the specified backoff limit
+LAST SEEN   TYPE      REASON                 OBJECT                                                                MESSAGE
+59m         Warning   Unhealthy              pod/product-service-646fd4c8b8-l9gdw                                  Liveness probe failed: Get "http://10.244.1.124:8002/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+59m         Normal    Created                pod/product-service-646fd4c8b8-7kks2                                  Created container: product-service
+59m         Normal    Pulled                 pod/product-service-646fd4c8b8-7kks2                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 174ms (174ms including waiting). Image size: 114682246 bytes.
+59m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 5; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: product-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+59m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-qr9w2
+59m         Normal    Scheduled              pod/product-service-646fd4c8b8-7kks2                                  Successfully assigned ecommerce/product-service-646fd4c8b8-7kks2 to aks-userpool-16719200-vmss000011
+59m         Normal    Started                pod/product-service-646fd4c8b8-qr9w2                                  Started container product-service
+59m         Normal    Pulling                pod/product-service-646fd4c8b8-7kks2                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+59m         Normal    Pulled                 pod/product-service-646fd4c8b8-qr9w2                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 161ms (161ms including waiting). Image size: 114682246 bytes.
+59m         Normal    Pulling                pod/product-service-646fd4c8b8-qr9w2                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+59m         Normal    Scheduled              pod/product-service-646fd4c8b8-qr9w2                                  Successfully assigned ecommerce/product-service-646fd4c8b8-qr9w2 to aks-userpool-16719200-vmss000010
+59m         Normal    Created                pod/product-service-646fd4c8b8-qr9w2                                  Created container: product-service
+59m         Normal    Started                pod/product-service-646fd4c8b8-7kks2                                  Started container product-service
+53m         Warning   Unhealthy              pod/product-service-646fd4c8b8-7kks2                                  Readiness probe failed: Get "http://10.244.1.13:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+53m         Warning   Unhealthy              pod/product-service-646fd4c8b8-qr9w2                                  Readiness probe failed: Get "http://10.244.2.67:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+51m         Warning   Unhealthy              pod/product-service-646fd4c8b8-l9gdw                                  Readiness probe failed: Get "http://10.244.1.124:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+51m         Warning   Unhealthy              pod/product-service-646fd4c8b8-fqngt                                  Readiness probe failed: Get "http://10.244.1.194:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+50m         Warning   BackoffLimitExceeded   job/k6-load-test-spike-product-service-k1-spike-rep1                  Job has reached the specified backoff limit
+45m         Normal    Killing                pod/product-service-646fd4c8b8-7kks2                                  Stopping container product-service
+45m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-7kks2
+45m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 4; reason: All metrics below target
+45m         Normal    Killing                pod/product-service-646fd4c8b8-fqngt                                  Stopping container product-service
+45m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-fqngt
+45m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-646fd4c8b8 from 4 to 3
+45m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 3; reason: All metrics below target
+45m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 2; reason: All metrics below target
+45m         Normal    Killing                pod/product-service-646fd4c8b8-l9gdw                                  Stopping container product-service
+45m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-646fd4c8b8 from 3 to 2
+45m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-l9gdw
+45m         Normal    Killing                pod/product-service-646fd4c8b8-qr9w2                                  Stopping container product-service
+45m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 1; reason: All metrics below target
+44m         Normal    KEDAScalersStarted     scaledobject/product-service-keda                                     Scaler prometheus is built
+43m         Normal    KEDAScalersStopped     scaledobject/product-service-keda                                     Stopped scalers watch
+43m         Warning   ScaledObjectDeleted    scaledobject/product-service-keda                                     ScaledObject was deleted
+41m         Normal    ScaledObjectReady      scaledobject/product-service-keda                                     ScaledObject is ready for scaling
+41m         Normal    KEDAScalersStarted     scaledobject/product-service-keda                                     Started scalers watch
+41m         Normal    KEDAScalersStarted     scaledobject/product-service-keda                                     Scaler prometheus is built
+40m         Normal    Scheduled              pod/k6-load-test-oscillating-product-service-k1-oscillating-re5966d   Successfully assigned ecommerce/k6-load-test-oscillating-product-service-k1-oscillating-re5966d to aks-userpool-16719200-vmss000010
+40m         Normal    Pulling                pod/k6-load-test-oscillating-product-service-k1-oscillating-re5966d   Pulling image "grafana/k6:latest"
+40m         Normal    SuccessfulCreate       job/k6-load-test-oscillating-product-service-k1-oscillating-rep1      Created pod: k6-load-test-oscillating-product-service-k1-oscillating-re5966d
+40m         Normal    Started                pod/k6-load-test-oscillating-product-service-k1-oscillating-re5966d   Started container k6
+40m         Normal    Pulled                 pod/k6-load-test-oscillating-product-service-k1-oscillating-re5966d   Successfully pulled image "grafana/k6:latest" in 2.598s (2.598s including waiting). Image size: 36750082 bytes.
+40m         Normal    Created                pod/k6-load-test-oscillating-product-service-k1-oscillating-re5966d   Created container: k6
+39m         Normal    Scheduled              pod/product-service-646fd4c8b8-n55ld                                  Successfully assigned ecommerce/product-service-646fd4c8b8-n55ld to aks-userpool-16719200-vmss000011
+39m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-n55ld
+39m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-646fd4c8b8 from 1 to 3
+39m         Normal    Scheduled              pod/product-service-646fd4c8b8-v8jqh                                  Successfully assigned ecommerce/product-service-646fd4c8b8-v8jqh to aks-userpool-16719200-vmss000011
+39m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 3; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: product-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+39m         Normal    Pulled                 pod/product-service-646fd4c8b8-v8jqh                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 302ms (302ms including waiting). Image size: 114682246 bytes.
+39m         Normal    Pulling                pod/product-service-646fd4c8b8-v8jqh                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+39m         Normal    Started                pod/product-service-646fd4c8b8-n55ld                                  Started container product-service
+39m         Normal    Pulling                pod/product-service-646fd4c8b8-n55ld                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+39m         Normal    Created                pod/product-service-646fd4c8b8-v8jqh                                  Created container: product-service
+39m         Normal    Created                pod/product-service-646fd4c8b8-n55ld                                  Created container: product-service
+39m         Normal    Pulled                 pod/product-service-646fd4c8b8-n55ld                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 302ms (302ms including waiting). Image size: 114682246 bytes.
+39m         Normal    Started                pod/product-service-646fd4c8b8-v8jqh                                  Started container product-service
+36m         Normal    Scheduled              pod/product-service-646fd4c8b8-fht7x                                  Successfully assigned ecommerce/product-service-646fd4c8b8-fht7x to aks-userpool-16719200-vmss000011
+36m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 5; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: product-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+36m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-rxhzx
+36m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-646fd4c8b8 from 3 to 5
+36m         Normal    Scheduled              pod/product-service-646fd4c8b8-rxhzx                                  Successfully assigned ecommerce/product-service-646fd4c8b8-rxhzx to aks-userpool-16719200-vmss000010
+36m         Normal    Pulled                 pod/product-service-646fd4c8b8-rxhzx                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 140ms (140ms including waiting). Image size: 114682246 bytes.
+36m         Normal    Created                pod/product-service-646fd4c8b8-fht7x                                  Created container: product-service
+36m         Normal    Pulling                pod/product-service-646fd4c8b8-fht7x                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+36m         Normal    Pulled                 pod/product-service-646fd4c8b8-fht7x                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 179ms (179ms including waiting). Image size: 114682246 bytes.
+36m         Normal    Started                pod/product-service-646fd4c8b8-rxhzx                                  Started container product-service
+36m         Normal    Created                pod/product-service-646fd4c8b8-rxhzx                                  Created container: product-service
+36m         Normal    Pulling                pod/product-service-646fd4c8b8-rxhzx                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+36m         Normal    Started                pod/product-service-646fd4c8b8-fht7x                                  Started container product-service
+31m         Warning   Unhealthy              pod/product-service-646fd4c8b8-95jhr                                  Readiness probe failed: Get "http://10.244.1.78:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+30m         Warning   Unhealthy              pod/product-service-646fd4c8b8-fht7x                                  Readiness probe failed: Get "http://10.244.1.207:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+30m         Warning   Unhealthy              pod/product-service-646fd4c8b8-rxhzx                                  Readiness probe failed: Get "http://10.244.2.70:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+29m         Warning   Unhealthy              pod/product-db-0                                                      Readiness probe failed: command timed out: "pg_isready -U product_user -d product_db" timed out after 1s
+28m         Warning   Unhealthy              pod/product-service-646fd4c8b8-v8jqh                                  Readiness probe failed: Get "http://10.244.1.46:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+28m         Warning   Unhealthy              pod/product-service-646fd4c8b8-n55ld                                  Readiness probe failed: Get "http://10.244.1.40:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+27m         Warning   BackoffLimitExceeded   job/k6-load-test-oscillating-product-service-k1-oscillating-rep1      Job has reached the specified backoff limit
+22m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-646fd4c8b8 from 5 to 4
+22m         Normal    Killing                pod/product-service-646fd4c8b8-fht7x                                  Stopping container product-service
+22m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-fht7x
+22m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 4; reason: All metrics below target
+22m         Normal    Killing                pod/product-service-646fd4c8b8-95jhr                                  Stopping container product-service
+22m         Normal    Killing                pod/product-service-646fd4c8b8-n55ld                                  Stopping container product-service
+22m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-646fd4c8b8 from 4 to 2
+22m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-n55ld
+22m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 2; reason: All metrics below target
+22m         Warning   Unhealthy              pod/product-service-646fd4c8b8-95jhr                                  Readiness probe failed: Get "http://10.244.1.78:8002/ready": dial tcp 10.244.1.78:8002: connect: connection refused
+22m         Normal    Killing                pod/product-service-646fd4c8b8-rxhzx                                  Stopping container product-service
+22m         Normal    SuccessfulRescale      horizontalpodautoscaler/keda-hpa-product-service-keda                 New size: 1; reason: All metrics below target
+18m         Normal    Scheduled              pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6fk5q           Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6fk5q to aks-userpool-16719200-vmss000010
+18m         Normal    Pulling                pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6fk5q           Pulling image "grafana/k6:latest"
+18m         Normal    SuccessfulCreate       job/k6-auth-test-gradual-auth-service-b1-gradual-rep1                 Created pod: k6-auth-test-gradual-auth-service-b1-gradual-rep1-6fk5q
+18m         Normal    Pulled                 pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6fk5q           Successfully pulled image "grafana/k6:latest" in 1.523s (1.523s including waiting). Image size: 36750082 bytes.
+18m         Normal    Created                pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6fk5q           Created container: k6
+18m         Normal    Started                pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-6fk5q           Started container k6
+10m         Warning   Unhealthy              pod/auth-service-88b4cd688-dztwq                                      Liveness probe failed: Get "http://10.244.2.146:8001/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+9m7s        Warning   Unhealthy              pod/auth-service-88b4cd688-dztwq                                      Readiness probe failed: Get "http://10.244.2.146:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+7m59s       Normal    Killing                pod/auth-service-88b4cd688-dztwq                                      Container auth-service failed liveness probe, will be restarted
+7m33s       Normal    Pulled                 pod/auth-service-88b4cd688-dztwq                                      Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 251ms (251ms including waiting). Image size: 129968897 bytes.
+7m33s       Normal    Started                pod/auth-service-88b4cd688-dztwq                                      Started container auth-service
+7m33s       Normal    Created                pod/auth-service-88b4cd688-dztwq                                      Created container: auth-service
+7m33s       Normal    Pulling                pod/auth-service-88b4cd688-dztwq                                      Pulling image "ecommerce.azurecr.io/auth-service:latest"
+5m32s       Warning   BackoffLimitExceeded   job/k6-auth-test-gradual-auth-service-b1-gradual-rep1                 Job has reached the specified backoff limit

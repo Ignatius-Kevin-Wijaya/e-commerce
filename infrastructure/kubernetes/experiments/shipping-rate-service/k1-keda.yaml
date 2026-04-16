@@ -1,0 +1,25 @@
+# K1: KEDA Prometheus Trigger — shipping-rate-service
+# Initial threshold is a starting point for live calibration and must match H3.
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: shipping-rate-service-keda
+  namespace: ecommerce
+  labels:
+    experiment: k1-keda
+spec:
+  scaleTargetRef:
+    name: shipping-rate-service
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  cooldownPeriod: 30
+  pollingInterval: 15
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus.monitoring.svc.cluster.local:9090
+        metricName: http_requests_per_second
+        query: |
+          sum(rate(http_requests_total{job="shipping-rate-service"}[1m]))
+        threshold: "5"

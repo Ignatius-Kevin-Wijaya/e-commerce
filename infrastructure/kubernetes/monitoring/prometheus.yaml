@@ -87,7 +87,7 @@ data:
           # Only scrape pods matching our app services (not redis/postgres/k6)
           - source_labels: [__meta_kubernetes_pod_label_app]
             action: keep
-            regex: (api-gateway|auth-service|product-service|cart-service|order-service|payment-service)
+            regex: (api-gateway|auth-service|product-service|cart-service|order-service|payment-service|shipping-rate-service|carrier-mock-service)
           # Set job label to the app name (e.g., "product-service")
           # This preserves backward compatibility with existing queries
           - source_labels: [__meta_kubernetes_pod_label_app]

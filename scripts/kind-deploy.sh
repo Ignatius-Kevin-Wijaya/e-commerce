@@ -26,7 +26,7 @@ kubectl wait --namespace ingress-nginx \
 
 # 3. Build & Load Docker Images
 echo "  🐳 Building and loading Docker images into KIND..."
-services=("auth" "product" "cart" "order" "payment")
+    services=("auth" "product" "cart" "order" "payment" "shipping-rate" "carrier-mock")
 for svc in "${services[@]}"; do
     echo "    Building ${svc}-service..."
     docker build -q -t "ghcr.io/your-org/ecommerce-${svc}-service:latest" "backend/services/${svc}-service" >/dev/null
@@ -57,9 +57,9 @@ kubectl wait --for=condition=ready pod -l app=redis -n "$NAMESPACE" --timeout=12
 
 # 5. Apply Application Services
 echo "  🔧 Deploying Application Services..."
-for svc in auth product cart order payment gateway frontend; do
-    kubectl apply -f "infrastructure/kubernetes/$svc/" -n "$NAMESPACE"
-done
+    for svc in auth product cart order payment shipping carrier-mock gateway frontend; do
+        kubectl apply -f "infrastructure/kubernetes/$svc/" -n "$NAMESPACE"
+    done
 
 kubectl apply -f infrastructure/kubernetes/ingress/ingress.yaml -n "$NAMESPACE"
 

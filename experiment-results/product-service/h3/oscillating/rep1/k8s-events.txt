@@ -1,29 +1,355 @@
-LAST SEEN   TYPE      REASON                         OBJECT                                                                MESSAGE
-62m         Normal    Scheduled                      pod/k6-load-test-gradual-product-service-h3-gradual-rep1-gfbmx        Successfully assigned ecommerce/k6-load-test-gradual-product-service-h3-gradual-rep1-gfbmx to aks-userpool-16719200-vmss00000h
-40m         Normal    Scheduled                      pod/k6-load-test-spike-product-service-h3-spike-rep1-hdxc6            Successfully assigned ecommerce/k6-load-test-spike-product-service-h3-spike-rep1-hdxc6 to aks-userpool-16719200-vmss00000h
-18m         Normal    Scheduled                      pod/k6-load-test-oscillating-product-service-h3-oscillating-rep74n6   Successfully assigned ecommerce/k6-load-test-oscillating-product-service-h3-oscillating-rep74n6 to aks-userpool-16719200-vmss00000h
-62m         Normal    SuccessfulCreate               job/k6-load-test-gradual-product-service-h3-gradual-rep1              Created pod: k6-load-test-gradual-product-service-h3-gradual-rep1-gfbmx
-62m         Normal    Pulling                        pod/k6-load-test-gradual-product-service-h3-gradual-rep1-gfbmx        Pulling image "grafana/k6:latest"
-62m         Normal    Pulled                         pod/k6-load-test-gradual-product-service-h3-gradual-rep1-gfbmx        Successfully pulled image "grafana/k6:latest" in 1.51s (1.51s including waiting). Image size: 36750082 bytes.
-62m         Normal    Created                        pod/k6-load-test-gradual-product-service-h3-gradual-rep1-gfbmx        Created container: k6
-62m         Normal    Started                        pod/k6-load-test-gradual-product-service-h3-gradual-rep1-gfbmx        Started container k6
-61m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/product-service-hpa-custom                    invalid metrics (1 invalid out of 1), first error is: failed to get pods metric value: unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server could not find the metric http_requests_per_second for pods
-50m         Warning   BackoffLimitExceeded           job/k6-load-test-gradual-product-service-h3-gradual-rep1              Job has reached the specified backoff limit
-44m         Warning   FailedGetPodsMetric            horizontalpodautoscaler/product-service-hpa-custom                    unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server could not find the metric http_requests_per_second for pods
-40m         Normal    SuccessfulCreate               job/k6-load-test-spike-product-service-h3-spike-rep1                  Created pod: k6-load-test-spike-product-service-h3-spike-rep1-hdxc6
-40m         Normal    Pulling                        pod/k6-load-test-spike-product-service-h3-spike-rep1-hdxc6            Pulling image "grafana/k6:latest"
-40m         Normal    Pulled                         pod/k6-load-test-spike-product-service-h3-spike-rep1-hdxc6            Successfully pulled image "grafana/k6:latest" in 1.892s (1.892s including waiting). Image size: 36750082 bytes.
-40m         Normal    Created                        pod/k6-load-test-spike-product-service-h3-spike-rep1-hdxc6            Created container: k6
-40m         Normal    Started                        pod/k6-load-test-spike-product-service-h3-spike-rep1-hdxc6            Started container k6
-39m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/product-service-hpa-custom                    invalid metrics (1 invalid out of 1), first error is: failed to get pods metric value: unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server could not find the metric http_requests_per_second for pods
-28m         Warning   BackoffLimitExceeded           job/k6-load-test-spike-product-service-h3-spike-rep1                  Job has reached the specified backoff limit
-22m         Warning   FailedGetPodsMetric            horizontalpodautoscaler/product-service-hpa-custom                    unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server could not find the metric http_requests_per_second for pods
-18m         Normal    SuccessfulCreate               job/k6-load-test-oscillating-product-service-h3-oscillating-rep1      Created pod: k6-load-test-oscillating-product-service-h3-oscillating-rep74n6
-18m         Normal    Pulling                        pod/k6-load-test-oscillating-product-service-h3-oscillating-rep74n6   Pulling image "grafana/k6:latest"
-18m         Normal    Started                        pod/k6-load-test-oscillating-product-service-h3-oscillating-rep74n6   Started container k6
-18m         Normal    Created                        pod/k6-load-test-oscillating-product-service-h3-oscillating-rep74n6   Created container: k6
-18m         Normal    Pulled                         pod/k6-load-test-oscillating-product-service-h3-oscillating-rep74n6   Successfully pulled image "grafana/k6:latest" in 1.442s (1.442s including waiting). Image size: 36750082 bytes.
-17m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/product-service-hpa-custom                    invalid metrics (1 invalid out of 1), first error is: failed to get pods metric value: unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server could not find the metric http_requests_per_second for pods
-9m45s       Warning   Unhealthy                      pod/product-service-75f4ddbd56-5xxkf                                  Readiness probe failed: Get "http://10.244.1.120:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
-6m2s        Warning   BackoffLimitExceeded           job/k6-load-test-oscillating-product-service-h3-oscillating-rep1      Job has reached the specified backoff limit
-34s         Warning   FailedGetPodsMetric            horizontalpodautoscaler/product-service-hpa-custom                    unable to get metric http_requests_per_second: unable to fetch metrics from custom metrics API: the server could not find the metric http_requests_per_second for pods
+LAST SEEN   TYPE      REASON                 OBJECT                                                                MESSAGE
+59m         Normal    Scheduled              pod/product-service-646fd4c8b8-vd6sg                                  Successfully assigned ecommerce/product-service-646fd4c8b8-vd6sg to aks-userpool-16719200-vmss000010
+59m         Normal    Created                pod/product-service-646fd4c8b8-8lv44                                  Created container: product-service
+59m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-8lv44
+59m         Normal    Scheduled              pod/product-service-646fd4c8b8-8lv44                                  Successfully assigned ecommerce/product-service-646fd4c8b8-8lv44 to aks-userpool-16719200-vmss000011
+59m         Normal    Pulling                pod/product-service-646fd4c8b8-8lv44                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+59m         Normal    Created                pod/product-service-646fd4c8b8-vd6sg                                  Created container: product-service
+59m         Normal    Pulled                 pod/product-service-646fd4c8b8-8lv44                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 159ms (159ms including waiting). Image size: 114682246 bytes.
+59m         Normal    Started                pod/product-service-646fd4c8b8-vd6sg                                  Started container product-service
+59m         Normal    Pulled                 pod/product-service-646fd4c8b8-vd6sg                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 153ms (153ms including waiting). Image size: 114682246 bytes.
+59m         Normal    Pulling                pod/product-service-646fd4c8b8-vd6sg                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+59m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-vd6sg
+59m         Normal    Started                pod/product-service-646fd4c8b8-8lv44                                  Started container product-service
+58m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 4; reason: All metrics below target
+58m         Normal    Killing                pod/product-service-646fd4c8b8-vd6sg                                  Stopping container product-service
+58m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-vd6sg
+58m         Warning   Unhealthy              pod/product-service-646fd4c8b8-vd6sg                                  Readiness probe failed: Get "http://10.244.2.32:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+58m         Warning   Unhealthy              pod/product-service-646fd4c8b8-vd6sg                                  Readiness probe failed: Get "http://10.244.2.32:8002/ready": dial tcp 10.244.2.32:8002: connect: connection refused
+57m         Normal    Scheduled              pod/product-service-646fd4c8b8-hpbsv                                  Successfully assigned ecommerce/product-service-646fd4c8b8-hpbsv to aks-userpool-16719200-vmss000010
+57m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 5; reason: pods metric http_requests_per_second above target
+57m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-hpbsv
+57m         Normal    Created                pod/product-service-646fd4c8b8-hpbsv                                  Created container: product-service
+57m         Normal    Started                pod/product-service-646fd4c8b8-hpbsv                                  Started container product-service
+57m         Normal    Pulling                pod/product-service-646fd4c8b8-hpbsv                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+57m         Normal    Pulled                 pod/product-service-646fd4c8b8-hpbsv                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 170ms (170ms including waiting). Image size: 114682246 bytes.
+53m         Warning   Unhealthy              pod/product-service-646fd4c8b8-8lv44                                  Readiness probe failed: Get "http://10.244.1.239:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+52m         Warning   Unhealthy              pod/product-service-646fd4c8b8-hpbsv                                  Readiness probe failed: Get "http://10.244.2.117:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+50m         Warning   Unhealthy              pod/product-service-646fd4c8b8-ckjlm                                  Readiness probe failed: Get "http://10.244.2.21:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+50m         Warning   Unhealthy              pod/product-service-646fd4c8b8-h7zhw                                  Readiness probe failed: Get "http://10.244.1.0:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+49m         Warning   BackoffLimitExceeded   job/k6-load-test-gradual-product-service-h3-gradual-rep1              Job has reached the specified backoff limit
+49m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 3; reason: All metrics below target
+49m         Normal    Killing                pod/product-service-646fd4c8b8-ckjlm                                  Stopping container product-service
+49m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-ckjlm
+49m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-hpbsv
+49m         Normal    Killing                pod/product-service-646fd4c8b8-hpbsv                                  Stopping container product-service
+48m         Normal    Killing                pod/product-service-646fd4c8b8-8lv44                                  Stopping container product-service
+48m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 1; reason: All metrics below target
+48m         Normal    Killing                pod/product-service-646fd4c8b8-h7zhw                                  Stopping container product-service
+48m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-h7zhw
+48m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-8lv44
+40m         Normal    SuccessfulCreate       job/k6-load-test-spike-product-service-h3-spike-rep1                  Created pod: k6-load-test-spike-product-service-h3-spike-rep1-zbp6n
+40m         Normal    Pulling                pod/k6-load-test-spike-product-service-h3-spike-rep1-zbp6n            Pulling image "grafana/k6:latest"
+40m         Normal    Scheduled              pod/k6-load-test-spike-product-service-h3-spike-rep1-zbp6n            Successfully assigned ecommerce/k6-load-test-spike-product-service-h3-spike-rep1-zbp6n to aks-userpool-16719200-vmss000011
+40m         Normal    Pulled                 pod/k6-load-test-spike-product-service-h3-spike-rep1-zbp6n            Successfully pulled image "grafana/k6:latest" in 1.4s (1.4s including waiting). Image size: 36750082 bytes.
+40m         Normal    Created                pod/k6-load-test-spike-product-service-h3-spike-rep1-zbp6n            Created container: k6
+40m         Normal    Started                pod/k6-load-test-spike-product-service-h3-spike-rep1-zbp6n            Started container k6
+39m         Normal    Scheduled              pod/product-service-646fd4c8b8-dwgv9                                  Successfully assigned ecommerce/product-service-646fd4c8b8-dwgv9 to aks-userpool-16719200-vmss000010
+39m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-dwgv9
+39m         Normal    Pulling                pod/product-service-646fd4c8b8-dwgv9                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+39m         Normal    Started                pod/product-service-646fd4c8b8-dwgv9                                  Started container product-service
+39m         Normal    Pulled                 pod/product-service-646fd4c8b8-dwgv9                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 214ms (214ms including waiting). Image size: 114682246 bytes.
+39m         Normal    Created                pod/product-service-646fd4c8b8-dwgv9                                  Created container: product-service
+39m         Normal    Scheduled              pod/product-service-646fd4c8b8-2bqjg                                  Successfully assigned ecommerce/product-service-646fd4c8b8-2bqjg to aks-userpool-16719200-vmss000011
+39m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-2bqjg
+39m         Normal    Created                pod/product-service-646fd4c8b8-2bqjg                                  Created container: product-service
+39m         Normal    Pulling                pod/product-service-646fd4c8b8-2bqjg                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+39m         Normal    Pulled                 pod/product-service-646fd4c8b8-2bqjg                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 124ms (124ms including waiting). Image size: 114682246 bytes.
+39m         Normal    Started                pod/product-service-646fd4c8b8-2bqjg                                  Started container product-service
+38m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-dwgv9
+38m         Normal    Killing                pod/product-service-646fd4c8b8-dwgv9                                  Stopping container product-service
+38m         Warning   Unhealthy              pod/product-service-646fd4c8b8-dwgv9                                  Readiness probe failed: Get "http://10.244.2.156:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+37m         Warning   Unhealthy              pod/product-service-646fd4c8b8-dwgv9                                  Readiness probe failed: Get "http://10.244.2.156:8002/ready": dial tcp 10.244.2.156:8002: connect: connection refused
+37m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-646fd4c8b8 from 2 to 3
+37m         Normal    Created                pod/product-service-646fd4c8b8-zfgk5                                  Created container: product-service
+37m         Normal    Started                pod/product-service-646fd4c8b8-zfgk5                                  Started container product-service
+37m         Normal    Pulled                 pod/product-service-646fd4c8b8-zfgk5                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 173ms (173ms including waiting). Image size: 114682246 bytes.
+37m         Normal    Pulling                pod/product-service-646fd4c8b8-zfgk5                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+37m         Normal    Scheduled              pod/product-service-646fd4c8b8-zfgk5                                  Successfully assigned ecommerce/product-service-646fd4c8b8-zfgk5 to aks-userpool-16719200-vmss000010
+37m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 3; reason: pods metric http_requests_per_second above target
+37m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-zfgk5
+37m         Normal    Scheduled              pod/product-service-646fd4c8b8-vng5q                                  Successfully assigned ecommerce/product-service-646fd4c8b8-vng5q to aks-userpool-16719200-vmss000011
+37m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-gg8rr
+37m         Normal    Started                pod/product-service-646fd4c8b8-vng5q                                  Started container product-service
+37m         Normal    Created                pod/product-service-646fd4c8b8-vng5q                                  Created container: product-service
+37m         Normal    Pulled                 pod/product-service-646fd4c8b8-vng5q                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 125ms (125ms including waiting). Image size: 114682246 bytes.
+37m         Normal    Scheduled              pod/product-service-646fd4c8b8-gg8rr                                  Successfully assigned ecommerce/product-service-646fd4c8b8-gg8rr to aks-userpool-16719200-vmss000010
+37m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-646fd4c8b8 from 3 to 5
+37m         Normal    Pulling                pod/product-service-646fd4c8b8-vng5q                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+37m         Normal    Pulling                pod/product-service-646fd4c8b8-gg8rr                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+37m         Normal    Pulled                 pod/product-service-646fd4c8b8-gg8rr                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 132ms (132ms including waiting). Image size: 114682246 bytes.
+37m         Normal    Created                pod/product-service-646fd4c8b8-gg8rr                                  Created container: product-service
+37m         Normal    Started                pod/product-service-646fd4c8b8-gg8rr                                  Started container product-service
+37m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-vng5q
+36m         Normal    Killing                pod/product-service-646fd4c8b8-zfgk5                                  Stopping container product-service
+36m         Normal    Killing                pod/product-service-646fd4c8b8-gg8rr                                  Stopping container product-service
+36m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-zfgk5
+36m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-gg8rr
+36m         Warning   Unhealthy              pod/product-service-646fd4c8b8-gg8rr                                  Readiness probe failed: Get "http://10.244.2.155:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+36m         Warning   Unhealthy              pod/product-service-646fd4c8b8-zfgk5                                  Readiness probe failed: Get "http://10.244.2.122:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+36m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-vng5q
+36m         Normal    Killing                pod/product-service-646fd4c8b8-vng5q                                  Stopping container product-service
+36m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-646fd4c8b8 from 3 to 2
+35m         Warning   Unhealthy              pod/product-service-646fd4c8b8-vng5q                                  Readiness probe failed: Get "http://10.244.1.220:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+35m         Warning   Unhealthy              pod/product-service-646fd4c8b8-gg8rr                                  Readiness probe failed: Get "http://10.244.2.155:8002/ready": dial tcp 10.244.2.155:8002: connect: connection refused
+35m         Warning   Unhealthy              pod/product-service-646fd4c8b8-zfgk5                                  Readiness probe failed: Get "http://10.244.2.122:8002/ready": dial tcp 10.244.2.122:8002: connect: connection refused
+35m         Warning   Unhealthy              pod/product-service-646fd4c8b8-2bqjg                                  Readiness probe failed: Get "http://10.244.1.66:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+35m         Warning   Unhealthy              pod/product-service-646fd4c8b8-vng5q                                  Readiness probe failed: Get "http://10.244.1.220:8002/ready": dial tcp 10.244.1.220:8002: connect: connection refused
+35m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-2bqjg
+35m         Normal    Killing                pod/product-service-646fd4c8b8-2bqjg                                  Stopping container product-service
+35m         Normal    Scheduled              pod/product-service-646fd4c8b8-sp965                                  Successfully assigned ecommerce/product-service-646fd4c8b8-sp965 to aks-userpool-16719200-vmss000010
+35m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 2; reason: pods metric http_requests_per_second above target
+35m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-646fd4c8b8 from 1 to 2
+35m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-sp965
+35m         Normal    Started                pod/product-service-646fd4c8b8-sp965                                  Started container product-service
+35m         Normal    Created                pod/product-service-646fd4c8b8-sp965                                  Created container: product-service
+35m         Normal    Pulled                 pod/product-service-646fd4c8b8-sp965                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 181ms (181ms including waiting). Image size: 114682246 bytes.
+35m         Normal    Pulling                pod/product-service-646fd4c8b8-sp965                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+35m         Warning   Unhealthy              pod/product-service-646fd4c8b8-2bqjg                                  Readiness probe failed: Get "http://10.244.1.66:8002/ready": dial tcp 10.244.1.66:8002: connect: connection refused
+35m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-wlr6c
+35m         Normal    Scheduled              pod/product-service-646fd4c8b8-6zntb                                  Successfully assigned ecommerce/product-service-646fd4c8b8-6zntb to aks-userpool-16719200-vmss000010
+35m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-6zntb
+35m         Normal    Scheduled              pod/product-service-646fd4c8b8-wlr6c                                  Successfully assigned ecommerce/product-service-646fd4c8b8-wlr6c to aks-userpool-16719200-vmss000011
+35m         Normal    Started                pod/product-service-646fd4c8b8-6zntb                                  Started container product-service
+35m         Normal    Pulled                 pod/product-service-646fd4c8b8-6zntb                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 96ms (96ms including waiting). Image size: 114682246 bytes.
+35m         Normal    Pulling                pod/product-service-646fd4c8b8-wlr6c                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+35m         Normal    Pulling                pod/product-service-646fd4c8b8-6zntb                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+35m         Normal    Started                pod/product-service-646fd4c8b8-wlr6c                                  Started container product-service
+35m         Normal    Created                pod/product-service-646fd4c8b8-wlr6c                                  Created container: product-service
+35m         Normal    Created                pod/product-service-646fd4c8b8-6zntb                                  Created container: product-service
+35m         Normal    Pulled                 pod/product-service-646fd4c8b8-wlr6c                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 127ms (127ms including waiting). Image size: 114682246 bytes.
+34m         Normal    Scheduled              pod/product-service-646fd4c8b8-rh64x                                  Successfully assigned ecommerce/product-service-646fd4c8b8-rh64x to aks-userpool-16719200-vmss000011
+34m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-rh64x
+34m         Normal    Started                pod/product-service-646fd4c8b8-rh64x                                  Started container product-service
+34m         Normal    Pulled                 pod/product-service-646fd4c8b8-rh64x                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 169ms (169ms including waiting). Image size: 114682246 bytes.
+34m         Normal    Pulling                pod/product-service-646fd4c8b8-rh64x                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+34m         Normal    Created                pod/product-service-646fd4c8b8-rh64x                                  Created container: product-service
+34m         Normal    Killing                pod/product-service-646fd4c8b8-6zntb                                  Stopping container product-service
+34m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-sp965
+34m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-6zntb
+34m         Normal    Killing                pod/product-service-646fd4c8b8-sp965                                  Stopping container product-service
+34m         Warning   Unhealthy              pod/product-service-646fd4c8b8-6zntb                                  Readiness probe failed: Get "http://10.244.2.186:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+33m         Warning   Unhealthy              pod/product-service-646fd4c8b8-sp965                                  Readiness probe failed: Get "http://10.244.2.118:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+33m         Warning   Unhealthy              pod/product-service-646fd4c8b8-6zntb                                  Readiness probe failed: Get "http://10.244.2.186:8002/ready": dial tcp 10.244.2.186:8002: connect: connection refused
+33m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-rh64x
+33m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-wlr6c
+33m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-646fd4c8b8 from 3 to 1
+33m         Normal    Killing                pod/product-service-646fd4c8b8-wlr6c                                  Stopping container product-service
+33m         Warning   Unhealthy              pod/product-service-646fd4c8b8-sp965                                  Readiness probe failed: Get "http://10.244.2.118:8002/ready": dial tcp 10.244.2.118:8002: connect: connection refused
+33m         Normal    Killing                pod/product-service-646fd4c8b8-rh64x                                  Stopping container product-service
+33m         Warning   Unhealthy              pod/product-service-646fd4c8b8-wlr6c                                  Readiness probe failed: Get "http://10.244.1.5:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+33m         Warning   Unhealthy              pod/product-service-646fd4c8b8-rh64x                                  Readiness probe failed: Get "http://10.244.1.37:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+33m         Warning   Unhealthy              pod/product-service-646fd4c8b8-wlr6c                                  Readiness probe failed: Get "http://10.244.1.5:8002/ready": dial tcp 10.244.1.5:8002: connect: connection refused
+33m         Warning   Unhealthy              pod/product-service-646fd4c8b8-rh64x                                  Readiness probe failed: Get "http://10.244.1.37:8002/ready": dial tcp 10.244.1.37:8002: connect: connection refused
+32m         Normal    Pulled                 pod/product-service-646fd4c8b8-vd4fw                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 156ms (156ms including waiting). Image size: 114682246 bytes.
+32m         Normal    Scheduled              pod/product-service-646fd4c8b8-vd4fw                                  Successfully assigned ecommerce/product-service-646fd4c8b8-vd4fw to aks-userpool-16719200-vmss000010
+32m         Normal    Pulling                pod/product-service-646fd4c8b8-vd4fw                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+32m         Normal    Created                pod/product-service-646fd4c8b8-vd4fw                                  Created container: product-service
+32m         Normal    Pulling                pod/product-service-646fd4c8b8-szzvn                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+32m         Normal    Scheduled              pod/product-service-646fd4c8b8-szzvn                                  Successfully assigned ecommerce/product-service-646fd4c8b8-szzvn to aks-userpool-16719200-vmss000011
+32m         Normal    Started                pod/product-service-646fd4c8b8-vd4fw                                  Started container product-service
+32m         Normal    Scheduled              pod/product-service-646fd4c8b8-6tzh4                                  Successfully assigned ecommerce/product-service-646fd4c8b8-6tzh4 to aks-userpool-16719200-vmss000010
+32m         Normal    Pulling                pod/product-service-646fd4c8b8-6tzh4                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+32m         Normal    Pulled                 pod/product-service-646fd4c8b8-bq2ns                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 211ms (211ms including waiting). Image size: 114682246 bytes.
+32m         Normal    Pulling                pod/product-service-646fd4c8b8-bq2ns                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+32m         Normal    Scheduled              pod/product-service-646fd4c8b8-bq2ns                                  Successfully assigned ecommerce/product-service-646fd4c8b8-bq2ns to aks-userpool-16719200-vmss000011
+32m         Normal    Created                pod/product-service-646fd4c8b8-szzvn                                  Created container: product-service
+32m         Normal    Pulled                 pod/product-service-646fd4c8b8-szzvn                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 252ms (252ms including waiting). Image size: 114682246 bytes.
+32m         Normal    Started                pod/product-service-646fd4c8b8-szzvn                                  Started container product-service
+32m         Normal    Started                pod/product-service-646fd4c8b8-bq2ns                                  Started container product-service
+32m         Normal    Pulled                 pod/product-service-646fd4c8b8-6tzh4                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 115ms (115ms including waiting). Image size: 114682246 bytes.
+32m         Normal    Created                pod/product-service-646fd4c8b8-6tzh4                                  Created container: product-service
+32m         Normal    Started                pod/product-service-646fd4c8b8-6tzh4                                  Started container product-service
+32m         Normal    Created                pod/product-service-646fd4c8b8-bq2ns                                  Created container: product-service
+32m         Warning   Unhealthy              pod/product-service-646fd4c8b8-q7dm4                                  Readiness probe failed: Get "http://10.244.2.183:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+32m         Warning   Unhealthy              pod/product-db-0                                                      Readiness probe errored and resulted in unknown state: rpc error: code = Unknown desc = failed to exec in container: failed to start exec "fd20ef8b76c8ebc78b101d3ed8197b961c12a2f0eacd4f282edbb33f9f767be6": OCI runtime exec failed: exec failed: unable to start container process: error executing setns process: exit status 1; runc init error(s): nsexec-1[445269]: failed to open /proc/208567/ns/ipc: No such file or directory; nsexec-0[445268]: failed to sync with stage-1: next state (got 0 of 4 bytes): unknown
+31m         Normal    Killing                pod/product-service-646fd4c8b8-vd4fw                                  Stopping container product-service
+31m         Normal    Killing                pod/product-service-646fd4c8b8-bq2ns                                  Stopping container product-service
+31m         Normal    Killing                pod/product-service-646fd4c8b8-szzvn                                  Stopping container product-service
+31m         Normal    Killing                pod/product-service-646fd4c8b8-6tzh4                                  Stopping container product-service
+31m         Warning   Unhealthy              pod/product-service-646fd4c8b8-szzvn                                  Readiness probe failed: Get "http://10.244.1.102:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+31m         Warning   Unhealthy              pod/product-service-646fd4c8b8-6tzh4                                  Readiness probe failed: Get "http://10.244.2.164:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+31m         Warning   Unhealthy              pod/product-service-646fd4c8b8-bq2ns                                  Readiness probe failed: Get "http://10.244.1.251:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+31m         Warning   Unhealthy              pod/product-service-646fd4c8b8-vd4fw                                  Readiness probe failed: Get "http://10.244.2.189:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+31m         Warning   Unhealthy              pod/product-service-646fd4c8b8-vd4fw                                  Readiness probe failed: Get "http://10.244.2.189:8002/ready": dial tcp 10.244.2.189:8002: connect: connection refused
+31m         Warning   Unhealthy              pod/product-service-646fd4c8b8-6tzh4                                  Readiness probe failed: Get "http://10.244.2.164:8002/ready": dial tcp 10.244.2.164:8002: connect: connection refused
+31m         Warning   Unhealthy              pod/product-service-646fd4c8b8-szzvn                                  Readiness probe failed: Get "http://10.244.1.102:8002/ready": dial tcp 10.244.1.102:8002: connect: connection refused
+31m         Warning   Unhealthy              pod/product-service-646fd4c8b8-bq2ns                                  Readiness probe failed: Get "http://10.244.1.251:8002/ready": dial tcp 10.244.1.251:8002: connect: connection refused
+31m         Normal    Started                pod/product-db-0                                                      Started container postgres
+31m         Normal    Pulled                 pod/product-db-0                                                      Container image "postgres:15-alpine" already present on machine
+31m         Normal    Created                pod/product-db-0                                                      Created container: postgres
+30m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 (combined from similar events): Created pod: product-service-646fd4c8b8-954p9
+30m         Normal    Scheduled              pod/product-service-646fd4c8b8-wdcgj                                  Successfully assigned ecommerce/product-service-646fd4c8b8-wdcgj to aks-userpool-16719200-vmss000010
+30m         Normal    Scheduled              pod/product-service-646fd4c8b8-954p9                                  Successfully assigned ecommerce/product-service-646fd4c8b8-954p9 to aks-userpool-16719200-vmss000010
+30m         Normal    Scheduled              pod/product-service-646fd4c8b8-2b7vp                                  Successfully assigned ecommerce/product-service-646fd4c8b8-2b7vp to aks-userpool-16719200-vmss000011
+30m         Normal    Scheduled              pod/product-service-646fd4c8b8-8ggmv                                  Successfully assigned ecommerce/product-service-646fd4c8b8-8ggmv to aks-userpool-16719200-vmss000011
+30m         Normal    Pulling                pod/product-service-646fd4c8b8-wdcgj                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+30m         Normal    Pulling                pod/product-service-646fd4c8b8-954p9                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+30m         Normal    Started                pod/product-service-646fd4c8b8-2b7vp                                  Started container product-service
+30m         Normal    Started                pod/product-service-646fd4c8b8-954p9                                  Started container product-service
+30m         Normal    Pulling                pod/product-service-646fd4c8b8-8ggmv                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+30m         Normal    Pulled                 pod/product-service-646fd4c8b8-8ggmv                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 186ms (186ms including waiting). Image size: 114682246 bytes.
+30m         Normal    Pulled                 pod/product-service-646fd4c8b8-2b7vp                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 268ms (268ms including waiting). Image size: 114682246 bytes.
+30m         Normal    Pulling                pod/product-service-646fd4c8b8-2b7vp                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+30m         Normal    Created                pod/product-service-646fd4c8b8-8ggmv                                  Created container: product-service
+30m         Normal    Pulled                 pod/product-service-646fd4c8b8-wdcgj                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 157ms (157ms including waiting). Image size: 114682246 bytes.
+30m         Normal    Created                pod/product-service-646fd4c8b8-954p9                                  Created container: product-service
+30m         Normal    Pulled                 pod/product-service-646fd4c8b8-954p9                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 226ms (226ms including waiting). Image size: 114682246 bytes.
+30m         Normal    Started                pod/product-service-646fd4c8b8-8ggmv                                  Started container product-service
+30m         Normal    Created                pod/product-service-646fd4c8b8-2b7vp                                  Created container: product-service
+30m         Normal    Created                pod/product-service-646fd4c8b8-wdcgj                                  Created container: product-service
+30m         Normal    Started                pod/product-service-646fd4c8b8-wdcgj                                  Started container product-service
+30m         Normal    Killing                pod/product-service-646fd4c8b8-q7dm4                                  Stopping container product-service
+30m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 4; reason: All metrics below target
+30m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-646fd4c8b8 from 5 to 4
+29m         Normal    Killing                pod/product-service-646fd4c8b8-wdcgj                                  Stopping container product-service
+29m         Normal    Killing                pod/product-service-646fd4c8b8-2b7vp                                  Stopping container product-service
+29m         Warning   Unhealthy              pod/product-service-646fd4c8b8-wdcgj                                  Readiness probe failed: Get "http://10.244.2.99:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+29m         Warning   Unhealthy              pod/product-service-646fd4c8b8-2b7vp                                  Readiness probe failed: Get "http://10.244.1.69:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+29m         Warning   Unhealthy              pod/product-service-646fd4c8b8-2b7vp                                  Readiness probe failed: Get "http://10.244.1.69:8002/ready": dial tcp 10.244.1.69:8002: connect: connection refused
+29m         Warning   Unhealthy              pod/product-service-646fd4c8b8-wdcgj                                  Readiness probe failed: Get "http://10.244.2.99:8002/ready": dial tcp 10.244.2.99:8002: connect: connection refused
+28m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 4; reason: pods metric http_requests_per_second above target
+28m         Normal    Scheduled              pod/product-service-646fd4c8b8-76rq6                                  Successfully assigned ecommerce/product-service-646fd4c8b8-76rq6 to aks-userpool-16719200-vmss000010
+28m         Normal    Created                pod/product-service-646fd4c8b8-45n6k                                  Created container: product-service
+28m         Normal    Pulled                 pod/product-service-646fd4c8b8-45n6k                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 276ms (276ms including waiting). Image size: 114682246 bytes.
+28m         Normal    Pulling                pod/product-service-646fd4c8b8-45n6k                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+28m         Normal    Scheduled              pod/product-service-646fd4c8b8-45n6k                                  Successfully assigned ecommerce/product-service-646fd4c8b8-45n6k to aks-userpool-16719200-vmss000010
+28m         Normal    Pulled                 pod/product-service-646fd4c8b8-76rq6                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 218ms (218ms including waiting). Image size: 114682246 bytes.
+28m         Normal    Pulling                pod/product-service-646fd4c8b8-76rq6                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+28m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-646fd4c8b8 from 2 to 4
+28m         Normal    Created                pod/product-service-646fd4c8b8-76rq6                                  Created container: product-service
+28m         Normal    Started                pod/product-service-646fd4c8b8-45n6k                                  Started container product-service
+28m         Normal    Started                pod/product-service-646fd4c8b8-76rq6                                  Started container product-service
+28m         Normal    Pulled                 pod/product-service-646fd4c8b8-qm2hc                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 168ms (168ms including waiting). Image size: 114682246 bytes.
+28m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled up replica set product-service-646fd4c8b8 from 4 to 5
+28m         Normal    Scheduled              pod/product-service-646fd4c8b8-qm2hc                                  Successfully assigned ecommerce/product-service-646fd4c8b8-qm2hc to aks-userpool-16719200-vmss000011
+28m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 5; reason: pods metric http_requests_per_second above target
+28m         Normal    Pulling                pod/product-service-646fd4c8b8-qm2hc                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+28m         Normal    Created                pod/product-service-646fd4c8b8-qm2hc                                  Created container: product-service
+28m         Normal    Started                pod/product-service-646fd4c8b8-qm2hc                                  Started container product-service
+28m         Warning   Unhealthy              pod/product-service-646fd4c8b8-954p9                                  Readiness probe failed: Get "http://10.244.2.164:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+27m         Warning   Unhealthy              pod/product-service-646fd4c8b8-8ggmv                                  Readiness probe failed: Get "http://10.244.1.20:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+27m         Warning   Unhealthy              pod/product-service-646fd4c8b8-45n6k                                  Readiness probe failed: Get "http://10.244.2.98:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+27m         Warning   BackoffLimitExceeded   job/k6-load-test-spike-product-service-h3-spike-rep1                  Job has reached the specified backoff limit
+27m         Normal    Killing                pod/product-service-646fd4c8b8-45n6k                                  Stopping container product-service
+27m         Normal    Killing                pod/product-service-646fd4c8b8-954p9                                  Stopping container product-service
+27m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 3; reason: All metrics below target
+27m         Normal    Killing                pod/product-service-646fd4c8b8-8ggmv                                  Stopping container product-service
+27m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 2; reason: All metrics below target
+26m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 1; reason: All metrics below target
+26m         Normal    Killing                pod/product-service-646fd4c8b8-qm2hc                                  Stopping container product-service
+26m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-646fd4c8b8 from 2 to 1
+18m         Normal    Scheduled              pod/k6-load-test-oscillating-product-service-h3-oscillating-rexnm5v   Successfully assigned ecommerce/k6-load-test-oscillating-product-service-h3-oscillating-rexnm5v to aks-userpool-16719200-vmss000011
+18m         Normal    SuccessfulCreate       job/k6-load-test-oscillating-product-service-h3-oscillating-rep1      Created pod: k6-load-test-oscillating-product-service-h3-oscillating-rexnm5v
+18m         Normal    Pulling                pod/k6-load-test-oscillating-product-service-h3-oscillating-rexnm5v   Pulling image "grafana/k6:latest"
+18m         Normal    Pulled                 pod/k6-load-test-oscillating-product-service-h3-oscillating-rexnm5v   Successfully pulled image "grafana/k6:latest" in 1.496s (1.496s including waiting). Image size: 36750082 bytes.
+18m         Normal    Created                pod/k6-load-test-oscillating-product-service-h3-oscillating-rexnm5v   Created container: k6
+18m         Normal    Started                pod/k6-load-test-oscillating-product-service-h3-oscillating-rexnm5v   Started container k6
+17m         Normal    Scheduled              pod/product-service-646fd4c8b8-zhjzm                                  Successfully assigned ecommerce/product-service-646fd4c8b8-zhjzm to aks-userpool-16719200-vmss000010
+17m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-zhjzm
+17m         Normal    Created                pod/product-service-646fd4c8b8-zhjzm                                  Created container: product-service
+17m         Normal    Pulling                pod/product-service-646fd4c8b8-zhjzm                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+17m         Normal    Pulled                 pod/product-service-646fd4c8b8-zhjzm                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 191ms (191ms including waiting). Image size: 114682246 bytes.
+17m         Normal    Started                pod/product-service-646fd4c8b8-zhjzm                                  Started container product-service
+16m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-zhjzm
+16m         Normal    Killing                pod/product-service-646fd4c8b8-zhjzm                                  Stopping container product-service
+15m         Warning   Unhealthy              pod/product-service-646fd4c8b8-zhjzm                                  Readiness probe failed: Get "http://10.244.2.233:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+15m         Warning   Unhealthy              pod/product-service-646fd4c8b8-zhjzm                                  Readiness probe failed: Get "http://10.244.2.233:8002/ready": dial tcp 10.244.2.233:8002: connect: connection refused
+13m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                                 Created pod: product-service-646fd4c8b8-n8bhw
+13m         Normal    Scheduled              pod/product-service-646fd4c8b8-n8bhw                                  Successfully assigned ecommerce/product-service-646fd4c8b8-n8bhw to aks-userpool-16719200-vmss000010
+13m         Normal    Scheduled              pod/product-service-646fd4c8b8-jfp4l                                  Successfully assigned ecommerce/product-service-646fd4c8b8-jfp4l to aks-userpool-16719200-vmss000011
+13m         Normal    Started                pod/product-service-646fd4c8b8-jfp4l                                  Started container product-service
+13m         Normal    Started                pod/product-service-646fd4c8b8-n8bhw                                  Started container product-service
+13m         Normal    Created                pod/product-service-646fd4c8b8-n8bhw                                  Created container: product-service
+13m         Normal    Created                pod/product-service-646fd4c8b8-jfp4l                                  Created container: product-service
+13m         Normal    Pulled                 pod/product-service-646fd4c8b8-jfp4l                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 194ms (194ms including waiting). Image size: 114682246 bytes.
+13m         Normal    Pulling                pod/product-service-646fd4c8b8-jfp4l                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+13m         Normal    Pulling                pod/product-service-646fd4c8b8-n8bhw                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+13m         Normal    Pulled                 pod/product-service-646fd4c8b8-n8bhw                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 159ms (159ms including waiting). Image size: 114682246 bytes.
+13m         Normal    ScalingReplicaSet      deployment/product-service                                            (combined from similar events): Scaled up replica set product-service-646fd4c8b8 from 3 to 4
+13m         Normal    Scheduled              pod/product-service-646fd4c8b8-qzrqw                                  Successfully assigned ecommerce/product-service-646fd4c8b8-qzrqw to aks-userpool-16719200-vmss000010
+13m         Normal    Pulling                pod/product-service-646fd4c8b8-qzrqw                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+13m         Normal    Pulled                 pod/product-service-646fd4c8b8-qzrqw                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 96ms (96ms including waiting). Image size: 114682246 bytes.
+13m         Normal    Created                pod/product-service-646fd4c8b8-qzrqw                                  Created container: product-service
+13m         Normal    Started                pod/product-service-646fd4c8b8-qzrqw                                  Started container product-service
+12m         Warning   Unhealthy              pod/product-service-646fd4c8b8-76rq6                                  Readiness probe failed: Get "http://10.244.2.255:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+12m         Normal    Killing                pod/product-service-646fd4c8b8-n8bhw                                  Stopping container product-service
+12m         Warning   Unhealthy              pod/product-service-646fd4c8b8-n8bhw                                  Readiness probe failed: Get "http://10.244.2.190:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+11m         Warning   Unhealthy              pod/product-service-646fd4c8b8-n8bhw                                  Readiness probe failed: Get "http://10.244.2.190:8002/ready": dial tcp 10.244.2.190:8002: connect: connection refused
+11m         Normal    Scheduled              pod/product-service-646fd4c8b8-7k87v                                  Successfully assigned ecommerce/product-service-646fd4c8b8-7k87v to aks-userpool-16719200-vmss000011
+11m         Normal    Pulled                 pod/product-service-646fd4c8b8-7k87v                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 190ms (190ms including waiting). Image size: 114682246 bytes.
+11m         Normal    Created                pod/product-service-646fd4c8b8-7k87v                                  Created container: product-service
+11m         Normal    Started                pod/product-service-646fd4c8b8-7k87v                                  Started container product-service
+11m         Normal    Pulling                pod/product-service-646fd4c8b8-7k87v                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+10m         Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-jfp4l
+10m         Normal    Killing                pod/product-service-646fd4c8b8-7k87v                                  Stopping container product-service
+10m         Normal    Killing                pod/product-service-646fd4c8b8-jfp4l                                  Stopping container product-service
+10m         Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-646fd4c8b8 from 4 to 2
+10m         Warning   Unhealthy              pod/product-service-646fd4c8b8-7k87v                                  Readiness probe failed: Get "http://10.244.1.193:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+10m         Warning   Unhealthy              pod/product-service-646fd4c8b8-jfp4l                                  Readiness probe failed: Get "http://10.244.1.10:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+10m         Normal    Killing                pod/product-service-646fd4c8b8-76rq6                                  Stopping container product-service
+10m         Warning   Unhealthy              pod/product-service-646fd4c8b8-7k87v                                  Readiness probe failed: Get "http://10.244.1.193:8002/ready": dial tcp 10.244.1.193:8002: connect: connection refused
+10m         Warning   Unhealthy              pod/product-service-646fd4c8b8-jfp4l                                  Readiness probe failed: Get "http://10.244.1.10:8002/ready": dial tcp 10.244.1.10:8002: connect: connection refused
+10m         Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 2; reason: pods metric http_requests_per_second above target
+10m         Normal    Pulling                pod/product-service-646fd4c8b8-l6j6z                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+10m         Normal    Scheduled              pod/product-service-646fd4c8b8-l6j6z                                  Successfully assigned ecommerce/product-service-646fd4c8b8-l6j6z to aks-userpool-16719200-vmss000011
+9m59s       Normal    Created                pod/product-service-646fd4c8b8-l6j6z                                  Created container: product-service
+9m59s       Normal    Pulled                 pod/product-service-646fd4c8b8-l6j6z                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 186ms (186ms including waiting). Image size: 114682246 bytes.
+9m59s       Normal    Started                pod/product-service-646fd4c8b8-l6j6z                                  Started container product-service
+9m15s       Normal    Scheduled              pod/product-service-646fd4c8b8-2r4dq                                  Successfully assigned ecommerce/product-service-646fd4c8b8-2r4dq to aks-userpool-16719200-vmss000010
+9m15s       Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 4; reason: pods metric http_requests_per_second above target
+9m15s       Normal    Scheduled              pod/product-service-646fd4c8b8-b4xcj                                  Successfully assigned ecommerce/product-service-646fd4c8b8-b4xcj to aks-userpool-16719200-vmss000010
+9m14s       Normal    Pulled                 pod/product-service-646fd4c8b8-2r4dq                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 157ms (157ms including waiting). Image size: 114682246 bytes.
+9m14s       Normal    Created                pod/product-service-646fd4c8b8-2r4dq                                  Created container: product-service
+9m14s       Normal    Pulled                 pod/product-service-646fd4c8b8-b4xcj                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 149ms (149ms including waiting). Image size: 114682246 bytes.
+9m14s       Normal    Pulling                pod/product-service-646fd4c8b8-b4xcj                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+9m14s       Normal    Started                pod/product-service-646fd4c8b8-b4xcj                                  Started container product-service
+9m14s       Normal    Created                pod/product-service-646fd4c8b8-b4xcj                                  Created container: product-service
+9m14s       Normal    Pulling                pod/product-service-646fd4c8b8-2r4dq                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+9m14s       Normal    Started                pod/product-service-646fd4c8b8-2r4dq                                  Started container product-service
+8m30s       Normal    Scheduled              pod/product-service-646fd4c8b8-9m4rb                                  Successfully assigned ecommerce/product-service-646fd4c8b8-9m4rb to aks-userpool-16719200-vmss000011
+8m29s       Normal    Started                pod/product-service-646fd4c8b8-9m4rb                                  Started container product-service
+8m29s       Normal    Created                pod/product-service-646fd4c8b8-9m4rb                                  Created container: product-service
+8m29s       Normal    Pulled                 pod/product-service-646fd4c8b8-9m4rb                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 205ms (205ms including waiting). Image size: 114682246 bytes.
+8m29s       Normal    Pulling                pod/product-service-646fd4c8b8-9m4rb                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+8m18s       Warning   Unhealthy              pod/product-service-646fd4c8b8-qzrqw                                  Readiness probe failed: Get "http://10.244.2.122:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+8m6s        Warning   Unhealthy              pod/product-db-0                                                      Readiness probe failed: command timed out: "pg_isready -U product_user -d product_db" timed out after 1s
+7m39s       Warning   Unhealthy              pod/product-service-646fd4c8b8-9m4rb                                  Liveness probe failed: Get "http://10.244.1.40:8002/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+7m30s       Normal    Killing                pod/product-service-646fd4c8b8-9m4rb                                  Stopping container product-service
+7m30s       Normal    Killing                pod/product-service-646fd4c8b8-qzrqw                                  Stopping container product-service
+7m27s       Warning   Unhealthy              pod/product-service-646fd4c8b8-9m4rb                                  Readiness probe failed: Get "http://10.244.1.40:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+7m17s       Warning   Unhealthy              pod/product-service-646fd4c8b8-qzrqw                                  Readiness probe failed: Get "http://10.244.2.122:8002/ready": dial tcp 10.244.2.122:8002: connect: connection refused
+7m7s        Warning   Unhealthy              pod/product-service-646fd4c8b8-9m4rb                                  Readiness probe failed: Get "http://10.244.1.40:8002/ready": dial tcp 10.244.1.40:8002: connect: connection refused
+6m59s       Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 2; reason: All metrics below target
+6m59s       Normal    Killing                pod/product-service-646fd4c8b8-l6j6z                                  Stopping container product-service
+6m56s       Warning   Unhealthy              pod/product-service-646fd4c8b8-l6j6z                                  Readiness probe failed: Get "http://10.244.1.15:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+6m36s       Warning   Unhealthy              pod/product-service-646fd4c8b8-l6j6z                                  Readiness probe failed: Get "http://10.244.1.15:8002/ready": dial tcp 10.244.1.15:8002: connect: connection refused
+6m29s       Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 3; reason: pods metric http_requests_per_second above target
+6m29s       Normal    Scheduled              pod/product-service-646fd4c8b8-7f5dp                                  Successfully assigned ecommerce/product-service-646fd4c8b8-7f5dp to aks-userpool-16719200-vmss000010
+6m28s       Normal    Started                pod/product-service-646fd4c8b8-7f5dp                                  Started container product-service
+6m28s       Normal    Created                pod/product-service-646fd4c8b8-7f5dp                                  Created container: product-service
+6m28s       Normal    Pulled                 pod/product-service-646fd4c8b8-7f5dp                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 218ms (218ms including waiting). Image size: 114682246 bytes.
+6m28s       Normal    Pulling                pod/product-service-646fd4c8b8-7f5dp                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+6m18s       Warning   Unhealthy              pod/product-service-646fd4c8b8-b4xcj                                  Readiness probe failed: Get "http://10.244.2.151:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+6m14s       Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 5; reason: pods metric http_requests_per_second above target
+6m14s       Normal    Scheduled              pod/product-service-646fd4c8b8-2sjwt                                  Successfully assigned ecommerce/product-service-646fd4c8b8-2sjwt to aks-userpool-16719200-vmss000011
+6m14s       Normal    Scheduled              pod/product-service-646fd4c8b8-j6ww2                                  Successfully assigned ecommerce/product-service-646fd4c8b8-j6ww2 to aks-userpool-16719200-vmss000011
+6m13s       Normal    Pulled                 pod/product-service-646fd4c8b8-j6ww2                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 197ms (197ms including waiting). Image size: 114682246 bytes.
+6m13s       Normal    Pulling                pod/product-service-646fd4c8b8-j6ww2                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+6m13s       Normal    Pulling                pod/product-service-646fd4c8b8-2sjwt                                  Pulling image "ecommerce.azurecr.io/product-service:latest"
+6m13s       Normal    Pulled                 pod/product-service-646fd4c8b8-2sjwt                                  Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 217ms (217ms including waiting). Image size: 114682246 bytes.
+6m13s       Normal    Started                pod/product-service-646fd4c8b8-j6ww2                                  Started container product-service
+6m13s       Normal    Created                pod/product-service-646fd4c8b8-2sjwt                                  Created container: product-service
+6m13s       Normal    Started                pod/product-service-646fd4c8b8-2sjwt                                  Started container product-service
+6m13s       Normal    Created                pod/product-service-646fd4c8b8-j6ww2                                  Created container: product-service
+5m43s       Warning   Unhealthy              pod/product-service-646fd4c8b8-2r4dq                                  Readiness probe failed: Get "http://10.244.2.82:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+5m41s       Warning   Unhealthy              pod/product-service-646fd4c8b8-7f5dp                                  Readiness probe failed: Get "http://10.244.2.164:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+5m32s       Warning   BackoffLimitExceeded   job/k6-load-test-oscillating-product-service-h3-oscillating-rep1      Job has reached the specified backoff limit
+5m14s       Normal    SuccessfulDelete       replicaset/product-service-646fd4c8b8                                 Deleted pod: product-service-646fd4c8b8-7f5dp
+5m14s       Normal    ScalingReplicaSet      deployment/product-service                                            Scaled down replica set product-service-646fd4c8b8 from 5 to 3
+5m14s       Normal    Killing                pod/product-service-646fd4c8b8-7f5dp                                  Stopping container product-service
+5m14s       Normal    Killing                pod/product-service-646fd4c8b8-2r4dq                                  Stopping container product-service
+5m14s       Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 3; reason: All metrics below target
+4m44s       Normal    SuccessfulRescale      horizontalpodautoscaler/product-service-hpa-custom                    New size: 1; reason: All metrics below target
+4m44s       Normal    Killing                pod/product-service-646fd4c8b8-2sjwt                                  Stopping container product-service
+4m44s       Normal    Killing                pod/product-service-646fd4c8b8-j6ww2                                  Stopping container product-service

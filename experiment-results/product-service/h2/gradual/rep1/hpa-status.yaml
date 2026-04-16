@@ -6,13 +6,13 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"labels":{"experiment":"h2-hpa-tuned"},"name":"product-service-hpa-tuned","namespace":"ecommerce"},"spec":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":15,"type":"Percent","value":100}],"stabilizationWindowSeconds":30},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Pods","value":5}],"stabilizationWindowSeconds":0}},"maxReplicas":5,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":50,"type":"Utilization"}},"type":"Resource"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"product-service"}}}
-    creationTimestamp: "2026-04-07T10:02:19Z"
+    creationTimestamp: "2026-04-14T12:06:00Z"
     labels:
       experiment: h2-hpa-tuned
     name: product-service-hpa-tuned
     namespace: ecommerce
-    resourceVersion: "984624"
-    uid: 67112470-40dc-4f54-bc4b-833d67ba4685
+    resourceVersion: "1599506"
+    uid: ac04194f-bbb9-46ca-8ab5-7fee7b054d42
   spec:
     behavior:
       scaleDown:
@@ -44,32 +44,31 @@ items:
       name: product-service
   status:
     conditions:
-    - lastTransitionTime: "2026-04-07T10:02:34Z"
+    - lastTransitionTime: "2026-04-14T12:06:15Z"
       message: recommended size matches current size
       reason: ReadyForNewScale
       status: "True"
       type: AbleToScale
-    - lastTransitionTime: "2026-04-07T10:02:34Z"
+    - lastTransitionTime: "2026-04-14T12:06:15Z"
       message: the HPA was able to successfully calculate a replica count from cpu
         resource utilization (percentage of request)
       reason: ValidMetricFound
       status: "True"
       type: ScalingActive
-    - lastTransitionTime: "2026-04-07T10:17:05Z"
-      message: the desired count is within the acceptable range
-      reason: DesiredWithinRange
-      status: "False"
+    - lastTransitionTime: "2026-04-14T12:22:16Z"
+      message: the desired replica count is less than the minimum replica count
+      reason: TooFewReplicas
+      status: "True"
       type: ScalingLimited
     currentMetrics:
     - resource:
         current:
-          averageUtilization: 2
+          averageUtilization: 0
           averageValue: 2m
         name: cpu
       type: Resource
     currentReplicas: 1
     desiredReplicas: 1
-    lastScaleTime: "2026-04-07T10:18:20Z"
 kind: List
 metadata:
   resourceVersion: ""

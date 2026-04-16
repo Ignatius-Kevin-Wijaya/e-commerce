@@ -5,8 +5,8 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"labels":{"experiment":"k1-keda"},"name":"product-service-keda","namespace":"ecommerce"},"spec":{"cooldownPeriod":30,"maxReplicaCount":5,"minReplicaCount":1,"pollingInterval":15,"scaleTargetRef":{"name":"product-service"},"triggers":[{"metadata":{"metricName":"http_requests_per_second","query":"sum(rate(http_requests_total{job=\"product-service\"}[1m]))\n","serverAddress":"http://prometheus.monitoring.svc.cluster.local:9090","threshold":"50"},"type":"prometheus"}]}}
-    creationTimestamp: "2026-04-07T12:05:53Z"
+        {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"labels":{"experiment":"k1-keda"},"name":"product-service-keda","namespace":"ecommerce"},"spec":{"cooldownPeriod":30,"maxReplicaCount":5,"minReplicaCount":1,"pollingInterval":15,"scaleTargetRef":{"name":"product-service"},"triggers":[{"metadata":{"metricName":"http_requests_per_second","query":"sum(rate(http_requests_total{job=\"product-service\"}[1m]))\n","serverAddress":"http://prometheus.monitoring.svc.cluster.local:9090","threshold":"5"},"type":"prometheus"}]}}
+    creationTimestamp: "2026-04-14T14:18:28Z"
     labels:
       app.kubernetes.io/managed-by: keda-operator
       app.kubernetes.io/name: keda-hpa-product-service-keda
@@ -22,9 +22,9 @@ items:
       controller: true
       kind: ScaledObject
       name: product-service-keda
-      uid: aa2fdef2-047a-4186-9dc3-1244cdcdc9ce
-    resourceVersion: "1024899"
-    uid: 2671b722-c65e-4231-80a1-0bdda6faadc8
+      uid: 433119ef-964c-4829-a0db-cbf7bd357774
+    resourceVersion: "1644878"
+    uid: 84dd19ab-909a-40c6-bb9b-cb19c5b31d91
   spec:
     maxReplicas: 5
     metrics:
@@ -35,7 +35,7 @@ items:
             matchLabels:
               scaledobject.keda.sh/name: product-service-keda
         target:
-          averageValue: "50"
+          averageValue: "5"
           type: AverageValue
       type: External
     minReplicas: 1
@@ -45,19 +45,19 @@ items:
       name: product-service
   status:
     conditions:
-    - lastTransitionTime: "2026-04-07T12:06:08Z"
-      message: recommended size matches current size
-      reason: ReadyForNewScale
+    - lastTransitionTime: "2026-04-14T14:18:43Z"
+      message: the HPA controller was able to update the target scale to 2
+      reason: SucceededRescale
       status: "True"
       type: AbleToScale
-    - lastTransitionTime: "2026-04-07T12:06:09Z"
+    - lastTransitionTime: "2026-04-14T14:18:46Z"
       message: 'the HPA was able to successfully calculate a replica count from external
         metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name:
         product-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},})'
       reason: ValidMetricFound
       status: "True"
       type: ScalingActive
-    - lastTransitionTime: "2026-04-07T12:06:09Z"
+    - lastTransitionTime: "2026-04-14T14:37:33Z"
       message: the desired count is within the acceptable range
       reason: DesiredWithinRange
       status: "False"
@@ -65,16 +65,16 @@ items:
     currentMetrics:
     - external:
         current:
-          averageValue: 222m
+          averageValue: 360m
         metric:
           name: s0-prometheus
           selector:
             matchLabels:
               scaledobject.keda.sh/name: product-service-keda
       type: External
-    currentReplicas: 1
-    desiredReplicas: 1
-    lastScaleTime: "2026-04-07T12:25:13Z"
+    currentReplicas: 3
+    desiredReplicas: 2
+    lastScaleTime: "2026-04-14T14:38:03Z"
 kind: List
 metadata:
   resourceVersion: ""

@@ -1,106 +1,85 @@
-LAST SEEN   TYPE      REASON                   OBJECT                                                           MESSAGE
-57m         Normal    Scheduled                pod/product-service-5c668487c-sb6rk                              Successfully assigned ecommerce/product-service-5c668487c-sb6rk to aks-userpool-16719200-vmss00000f
-40m         Normal    Scheduled                pod/k6-load-test-gradual-product-service-b1-gradual-rep1-669jm   Successfully assigned ecommerce/k6-load-test-gradual-product-service-b1-gradual-rep1-669jm to aks-userpool-16719200-vmss00000h
-18m         Normal    Scheduled                pod/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd       Successfully assigned ecommerce/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd to aks-userpool-16719200-vmss00000h
-56m         Normal    Scheduled                pod/redis-795dff8cc4-z95gw                                       Successfully assigned ecommerce/redis-795dff8cc4-z95gw to aks-userpool-16719200-vmss00000h
-57m         Normal    Scheduled                pod/order-service-778787b555-rr9nc                               Successfully assigned ecommerce/order-service-778787b555-rr9nc to aks-userpool-16719200-vmss00000f
-57m         Normal    Scheduled                pod/cart-service-7d7fdd477-v2g7k                                 Successfully assigned ecommerce/cart-service-7d7fdd477-v2g7k to aks-userpool-16719200-vmss00000h
-57m         Normal    Scheduled                pod/redis-795dff8cc4-8bd49                                       Successfully assigned ecommerce/redis-795dff8cc4-8bd49 to aks-userpool-16719200-vmss00000h
-55m         Normal    Scheduled                pod/redis-66b87f6c7c-d4g5s                                       Successfully assigned ecommerce/redis-66b87f6c7c-d4g5s to aks-userpool-16719200-vmss00000h
-57m         Normal    Scheduled                pod/api-gateway-55bf47c6f6-vt2tb                                 Successfully assigned ecommerce/api-gateway-55bf47c6f6-vt2tb to aks-userpool-16719200-vmss00000f
-57m         Normal    Scheduled                pod/payment-service-78b57ddcc5-b9mb7                             Successfully assigned ecommerce/payment-service-78b57ddcc5-b9mb7 to aks-userpool-16719200-vmss00000h
-57m         Normal    Scheduled                pod/auth-service-676fc6d7d5-mzhq7                                Successfully assigned ecommerce/auth-service-676fc6d7d5-mzhq7 to aks-userpool-16719200-vmss00000f
-43m         Normal    Scheduled                pod/product-service-75f4ddbd56-6nv6h                             Successfully assigned ecommerce/product-service-75f4ddbd56-6nv6h to aks-userpool-16719200-vmss00000h
-57m         Normal    SuccessfulCreate         replicaset/product-service-5c668487c                             Created pod: product-service-5c668487c-sb6rk
-57m         Normal    ScalingReplicaSet        deployment/api-gateway                                           Scaled up replica set api-gateway-55bf47c6f6 from 0 to 1
-57m         Normal    ScalingReplicaSet        deployment/payment-service                                       Scaled up replica set payment-service-78b57ddcc5 from 0 to 1
-57m         Normal    SuccessfulCreate         replicaset/auth-service-676fc6d7d5                               Created pod: auth-service-676fc6d7d5-mzhq7
-57m         Normal    SuccessfulCreate         replicaset/payment-service-78b57ddcc5                            Created pod: payment-service-78b57ddcc5-b9mb7
-57m         Normal    ScalingReplicaSet        deployment/product-service                                       Scaled up replica set product-service-5c668487c from 0 to 1
-57m         Normal    ScalingReplicaSet        deployment/auth-service                                          Scaled up replica set auth-service-676fc6d7d5 from 0 to 1
-57m         Normal    SuccessfulCreate         replicaset/cart-service-7d7fdd477                                Created pod: cart-service-7d7fdd477-v2g7k
-57m         Normal    ScalingReplicaSet        deployment/order-service                                         Scaled up replica set order-service-778787b555 from 0 to 1
-57m         Normal    SuccessfulCreate         replicaset/order-service-778787b555                              Created pod: order-service-778787b555-rr9nc
-57m         Normal    SuccessfulCreate         replicaset/api-gateway-55bf47c6f6                                Created pod: api-gateway-55bf47c6f6-vt2tb
-57m         Warning   FailedAttachVolume       pod/redis-795dff8cc4-8bd49                                       Multi-Attach error for volume "pvc-2b137495-17bd-49d9-b92d-eca2c62e859c" Volume is already used by pod(s) redis-66b87f6c7c-jk4s8
-57m         Normal    SuccessfulCreate         replicaset/redis-795dff8cc4                                      Created pod: redis-795dff8cc4-8bd49
-57m         Normal    ScalingReplicaSet        deployment/redis                                                 Scaled up replica set redis-795dff8cc4 from 0 to 1
-57m         Normal    ScalingReplicaSet        deployment/cart-service                                          Scaled up replica set cart-service-7d7fdd477 from 0 to 1
-57m         Normal    Killing                  pod/payment-service-786d8f4656-hh8nk                             Stopping container payment-service
-57m         Normal    Started                  pod/product-service-5c668487c-sb6rk                              Started container product-service
-57m         Normal    Pulling                  pod/api-gateway-55bf47c6f6-vt2tb                                 Pulling image "ecommerce.azurecr.io/api-gateway:latest"
-57m         Normal    Started                  pod/cart-service-7d7fdd477-v2g7k                                 Started container cart-service
-57m         Normal    Pulled                   pod/api-gateway-55bf47c6f6-vt2tb                                 Successfully pulled image "ecommerce.azurecr.io/api-gateway:latest" in 383ms (383ms including waiting). Image size: 92720454 bytes.
-57m         Normal    Created                  pod/api-gateway-55bf47c6f6-vt2tb                                 Created container: api-gateway
-57m         Normal    Started                  pod/api-gateway-55bf47c6f6-vt2tb                                 Started container api-gateway
-57m         Normal    Pulling                  pod/auth-service-676fc6d7d5-mzhq7                                Pulling image "ecommerce.azurecr.io/auth-service:latest"
-57m         Normal    Pulled                   pod/auth-service-676fc6d7d5-mzhq7                                Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 339ms (339ms including waiting). Image size: 129941761 bytes.
-57m         Normal    Created                  pod/product-service-5c668487c-sb6rk                              Created container: product-service
-57m         Normal    Created                  pod/cart-service-7d7fdd477-v2g7k                                 Created container: cart-service
-57m         Normal    Pulled                   pod/product-service-5c668487c-sb6rk                              Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 317ms (317ms including waiting). Image size: 114656012 bytes.
-57m         Normal    Pulling                  pod/product-service-5c668487c-sb6rk                              Pulling image "ecommerce.azurecr.io/product-service:latest"
-57m         Normal    Created                  pod/auth-service-676fc6d7d5-mzhq7                                Created container: auth-service
-57m         Normal    ScalingReplicaSet        deployment/payment-service                                       Scaled down replica set payment-service-786d8f4656 from 1 to 0
-57m         Normal    Started                  pod/auth-service-676fc6d7d5-mzhq7                                Started container auth-service
-57m         Normal    Started                  pod/payment-service-78b57ddcc5-b9mb7                             Started container payment-service
-57m         Normal    Created                  pod/payment-service-78b57ddcc5-b9mb7                             Created container: payment-service
-57m         Normal    Pulled                   pod/payment-service-78b57ddcc5-b9mb7                             Container image "ecommerce.azurecr.io/payment-service:latest" already present on machine
-57m         Normal    Pulled                   pod/cart-service-7d7fdd477-v2g7k                                 Container image "ecommerce.azurecr.io/cart-service:latest" already present on machine
-57m         Normal    Pulled                   pod/order-service-778787b555-rr9nc                               Container image "ecommerce.azurecr.io/order-service:latest" already present on machine
-57m         Normal    Created                  pod/order-service-778787b555-rr9nc                               Created container: order-service
-57m         Normal    Started                  pod/order-service-778787b555-rr9nc                               Started container order-service
-57m         Normal    SuccessfulDelete         replicaset/payment-service-786d8f4656                            Deleted pod: payment-service-786d8f4656-hh8nk
-56m         Normal    Killing                  pod/order-service-6bc4d85ff4-fqjb4                               Stopping container order-service
-56m         Normal    ScalingReplicaSet        deployment/order-service                                         Scaled down replica set order-service-6bc4d85ff4 from 1 to 0
-56m         Normal    Killing                  pod/cart-service-69579bdf8d-66s5t                                Stopping container cart-service
-56m         Normal    SuccessfulDelete         replicaset/cart-service-69579bdf8d                               Deleted pod: cart-service-69579bdf8d-66s5t
-56m         Normal    ScalingReplicaSet        deployment/cart-service                                          Scaled down replica set cart-service-69579bdf8d from 1 to 0
-56m         Normal    SuccessfulDelete         replicaset/order-service-6bc4d85ff4                              Deleted pod: order-service-6bc4d85ff4-fqjb4
-56m         Normal    SuccessfulDelete         replicaset/auth-service-94cc679cc                                Deleted pod: auth-service-94cc679cc-fq8b2
-56m         Normal    Killing                  pod/auth-service-94cc679cc-fq8b2                                 Stopping container auth-service
-56m         Normal    ScalingReplicaSet        deployment/auth-service                                          Scaled down replica set auth-service-94cc679cc from 1 to 0
-56m         Normal    Killing                  pod/product-service-7c9848795d-pnzzm                             Stopping container product-service
-56m         Normal    Killing                  pod/api-gateway-5889dd67f7-nvs9g                                 Stopping container api-gateway
-56m         Normal    SuccessfulDelete         replicaset/api-gateway-5889dd67f7                                Deleted pod: api-gateway-5889dd67f7-nvs9g
-56m         Normal    ScalingReplicaSet        deployment/product-service                                       Scaled down replica set product-service-7c9848795d from 1 to 0
-56m         Normal    ScalingReplicaSet        deployment/api-gateway                                           Scaled down replica set api-gateway-5889dd67f7 from 1 to 0
-56m         Normal    SuccessfulDelete         replicaset/product-service-7c9848795d                            Deleted pod: product-service-7c9848795d-pnzzm
-56m         Normal    SuccessfulCreate         replicaset/redis-795dff8cc4                                      Created pod: redis-795dff8cc4-z95gw
-56m         Warning   FailedAttachVolume       pod/redis-795dff8cc4-z95gw                                       Multi-Attach error for volume "pvc-2b137495-17bd-49d9-b92d-eca2c62e859c" Volume is already used by pod(s) redis-66b87f6c7c-jk4s8
-55m         Normal    SuccessfulCreate         replicaset/redis-66b87f6c7c                                      Created pod: redis-66b87f6c7c-d4g5s
-55m         Normal    Killing                  pod/redis-66b87f6c7c-jk4s8                                       Stopping container redis
-55m         Normal    SuccessfulAttachVolume   pod/redis-66b87f6c7c-d4g5s                                       AttachVolume.Attach succeeded for volume "pvc-2b137495-17bd-49d9-b92d-eca2c62e859c"
-55m         Normal    SuccessfulAttachVolume   pod/redis-795dff8cc4-z95gw                                       AttachVolume.Attach succeeded for volume "pvc-2b137495-17bd-49d9-b92d-eca2c62e859c"
-55m         Warning   Unhealthy                pod/cart-service-7d7fdd477-v2g7k                                 Readiness probe failed: HTTP probe failed with statuscode: 503
-55m         Normal    Pulling                  pod/redis-66b87f6c7c-d4g5s                                       Pulling image "redis:7-alpine"
-55m         Normal    Pulling                  pod/redis-795dff8cc4-z95gw                                       Pulling image "redis:7-alpine"
-55m         Normal    Started                  pod/redis-795dff8cc4-z95gw                                       Started container redis
-55m         Normal    Created                  pod/redis-795dff8cc4-z95gw                                       Created container: redis
-55m         Normal    Pulled                   pod/redis-795dff8cc4-z95gw                                       Successfully pulled image "redis:7-alpine" in 6.271s (6.271s including waiting). Image size: 17253707 bytes.
-55m         Normal    Started                  pod/redis-66b87f6c7c-d4g5s                                       Started container redis
-55m         Normal    Created                  pod/redis-66b87f6c7c-d4g5s                                       Created container: redis
-55m         Normal    Pulled                   pod/redis-66b87f6c7c-d4g5s                                       Successfully pulled image "redis:7-alpine" in 6.461s (6.461s including waiting). Image size: 17253707 bytes.
-55m         Normal    ScalingReplicaSet        deployment/redis                                                 Scaled down replica set redis-66b87f6c7c from 1 to 0
-55m         Normal    SuccessfulDelete         replicaset/redis-66b87f6c7c                                      Deleted pod: redis-66b87f6c7c-d4g5s
-54m         Normal    Killing                  pod/redis-66b87f6c7c-d4g5s                                       Stopping container redis
-43m         Normal    Pulled                   pod/product-service-75f4ddbd56-6nv6h                             Container image "ecommerce.azurecr.io/product-service:latest" already present on machine
-43m         Normal    SuccessfulCreate         replicaset/product-service-75f4ddbd56                            Created pod: product-service-75f4ddbd56-6nv6h
-43m         Normal    Created                  pod/product-service-75f4ddbd56-6nv6h                             Created container: product-service
-43m         Normal    ScalingReplicaSet        deployment/product-service                                       Scaled up replica set product-service-75f4ddbd56 from 0 to 1
-43m         Normal    Started                  pod/product-service-75f4ddbd56-6nv6h                             Started container product-service
-42m         Normal    Killing                  pod/product-service-5c668487c-sb6rk                              Stopping container product-service
-42m         Normal    ScalingReplicaSet        deployment/product-service                                       Scaled down replica set product-service-5c668487c from 1 to 0
-42m         Normal    SuccessfulDelete         replicaset/product-service-5c668487c                             Deleted pod: product-service-5c668487c-sb6rk
-40m         Normal    SuccessfulCreate         job/k6-load-test-gradual-product-service-b1-gradual-rep1         Created pod: k6-load-test-gradual-product-service-b1-gradual-rep1-669jm
-40m         Normal    Pulling                  pod/k6-load-test-gradual-product-service-b1-gradual-rep1-669jm   Pulling image "grafana/k6:latest"
-40m         Normal    Created                  pod/k6-load-test-gradual-product-service-b1-gradual-rep1-669jm   Created container: k6
-40m         Normal    Pulled                   pod/k6-load-test-gradual-product-service-b1-gradual-rep1-669jm   Successfully pulled image "grafana/k6:latest" in 1.503s (1.503s including waiting). Image size: 36750082 bytes.
-40m         Normal    Started                  pod/k6-load-test-gradual-product-service-b1-gradual-rep1-669jm   Started container k6
-28m         Warning   BackoffLimitExceeded     job/k6-load-test-gradual-product-service-b1-gradual-rep1         Job has reached the specified backoff limit
-18m         Normal    Pulling                  pod/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd       Pulling image "grafana/k6:latest"
-18m         Normal    SuccessfulCreate         job/k6-load-test-spike-product-service-b1-spike-rep1             Created pod: k6-load-test-spike-product-service-b1-spike-rep1-mhqqd
-18m         Normal    Started                  pod/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd       Started container k6
-18m         Normal    Created                  pod/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd       Created container: k6
-18m         Normal    Pulled                   pod/k6-load-test-spike-product-service-b1-spike-rep1-mhqqd       Successfully pulled image "grafana/k6:latest" in 1.473s (1.473s including waiting). Image size: 36750082 bytes.
-8m32s       Warning   Unhealthy                pod/product-service-75f4ddbd56-6nv6h                             Readiness probe failed: Get "http://10.244.2.80:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
-6m3s        Warning   BackoffLimitExceeded     job/k6-load-test-spike-product-service-b1-spike-rep1             Job has reached the specified backoff limit
+LAST SEEN   TYPE      REASON                 OBJECT                                                           MESSAGE
+49m         Normal    SuccessfulCreate       replicaset/auth-service-88b4cd688                                Created pod: auth-service-88b4cd688-dztwq
+49m         Normal    ScalingReplicaSet      deployment/redis                                                 Scaled up replica set redis-75df988755 from 0 to 1
+49m         Normal    Scheduled              pod/api-gateway-c5fbb8f7f-k4qrb                                  Successfully assigned ecommerce/api-gateway-c5fbb8f7f-k4qrb to aks-userpool-16719200-vmss000010
+49m         Normal    ScalingReplicaSet      deployment/product-service                                       Scaled up replica set product-service-646fd4c8b8 from 0 to 1
+49m         Normal    ScalingReplicaSet      deployment/payment-service                                       Scaled up replica set payment-service-6ddc6f6fd6 from 0 to 1
+49m         Normal    ScalingReplicaSet      deployment/order-service                                         Scaled up replica set order-service-65b877996 from 0 to 1
+49m         Normal    ScalingReplicaSet      deployment/cart-service                                          Scaled up replica set cart-service-79cb5bdd58 from 0 to 1
+49m         Normal    SuccessfulCreate       replicaset/api-gateway-c5fbb8f7f                                 Created pod: api-gateway-c5fbb8f7f-k4qrb
+49m         Normal    ScalingReplicaSet      deployment/api-gateway                                           Scaled up replica set api-gateway-c5fbb8f7f from 0 to 1
+49m         Normal    SuccessfulCreate       replicaset/cart-service-79cb5bdd58                               Created pod: cart-service-79cb5bdd58-bz2kl
+49m         Normal    Scheduled              pod/cart-service-79cb5bdd58-bz2kl                                Successfully assigned ecommerce/cart-service-79cb5bdd58-bz2kl to aks-userpool-16719200-vmss000010
+49m         Normal    ScalingReplicaSet      deployment/auth-service                                          Scaled up replica set auth-service-88b4cd688 from 0 to 1
+49m         Normal    Scheduled              pod/auth-service-88b4cd688-dztwq                                 Successfully assigned ecommerce/auth-service-88b4cd688-dztwq to aks-userpool-16719200-vmss000010
+49m         Normal    Scheduled              pod/product-service-646fd4c8b8-q7dm4                             Successfully assigned ecommerce/product-service-646fd4c8b8-q7dm4 to aks-userpool-16719200-vmss000010
+49m         Normal    Started                pod/payment-service-6ddc6f6fd6-cclsh                             Started container payment-service
+49m         Normal    Pulling                pod/order-service-65b877996-mxps9                                Pulling image "ecommerce.azurecr.io/order-service:latest"
+49m         Normal    Scheduled              pod/order-service-65b877996-mxps9                                Successfully assigned ecommerce/order-service-65b877996-mxps9 to aks-userpool-16719200-vmss000010
+49m         Normal    Pulling                pod/auth-service-88b4cd688-dztwq                                 Pulling image "ecommerce.azurecr.io/auth-service:latest"
+49m         Normal    SuccessfulCreate       replicaset/order-service-65b877996                               Created pod: order-service-65b877996-mxps9
+49m         Normal    SuccessfulCreate       replicaset/redis-75df988755                                      Created pod: redis-75df988755-7998w
+49m         Normal    Started                pod/redis-75df988755-7998w                                       Started container redis
+49m         Normal    Pulling                pod/cart-service-79cb5bdd58-bz2kl                                Pulling image "ecommerce.azurecr.io/cart-service:latest"
+49m         Normal    Scheduled              pod/payment-service-6ddc6f6fd6-cclsh                             Successfully assigned ecommerce/payment-service-6ddc6f6fd6-cclsh to aks-userpool-16719200-vmss000010
+49m         Normal    Pulled                 pod/payment-service-6ddc6f6fd6-cclsh                             Container image "ecommerce.azurecr.io/payment-service:latest" already present on machine
+49m         Normal    Created                pod/payment-service-6ddc6f6fd6-cclsh                             Created container: payment-service
+49m         Normal    Created                pod/redis-75df988755-7998w                                       Created container: redis
+49m         Normal    SuccessfulCreate       replicaset/payment-service-6ddc6f6fd6                            Created pod: payment-service-6ddc6f6fd6-cclsh
+49m         Normal    Pulled                 pod/redis-75df988755-7998w                                       Container image "redis:7-alpine" already present on machine
+49m         Normal    Scheduled              pod/redis-75df988755-7998w                                       Successfully assigned ecommerce/redis-75df988755-7998w to aks-userpool-16719200-vmss000011
+49m         Normal    Pulling                pod/product-service-646fd4c8b8-q7dm4                             Pulling image "ecommerce.azurecr.io/product-service:latest"
+49m         Normal    Pulling                pod/api-gateway-c5fbb8f7f-k4qrb                                  Pulling image "ecommerce.azurecr.io/api-gateway:latest"
+49m         Normal    SuccessfulCreate       replicaset/product-service-646fd4c8b8                            Created pod: product-service-646fd4c8b8-q7dm4
+49m         Normal    Killing                pod/redis-795dff8cc4-7j6tc                                       Stopping container redis
+49m         Normal    ScalingReplicaSet      deployment/payment-service                                       Scaled down replica set payment-service-78b57ddcc5 from 1 to 0
+49m         Normal    ScalingReplicaSet      deployment/redis                                                 Scaled down replica set redis-795dff8cc4 from 1 to 0
+49m         Normal    SuccessfulDelete       replicaset/payment-service-78b57ddcc5                            Deleted pod: payment-service-78b57ddcc5-szk9g
+49m         Normal    Killing                pod/payment-service-78b57ddcc5-szk9g                             Stopping container payment-service
+49m         Normal    SuccessfulDelete       replicaset/redis-795dff8cc4                                      Deleted pod: redis-795dff8cc4-7j6tc
+49m         Warning   Unhealthy              pod/cart-service-7d7fdd477-wzpw2                                 Readiness probe failed: HTTP probe failed with statuscode: 503
+49m         Normal    Created                pod/cart-service-79cb5bdd58-bz2kl                                Created container: cart-service
+49m         Normal    Pulled                 pod/cart-service-79cb5bdd58-bz2kl                                Successfully pulled image "ecommerce.azurecr.io/cart-service:latest" in 5.094s (5.094s including waiting). Image size: 84342978 bytes.
+49m         Normal    Started                pod/order-service-65b877996-mxps9                                Started container order-service
+49m         Normal    Created                pod/order-service-65b877996-mxps9                                Created container: order-service
+49m         Normal    Pulled                 pod/order-service-65b877996-mxps9                                Successfully pulled image "ecommerce.azurecr.io/order-service:latest" in 4.896s (4.896s including waiting). Image size: 113801679 bytes.
+49m         Normal    Started                pod/api-gateway-c5fbb8f7f-k4qrb                                  Started container api-gateway
+49m         Normal    Created                pod/api-gateway-c5fbb8f7f-k4qrb                                  Created container: api-gateway
+49m         Normal    Started                pod/cart-service-79cb5bdd58-bz2kl                                Started container cart-service
+49m         Normal    Pulled                 pod/api-gateway-c5fbb8f7f-k4qrb                                  Successfully pulled image "ecommerce.azurecr.io/api-gateway:latest" in 5.445s (5.445s including waiting). Image size: 92720454 bytes.
+49m         Normal    Pulled                 pod/product-service-646fd4c8b8-q7dm4                             Successfully pulled image "ecommerce.azurecr.io/product-service:latest" in 8.44s (8.44s including waiting). Image size: 114682246 bytes.
+49m         Normal    Started                pod/product-service-646fd4c8b8-q7dm4                             Started container product-service
+49m         Normal    Created                pod/product-service-646fd4c8b8-q7dm4                             Created container: product-service
+49m         Normal    Created                pod/auth-service-88b4cd688-dztwq                                 Created container: auth-service
+49m         Normal    Started                pod/auth-service-88b4cd688-dztwq                                 Started container auth-service
+49m         Normal    Pulled                 pod/auth-service-88b4cd688-dztwq                                 Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 9.11s (9.11s including waiting). Image size: 129968897 bytes.
+49m         Normal    Killing                pod/cart-service-7d7fdd477-wzpw2                                 Stopping container cart-service
+49m         Normal    Killing                pod/order-service-778787b555-7t2cc                               Stopping container order-service
+49m         Normal    SuccessfulDelete       replicaset/order-service-778787b555                              Deleted pod: order-service-778787b555-7t2cc
+49m         Normal    ScalingReplicaSet      deployment/order-service                                         Scaled down replica set order-service-778787b555 from 1 to 0
+49m         Normal    ScalingReplicaSet      deployment/cart-service                                          Scaled down replica set cart-service-7d7fdd477 from 1 to 0
+49m         Normal    SuccessfulDelete       replicaset/cart-service-7d7fdd477                                Deleted pod: cart-service-7d7fdd477-wzpw2
+49m         Normal    ScalingReplicaSet      deployment/api-gateway                                           Scaled down replica set api-gateway-55bf47c6f6 from 1 to 0
+49m         Normal    Killing                pod/api-gateway-55bf47c6f6-fmc6z                                 Stopping container api-gateway
+49m         Normal    SuccessfulDelete       replicaset/api-gateway-55bf47c6f6                                Deleted pod: api-gateway-55bf47c6f6-fmc6z
+48m         Normal    Killing                pod/product-service-6f66b9867b-bljpn                             Stopping container product-service
+48m         Normal    ScalingReplicaSet      deployment/product-service                                       Scaled down replica set product-service-6f66b9867b from 1 to 0
+48m         Normal    Killing                pod/auth-service-6f76d48874-pjdd5                                Stopping container auth-service
+48m         Normal    ScalingReplicaSet      deployment/auth-service                                          Scaled down replica set auth-service-6f76d48874 from 1 to 0
+48m         Normal    SuccessfulDelete       replicaset/auth-service-6f76d48874                               Deleted pod: auth-service-6f76d48874-pjdd5
+48m         Normal    SuccessfulDelete       replicaset/product-service-6f66b9867b                            Deleted pod: product-service-6f66b9867b-bljpn
+40m         Normal    SuccessfulCreate       job/k6-load-test-gradual-product-service-b1-gradual-rep1         Created pod: k6-load-test-gradual-product-service-b1-gradual-rep1-qrpqt
+40m         Normal    Scheduled              pod/k6-load-test-gradual-product-service-b1-gradual-rep1-qrpqt   Successfully assigned ecommerce/k6-load-test-gradual-product-service-b1-gradual-rep1-qrpqt to aks-userpool-16719200-vmss000011
+40m         Normal    Pulling                pod/k6-load-test-gradual-product-service-b1-gradual-rep1-qrpqt   Pulling image "grafana/k6:latest"
+40m         Normal    Pulled                 pod/k6-load-test-gradual-product-service-b1-gradual-rep1-qrpqt   Successfully pulled image "grafana/k6:latest" in 5.155s (5.155s including waiting). Image size: 36750082 bytes.
+40m         Normal    Created                pod/k6-load-test-gradual-product-service-b1-gradual-rep1-qrpqt   Created container: k6
+40m         Normal    Started                pod/k6-load-test-gradual-product-service-b1-gradual-rep1-qrpqt   Started container k6
+27m         Warning   BackoffLimitExceeded   job/k6-load-test-gradual-product-service-b1-gradual-rep1         Job has reached the specified backoff limit
+18m         Normal    Scheduled              pod/k6-load-test-spike-product-service-b1-spike-rep1-xw7z9       Successfully assigned ecommerce/k6-load-test-spike-product-service-b1-spike-rep1-xw7z9 to aks-userpool-16719200-vmss000011
+18m         Normal    Pulling                pod/k6-load-test-spike-product-service-b1-spike-rep1-xw7z9       Pulling image "grafana/k6:latest"
+18m         Normal    SuccessfulCreate       job/k6-load-test-spike-product-service-b1-spike-rep1             Created pod: k6-load-test-spike-product-service-b1-spike-rep1-xw7z9
+18m         Normal    Pulled                 pod/k6-load-test-spike-product-service-b1-spike-rep1-xw7z9       Successfully pulled image "grafana/k6:latest" in 1.647s (1.647s including waiting). Image size: 36750082 bytes.
+18m         Normal    Created                pod/k6-load-test-spike-product-service-b1-spike-rep1-xw7z9       Created container: k6
+18m         Normal    Started                pod/k6-load-test-spike-product-service-b1-spike-rep1-xw7z9       Started container k6
+9m44s       Warning   Unhealthy              pod/product-service-646fd4c8b8-q7dm4                             Readiness probe failed: Get "http://10.244.2.183:8002/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+5m34s       Warning   BackoffLimitExceeded   job/k6-load-test-spike-product-service-b1-spike-rep1             Job has reached the specified backoff limit

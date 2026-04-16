@@ -18,6 +18,7 @@ PRODUCT_SERVICE_URL = os.getenv("PRODUCT_SERVICE_URL", "http://localhost:8002")
 CART_SERVICE_URL = os.getenv("CART_SERVICE_URL", "http://localhost:8003")
 ORDER_SERVICE_URL = os.getenv("ORDER_SERVICE_URL", "http://localhost:8004")
 PAYMENT_SERVICE_URL = os.getenv("PAYMENT_SERVICE_URL", "http://localhost:8005")
+SHIPPING_RATE_SERVICE_URL = os.getenv("SHIPPING_RATE_SERVICE_URL", "http://localhost:8006")
 
 
 @dataclass
@@ -45,6 +46,9 @@ ROUTES: list[RouteConfig] = [
     # Payment endpoints (auth required)
     RouteConfig("/payments", PAYMENT_SERVICE_URL, requires_auth=True),
     RouteConfig("/webhooks", PAYMENT_SERVICE_URL, requires_auth=False),
+
+    # Shipping quote endpoints (public quote estimation)
+    RouteConfig("/shipping", SHIPPING_RATE_SERVICE_URL, requires_auth=False),
 ]
 
 

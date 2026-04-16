@@ -1,0 +1,63 @@
+# B1: Under-provisioned Baseline — shipping-rate-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping-rate-service
+  namespace: ecommerce
+  labels:
+    app: shipping-rate-service
+    experiment: b1-underprovisioned
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shipping-rate-service
+  template:
+    metadata:
+      labels:
+        app: shipping-rate-service
+    spec:
+      containers:
+        - name: shipping-rate-service
+          image: ecommerce.azurecr.io/shipping-rate-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8006
+          env:
+            - name: CARRIER_SERVICE_URL
+              value: "http://carrier-mock-service:8007"
+            - name: CARRIER_TIMEOUT_SECONDS
+              value: "3.0"
+            - name: ENVIRONMENT
+              value: "production"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: INTERNAL_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: internal-gateway-secret
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8006
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 6
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8006
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3

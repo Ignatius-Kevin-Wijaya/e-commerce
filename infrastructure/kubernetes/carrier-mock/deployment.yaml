@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: carrier-mock-service
+  namespace: ecommerce
+  labels:
+    app: carrier-mock-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: carrier-mock-service
+  template:
+    metadata:
+      labels:
+        app: carrier-mock-service
+    spec:
+      containers:
+        - name: carrier-mock-service
+          image: ecommerce.azurecr.io/carrier-mock-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8007
+          env:
+            - name: ENVIRONMENT
+              value: "production"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: INTERNAL_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: internal-gateway-secret
+            - name: CARRIER_DELAY_SCALE
+              value: "1.0"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8007
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 6
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8007
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3

@@ -4,9 +4,18 @@
   "config": "b2",
   "pattern": "gradual",
   "repetition": 1,
-  "start_epoch": 1775548975,
-  "end_epoch": 1775550133,
-  "duration_seconds": 1158,
+  "start_epoch": 1776160241,
+  "end_epoch": 1776161579,
+  "duration_seconds": 1338,
   "k6_job_name": "k6-load-test-gradual-product-service-b2-gradual-rep1",
-  "timestamp": "2026-04-07T08:22:13+00:00"
+  "target_url": "http://product-service.ecommerce.svc.cluster.local:8002",
+  "load_profile": {
+    "version": "recovery-v2",
+    "base_rps": 20,
+    "peak_rps": 200,
+    "page_size": 100,
+    "max_page": 12,
+    "search_terms": "Laptop,Phone,Camera,Headphones,Keyboard,Monitor,Speaker,Charger"
+  },
+  "timestamp": "2026-04-14T10:12:59+00:00"
 }

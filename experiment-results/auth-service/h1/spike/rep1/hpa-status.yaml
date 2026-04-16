@@ -6,13 +6,13 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"labels":{"experiment":"h1-hpa-default"},"name":"auth-service-hpa-default","namespace":"ecommerce"},"spec":{"maxReplicas":5,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":70,"type":"Utilization"}},"type":"Resource"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"auth-service"}}}
-    creationTimestamp: "2026-04-07T15:45:07Z"
+    creationTimestamp: "2026-04-14T17:52:03Z"
     labels:
       experiment: h1-hpa-default
     name: auth-service-hpa-default
     namespace: ecommerce
-    resourceVersion: "1096209"
-    uid: a840bc8c-b62a-43bc-9ef3-f42ceaf8a92e
+    resourceVersion: "1714436"
+    uid: 7630c965-cc18-4fcf-b2b8-7f894f8ffff8
   spec:
     maxReplicas: 5
     metrics:
@@ -29,40 +29,39 @@ items:
       name: auth-service
   status:
     conditions:
-    - lastTransitionTime: "2026-04-07T15:45:22Z"
-      message: recent recommendations were higher than current one, applying the highest
-        recent recommendation
-      reason: ScaleDownStabilized
+    - lastTransitionTime: "2026-04-14T17:52:18Z"
+      message: the HPA controller was able to update the target scale to 1
+      reason: SucceededRescale
       status: "True"
       type: AbleToScale
-    - lastTransitionTime: "2026-04-07T15:45:22Z"
+    - lastTransitionTime: "2026-04-14T17:52:18Z"
       message: the HPA was able to successfully calculate a replica count from cpu
         resource utilization (percentage of request)
       reason: ValidMetricFound
       status: "True"
       type: ScalingActive
-    - lastTransitionTime: "2026-04-07T15:49:08Z"
-      message: the desired replica count is more than the maximum replica count
-      reason: TooManyReplicas
-      status: "True"
+    - lastTransitionTime: "2026-04-14T18:09:50Z"
+      message: the desired count is within the acceptable range
+      reason: DesiredWithinRange
+      status: "False"
       type: ScalingLimited
     currentMetrics:
     - resource:
         current:
-          averageUtilization: 2
+          averageUtilization: 0
           averageValue: 2m
         name: cpu
       type: Resource
-    currentReplicas: 5
-    desiredReplicas: 5
-    lastScaleTime: "2026-04-07T15:49:23Z"
+    currentReplicas: 4
+    desiredReplicas: 1
+    lastScaleTime: "2026-04-14T18:11:50Z"
 - apiVersion: autoscaling/v2
   kind: HorizontalPodAutoscaler
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"labels":{"experiment":"k1-keda"},"name":"product-service-keda","namespace":"ecommerce"},"spec":{"cooldownPeriod":30,"maxReplicaCount":5,"minReplicaCount":1,"pollingInterval":15,"scaleTargetRef":{"name":"product-service"},"triggers":[{"metadata":{"metricName":"http_requests_per_second","query":"sum(rate(http_requests_total{job=\"product-service\"}[1m]))\n","serverAddress":"http://prometheus.monitoring.svc.cluster.local:9090","threshold":"50"},"type":"prometheus"}]}}
-    creationTimestamp: "2026-04-07T12:49:58Z"
+        {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"labels":{"experiment":"k1-keda"},"name":"product-service-keda","namespace":"ecommerce"},"spec":{"cooldownPeriod":30,"maxReplicaCount":5,"minReplicaCount":1,"pollingInterval":15,"scaleTargetRef":{"name":"product-service"},"triggers":[{"metadata":{"metricName":"http_requests_per_second","query":"sum(rate(http_requests_total{job=\"product-service\"}[1m]))\n","serverAddress":"http://prometheus.monitoring.svc.cluster.local:9090","threshold":"5"},"type":"prometheus"}]}}
+    creationTimestamp: "2026-04-14T15:04:38Z"
     labels:
       app.kubernetes.io/managed-by: keda-operator
       app.kubernetes.io/name: keda-hpa-product-service-keda
@@ -78,9 +77,9 @@ items:
       controller: true
       kind: ScaledObject
       name: product-service-keda
-      uid: a46d66b1-8001-4339-b541-a5b09f0ae527
-    resourceVersion: "1097382"
-    uid: f07cfc82-1b9a-4b2c-8d68-db77a8a37e3e
+      uid: 262994d7-c0ca-4a50-bce5-954b8d506adc
+    resourceVersion: "1714405"
+    uid: 89909154-c33a-449e-b1ba-68bf7e1397c2
   spec:
     maxReplicas: 5
     metrics:
@@ -91,7 +90,7 @@ items:
             matchLabels:
               scaledobject.keda.sh/name: product-service-keda
         target:
-          averageValue: "50"
+          averageValue: "5"
           type: AverageValue
       type: External
     minReplicas: 1
@@ -101,19 +100,19 @@ items:
       name: product-service
   status:
     conditions:
-    - lastTransitionTime: "2026-04-07T12:50:13Z"
+    - lastTransitionTime: "2026-04-14T15:04:53Z"
       message: recommended size matches current size
       reason: ReadyForNewScale
       status: "True"
       type: AbleToScale
-    - lastTransitionTime: "2026-04-07T12:50:13Z"
+    - lastTransitionTime: "2026-04-14T15:04:53Z"
       message: 'the HPA was able to successfully calculate a replica count from external
         metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name:
         product-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},})'
       reason: ValidMetricFound
       status: "True"
       type: ScalingActive
-    - lastTransitionTime: "2026-04-07T12:50:13Z"
+    - lastTransitionTime: "2026-04-14T15:23:40Z"
       message: the desired count is within the acceptable range
       reason: DesiredWithinRange
       status: "False"
@@ -130,7 +129,7 @@ items:
       type: External
     currentReplicas: 1
     desiredReplicas: 1
-    lastScaleTime: "2026-04-07T13:09:30Z"
+    lastScaleTime: "2026-04-14T15:24:25Z"
 kind: List
 metadata:
   resourceVersion: ""
