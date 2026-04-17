@@ -289,6 +289,7 @@ metadata:
     target: shipping-rate-service
 spec:
   ttlSecondsAfterFinished: 300
+  backoffLimit: 0         # prevent retry k6 pods from polluting result dirs
   template:
     metadata:
       labels:
@@ -350,6 +351,7 @@ metadata:
     target: shipping-rate-service
 spec:
   ttlSecondsAfterFinished: 300
+  backoffLimit: 0         # prevent retry k6 pods from polluting result dirs
   template:
     metadata:
       labels:
@@ -411,6 +413,7 @@ metadata:
     target: shipping-rate-service
 spec:
   ttlSecondsAfterFinished: 300
+  backoffLimit: 0         # prevent retry k6 pods from polluting result dirs
   template:
     metadata:
       labels:

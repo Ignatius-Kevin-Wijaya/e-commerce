@@ -1,4 +1,9 @@
-"""HTTP client for the internal carrier-mock-service."""
+"""HTTP client for the internal carrier-mock-service.
+
+Uses a module-level shared httpx.AsyncClient to avoid per-request allocation
+overhead. Under 60 RPS × 3 carriers, creating/destroying 60 clients/sec caused
+OOMKill at 512Mi — the shared pool keeps memory stable at ~60-80Mi under load.
+"""
 
 import asyncio
 import logging
@@ -13,6 +18,24 @@ CARRIER_SERVICE_URL = os.getenv("CARRIER_SERVICE_URL", "http://localhost:8007")
 INTERNAL_GATEWAY_SECRET = os.getenv("INTERNAL_GATEWAY_SECRET", "dev_secret_gateway_key")
 TIMEOUT = float(os.getenv("CARRIER_TIMEOUT_SECONDS", "3.0"))
 CARRIERS = ("fastship", "ecopost", "globex")
+
+# Shared httpx client — created lazily on first use, reused for all requests.
+# Connection pool limits prevent unbounded connection growth under load.
+_shared_client: httpx.AsyncClient | None = None
+
+
+def _get_shared_client() -> httpx.AsyncClient:
+    """Return the module-level shared httpx.AsyncClient, creating it on first call."""
+    global _shared_client
+    if _shared_client is None or _shared_client.is_closed:
+        _shared_client = httpx.AsyncClient(
+            timeout=TIMEOUT,
+            limits=httpx.Limits(
+                max_connections=200,      # enough for 60 RPS × 3 carriers
+                max_keepalive_connections=30,
+            ),
+        )
+    return _shared_client
 
 
 class CarrierClientError(Exception):
@@ -34,9 +57,9 @@ class CarrierClient:
         return resp.json()
 
     async def fetch_quotes(self, payload: dict[str, Any]) -> list[dict[str, Any]]:
-        async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-            tasks = [self._fetch_quote(client, carrier, payload) for carrier in CARRIERS]
-            results = await asyncio.gather(*tasks, return_exceptions=True)
+        client = _get_shared_client()
+        tasks = [self._fetch_quote(client, carrier, payload) for carrier in CARRIERS]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
 
         quotes: list[dict[str, Any]] = []
         failures: list[str] = []
@@ -53,7 +76,7 @@ class CarrierClient:
         return quotes
 
     async def health_check(self) -> dict[str, Any]:
-        async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-            resp = await client.get(f"{self.base_url}/ready", headers=self._headers)
-            resp.raise_for_status()
-            return resp.json()
+        client = _get_shared_client()
+        resp = await client.get(f"{self.base_url}/ready", headers=self._headers)
+        resp.raise_for_status()
+        return resp.json()

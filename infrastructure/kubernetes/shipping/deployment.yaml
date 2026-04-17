@@ -38,17 +38,21 @@ spec:
           resources:
             requests:
               cpu: "250m"
-              memory: "128Mi"
+              memory: "256Mi"   # raised from 128Mi — prevents OOMKill at 60 RPS fan-out
             limits:
               cpu: "500m"
-              memory: "256Mi"
+              memory: "512Mi"   # raised from 256Mi — 3x carrier fan-out needs headroom
           livenessProbe:
             httpGet:
               path: /health
               port: 8006
             initialDelaySeconds: 10
-            periodSeconds: 15
-            timeoutSeconds: 5
+            # periodSeconds=20, timeoutSeconds=10: matches auth-service probe tuning.
+            # Under concurrent 3x fan-out at 30+ RPS the asyncio event loop is busy;
+            # 5s timeout caused false-positive kills. 10s gives the loop time to respond.
+            # failureThreshold=6 = 120s tolerance before any restart.
+            periodSeconds: 20
+            timeoutSeconds: 10
             failureThreshold: 6
           readinessProbe:
             httpGet:
@@ -56,5 +60,5 @@ spec:
               port: 8006
             initialDelaySeconds: 5
             periodSeconds: 10
-            timeoutSeconds: 5
+            timeoutSeconds: 10   # /ready calls carrier-mock-service; 5s was too short under load
             failureThreshold: 3
