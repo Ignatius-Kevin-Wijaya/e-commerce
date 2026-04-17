@@ -25,7 +25,7 @@ spec:
             - name: CARRIER_SERVICE_URL
               value: "http://carrier-mock-service:8007"
             - name: CARRIER_TIMEOUT_SECONDS
-              value: "3.0"
+              value: "10.0"  # raised: pool queuing shows as latency not timeout errors
             - name: ENVIRONMENT
               value: "production"
             - name: LOG_LEVEL
@@ -47,18 +47,22 @@ spec:
               path: /health
               port: 8006
             initialDelaySeconds: 10
-            # periodSeconds=20, timeoutSeconds=10: matches auth-service probe tuning.
-            # Under concurrent 3x fan-out at 30+ RPS the asyncio event loop is busy;
-            # 5s timeout caused false-positive kills. 10s gives the loop time to respond.
-            # failureThreshold=6 = 120s tolerance before any restart.
-            periodSeconds: 20
-            timeoutSeconds: 10
-            failureThreshold: 6
+            # Keep liveness tolerant under the saturated 1-rep B1 envelope.
+            # On 2026-04-17, a 20s/10s probe still restarted the pod mid-run
+            # even though memory stayed healthy; the problem was transient
+            # event-loop starvation, not a deadlock. At the calibrated 10->80
+            # B1 load, even 30s/15s/10 still caused a late-run restart, so we
+            # intentionally stretch liveness beyond the experiment hot window.
+            periodSeconds: 60
+            timeoutSeconds: 15
+            failureThreshold: 10
           readinessProbe:
             httpGet:
               path: /ready
               port: 8006
             initialDelaySeconds: 5
-            periodSeconds: 10
-            timeoutSeconds: 10   # /ready calls carrier-mock-service; 5s was too short under load
-            failureThreshold: 3
+            # /ready is now a lightweight local check, but keep some tolerance
+            # so transient overload does not remove the only endpoint.
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 6

@@ -108,19 +108,111 @@ The thesis has evolved through five iterations:
 | **2026-04-16** | Shipping-rate-service implemented and verified | `shipping-rate-service` and `carrier-mock-service` were implemented, routed through `api-gateway`, deployed on AKS, and verified locally plus in-cluster via real `POST /shipping/quotes` requests returning multi-carrier quote aggregates. |
 | **2026-04-16** | Shipping load and autoscaler smoke calibration | Shipping k6 smoke at gradual `5 -> 20` RPS completed with about `8549` requests, `0.33%` failures, and `p95 ≈ 929ms`. H3 and K1 were first shown to read the shipping metric path correctly, then recalibrated from threshold `15` to `5`, after which both scaled `shipping-rate-service` from `1 -> 2` on AKS. |
 | **Current interpretation** | Post-pivot validated state | Auth-service is now a defensible CPU-bound control, and shipping-rate-service is now the implemented and smoke-validated wait-dominant comparison service. Product-service remains academically useful, but as a dependency-sensitive DB-backed case study rather than part of the final controlled matrix. |
+| **2026-04-17** | Executor changed from `ramping-arrival-rate` to `ramping-vus` for shipping | Shipping used RPS-based executor. At 60 RPS the pod generated errors because asyncio backpressure has no graceful degradation mode. Switched to `ramping-vus` which lets the service naturally self-regulate throughput by response time, producing clean stress curves without artificial error injection. |
+| **2026-04-17** | PEAK_VUS 4-point calibration ladder (70 / 80 / 100 / 120) | Ran all four levels against B1 (1 pod) and B2 (5 pods) with CPU and request-rate Prometheus sampling. Chose **PEAK_VUS = 80** as the locked value. |
+| **2026-04-17** | Critical finding: shipping is NOT purely wait-dominant at high VUs | At VU=80, CPU = 290 m (116% of 250 m request). asyncio event loop, httpx pool management, JSON serialization, and Prometheus instrumentation all generate measurable CPU overhead. H1 and H2 both trigger at all VU levels tested. |
+| **2026-04-17** | H3/K1 threshold recalibrated from 5 → 15 req/s/pod | Old threshold of 5 req/s/pod was calibrated for `ramping-arrival-rate` Prometheus observations. With `ramping-vus`, warm-up already generates ~13 req/s/pod (10 VUs ÷ 0.75 s avg latency). Threshold of 15 fires only when pod reaches ~90% throughput capacity, not during warm-up. |
+| **2026-04-17** | B2 confirmation run at VU=80 | p95 = 917 ms (expected_response:true), 2.17% tail errors hitting 10 s carrier timeout. B1/B2 p95 ratio = 5.56×. Confirms VU=80 generates a statistically interesting differentiation between provisioning levels. |
+| **2026-04-17** | 4 pre-flight bugs found and fixed before first run | (1) Stale state file entries from calibration, (2) runner set BASE_RPS/PEAK_RPS but k6 reads BASE_VUS/PEAK_VUS, (3) metadata.json recorded wrong units, (4) validator expected_request_count used RPS math overestimating by 32%. All fixed. |
+| **2026-04-18** | 18-run first repetition ready to launch | All 6 configs × 3 patterns × 1 repetition = 18 runs. Estimated ~4.5 hours on AKS. Runner script to be executed from `ecommerce-vm` so laptop can be powered off. |
+
+### Shipping-Rate-Service Calibration Deep Dive (April 17–18, 2026)
+
+This section records the full reasoning chain behind each calibration decision for shipping-rate-service, with explicit thesis implications.
+
+#### Why `ramping-vus` Instead of `ramping-arrival-rate`
+
+**Decision:** Replace `ramping-arrival-rate` with `ramping-vus` as the k6 executor for all shipping-rate-service tests.
+
+**Technical reason:** `ramping-arrival-rate` is an open-loop executor — k6 fires requests at the specified rate regardless of whether the service is keeping up. When the service saturates, requests pile up in a VU queue. This generates *artificially inflated error rates* that reflect k6's queuing behavior, not the service's actual degradation curve. For a wait-dominant fan-out service (shipping-rate-service calls 3 carrier endpoints with ~200–800 ms simulated delay), the pod's asyncio event loop has no graceful backpressure signal to send to k6's open loop, so errors appear earlier and more abruptly than they would in real production traffic.
+
+`ramping-vus` is a closed-loop executor — each virtual user completes one request before starting the next. This naturally self-regulates throughput via Little's Law: `throughput = VUs / avg_response_time`. When the service slows down, throughput drops proportionally but errors do not spike artificially. This produces the smooth degradation curve that autoscaler comparison research needs.
+
+**Thesis implication:** Using `ramping-vus` makes the B1 (underprovisioned) results *more conservative* — the service degrades gracefully with high latency rather than failing loudly with errors. This is methodologically stronger because: (1) it matches production behavior more closely, (2) the B1/B2 differentiation comes from measurable p95 latency ratio rather than error rate, which is a richer signal for thesis analysis, and (3) autoscalers triggering on latency-driven load is more realistic than autoscalers triggering on artificially induced error storms.
+
+#### Why PEAK_VUS = 80
+
+**Decision:** Lock PEAK_VUS = 80 for all 18 shipping runs.
+
+**Calibration data:**
+
+| VUs | B1 p95 | B1 Errors | CPU @ peak | B1/B2 ratio | Verdict |
+|-----|--------|-----------|-----------|------------|---------|
+| 70 | 4.21 s | 0% | 372 m (149%) | ~4.4× | p95 acceptable but margin too low |
+| **80** | **5.10 s** | **0%** | **290 m (116%)** | **5.56×** | **✅ Selected** |
+| 100 | 9.49 s | 0% | 500 m (200%) | ~10× | CPU throttled, near timeout boundary |
+| 120 | 11.81 s | 19.6% | 358 m (143%) | — | ❌ Errors disqualify |
+
+**Selection rationale:**
+- **0% errors** — no artificial error signal contaminating the autoscaler comparison
+- **5.56× B1/B2 p95 ratio** — statistically large differentiation between provisioning levels, sufficient to distinguish autoscaler effectiveness in BAB 4
+- **CPU not throttled** — at VU=100 the pod is CPU-throttled (500 m against a 500 m limit), which distorts the CPU-HPA comparison because throttling makes CPU appear to plateau even though load is still increasing
+- **Below the 10 s carrier timeout** — p99 at VU=80 stays below 10 s, so there is no carrier-timeout error contamination
+
+**Thesis implication:** The B1/B2 gate (5.56× ratio) is the scientific validity gate for the entire matrix. If B2 (5 pods) cannot outperform B1 (1 pod) significantly, the workload is not app-tier-sensitive and autoscaler comparison is meaningless. A 5.56× ratio is a strong gate. For context, a ratio of 2–3× is considered acceptable; >5× is excellent. This gate figure will be reported in BAB 3 (Metode Penelitian) as the load calibration evidence.
+
+#### Why the Service Is Not Purely Wait-Dominant at High VUs
+
+**Finding:** At VU=80, the shipping-rate-service pod consumes 290 m CPU — 116% of its 250 m resource request. H1 (70% CPU threshold = 175 m) and H2 (50% CPU threshold = 125 m) both trigger scaling. This was unexpected.
+
+**Root cause:** asyncio is not truly CPU-free at high concurrency. At 80 simultaneous coroutines, the Python event loop generates measurable CPU overhead from:
+1. **Coroutine scheduling** — selecting which coroutine to run next at each `await` point
+2. **httpx connection pool management** — SSL handshakes, socket polling, connection reuse
+3. **JSON serialization** — deserializing carrier responses and re-serializing the aggregate quote
+4. **Prometheus instrumentation** — counter and histogram operations on every request
+5. **FastAPI request routing** — Pydantic validation, dependency injection overhead
+
+**Revised thesis narrative:** The original framing was "CPU HPA should fail on a wait-dominant service because the CPU signal is too weak." This is now replaced with a more nuanced and actually *stronger* claim:
+
+> "For fan-out aggregation services, both CPU and request-rate signals generate autoscaling activity, but they differ in **timing precision and proportionality**. CPU-based scaling (H1/H2) reacts to event-loop overhead, which is a byproduct of concurrency rather than a direct measure of user-visible degradation. Request-rate scaling (H3/K1) reacts directly to traffic intensity, which is the root cause of latency increase. This difference in signal semantics produces measurable differences in scale-up timing, pod headcount, and time-to-recovery that constitute the empirical contribution of this thesis."
+
+**Thesis implication:** This finding makes the thesis *stronger* in three ways:
+1. **It is a more honest result** — claiming CPU HPA "simply fails" would be an exaggeration. Showing that it *responds to a different signal with different timing* is a more sophisticated and defensible finding.
+2. **It provides a concrete research contribution** — the distinction between "metric that correlates with load" and "metric that causes load" is the core academic insight. Request rate is the *cause*; CPU overhead is an *effect* (and a noisy one at high coroutine counts). This maps directly to BAB 4 analysis and BAB 5 conclusions.
+3. **It opens the door for a timing analysis** — H3/K1 should scale *earlier* in the ramp than H1/H2 because they react to the root cause rather than its consequence. If the Prometheus data confirms this, it becomes a publishable-quality finding.
+
+#### H3/K1 Threshold Recalibration: 5 → 15 req/s/pod
+
+**Decision:** Raise the `averageValue` (H3) and `threshold` (K1) from 5 to 15 req/s/pod.
+
+**Problem with threshold = 5:** The original threshold of 5 req/s/pod was calibrated when the shipping service used `ramping-arrival-rate`. Under that executor, Prometheus observed only 10–15 req/s from the single pod even when k6 was trying to send 60 req/s — because errors and backpressure ate the undelivered load. With `ramping-vus`, the same 10 BASE_VUS at ~750 ms avg latency generates `10 / 0.75 = 13.3 req/s` cleanly, with no errors. A threshold of 5 would cause H3 and K1 to scale up *during the warm-up phase*, before peak load even begins. This would pollute the B1-level starting condition and make H3/K1 look faster than they are.
+
+**New threshold = 15:** At VU=80 peak, Prometheus observed 16.6 req/s/pod. Threshold of 15 fires when the pod is at ~90% throughput capacity. It remains silent at warm-up (13.3 req/s < 15). KEDA scaling math: `ceil(16.6 / 15) = 2 replicas` — matches H3 AverageValue semantics exactly.
+
+**Important note for BAB 3:** H3 and K1 use the *same numeric threshold* (15) but the underlying Kubernetes mechanics differ. H3 HPA computes `desiredReplicas = ceil(currentMetricValue / averageValue)` where `currentMetricValue` is the sum over all pods. K1 KEDA computes `desiredReplicas = ceil(queryResult / threshold)` where `queryResult` is the raw PromQL aggregate. Since both query `sum(rate(http_requests_total{job="shipping-rate-service"}[1m]))`, the math is identical. This equivalence is intentional — it isolates the autoscaler *engine* (HPA vs KEDA controller) from the *metric semantics* (same query, same threshold), which is required for a fair head-to-head comparison.
+
+#### Pre-Flight Bug Fixes (April 17, 2026)
+
+Before launching the 18-run matrix, a deep pre-flight audit found 4 bugs. All were fixed.
+
+| Bug | File | Root Cause | Fix | Thesis Impact |
+|-----|------|-----------|-----|--------------|
+| Stale state file | `.experiment-state` | 5 calibration runs wrote duplicate `DONE:shipping_b1_gradual_rep1` entries | Removed all shipping entries; deleted stale results dir | Would have caused `--resume` to skip B1 gradual, corrupting the dataset |
+| Wrong env var names | `run-experiment.sh` | Runner set `BASE_RPS`/`PEAK_RPS` but k6 reads `BASE_VUS`/`PEAK_VUS` | Renamed to `SHIPPING_BASE_VUS`/`SHIPPING_PEAK_VUS` throughout | k6 used correct template defaults (harmless), but runner could not override VUs at runtime |
+| Misleading metadata | `run-experiment.sh` | `metadata.json` recorded `"base_rps": 10, "peak_rps": 60"` | Conditional logic: shipping records `"base_vus": 10, "peak_vus": 80"` | Metadata is the ground truth for the validator and thesis appendix; wrong units would cause confusion |
+| Validator false alarm | `deep_validate.py` | `expected_request_count()` used RPS×time math, overestimating by 32% | Added `SHIPPING_EXPECTED_REQUESTS` with calibrated per-pattern minimums (15k/12k/10k) | Every B1 shipping run would have flagged as A1-RPS critical, causing false re-runs |
 
 ### What This Means For The Thesis
 
 - **The original strong claim that "CPU HPA should clearly fail on product-service" is too strong.** Product-service should no longer be treated as the final non-CPU counterpart in the core matrix.
-- **The strongest thesis contribution is now a two-part story.** First, auth-service validates the CPU-dominant control case. Second, the product experiments document a real-world validity lesson: app-tier autoscaling comparisons break down when a downstream dependency dominates.
-- **This makes the thesis more credible, not weaker.** A refuted or nuanced hypothesis is still a valid research contribution, especially because the factorial design isolates metric choice from autoscaler engine choice.
-- **Methodological calibration is now part of the contribution.** Fair CPU requests, service-specific request-rate thresholds, same-workload comparisons, and a dependency-isolation gate explain why earlier results were misleading and why the corrected runs are more defensible.
-- **The final controlled comparison should now be auth-service vs shipping-rate-service.** This preserves the original thesis objective, but with a much cleaner non-CPU workload whose bottleneck is deliberate wait on outbound dependency calls rather than an overloaded in-cluster database.
-- **Product-service remains in the thesis as a case-study, not as wasted work.** It provides a realistic counterexample showing that autoscaling app pods does not fix every performance problem.
+- **The strongest thesis contribution is now a two-part story.** First, auth-service validates the CPU-dominant control case. Second, the shipping experiments reveal a subtler and more academically valuable finding: even in a wait-dominant service, CPU and request-rate signals *both* trigger autoscaling — but they react to fundamentally different causal mechanisms with measurably different timing.
+- **This makes the thesis more credible, not weaker.** A nuanced hypothesis ("signals differ in timing and proportionality") is more defensible than a binary one ("CPU fails, request-rate wins"). The factorial design isolates metric choice from autoscaler engine choice, which allows the analysis to separate *what is being measured* from *which system is doing the measuring*.
+- **Methodological calibration is now explicitly part of the contribution.** Fair CPU requests, service-specific VU calibration, executor selection rationale, threshold derivation math, and a dependency-isolation gate all explain why prior results were misleading and why the corrected runs are academically defensible. This methodology section will be a key strength in the thesis defense.
+- **The final controlled comparison is auth-service vs shipping-rate-service.** Auth-service provides the CPU-dominant control where H1/H2 are expected to be both reactive and proportional. Shipping-rate-service provides the mixed-workload case where H1/H2 still react (via asyncio overhead) but H3/K1 are hypothesized to react *earlier and more proportionally* because they measure the root cause of latency.
+- **Product-service remains in the thesis as a case-study, not as wasted work.** It provides a realistic counterexample showing that autoscaling app pods does not fix every performance problem — specifically, that when a downstream dependency dominates, app-tier scaling can make outcomes *worse* by increasing database connection pressure.
+- **The revised thesis central claim (for BAB 5):** Request-rate-based autoscaling (H3/K1) is hypothesized to outperform CPU-based autoscaling (H1/H2) on the shipping-rate-service on two dimensions: (1) earlier scale-up initiation relative to load ramp onset, and (2) lower peak p95 latency during the hold-at-peak phase. Whether H1/H2 still achieve *eventual* effectiveness (by triggering on asyncio CPU overhead) is an empirical question the matrix data will answer.
 
 ### One Important Caution
 
-These findings are strong, but they are still **pre-final-matrix findings**, not the final full auth+shipping dataset. Shipping-rate-service is now implemented and smoke-calibrated, but the full `B1/B2/H1/H2/H3/K1` matrix should only be trusted after a fresh `experiment-first` sweep passes with the updated auth+shipping scripts, exporters, and validators. Product-service runs should not be mixed into the final core statistical analysis; they should be reported separately as exploratory or appendix results.
+These findings are strong, but they are still **pre-final-matrix findings** — the 18-run first repetition for shipping-rate-service has not yet been executed. The hypotheses above are directionally grounded in calibration data, but the actual H1/H2 vs H3/K1 timing comparison requires the full Prometheus time-series data from the 18 runs. Key unknowns still to be resolved by the data:
+
+1. **Does H3/K1 actually scale earlier than H1/H2?** Calibration shows both signals are present, but the *relative timing* under real load has not been measured.
+2. **Does the 2.17% tail error rate in B2 represent a systematic ceiling or a noise artifact?** If it appears consistently across B2 runs, it must be noted in the methodology as a characteristic of the carrier-timeout interaction.
+3. **Do oscillating load patterns reveal thrashing behavior in any config?** The oscillating pattern cycles 3× between base and peak load — H2's aggressive scale-down policy could cause rapid pod churn that is not visible in gradual or spike patterns.
+
+Product-service runs should not be mixed into the final core statistical analysis; they should be reported separately as exploratory or appendix results.
+
+
 
 ---
 

@@ -53,8 +53,8 @@ PRODUCT_PAGE_SIZE="${PRODUCT_PAGE_SIZE:-100}"
 PRODUCT_MAX_PAGE="${PRODUCT_MAX_PAGE:-12}"
 PRODUCT_SEARCH_TERMS="${PRODUCT_SEARCH_TERMS:-Laptop,Phone,Camera,Headphones,Keyboard,Monitor,Speaker,Charger}"
 
-SHIPPING_BASE_RPS="${SHIPPING_BASE_RPS:-10}"
-SHIPPING_PEAK_RPS="${SHIPPING_PEAK_RPS:-60}"
+SHIPPING_BASE_VUS="${SHIPPING_BASE_VUS:-10}"
+SHIPPING_PEAK_VUS="${SHIPPING_PEAK_VUS:-80}"
 SHIPPING_MAX_ITEMS="${SHIPPING_MAX_ITEMS:-4}"
 SHIPPING_MIN_WEIGHT_GRAMS="${SHIPPING_MIN_WEIGHT_GRAMS:-200}"
 SHIPPING_MAX_WEIGHT_GRAMS="${SHIPPING_MAX_WEIGHT_GRAMS:-2500}"
@@ -152,8 +152,8 @@ create_k6_job_from_yaml() {
   PRODUCT_PAGE_SIZE="${PRODUCT_PAGE_SIZE}" \
   PRODUCT_MAX_PAGE="${PRODUCT_MAX_PAGE}" \
   PRODUCT_SEARCH_TERMS="${PRODUCT_SEARCH_TERMS}" \
-  SHIPPING_BASE_RPS="${SHIPPING_BASE_RPS}" \
-  SHIPPING_PEAK_RPS="${SHIPPING_PEAK_RPS}" \
+  SHIPPING_BASE_VUS="${SHIPPING_BASE_VUS}" \
+  SHIPPING_PEAK_VUS="${SHIPPING_PEAK_VUS}" \
   SHIPPING_MAX_ITEMS="${SHIPPING_MAX_ITEMS}" \
   SHIPPING_MIN_WEIGHT_GRAMS="${SHIPPING_MIN_WEIGHT_GRAMS}" \
   SHIPPING_MAX_WEIGHT_GRAMS="${SHIPPING_MAX_WEIGHT_GRAMS}" \
@@ -207,8 +207,8 @@ for doc in docs:
             set_env(env_list, "PRODUCT_MAX_PAGE", os.environ["PRODUCT_MAX_PAGE"])
             set_env(env_list, "PRODUCT_SEARCH_TERMS", os.environ["PRODUCT_SEARCH_TERMS"])
         elif service == "shipping-rate-service":
-            set_env(env_list, "BASE_RPS", os.environ["SHIPPING_BASE_RPS"])
-            set_env(env_list, "PEAK_RPS", os.environ["SHIPPING_PEAK_RPS"])
+            set_env(env_list, "BASE_VUS", os.environ["SHIPPING_BASE_VUS"])
+            set_env(env_list, "PEAK_VUS", os.environ["SHIPPING_PEAK_VUS"])
             set_env(env_list, "SHIPPING_MAX_ITEMS", os.environ["SHIPPING_MAX_ITEMS"])
             set_env(env_list, "SHIPPING_MIN_WEIGHT_GRAMS", os.environ["SHIPPING_MIN_WEIGHT_GRAMS"])
             set_env(env_list, "SHIPPING_MAX_WEIGHT_GRAMS", os.environ["SHIPPING_MAX_WEIGHT_GRAMS"])
@@ -306,11 +306,26 @@ service_port() {
   esac
 }
 
+service_base_vus() {
+  local service=$1
+  case "${service}" in
+    shipping-rate-service) echo "${SHIPPING_BASE_VUS}" ;;
+    *) echo "" ;;
+  esac
+}
+
+service_peak_vus() {
+  local service=$1
+  case "${service}" in
+    shipping-rate-service) echo "${SHIPPING_PEAK_VUS}" ;;
+    *) echo "" ;;
+  esac
+}
+
 service_base_rps() {
   local service=$1
   case "${service}" in
     product-service) echo "${PRODUCT_BASE_RPS}" ;;
-    shipping-rate-service) echo "${SHIPPING_BASE_RPS}" ;;
     *) echo "${AUTH_BASE_RPS}" ;;
   esac
 }
@@ -319,7 +334,6 @@ service_peak_rps() {
   local service=$1
   case "${service}" in
     product-service) echo "${PRODUCT_PEAK_RPS}" ;;
-    shipping-rate-service) echo "${SHIPPING_PEAK_RPS}" ;;
     *) echo "${AUTH_PEAK_RPS}" ;;
   esac
 }
@@ -568,18 +582,42 @@ for doc in docs:
   log_step "Waiting for k6 job to complete (timeout: ${K6_TIMEOUT}s)..."
   local start_time
   start_time=$(date +%s)
+  local deadline=$((start_time + K6_TIMEOUT))
+  local terminal_state="timeout"
 
-  if kubectl wait --for=condition=complete job/"${job_run_name}" -n "${NAMESPACE}" --timeout="${K6_TIMEOUT}s" 2>/dev/null; then
-    local end_time
-    end_time=$(date +%s)
-    local duration=$((end_time - start_time))
-    log_success "k6 job completed in ${duration}s"
-  else
-    local end_time
-    end_time=$(date +%s)
-    local duration=$((end_time - start_time))
-    log_warn "k6 job did not complete cleanly after ${duration}s (may have failed threshold checks — this is expected data)"
-  fi
+  while (( $(date +%s) < deadline )); do
+    local conditions
+    conditions=$(kubectl get job "${job_run_name}" -n "${NAMESPACE}" \
+      -o jsonpath='{range .status.conditions[*]}{.type}={.status}{" "}{end}' 2>/dev/null || true)
+
+    if [[ "${conditions}" == *"Complete=True"* ]]; then
+      terminal_state="complete"
+      break
+    fi
+
+    if [[ "${conditions}" == *"Failed=True"* ]]; then
+      terminal_state="failed"
+      break
+    fi
+
+    sleep 5
+  done
+
+  local end_time
+  end_time=$(date +%s)
+  local duration=$((end_time - start_time))
+
+  case "${terminal_state}" in
+    complete)
+      log_success "k6 job completed in ${duration}s"
+      ;;
+    failed)
+      log_warn "k6 job reached terminal failed state after ${duration}s (threshold failures are still valid data)"
+      ;;
+    *)
+      log_warn "k6 job did not reach a terminal state after ${duration}s (may have failed threshold checks — this is expected data)"
+      ;;
+  esac
 
   CURRENT_JOB_NAME="${job_run_name}"
 }
@@ -622,7 +660,7 @@ EOF
 }
 
 export_prometheus_metrics() {
-  local service=$1 config=$2 job_name=$3 results_dir=$4
+  local service=$1 config=$2 job_name=$3 results_dir=$4 run_start_epoch=$5
   local prom_pod
   prom_pod=$(kubectl get pods -n "${MONITORING_NS}" -l app=prometheus --no-headers -o custom-columns=":metadata.name" | head -1)
 
@@ -639,8 +677,8 @@ export_prometheus_metrics() {
 
   # Export key metrics via Prometheus API (using kubectl exec to avoid port-forward)
   local queries=(
-    "rate(http_requests_total{job=\"${service}\"}[1m])|http_requests_rate"
-    "histogram_quantile(0.95,rate(http_request_duration_seconds_bucket{job=\"${service}\"}[1m]))|p95_latency"
+    "sum by (handler,method) (rate(http_requests_total{job=\"${service}\"}[1m]))|http_requests_rate"
+    "histogram_quantile(0.95,sum by (le,handler,method) (rate(http_request_duration_seconds_bucket{job=\"${service}\"}[1m])))|p95_latency"
     "kube_deployment_status_replicas{deployment=\"${service}\"}|replica_count"
     "kube_deployment_status_replicas_ready{deployment=\"${service}\"}|replica_ready_count"
     "rate(container_cpu_usage_seconds_total{container=\"${service}\"}[1m])|cpu_usage"
@@ -657,15 +695,79 @@ export_prometheus_metrics() {
       > "${results_dir}/prom_${name}.json" 2>/dev/null || log_warn "Failed to export ${name}"
   done
 
-  local hpa_name scaledobject_name event_pattern
+  local hpa_name scaledobject_name
   hpa_name=$(hpa_name_for_config "${service}" "${config}")
   scaledobject_name=$(scaledobject_name_for_config "${service}" "${config}")
-  event_pattern=$(printf '%s\n' "${service}" "${job_name}" "${hpa_name}" "${scaledobject_name}" | \
-    python3 -c 'import re, sys; patterns=[line.strip() for line in sys.stdin if line.strip()]; print("|".join(re.escape(p) for p in patterns))')
+  local event_filter_script
+  read -r -d '' event_filter_script <<'PYEOF' || true
+import datetime as dt
+import json
+import sys
 
-  # Export only events relevant to the current run's service/job/autoscaler.
-  kubectl get events -n "${NAMESPACE}" --sort-by='.lastTimestamp' 2>/dev/null | \
-    awk -v pat="${event_pattern}" 'NR == 1 || $0 ~ pat' > "${results_dir}/k8s-events.txt" || true
+service, job_name, hpa_name, scaledobject_name, run_start_epoch = sys.argv[1:]
+run_start_epoch = float(run_start_epoch)
+names = [name for name in (service, job_name, hpa_name, scaledobject_name) if name]
+
+def parse_event_epoch(event):
+    candidates = (
+        event.get("eventTime"),
+        event.get("series", {}).get("lastObservedTime"),
+        event.get("lastTimestamp"),
+        event.get("firstTimestamp"),
+        event.get("metadata", {}).get("creationTimestamp"),
+    )
+    for raw in candidates:
+        if not raw:
+            continue
+        try:
+            return dt.datetime.fromisoformat(raw.replace("Z", "+00:00")).timestamp()
+        except ValueError:
+            continue
+    return None
+
+def is_relevant(event):
+    obj = event.get("involvedObject", {})
+    object_name = obj.get("name", "")
+    message = event.get("message", "")
+    haystacks = (object_name, message)
+    return any(name and any(name in hay for hay in haystacks) for name in names)
+
+payload = json.load(sys.stdin)
+items = payload.get("items", [])
+filtered = []
+for event in items:
+    event_epoch = parse_event_epoch(event)
+    if event_epoch is None or event_epoch < run_start_epoch - 30:
+        continue
+    if not is_relevant(event):
+        continue
+    filtered.append((event_epoch, event))
+
+filtered.sort(key=lambda item: item[0])
+print("TIMESTAMP\tTYPE\tREASON\tOBJECT\tMESSAGE")
+for event_epoch, event in filtered:
+    obj = event.get("involvedObject", {})
+    object_ref = f"{obj.get('kind', '').lower()}/{obj.get('name', '')}".strip("/")
+    message = event.get("message", "").replace("\t", " ").replace("\n", " ")
+    timestamp = dt.datetime.fromtimestamp(event_epoch, tz=dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    print(
+        "\t".join(
+            [
+                timestamp,
+                event.get("type", ""),
+                event.get("reason", ""),
+                object_ref,
+                message,
+            ]
+        )
+    )
+PYEOF
+
+  # Export only events from the current run window so old k6 jobs / stale pod
+  # history cannot leak into a fresh result directory.
+  kubectl get events -n "${NAMESPACE}" -o json 2>/dev/null | \
+    python3 -c "${event_filter_script}" "${service}" "${job_name}" "${hpa_name}" "${scaledobject_name}" "${run_start_epoch}" \
+    > "${results_dir}/k8s-events.txt" || true
 
   # Export only the autoscaler objects relevant to the current run.
   write_scoped_yaml "hpa" "${hpa_name}" "${results_dir}/hpa-status.yaml"
@@ -720,7 +822,7 @@ execute_single_run() {
 
   # Step 5: Export data
   export_k6_results "${job_name}" "${results_dir}"
-  export_prometheus_metrics "${service}" "${config}" "${job_name}" "${results_dir}"
+  export_prometheus_metrics "${service}" "${config}" "${job_name}" "${results_dir}" "${run_start}"
 
   # Step 6: Record metadata
   local run_end
@@ -742,8 +844,11 @@ execute_single_run() {
   "target_url": "http://${service}.${NAMESPACE}.svc.cluster.local:$(service_port "${service}")",
   "load_profile": {
     "version": "$(service_profile_version "${service}")",
-    "base_rps": $(service_base_rps "${service}"),
-    "peak_rps": $(service_peak_rps "${service}")$(if [[ "${service}" == "product-service" ]]; then
+    $(if [[ "${service}" == "shipping-rate-service" ]]; then
+      printf '"base_vus": %s,\n    "peak_vus": %s' "$(service_base_vus "${service}")" "$(service_peak_vus "${service}")"
+    else
+      printf '"base_rps": %s,\n    "peak_rps": %s' "$(service_base_rps "${service}")" "$(service_peak_rps "${service}")"
+    fi)$(if [[ "${service}" == "product-service" ]]; then
       printf ',\n    "page_size": %s,\n    "max_page": %s,\n    "search_terms": "%s"' "${PRODUCT_PAGE_SIZE}" "${PRODUCT_MAX_PAGE}" "${PRODUCT_SEARCH_TERMS}"
     elif [[ "${service}" == "shipping-rate-service" ]]; then
       printf ',\n    "shipping_max_items": %s,\n    "shipping_min_weight_grams": %s,\n    "shipping_max_weight_grams": %s,\n    "shipping_destination_zones": "%s"' "${SHIPPING_MAX_ITEMS}" "${SHIPPING_MIN_WEIGHT_GRAMS}" "${SHIPPING_MAX_WEIGHT_GRAMS}" "${SHIPPING_DESTINATION_ZONES}"

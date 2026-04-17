@@ -28,7 +28,7 @@ spec:
             - name: CARRIER_SERVICE_URL
               value: "http://carrier-mock-service:8007"
             - name: CARRIER_TIMEOUT_SECONDS
-              value: "3.0"
+              value: "10.0"  # raised: pool queuing shows as latency not timeout errors
             - name: ENVIRONMENT
               value: "production"
             - name: LOG_LEVEL
@@ -50,14 +50,14 @@ spec:
               path: /health
               port: 8006
             initialDelaySeconds: 10
-            periodSeconds: 20
-            timeoutSeconds: 10
-            failureThreshold: 6
+            periodSeconds: 60
+            timeoutSeconds: 15
+            failureThreshold: 10
           readinessProbe:
             httpGet:
               path: /ready
               port: 8006
             initialDelaySeconds: 5
-            periodSeconds: 10
+            periodSeconds: 15
             timeoutSeconds: 10
-            failureThreshold: 3
+            failureThreshold: 6

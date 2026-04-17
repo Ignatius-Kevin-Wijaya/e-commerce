@@ -172,8 +172,9 @@ def parse_k6_log(log_path: Path) -> dict:
 
     content = log_path.read_text(errors="replace")
 
-    # p95 — formats: "p(95)=4.72s" or "p(95)=472.3ms"
-    m = re.search(r"p\(95\)=([0-9.]+)(ms|s)\b", content)
+    # p95 — target the http_req_duration line specifically so we don't
+    # accidentally read p95 from http_req_blocked/http_req_connecting.
+    m = re.search(r"http_req_duration[^\n]*p\(95\)=([0-9.]+)(ms|s)\b", content)
     if m:
         val, unit = float(m.group(1)), m.group(2)
         kpis["p95_ms"] = val if unit == "ms" else val * 1000
@@ -236,6 +237,18 @@ def load_rep(rep_dir: Path, service: str, start_epoch: int = None) -> dict:
         start_epoch
     )
     k6 = parse_k6_log(rep_dir / "k6-output.log")
+    latency_capped = (
+        service == "shipping-rate-service"
+        and not latency.empty
+        and not np.isnan(k6.get("p95_ms", np.nan))
+        and k6["p95_ms"] > 1000
+        and latency["value"].max() <= 1.05
+    )
+    if latency_capped:
+        print(
+            f"  ⚠️  {rep_dir}: Prometheus latency histogram appears capped near 1s; "
+            "re-run this dataset after deploying the widened service buckets before using time-series latency figures."
+        )
 
     return {
         "rps": rps,
@@ -244,6 +257,7 @@ def load_rep(rep_dir: Path, service: str, start_epoch: int = None) -> dict:
         "replicas_ready": replicas_ready,
         "cpu": cpu,
         "k6": k6,
+        "latency_capped": latency_capped,
         "start_epoch": start_epoch,
     }
 

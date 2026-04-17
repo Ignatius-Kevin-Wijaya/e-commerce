@@ -68,6 +68,13 @@ class TestShippingHealth:
         assert resp.json()["service"] == "shipping-rate-service"
 
     @pytest.mark.asyncio
+    async def test_ready(self, client):
+        resp = await client.get("/ready")
+        assert resp.status_code == 200
+        assert resp.json()["service"] == "shipping-rate-service"
+        assert resp.json()["check_mode"] == "lightweight-local"
+
+    @pytest.mark.asyncio
     async def test_root(self, client):
         resp = await client.get("/")
         assert resp.status_code == 200

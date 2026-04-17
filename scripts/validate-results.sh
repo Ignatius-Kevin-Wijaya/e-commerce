@@ -72,9 +72,19 @@ def parse_prometheus_stats(prom_path: pathlib.Path):
     }
 
 
-def parse_pod_status(pod_status_path: pathlib.Path):
+def parse_age_seconds(age_text: str):
+    matches = re.findall(r"(\d+)([smhd])", age_text)
+    if not matches:
+        return None
+
+    multipliers = {"s": 1, "m": 60, "h": 3600, "d": 86400}
+    return sum(int(amount) * multipliers[unit] for amount, unit in matches)
+
+
+def parse_pod_status(pod_status_path: pathlib.Path, run_duration: int | None):
     restarts = 0
     bad_statuses = []
+    max_pod_age = (run_duration + 180) if run_duration else None
 
     lines = pod_status_path.read_text().splitlines()
     for line in lines[1:]:
@@ -87,9 +97,15 @@ def parse_pod_status(pod_status_path: pathlib.Path):
         name = cols[0]
         status = cols[2]
         restart_count = cols[3]
+        age_index = 4
+        if len(cols) > 6 and cols[4].startswith("("):
+            age_index = 6
 
+        age_seconds = parse_age_seconds(cols[age_index]) if len(cols) > age_index else None
         try:
-            restarts += int(restart_count)
+            restart_value = int(restart_count)
+            if restart_value > 0 and (max_pod_age is None or age_seconds is None or age_seconds <= max_pod_age):
+                restarts += restart_value
         except ValueError:
             pass
 
@@ -168,14 +184,14 @@ for metadata_path in sorted(results_dir.rglob("metadata.json")):
 
     pod_status = run_dir / "pod-status.txt"
     if file_has_content(pod_status):
-        pod_stats = parse_pod_status(pod_status)
+        pod_stats = parse_pod_status(pod_status, duration)
         if pod_stats["bad_statuses"]:
             issues.append(("critical", f"Pods not healthy at export: {', '.join(pod_stats['bad_statuses'])}"))
         if pod_stats["restart_count"] > 0:
             if config == "b1":
-                issues.append(("info", f"Observed {pod_stats['restart_count']} pod restarts (expected under baseline overload)"))
+                issues.append(("info", f"Observed {pod_stats['restart_count']} run-scoped pod restarts (expected under baseline overload)"))
             else:
-                issues.append(("warning", f"Observed {pod_stats['restart_count']} pod restarts"))
+                issues.append(("warning", f"Observed {pod_stats['restart_count']} run-scoped pod restarts"))
     else:
         issues.append(("warning", "No pod-status snapshot"))
 

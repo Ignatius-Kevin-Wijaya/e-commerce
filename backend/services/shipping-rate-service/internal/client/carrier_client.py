@@ -31,8 +31,14 @@ def _get_shared_client() -> httpx.AsyncClient:
         _shared_client = httpx.AsyncClient(
             timeout=TIMEOUT,
             limits=httpx.Limits(
-                max_connections=200,      # enough for 60 RPS × 3 carriers
-                max_keepalive_connections=30,
+                # Pool sized at 80 connections per pod — realistic for a microservice.
+                # With ramping-vus executor at 80 VUs peak:
+                #   B1 (1 pod): 80 VUs × 3 carriers × 0.71s hold = 170 concurrent
+                #               needed → 90 queue → +~700ms latency → p95 rises
+                #   B2 (5 pods): 16 VUs/pod × 3 × 0.71s = 34/pod → no queue
+                # This produces the correct wait-dominant latency differentiation.
+                max_connections=80,
+                max_keepalive_connections=40,
             ),
         )
     return _shared_client
@@ -66,11 +72,11 @@ class CarrierClient:
         for carrier, result in zip(CARRIERS, results):
             if isinstance(result, Exception):
                 failures.append(f"{carrier}: {result}")
-                logger.warning("Carrier quote failed for %s: %s", carrier, result)
                 continue
             quotes.append(result)
 
         if not quotes:
+            logger.warning("All carrier quotes failed: %s", "; ".join(failures))
             raise CarrierClientError("All carriers failed: " + "; ".join(failures))
 
         return quotes

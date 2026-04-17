@@ -22,4 +22,4 @@ spec:
         metricName: http_requests_per_second
         query: |
           sum(rate(http_requests_total{job="shipping-rate-service"}[1m]))
-        threshold: "5"
+        threshold: "15"  # calibrated: matches H3 averageValue=15; VU=80 peak → 16.6 req/s total → ceil(16.6/15)=2 replicas

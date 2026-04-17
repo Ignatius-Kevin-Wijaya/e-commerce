@@ -22,7 +22,7 @@ spec:
           name: http_requests_per_second
         target:
           type: AverageValue
-          averageValue: "5"
+          averageValue: "15"  # calibrated: VU=80 peak → 16.6 req/s/pod; threshold=15 fires at ~90% capacity, not at warm-up (~13 req/s)
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 0
