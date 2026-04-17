@@ -6,7 +6,11 @@ metadata:
   labels:
     app: carrier-mock-service
 spec:
-  replicas: 1
+  # Fixed at 5 replicas — carrier-mock is controlled test infrastructure, not the service
+  # under test. At 60 RPS × 3 carrier fan-out = 180 carrier RPS; 5 pods = 36 RPS/pod,
+  # well within single-uvicorn asyncio capacity. This ensures the mock dependency is
+  # never the bottleneck, isolating autoscaling behavior of shipping-rate-service.
+  replicas: 5
   selector:
     matchLabels:
       app: carrier-mock-service
@@ -35,18 +39,18 @@ spec:
               value: "1.0"
           resources:
             requests:
-              cpu: "100m"
-              memory: "128Mi"
-            limits:
               cpu: "250m"
               memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
           livenessProbe:
             httpGet:
               path: /health
               port: 8007
             initialDelaySeconds: 10
-            periodSeconds: 15
-            timeoutSeconds: 5
+            periodSeconds: 20
+            timeoutSeconds: 10
             failureThreshold: 6
           readinessProbe:
             httpGet:
@@ -54,5 +58,5 @@ spec:
               port: 8007
             initialDelaySeconds: 5
             periodSeconds: 10
-            timeoutSeconds: 5
+            timeoutSeconds: 10
             failureThreshold: 3
