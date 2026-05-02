@@ -1,0 +1,9 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-04-17T10:27:27Z	Normal	SuccessfulCreate	job/k6-shipping-test-gradual-shipping-rate-service-b1-gradual-rep1	Created pod: k6-shipping-test-gradual-shipping-rate-service-b1-gradual-lfshb
+2026-04-17T10:27:27Z	Normal	Scheduled	pod/k6-shipping-test-gradual-shipping-rate-service-b1-gradual-lfshb	Successfully assigned ecommerce/k6-shipping-test-gradual-shipping-rate-service-b1-gradual-lfshb to aks-userpool-16719200-vmss000018
+2026-04-17T10:27:28Z	Normal	Pulled	pod/k6-shipping-test-gradual-shipping-rate-service-b1-gradual-lfshb	Container image "grafana/k6:0.46.0" already present on machine
+2026-04-17T10:27:28Z	Normal	Created	pod/k6-shipping-test-gradual-shipping-rate-service-b1-gradual-lfshb	Created container: k6
+2026-04-17T10:27:28Z	Normal	Started	pod/k6-shipping-test-gradual-shipping-rate-service-b1-gradual-lfshb	Started container k6
+2026-04-17T10:32:04Z	Warning	Unhealthy	pod/shipping-rate-service-8bbcdd5cc-rptnn	Liveness probe failed: Get "http://10.244.2.117:8006/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-04-17T10:35:44Z	Warning	Unhealthy	pod/shipping-rate-service-8bbcdd5cc-rptnn	Readiness probe failed: Get "http://10.244.2.117:8006/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-04-17T10:39:47Z	Warning	BackoffLimitExceeded	job/k6-shipping-test-gradual-shipping-rate-service-b1-gradual-rep1	Job has reached the specified backoff limit

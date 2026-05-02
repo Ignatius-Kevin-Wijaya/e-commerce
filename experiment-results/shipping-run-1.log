@@ -1,0 +1,51 @@
+[0;36m[2026-04-18 20:25:25][0m ================================================================
+[0;36m[2026-04-18 20:25:25][0m   THESIS EXPERIMENT RUNNER
+[0;36m[2026-04-18 20:25:25][0m   Started: 2026-04-18T20:25:25+07:00
+[0;36m[2026-04-18 20:25:25][0m ================================================================
+[0;36m[2026-04-18 20:25:25][0m 
+[0;36m[2026-04-18 20:25:25][0m   Total runs:     18
+[0;36m[2026-04-18 20:25:25][0m   Already done:   0
+[0;36m[2026-04-18 20:25:25][0m   Pending:        18
+[0;36m[2026-04-18 20:25:25][0m   Estimated time: 4h 30m
+[0;36m[2026-04-18 20:25:25][0m   Product load:   base=20 peak=200 page_size=100 max_page=12
+[0;36m[2026-04-18 20:25:25][0m   Auth load:      base=10 peak=40 me=70% login=30% users=120
+[0;36m[2026-04-18 20:25:25][0m 
+[0;36m[2026-04-18 20:25:25][0m [0;34m── Verifying cluster connectivity...[0m
+[0;36m[2026-04-18 20:25:25][0m [0;34m── Deleting leftover k6 jobs...[0m
+[0;36m[2026-04-18 20:25:27][0m [0;34m── Refreshing k6 ConfigMaps from local manifests...[0m
+configmap/k6-script-gradual unchanged
+configmap/k6-script-spike unchanged
+configmap/k6-script-oscillating unchanged
+configmap/k6-auth-script-gradual unchanged
+configmap/k6-auth-script-spike unchanged
+configmap/k6-auth-script-oscillating unchanged
+configmap/k6-shipping-script-gradual unchanged
+configmap/k6-shipping-script-spike unchanged
+configmap/k6-shipping-script-oscillating unchanged
+[0;36m[2026-04-18 20:25:31][0m [0;32m✅ Cluster connectivity verified[0m
+[0;36m[2026-04-18 20:25:31][0m 
+[0;36m[2026-04-18 20:25:31][0m ╔══════════════════════════════════════════════════════════════╗
+[0;36m[2026-04-18 20:25:31][0m ║  Progress: 1/18 | ETA: 4h 30m | Done: 36/18
+[0;36m[2026-04-18 20:25:31][0m ╚══════════════════════════════════════════════════════════════╝
+[0;36m[2026-04-18 20:25:31][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-04-18 20:25:31][0m   RUN: shipping-rate-service_b1_gradual_rep1
+[0;36m[2026-04-18 20:25:31][0m   Service: shipping-rate-service | Config: b1 | Pattern: gradual | Rep: 1
+[0;36m[2026-04-18 20:25:31][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-04-18 20:25:31][0m [0;34m── Resetting cluster state for shipping-rate-service...[0m
+[0;36m[2026-04-18 20:25:31][0m [0;34m── Cleaning up all autoscalers for shipping-rate-service...[0m
+[0;36m[2026-04-18 20:25:41][0m [0;34m── Waiting for shipping-rate-service to return to the 1-replica baseline...[0m
+[0;36m[2026-04-18 20:25:43][0m [0;32m✅ shipping-rate-service reached 1/1 ready replicas during cleanup[0m
+[0;36m[2026-04-18 20:25:43][0m [0;34m── Deleting leftover k6 jobs...[0m
+[0;36m[2026-04-18 20:25:44][0m [0;34m── Waiting 120s for cluster stabilization...[0m
+[0;36m[2026-04-18 20:27:47][0m [0;32m✅ shipping-rate-service reached 1/1 ready replicas during post-reset stabilization[0m
+[0;36m[2026-04-18 20:27:47][0m [0;32m✅ Cluster state reset complete for shipping-rate-service[0m
+[0;36m[2026-04-18 20:27:47][0m [0;34m── Applying configuration: b1 (b1-underprovisioned.yaml) for shipping-rate-service[0m
+[0;36m[2026-04-18 20:27:50][0m [0;32m✅ shipping-rate-service reached 1/1 ready replicas during config apply (b1)[0m
+[0;36m[2026-04-18 20:27:50][0m [0;34m── Waiting 90s for metrics to baseline...[0m
+[0;36m[2026-04-18 20:29:23][0m [0;32m✅ shipping-rate-service reached 1/1 ready replicas during post-config stabilization (b1)[0m
+[0;36m[2026-04-18 20:29:23][0m [0;32m✅ Configuration b1 applied for shipping-rate-service[0m
+[0;36m[2026-04-18 20:29:23][0m [0;34m── Pre-flight: verifying shipping-rate-service is ready on /ready...[0m
+[0;36m[2026-04-18 20:29:27][0m [0;32m✅ Pre-flight passed: shipping-rate-service is ready[0m
+[0;36m[2026-04-18 20:29:27][0m [0;34m── Starting k6 load test: k6-shipping-test-gradual-shipping-rate-service-b1-gradual-rep1 (pattern: gradual)[0m
+job.batch/k6-shipping-test-gradual-shipping-rate-service-b1-gradual-rep1 created
+[0;36m[2026-04-18 20:29:32][0m [0;34m── Waiting for k6 job to complete (timeout: 900s)...[0m

@@ -106,14 +106,6 @@ mark_completed() {
   echo "DONE:${rid}" >> "${STATE_FILE}"
 }
 
-# Get total and completed counts
-get_progress() {
-  local total=$1
-  local completed=0
-  [[ -f "${STATE_FILE}" ]] && completed=$(grep -c "^DONE:" "${STATE_FILE}" 2>/dev/null || echo 0)
-  echo "${completed}/${total}"
-}
-
 # Calculate ETA
 calc_eta() {
   local remaining=$1 avg_seconds=$2
@@ -535,10 +527,17 @@ run_k6_test() {
   local service=$1 pattern=$2 run_id=$3
   local job_base_name
   job_base_name=$(get_k6_job_name "${service}" "${pattern}")
-  local job_run_name="${job_base_name}-${run_id}"
+  local raw_job_name="${job_base_name}-${run_id}"
+  local job_run_name
+  job_run_name=$(echo "${raw_job_name}" | tr '_' '-' | tr '[:upper:]' '[:lower:]')
 
-  # k6 job names must be DNS-compatible (lowercase, max 63 chars, only a-z0-9-)
-  job_run_name=$(echo "${job_run_name}" | tr '_' '-' | cut -c1-63)
+  # k6 job names must be DNS-compatible and <=63 chars. Preserve uniqueness
+  # with a stable hash suffix so long oscillating run ids do not collide across reps.
+  if (( ${#job_run_name} > 63 )); then
+    local job_hash
+    job_hash=$(printf '%s' "${job_run_name}" | sha1sum | cut -c1-8)
+    job_run_name="${job_run_name:0:54}-${job_hash}"
+  fi
 
   log_step "Starting k6 load test: ${job_run_name} (pattern: ${pattern})"
 
@@ -637,11 +636,17 @@ export_k6_results() {
     kubectl cp "${NAMESPACE}/${pod_name}:/results/results.json" "${results_dir}/k6-results.json" 2>/dev/null || log_warn "Could not copy k6 JSON results"
 
     # Also capture k6 pod logs (contains summary metrics)
-    kubectl logs "${pod_name}" -n "${NAMESPACE}" > "${results_dir}/k6-output.log" 2>/dev/null || log_warn "Could not capture k6 logs"
+    kubectl logs "${pod_name}" -n "${NAMESPACE}" > "${results_dir}/k6-output.log" 2>/dev/null || true
+
+    if [[ ! -s "${results_dir}/k6-output.log" ]]; then
+      log_error "Could not capture k6 logs for job ${job_name}"
+      return 1
+    fi
 
     log_success "k6 results exported to ${results_dir}/"
   else
-    log_warn "No k6 pod found for job ${job_name}"
+    log_error "No k6 pod found for job ${job_name}"
+    return 1
   fi
 }
 
@@ -665,8 +670,8 @@ export_prometheus_metrics() {
   prom_pod=$(kubectl get pods -n "${MONITORING_NS}" -l app=prometheus --no-headers -o custom-columns=":metadata.name" | head -1)
 
   if [[ -z "${prom_pod}" ]]; then
-    log_warn "Prometheus pod not found — skipping metric export"
-    return
+    log_error "Prometheus pod not found — cannot export metrics"
+    return 1
   fi
 
   log_step "Exporting Prometheus metrics..."
@@ -684,6 +689,7 @@ export_prometheus_metrics() {
     "rate(container_cpu_usage_seconds_total{container=\"${service}\"}[1m])|cpu_usage"
   )
 
+  local export_failed=false
   for query_pair in "${queries[@]}"; do
     local query="${query_pair%%|*}"
     local name="${query_pair##*|}"
@@ -692,7 +698,14 @@ export_prometheus_metrics() {
 
     kubectl exec -n "${MONITORING_NS}" "${prom_pod}" -- \
       wget -q -O - "http://localhost:9090/api/v1/query_range?query=${encoded_query}&start=${start_time}&end=${end_time}&step=15" \
-      > "${results_dir}/prom_${name}.json" 2>/dev/null || log_warn "Failed to export ${name}"
+      > "${results_dir}/prom_${name}.json" 2>/dev/null || {
+        log_error "Failed to export ${name}"
+        export_failed=true
+      }
+    if [[ ! -s "${results_dir}/prom_${name}.json" ]]; then
+      log_error "Prometheus export ${name} is missing or empty"
+      export_failed=true
+    fi
   done
 
   local hpa_name scaledobject_name
@@ -775,6 +788,10 @@ PYEOF
 
   # Export pod states
   kubectl get pods -n "${NAMESPACE}" -l "app=${service}" -o wide > "${results_dir}/pod-status.txt" 2>/dev/null || true
+
+  if ${export_failed}; then
+    return 1
+  fi
 
   log_success "Prometheus metrics exported to ${results_dir}/"
 }
@@ -996,7 +1013,7 @@ main() {
 
     # Progress header
     local progress
-    progress=$(get_progress "${total_runs}")
+    progress="$((skipped_runs + completed - 1))/${total_runs}"
     local remaining=$((pending_runs - completed + 1))
     local avg_time=900
     [[ ${completed} -gt 1 && ${total_elapsed} -gt 0 ]] && avg_time=$((total_elapsed / (completed - 1)))

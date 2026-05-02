@@ -172,12 +172,30 @@ def parse_k6_log(log_path: Path) -> dict:
 
     content = log_path.read_text(errors="replace")
 
+    def parse_duration_to_ms(raw: str) -> float:
+        """
+        Parse k6-style duration tokens into milliseconds.
+        Supports compound values like 1m0s in addition to ms/s.
+        """
+        unit_ms = {
+            "ns": 1e-6,
+            "us": 1e-3,
+            "µs": 1e-3,
+            "ms": 1.0,
+            "s": 1000.0,
+            "m": 60_000.0,
+            "h": 3_600_000.0,
+        }
+        matches = re.findall(r"([0-9.]+)(ns|us|µs|ms|s|m|h)", raw)
+        if not matches:
+            return np.nan
+        return sum(float(value) * unit_ms[unit] for value, unit in matches)
+
     # p95 — target the http_req_duration line specifically so we don't
     # accidentally read p95 from http_req_blocked/http_req_connecting.
-    m = re.search(r"http_req_duration[^\n]*p\(95\)=([0-9.]+)(ms|s)\b", content)
+    m = re.search(r"http_req_duration[^\n]*p\(95\)=([^\s]+)", content)
     if m:
-        val, unit = float(m.group(1)), m.group(2)
-        kpis["p95_ms"] = val if unit == "ms" else val * 1000
+        kpis["p95_ms"] = parse_duration_to_ms(m.group(1))
 
     # error rate — "http_req_failed...: 31.03% ..."
     m = re.search(r"http_req_failed[^:]*:\s+([0-9.]+)%", content)
@@ -315,7 +333,9 @@ def compute_cost_index(replicas_df: pd.DataFrame, duration_s: float) -> float:
     mask = (t >= 0) & (t <= duration_s)
     if mask.sum() < 2:
         return np.nan
-    area = np.trapz(r[mask], t[mask])  # pod-seconds
+    # NumPy 2.x moved trapezoidal integration to np.trapezoid.
+    integrator = np.trapezoid if hasattr(np, "trapezoid") else np.trapz
+    area = integrator(r[mask], t[mask])  # pod-seconds
     return area * CPU_REQUEST_CORES * PRICE_PER_CPU_SECOND
 
 
@@ -433,7 +453,7 @@ def plot_scaling_timeline(data: dict, service: str, pattern: str, out_dir: Path)
         if not ts_lat.empty:
             ax_lat.plot(ts_lat["t"], ts_lat["value"] * 1000, color=color, lw=lw, ls=ls)  # s→ms
         if not ts_cpu.empty:
-            ax_cpu.plot(ts_cpu["t"], ts_cpu["value"] * 100, color=color, lw=lw, ls=ls)   # cores→%
+            ax_cpu.plot(ts_cpu["t"], ts_cpu["value"] * 100, color=color, lw=lw, ls=ls)   # cores -> % of one CPU core
 
         legend_handles.append(mpatches.Patch(color=color, label=label))
 
@@ -443,7 +463,7 @@ def plot_scaling_timeline(data: dict, service: str, pattern: str, out_dir: Path)
     ax_rep.set_ylabel("Active Pods")
     ax_rep.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
     ax_lat.set_ylabel("p95 Latency (ms)")
-    ax_cpu.set_ylabel("CPU (%)")
+    ax_cpu.set_ylabel("CPU (% of 1 core)")
     ax_cpu.set_xlabel("Time (seconds from experiment start)")
 
     # Hide x-tick labels on top three panels

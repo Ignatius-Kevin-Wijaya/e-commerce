@@ -1,0 +1,22 @@
+{
+  "run_id": "shipping-rate-service_h2_spike_rep1",
+  "service": "shipping-rate-service",
+  "config": "h2",
+  "pattern": "spike",
+  "repetition": 1,
+  "start_epoch": 1776792486,
+  "end_epoch": 1776793668,
+  "duration_seconds": 1182,
+  "k6_job_name": "k6-shipping-test-spike-shipping-rate-service-h2-spike-rep1",
+  "target_url": "http://shipping-rate-service.ecommerce.svc.cluster.local:8006",
+  "load_profile": {
+    "version": "wait-bound-v1",
+    "base_vus": 10,
+    "peak_vus": 80,
+    "shipping_max_items": 4,
+    "shipping_min_weight_grams": 200,
+    "shipping_max_weight_grams": 2500,
+    "shipping_destination_zones": "domestic,regional,remote"
+  },
+  "timestamp": "2026-04-22T00:47:48+07:00"
+}

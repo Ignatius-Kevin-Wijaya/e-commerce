@@ -50,7 +50,6 @@ def main():
     
     y_2xx = [rps_2xx.get(ts, 0.0) for ts in all_ts]
     y_4xx = [rps_4xx.get(ts, 0.0) for ts in all_ts]
-    y_cpu = [cpu_usage.get(ts, 0.0) * 100 for ts in all_ts] # To percentage of 1 core (millicores essentially, or % of 1000m) Wait: 0.35 = 35% of 1 core. Let's just output raw cores.
     y_cpu = [cpu_usage.get(ts, 0.0) for ts in all_ts]
     
     fig, ax1 = plt.subplots(figsize=(10, 6))

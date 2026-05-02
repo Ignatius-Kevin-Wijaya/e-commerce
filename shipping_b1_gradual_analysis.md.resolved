@@ -1,0 +1,198 @@
+# Deep Analysis: `shipping-rate-service / b1 / gradual / rep1`
+_Analysed: 2026-04-17_
+
+---
+
+## 1. Official Validator Output (`validate-results.sh`)
+
+```
+── shipping-rate-service_b1_gradual_rep1 ──
+  🟢 INFO:     k6 dropped 5840 iterations (expected for under-provisioned baseline)
+  🟢 INFO:     Error rate 46.00% (expected for under-provisioned baseline)
+  🟡 WARNING:  1 Prometheus scrape gap >30s
+  🔴 CRITICAL: Pods not healthy at export: shipping-rate-service=CrashLoopBackOff
+  🟢 INFO:     Observed 5 pod restarts (expected under baseline overload)
+
+  Critical issues: 1
+  Warnings:        1
+```
+
+The validator correctly flags a **critical issue**. But the real story goes much deeper.
+
+---
+
+## 2. Run Metadata
+
+| Field | Value |
+|---|---|
+| Run ID | `shipping-rate-service_b1_gradual_rep1` |
+| Experiment start | `2026-04-16T16:52:20 UTC` |
+| Experiment end | `2026-04-16T17:14:23 UTC` |
+| Duration | **1323s (22m 3s)** ← within valid range |
+| Target URL | `http://shipping-rate-service.ecommerce.svc.cluster.local:8006` |
+| Load profile | `wait-bound-v1`, base=10 RPS, peak=60 RPS |
+| Config | B1 (underprovisioned: 1 replica, no autoscaler) |
+
+---
+
+## 3. K6 Summary Metrics
+
+```
+http_req_failed:      46.00%  (8492 failed / 18459 total)
+dropped_iterations:   5840
+http_req_duration p50: 751ms
+http_req_duration p90: 7.46s
+http_req_duration p95: 14.15s     ← very high
+http_req_duration avg: 2.63s
+
+status is 200:            53% (9967/18459)
+returns quotes:           53%
+response time < 2000ms:   67%
+
+http_req_blocked avg:   744ms   ← extremely high — connection queuing
+http_req_connecting avg:744ms   ← TCP connections being re-established repeatedly
+
+vus_max: 800  (vs expected ~150 for 60 RPS with ~2.5s latency)
+```
+
+> **Key concern:** `http_req_blocked` avg=744ms is very high. This indicates that k6 was unable to reuse connections and was repeatedly waiting for TCP connection slots — a symptom of the backend actively dropping connections during CrashLoopBackOff. The p95=14.15s is also much higher than expected for a wait-bound service (normal p95 should be ~900ms-3s at 60 RPS on a single pod).
+
+---
+
+## 4. CrashLoopBackOff Root Cause: **OOMKilled**
+
+> This is the most critical finding.
+
+From `kubectl describe pod`:
+```
+Last State: Terminated
+  Reason:    OOMKilled
+  Exit Code: 137
+  Started:   2026-04-17T00:16:16 +0700
+  Finished:  2026-04-17T00:22:37 +0700
+Restart Count: 6 (at export time)
+```
+
+**The shipping-rate-service pod was killed by the Linux OOM killer** (exit code 137 = SIGKILL from OOM), not by a business-level error.
+
+### Why OOMKilled?
+The `shipping-rate-service` deployment is configured with:
+- `requests.memory = 128Mi`
+- `limits.memory = 256Mi`
+
+The wait-bound service fans out to **3 carrier mock endpoints concurrently** per request. Under a gradual ramp to 60 RPS (the B1 baseline), that means up to **180 concurrent async HTTP requests in-flight** at peak. Python asyncio + httpx + FastAPI + concurrent connections accumulates significant in-process memory. At ~34 RPS (the peak reached before crash), that's ~100 concurrent fan-out calls — enough to breach 256Mi under the accumulated asyncio event loop state, connection pools, and response buffers.
+
+---
+
+## 5. Prometheus RPS Timeline — Two K6 Runs Detected
+
+The Prometheus data reveals a disturbing anomaly: **two separate k6 load tests ran against the same "rep1" result**.
+
+```
+Phase                  Timestamp range    Details
+───────────────────────────────────────────────────────────────────────
+Stabilization          t+118s → t+208s    0 RPS — correct (90s wait)
+K6 RUN 1 (gradual up)  t+253s → t+568s    0→34 RPS — ramp looks correct
+CRASH ZONE             t+568s → t+898s    330s GAP — pod OOMKilled, restarting
+K6 RUN 2 (gradual up)  t+898s → t+1273s   0→34.7 RPS — SECOND k6 job fired
+Ramp down              t+1273s → t+1303s  ~24 → 15 RPS
+```
+
+The runner script detects k6 job completion via `kubectl wait --for=condition=complete` or a 900s timeout. During the extended CrashLoopBackOff (5+ restarts, each ~90-120s backoff), the **first k6 job timed out after 900s and was treated as complete**. The runner then moved on to the next step (export-wait, export, cleanup), but by the time export happened a second k6 pod (`vs76v`) had already started — likely a retry pod created by the k6 Job controller itself (the Job spec has `backoffLimit > 0`).
+
+**The saved k6-output.log captures the SECOND k6 job's output**, not the first. This means:
+- The exported log does NOT represent a single clean 12-minute gradual ramp
+- The 46% error rate and 14.15s p95 are a **composite of two separate failed tests**
+- The Prometheus data also contains a discontinuity that corrupts any latency/RPS trend analysis
+
+---
+
+## 6. K8s Events Summary
+
+| Time (relative to 17:21) | Event | Significance |
+|---|---|---|
+| 18m ago (17:03) | First k6 pod `684r7` created | K6 RUN 1 starts |
+| 12m ago (17:09) | Shipping liveness probe FAILED (EOF) | Pod starts dying |
+| 12m ago (17:09) | Readiness probe FAILED (connection reset) | Pod no longer receives traffic |
+| ~10m ago (17:11) | Multiple restart cycles, BackOff | CrashLoopBackOff deepens |
+| 7m57s ago (17:13) | Pod restarted, new container started | Brief recovery |
+| 5m58s ago (17:15) | Second k6 pod `vs76v` created | **K6 RUN 2 starts** |
+| 52s ago (17:20) | Liveness probe FAILED again (timeout) | Another crash cycle |
+
+---
+
+## 7. What B1 Should Look Like vs. What We Got
+
+For `shipping-rate-service / B1 / gradual`:
+
+| Metric | Expected (B1 underprovisioned) | Actual | Correct? |
+|---|---|---|---|
+| Replicas | Always 1 | Always 1 ✅ | ✅ |
+| Pod restarts | 0 (wait-bound, NOT CPU-bound) | 6 restarts ❌ | ❌ |
+| Pod exit reason | N/A | **OOMKilled** ❌ | ❌ |
+| Error rate | ~5-20% (queue overflow, slow requests) | 46% | ⚠️ |
+| p95 latency | ~2-5s (wait-bound stack delays) | 14.15s ❌ | ❌ |
+| k6 iterations dropped | Small-moderate | 5840 (~31%) ❌ | ❌ |
+| k6 runs in one rep | 1 | **2 (two k6 pods)** ❌ | ❌ |
+| Prometheus continuity | Continuous | 330s gap ❌ | ❌ |
+| Pod state at export | Running | **CrashLoopBackOff** ❌ | ❌ |
+
+**The result is NOT valid for thesis use.**
+
+---
+
+## 8. Verdict
+
+> [!CAUTION]
+> **This run is INVALID for the thesis.** It must be discarded and re-run after fixing the OOM issue.
+
+The data is contaminated by three compounding failures:
+1. **OOMKilled** — the shipping pod was killed by the kernel OOM killer mid-test
+2. **Two k6 runs** blended into one result directory — the exported log represents the second k6 job that started after the pod partially recovered
+3. **330s Prometheus scrape gap** — the time-series data has a discontinuity that breaks trend analysis
+
+---
+
+## 9. Root Cause & Fix
+
+### Immediate fix: Increase memory limit
+
+The `shipping-rate-service` memory limit of **256Mi is insufficient** for 60 RPS with 3× concurrent fan-out. At 60 RPS with ~1s average latency, ~60 concurrent requests × 3 fan-out connections = 180 concurrent httpx requests. Recommend:
+
+```yaml
+# infrastructure/kubernetes/shipping/deployment.yaml
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"   # ← raise from 128Mi
+  limits:
+    cpu: "500m"
+    memory: "512Mi"   # ← raise from 256Mi
+```
+
+### Also verify k6 Job backoffLimit
+Check `infrastructure/kubernetes/load-testing/k6-shipping-job.yaml` for `spec.backoffLimit`. If it is `>0`, a failed k6 pod will spawn retries that pollute the result. Set `backoffLimit: 0` to prevent this.
+
+### After fix: clean the cluster and re-run
+```bash
+# Stabilize shipping pod first
+kubectl rollout restart deployment/shipping-rate-service -n ecommerce
+kubectl rollout status deployment/shipping-rate-service -n ecommerce --timeout=120s
+
+# Remove the invalid state entry and re-run
+sed -i '/DONE:shipping-rate-service_b1_gradual_rep1/d' experiment-results/.experiment-state
+
+# Clean the results directory
+rm -rf experiment-results/shipping-rate-service/b1/gradual/rep1
+
+# Re-run the b1 gradual specifically  
+./scripts/run-experiment.sh --service shipping-rate-service --config b1 --pattern gradual --first
+```
+
+---
+
+## 10. Current Live Cluster State
+
+As of inspection, the shipping pod **recovered** (logs show active `POST /shipping/quotes HTTP/1.1 200 OK` responses). However it is still in CrashLoopBackOff cycling. The cluster needs to be stabilized before the next experiment run.
+
+Also: `.tmp/shipping-rate-service_b1_spike_rep1-*` directory exists with only a `start_time.txt`, suggesting the runner attempted B1/spike but was aborted. That partial directory is a leftover that should be cleaned.

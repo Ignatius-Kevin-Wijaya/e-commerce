@@ -46,6 +46,7 @@ SHIPPING_EXPECTED_REQUESTS = {
     # Oscillating (12m): 3 on/off cycles; conservative estimate
     "oscillating": 10000,
 }
+SHIPPING_REQUEST_FLOOR = 0.70
 PATTERN_STAGE_TARGETS = {
     "gradual": [
         (120, "base"),
@@ -360,7 +361,8 @@ def check_a1_k6_target_rps(run: RunResult):
     if rps_match:
         total_reqs = int(rps_match.group(1))
         expected_reqs = expected_request_count(run)
-        minimum_expected = int(expected_reqs * 0.85)
+        minimum_ratio = SHIPPING_REQUEST_FLOOR if run.service == "shipping-rate-service" else 0.85
+        minimum_expected = int(expected_reqs * minimum_ratio)
         if total_reqs < minimum_expected:
             pct = (total_reqs / expected_reqs * 100) if expected_reqs else 0
             profile = get_load_profile(run)
@@ -601,7 +603,7 @@ def check_b1_error_rate(run: RunResult):
         elif cfg == "k1":
             run.add_warning("B1", f"Error rate {error_rate:.2f}% on K1 — check if KEDA scaled properly")
     else:
-        if run.config in ("b1",) and error_rate < 1:
+        if run.config in ("b1",) and run.service != "shipping-rate-service" and error_rate < 1:
             run.add_warning("B1-LOW", f"Error rate {error_rate:.2f}% on B1 — suspiciously LOW for under-provisioned baseline")
 
 

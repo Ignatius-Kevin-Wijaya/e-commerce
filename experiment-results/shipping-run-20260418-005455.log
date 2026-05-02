@@ -1,0 +1,39 @@
+[0;36m[2026-04-18 00:54:55][0m ================================================================
+[0;36m[2026-04-18 00:54:55][0m   THESIS EXPERIMENT RUNNER
+[0;36m[2026-04-18 00:54:55][0m   Started: 2026-04-18T00:54:55+07:00
+[0;36m[2026-04-18 00:54:55][0m ================================================================
+[0;36m[2026-04-18 00:54:55][0m 
+[0;36m[2026-04-18 00:54:55][0m   Total runs:     18
+[0;36m[2026-04-18 00:54:55][0m   Already done:   0
+[0;36m[2026-04-18 00:54:55][0m   Pending:        18
+[0;36m[2026-04-18 00:54:55][0m   Estimated time: 4h 30m
+[0;36m[2026-04-18 00:54:55][0m   Product load:   base=20 peak=200 page_size=100 max_page=12
+[0;36m[2026-04-18 00:54:55][0m   Auth load:      base=10 peak=40 me=70% login=30% users=120
+[0;36m[2026-04-18 00:54:55][0m 
+[0;36m[2026-04-18 00:54:55][0m [0;34m── Verifying cluster connectivity...[0m
+[0;36m[2026-04-18 00:54:56][0m [0;34m── Deleting leftover k6 jobs...[0m
+[0;36m[2026-04-18 00:54:58][0m [0;34m── Refreshing k6 ConfigMaps from local manifests...[0m
+configmap/k6-script-gradual unchanged
+configmap/k6-script-spike unchanged
+configmap/k6-script-oscillating unchanged
+configmap/k6-auth-script-gradual unchanged
+configmap/k6-auth-script-spike unchanged
+configmap/k6-auth-script-oscillating unchanged
+configmap/k6-shipping-script-gradual unchanged
+configmap/k6-shipping-script-spike unchanged
+configmap/k6-shipping-script-oscillating unchanged
+[0;36m[2026-04-18 00:55:01][0m [0;32m✅ Cluster connectivity verified[0m
+[0;36m[2026-04-18 00:55:01][0m 
+[0;36m[2026-04-18 00:55:01][0m ╔══════════════════════════════════════════════════════════════╗
+[0;36m[2026-04-18 00:55:01][0m ║  Progress: 1/18 | ETA: 4h 30m | Done: 36/18
+[0;36m[2026-04-18 00:55:02][0m ╚══════════════════════════════════════════════════════════════╝
+[0;36m[2026-04-18 00:55:02][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-04-18 00:55:02][0m   RUN: shipping-rate-service_b1_gradual_rep1
+[0;36m[2026-04-18 00:55:02][0m   Service: shipping-rate-service | Config: b1 | Pattern: gradual | Rep: 1
+[0;36m[2026-04-18 00:55:02][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-04-18 00:55:02][0m [0;34m── Resetting cluster state for shipping-rate-service...[0m
+[0;36m[2026-04-18 00:55:02][0m [0;34m── Cleaning up all autoscalers for shipping-rate-service...[0m
+[0;36m[2026-04-18 00:55:09][0m [0;34m── Waiting for shipping-rate-service to return to the 1-replica baseline...[0m
+[0;36m[2026-04-18 00:55:12][0m [0;32m✅ shipping-rate-service reached 1/1 ready replicas during cleanup[0m
+[0;36m[2026-04-18 00:55:12][0m [0;34m── Deleting leftover k6 jobs...[0m
+[0;36m[2026-04-18 00:55:13][0m [0;34m── Waiting 120s for cluster stabilization...[0m
