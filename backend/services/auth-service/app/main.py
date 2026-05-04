@@ -53,6 +53,11 @@ PROMETHEUS_LATENCY_BUCKETS = (
 logging.basicConfig(level=getattr(logging, LOG_LEVEL, logging.INFO))
 logger = logging.getLogger("auth-service")
 
+
+def _should_skip_db_session(path: str) -> bool:
+    """Keep liveness/docs/metrics outside the request DB session middleware."""
+    return path in {"/health", "/ready", "/docs", "/openapi.json", "/"} or path.startswith("/metrics")
+
 # ── Database engine (connection pool) ─────────────────────────
 # SQLite doesn't support pool_size/max_overflow (it uses NullPool)
 _engine_kwargs = {} if DATABASE_URL.startswith("sqlite") else {"pool_size": 10, "max_overflow": 20}
@@ -112,6 +117,9 @@ async def db_session_middleware(request: Request, call_next):
     Creates a fresh DB session per request and closes it after.
     The session is available as request.state.db in handlers.
     """
+    if _should_skip_db_session(request.url.path):
+        return await call_next(request)
+
     async with async_session() as session:
         request.state.db = session
         response: Response = await call_next(request)

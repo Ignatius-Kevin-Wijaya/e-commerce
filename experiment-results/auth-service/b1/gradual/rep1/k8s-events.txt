@@ -1,0 +1,19 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-05-02T16:02:14Z	Normal	Scheduled	pod/auth-service-55bd95c686-lpfsn	Successfully assigned ecommerce/auth-service-55bd95c686-lpfsn to aks-userpool-16719200-vmss00001k
+2026-05-02T16:02:14Z	Normal	Pulling	pod/auth-service-55bd95c686-lpfsn	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-02T16:02:14Z	Normal	Pulled	pod/auth-service-55bd95c686-lpfsn	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 177ms (177ms including waiting). Image size: 129975007 bytes.
+2026-05-02T16:02:14Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-lpfsn
+2026-05-02T16:02:14Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 0 to 1
+2026-05-02T16:02:15Z	Normal	Created	pod/auth-service-55bd95c686-lpfsn	Created container: auth-service
+2026-05-02T16:02:15Z	Normal	Started	pod/auth-service-55bd95c686-lpfsn	Started container auth-service
+2026-05-02T16:02:31Z	Normal	Killing	pod/auth-service-c44d59895-q4dd8	Stopping container auth-service
+2026-05-02T16:02:31Z	Normal	SuccessfulDelete	replicaset/auth-service-c44d59895	Deleted pod: auth-service-c44d59895-q4dd8
+2026-05-02T16:02:31Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-c44d59895 from 1 to 0
+2026-05-02T16:04:17Z	Normal	Scheduled	pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-f2gjk	Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-b1-gradual-rep1-f2gjk to aks-userpool-16719200-vmss00001k
+2026-05-02T16:04:17Z	Normal	Pulling	pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-f2gjk	Pulling image "grafana/k6:latest"
+2026-05-02T16:04:17Z	Normal	SuccessfulCreate	job/k6-auth-test-gradual-auth-service-b1-gradual-rep1	Created pod: k6-auth-test-gradual-auth-service-b1-gradual-rep1-f2gjk
+2026-05-02T16:04:19Z	Normal	Pulled	pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-f2gjk	Successfully pulled image "grafana/k6:latest" in 1.471s (1.471s including waiting). Image size: 33807672 bytes.
+2026-05-02T16:04:19Z	Normal	Created	pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-f2gjk	Created container: k6
+2026-05-02T16:04:19Z	Normal	Started	pod/k6-auth-test-gradual-auth-service-b1-gradual-rep1-f2gjk	Started container k6
+2026-05-02T16:14:50Z	Warning	Unhealthy	pod/auth-service-55bd95c686-lpfsn	Readiness probe failed: Get "http://10.244.2.39:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-05-02T16:16:50Z	Warning	BackoffLimitExceeded	job/k6-auth-test-gradual-auth-service-b1-gradual-rep1	Job has reached the specified backoff limit

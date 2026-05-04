@@ -1,0 +1,33 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-05-02T17:04:27Z	Normal	Scheduled	pod/auth-service-55bd95c686-ck7nv	Successfully assigned ecommerce/auth-service-55bd95c686-ck7nv to aks-userpool-16719200-vmss00001k
+2026-05-02T17:04:27Z	Normal	Scheduled	pod/auth-service-55bd95c686-gdfqx	Successfully assigned ecommerce/auth-service-55bd95c686-gdfqx to aks-userpool-16719200-vmss00001k
+2026-05-02T17:04:27Z	Normal	Pulling	pod/auth-service-55bd95c686-gdfqx	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-02T17:04:27Z	Normal	Scheduled	pod/auth-service-55bd95c686-p7tjx	Successfully assigned ecommerce/auth-service-55bd95c686-p7tjx to aks-userpool-16719200-vmss00001k
+2026-05-02T17:04:27Z	Normal	Pulling	pod/auth-service-55bd95c686-p7tjx	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-02T17:04:27Z	Normal	Scheduled	pod/auth-service-55bd95c686-tdf2k	Successfully assigned ecommerce/auth-service-55bd95c686-tdf2k to aks-userpool-16719200-vmss00001k
+2026-05-02T17:04:27Z	Normal	Pulling	pod/auth-service-55bd95c686-tdf2k	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-02T17:04:27Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-tdf2k
+2026-05-02T17:04:27Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-gdfqx
+2026-05-02T17:04:27Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-ck7nv
+2026-05-02T17:04:27Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-p7tjx
+2026-05-02T17:04:27Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 1 to 5
+2026-05-02T17:04:28Z	Normal	Pulling	pod/auth-service-55bd95c686-ck7nv	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-02T17:04:28Z	Normal	Pulled	pod/auth-service-55bd95c686-ck7nv	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 299ms (299ms including waiting). Image size: 129975007 bytes.
+2026-05-02T17:04:28Z	Normal	Created	pod/auth-service-55bd95c686-ck7nv	Created container: auth-service
+2026-05-02T17:04:28Z	Normal	Started	pod/auth-service-55bd95c686-ck7nv	Started container auth-service
+2026-05-02T17:04:28Z	Normal	Pulled	pod/auth-service-55bd95c686-gdfqx	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 412ms (412ms including waiting). Image size: 129975007 bytes.
+2026-05-02T17:04:28Z	Normal	Created	pod/auth-service-55bd95c686-gdfqx	Created container: auth-service
+2026-05-02T17:04:28Z	Normal	Started	pod/auth-service-55bd95c686-gdfqx	Started container auth-service
+2026-05-02T17:04:28Z	Normal	Pulled	pod/auth-service-55bd95c686-p7tjx	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 424ms (424ms including waiting). Image size: 129975007 bytes.
+2026-05-02T17:04:28Z	Normal	Created	pod/auth-service-55bd95c686-p7tjx	Created container: auth-service
+2026-05-02T17:04:28Z	Normal	Started	pod/auth-service-55bd95c686-p7tjx	Started container auth-service
+2026-05-02T17:04:28Z	Normal	Pulled	pod/auth-service-55bd95c686-tdf2k	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 406ms (406ms including waiting). Image size: 129975007 bytes.
+2026-05-02T17:04:28Z	Normal	Created	pod/auth-service-55bd95c686-tdf2k	Created container: auth-service
+2026-05-02T17:04:28Z	Normal	Started	pod/auth-service-55bd95c686-tdf2k	Started container auth-service
+2026-05-02T17:06:33Z	Normal	Scheduled	pod/k6-auth-test-gradual-auth-service-b2-gradual-rep1-d99zr	Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-b2-gradual-rep1-d99zr to aks-userpool-16719200-vmss00001k
+2026-05-02T17:06:33Z	Normal	Pulling	pod/k6-auth-test-gradual-auth-service-b2-gradual-rep1-d99zr	Pulling image "grafana/k6:latest"
+2026-05-02T17:06:33Z	Normal	SuccessfulCreate	job/k6-auth-test-gradual-auth-service-b2-gradual-rep1	Created pod: k6-auth-test-gradual-auth-service-b2-gradual-rep1-d99zr
+2026-05-02T17:06:35Z	Normal	Pulled	pod/k6-auth-test-gradual-auth-service-b2-gradual-rep1-d99zr	Successfully pulled image "grafana/k6:latest" in 1.34s (1.34s including waiting). Image size: 33807672 bytes.
+2026-05-02T17:06:35Z	Normal	Created	pod/k6-auth-test-gradual-auth-service-b2-gradual-rep1-d99zr	Created container: k6
+2026-05-02T17:06:35Z	Normal	Started	pod/k6-auth-test-gradual-auth-service-b2-gradual-rep1-d99zr	Started container k6
+2026-05-02T17:19:07Z	Normal	Completed	job/k6-auth-test-gradual-auth-service-b2-gradual-rep1	Job completed

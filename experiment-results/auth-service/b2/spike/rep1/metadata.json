@@ -1,0 +1,21 @@
+{
+  "run_id": "auth-service_b2_spike_rep1",
+  "service": "auth-service",
+  "config": "b2",
+  "pattern": "spike",
+  "repetition": 1,
+  "start_epoch": 1777742544,
+  "end_epoch": 1777743761,
+  "duration_seconds": 1217,
+  "k6_job_name": "k6-auth-test-spike-auth-service-b2-spike-rep1",
+  "target_url": "http://auth-service.ecommerce.svc.cluster.local:8001",
+  "load_profile": {
+    "version": "recovery-v2",
+    "base_rps": 10,
+    "peak_rps": 40,
+    "auth_me_percent": 70,
+    "auth_login_percent": 30,
+    "num_test_users": 120
+  },
+  "timestamp": "2026-05-03T00:42:41+07:00"
+}

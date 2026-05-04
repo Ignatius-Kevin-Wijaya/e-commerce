@@ -22,20 +22,31 @@ class UserRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
+    async def _detach_and_release(self, entity):
+        """
+        Return ORM objects as detached instances so the checked-out DB connection
+        can go back to the pool before CPU-heavy work finishes.
+        """
+        if entity is not None:
+            self.db.expunge(entity)
+        if self.db.in_transaction():
+            await self.db.rollback()
+        return entity
+
     async def find_by_email(self, email: str) -> Optional[User]:
         """Find a user by email address."""
         result = await self.db.execute(select(User).where(User.email == email))
-        return result.scalar_one_or_none()
+        return await self._detach_and_release(result.scalar_one_or_none())
 
     async def find_by_username(self, username: str) -> Optional[User]:
         """Find a user by username."""
         result = await self.db.execute(select(User).where(User.username == username))
-        return result.scalar_one_or_none()
+        return await self._detach_and_release(result.scalar_one_or_none())
 
     async def find_by_id(self, user_id: UUID) -> Optional[User]:
         """Find a user by their UUID."""
         result = await self.db.execute(select(User).where(User.id == user_id))
-        return result.scalar_one_or_none()
+        return await self._detach_and_release(result.scalar_one_or_none())
 
     async def create(self, user: User) -> User:
         """Insert a new user into the database."""
@@ -69,7 +80,7 @@ class UserRepository:
                 Session.is_revoked == False,  # noqa: E712
             )
         )
-        return result.scalar_one_or_none()
+        return await self._detach_and_release(result.scalar_one_or_none())
 
     async def revoke_session(self, session_id: UUID) -> None:
         """Mark a session as revoked (logout)."""

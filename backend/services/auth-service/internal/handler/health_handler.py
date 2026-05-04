@@ -4,13 +4,11 @@ Health check handler — Kubernetes liveness and readiness probes.
 LEARNING NOTES:
 - Kubernetes pings these endpoints to decide if your pod is healthy.
 - /health (liveness): "Is the process alive?" If this fails, K8s RESTARTS the pod.
-- /ready (readiness): "Can it handle traffic?" If this fails, K8s stops sending requests
-  but does NOT restart — useful during startup or when the DB is down.
+- /ready (readiness): "Can it handle traffic?" During thesis load tests we keep this
+  lightweight/local so overload doesn't get misclassified as a dependency outage.
 """
 
-from fastapi import APIRouter, Request
-from fastapi.responses import JSONResponse
-from sqlalchemy import text
+from fastapi import APIRouter
 
 router = APIRouter(tags=["Health"])
 
@@ -21,14 +19,6 @@ async def health_check():
 
 
 @router.get("/ready")
-async def readiness_check(request: Request):
-    """Readiness probe — checks database connectivity."""
-    try:
-        db = request.state.db
-        await db.execute(text("SELECT 1"))
-        return {"status": "ready", "service": "auth-service", "database": "connected"}
-    except Exception as e:
-        return JSONResponse(
-            status_code=503,
-            content={"status": "not_ready", "service": "auth-service", "error": str(e)}
-        )
+async def readiness_check():
+    """Readiness probe — intentionally lightweight/local for experiment stability."""
+    return {"status": "ready", "service": "auth-service", "check_mode": "lightweight-local"}

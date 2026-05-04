@@ -54,23 +54,14 @@ spec:
             limits:
               cpu: "500m"
               memory: "256Mi"
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8001
-            initialDelaySeconds: 10
-            # periodSeconds=20, timeoutSeconds=10: gives /health enough time to
-            # respond when the event loop is busy processing bcrypt (9.7ms each).
-            # At 80 RPS peak / 1 pod (~155% CPU), probe can still complete in <10s.
-            # failureThreshold=6 = 120s tolerance before restart (prevents false kills).
-            periodSeconds: 20
-            timeoutSeconds: 10
-            failureThreshold: 6
+          # No liveness probe for thesis experiments: under severe CPU saturation,
+          # kubelet was repeatedly classifying an overloaded-but-live auth worker
+          # as dead and restarting it, contaminating B1/H* measurements.
           readinessProbe:
             httpGet:
               path: /ready
               port: 8001
             initialDelaySeconds: 5
-            periodSeconds: 10
+            periodSeconds: 15
             timeoutSeconds: 10
-            failureThreshold: 3
+            failureThreshold: 6

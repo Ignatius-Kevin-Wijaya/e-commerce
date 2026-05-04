@@ -64,6 +64,12 @@ class TestHealthEndpoints:
         assert response.json()["status"] == "healthy"
 
     @pytest.mark.asyncio
+    async def test_readiness_check(self, client):
+        response = await client.get("/ready")
+        assert response.status_code == 200
+        assert response.json()["check_mode"] == "lightweight-local"
+
+    @pytest.mark.asyncio
     async def test_root(self, client):
         response = await client.get("/")
         assert response.status_code == 200

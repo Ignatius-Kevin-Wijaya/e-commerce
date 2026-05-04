@@ -1,0 +1,21 @@
+{
+  "run_id": "auth-service_b2_oscillating_rep1",
+  "service": "auth-service",
+  "config": "b2",
+  "pattern": "oscillating",
+  "repetition": 1,
+  "start_epoch": 1777743764,
+  "end_epoch": 1777744981,
+  "duration_seconds": 1217,
+  "k6_job_name": "k6-auth-test-oscillating-auth-service-b2-oscillating-rep1",
+  "target_url": "http://auth-service.ecommerce.svc.cluster.local:8001",
+  "load_profile": {
+    "version": "recovery-v2",
+    "base_rps": 10,
+    "peak_rps": 40,
+    "auth_me_percent": 70,
+    "auth_login_percent": 30,
+    "num_test_users": 120
+  },
+  "timestamp": "2026-05-03T01:03:01+07:00"
+}
