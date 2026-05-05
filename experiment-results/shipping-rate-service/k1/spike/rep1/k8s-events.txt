@@ -1,0 +1,40 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-05-05T01:21:16Z	Normal	KEDAScalersStarted	scaledobject/shipping-rate-service-keda	Scaler prometheus is built
+2026-05-05T01:21:49Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-shipping-rate-service-keda	New size: 4; reason: All metrics below target
+2026-05-05T01:21:49Z	Normal	Killing	pod/shipping-rate-service-68467f5cb-7mr8r	Stopping container shipping-rate-service
+2026-05-05T01:21:49Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-68467f5cb	Deleted pod: shipping-rate-service-68467f5cb-7mr8r
+2026-05-05T01:21:49Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled down replica set shipping-rate-service-68467f5cb from 5 to 4
+2026-05-05T01:22:17Z	Normal	KEDAScalersStopped	scaledobject/shipping-rate-service-keda	Stopped scalers watch
+2026-05-05T01:22:17Z	Warning	ScaledObjectDeleted	scaledobject/shipping-rate-service-keda	ScaledObject was deleted
+2026-05-05T01:22:18Z	Normal	Killing	pod/shipping-rate-service-68467f5cb-6px8h	Stopping container shipping-rate-service
+2026-05-05T01:22:18Z	Normal	Killing	pod/shipping-rate-service-68467f5cb-86xf5	Stopping container shipping-rate-service
+2026-05-05T01:22:18Z	Normal	Killing	pod/shipping-rate-service-68467f5cb-9s6ng	Stopping container shipping-rate-service
+2026-05-05T01:22:18Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-68467f5cb	Deleted pod: shipping-rate-service-68467f5cb-86xf5
+2026-05-05T01:22:18Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-68467f5cb	Deleted pod: shipping-rate-service-68467f5cb-9s6ng
+2026-05-05T01:22:18Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-68467f5cb	Deleted pod: shipping-rate-service-68467f5cb-6px8h
+2026-05-05T01:22:18Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled down replica set shipping-rate-service-68467f5cb from 4 to 1
+2026-05-05T01:24:26Z	Normal	KEDAScalersStarted	scaledobject/shipping-rate-service-keda	Scaler prometheus is built
+2026-05-05T01:24:26Z	Normal	KEDAScalersStarted	scaledobject/shipping-rate-service-keda	Started scalers watch
+2026-05-05T01:24:26Z	Normal	ScaledObjectReady	scaledobject/shipping-rate-service-keda	ScaledObject is ready for scaling
+2026-05-05T01:26:06Z	Normal	SuccessfulCreate	job/k6-shipping-test-spike-shipping-rate-service-k1-spike-rep1	Created pod: k6-shipping-test-spike-shipping-rate-service-k1-spike-rep1wsk28
+2026-05-05T01:26:06Z	Normal	Scheduled	pod/k6-shipping-test-spike-shipping-rate-service-k1-spike-rep1wsk28	Successfully assigned ecommerce/k6-shipping-test-spike-shipping-rate-service-k1-spike-rep1wsk28 to aks-userpool-16719200-vmss00001l
+2026-05-05T01:26:07Z	Normal	Pulled	pod/k6-shipping-test-spike-shipping-rate-service-k1-spike-rep1wsk28	Container image "grafana/k6:0.46.0" already present on machine
+2026-05-05T01:26:07Z	Normal	Created	pod/k6-shipping-test-spike-shipping-rate-service-k1-spike-rep1wsk28	Created container: k6
+2026-05-05T01:26:07Z	Normal	Started	pod/k6-shipping-test-spike-shipping-rate-service-k1-spike-rep1wsk28	Started container k6
+2026-05-05T01:28:27Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-shipping-rate-service-keda	New size: 2; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: shipping-rate-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+2026-05-05T01:28:27Z	Normal	Pulling	pod/shipping-rate-service-68467f5cb-55p22	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-05-05T01:28:27Z	Normal	Pulled	pod/shipping-rate-service-68467f5cb-55p22	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 223ms (223ms including waiting). Image size: 61321205 bytes.
+2026-05-05T01:28:27Z	Normal	Created	pod/shipping-rate-service-68467f5cb-55p22	Created container: shipping-rate-service
+2026-05-05T01:28:27Z	Normal	SuccessfulCreate	replicaset/shipping-rate-service-68467f5cb	Created pod: shipping-rate-service-68467f5cb-55p22
+2026-05-05T01:28:27Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled up replica set shipping-rate-service-68467f5cb from 1 to 2
+2026-05-05T01:28:27Z	Normal	Scheduled	pod/shipping-rate-service-68467f5cb-55p22	Successfully assigned ecommerce/shipping-rate-service-68467f5cb-55p22 to aks-userpool-16719200-vmss00001l
+2026-05-05T01:28:28Z	Normal	Started	pod/shipping-rate-service-68467f5cb-55p22	Started container shipping-rate-service
+2026-05-05T01:36:42Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-shipping-rate-service-keda	New size: 3; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: shipping-rate-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+2026-05-05T01:36:42Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled up replica set shipping-rate-service-68467f5cb from 2 to 3
+2026-05-05T01:36:43Z	Normal	Pulling	pod/shipping-rate-service-68467f5cb-ln8rc	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-05-05T01:36:43Z	Normal	Pulled	pod/shipping-rate-service-68467f5cb-ln8rc	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 213ms (213ms including waiting). Image size: 61321205 bytes.
+2026-05-05T01:36:43Z	Normal	SuccessfulCreate	replicaset/shipping-rate-service-68467f5cb	Created pod: shipping-rate-service-68467f5cb-ln8rc
+2026-05-05T01:36:43Z	Normal	Scheduled	pod/shipping-rate-service-68467f5cb-ln8rc	Successfully assigned ecommerce/shipping-rate-service-68467f5cb-ln8rc to aks-userpool-16719200-vmss00001l
+2026-05-05T01:36:44Z	Normal	Created	pod/shipping-rate-service-68467f5cb-ln8rc	Created container: shipping-rate-service
+2026-05-05T01:36:44Z	Normal	Started	pod/shipping-rate-service-68467f5cb-ln8rc	Started container shipping-rate-service
+2026-05-05T01:38:11Z	Warning	BackoffLimitExceeded	job/k6-shipping-test-spike-shipping-rate-service-k1-spike-rep1	Job has reached the specified backoff limit

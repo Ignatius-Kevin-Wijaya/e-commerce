@@ -1,6 +1,6 @@
 .PHONY: help dev down build test lint migrate seed deploy clean logs kind-up kind-down kind-load kind-secrets kind-monitoring kind-load-test kind-status \
-       experiment experiment-dry-run experiment-resume experiment-pilot experiment-validate experiment-status experiment-product experiment-auth experiment-shipping \
-       experiment-validate-product experiment-validate-auth experiment-validate-shipping
+       experiment experiment-dry-run experiment-resume experiment-first experiment-first-resume experiment-pilot experiment-validate experiment-status \
+       experiment-product experiment-auth experiment-shipping experiment-validate-product experiment-validate-auth experiment-validate-shipping
 
 # ──── Image Registry ───────────────────────────────────────
 # Override via env: IMAGE_REGISTRY=ghcr.io/myorg make kind-load
@@ -107,7 +107,7 @@ kind-status: ## Show status of all pods in ecommerce and monitoring namespaces
 # ──── Thesis Experiment ────────────────────────────────────
 # Run experiments inside tmux to survive terminal disconnects:
 #   tmux new -s experiment
-#   make experiment
+#   make experiment-first-resume
 #   Ctrl+B, D to detach
 
 experiment: ## Run ALL 180 experiment runs (~45 hours)
@@ -126,17 +126,24 @@ experiment-first: ## Run exactly 1 repetition of all 36 configurations to test o
 	@echo "🧪 Starting first sweep (1 Repetition across all Configs & Patterns, 36 runs)"
 	bash scripts/run-experiment.sh --first
 
+experiment-first-resume: ## Resume the 36-run first sweep across both core services
+	@echo "🧪 Resuming first sweep (shipping-rate-service + auth-service, rep1 only)"
+	bash scripts/run-experiment.sh --first --resume
+
 experiment-pilot: ## Pilot run: shipping-rate-service B1 only (15 runs, ~4 hours)
 	@echo "🧪 Starting pilot run (shipping-rate-service, B1 config, 15 runs)"
 	bash scripts/run-experiment.sh --service shipping-rate-service --config b1
 
-experiment-shipping: ## Run all shipping-rate-service experiments (90 runs, ~22 hours)
+experiment-shipping: ## Run only shipping-rate-service experiments (90 runs, ~22 hours)
 	bash scripts/run-experiment.sh --service shipping-rate-service
 
-experiment-product: ## Run all exploratory product-service experiments (90 runs, ~22 hours)
-	bash scripts/run-experiment.sh --service product-service
+experiment-product: ## Product-service is appendix-only and not part of the active core runner
+	@echo "⚠️  product-service is exploratory/appendix-only and is not part of the active core experiment runner."
+	@echo "   Active core services: shipping-rate-service, auth-service"
+	@echo "   Use archived product artifacts instead of launching this target."
+	@exit 1
 
-experiment-auth: ## Run all auth-service experiments (90 runs, ~22 hours)
+experiment-auth: ## Run only auth-service experiments (90 runs, ~22 hours)
 	bash scripts/run-experiment.sh --service auth-service
 
 experiment-validate: ## Validate all completed experiment results for anomalies

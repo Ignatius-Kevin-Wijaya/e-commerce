@@ -1,0 +1,40 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-05-05T04:21:21Z	Normal	KEDAScalersStarted	scaledobject/auth-service-keda	Scaler prometheus is built
+2026-05-05T04:21:21Z	Normal	KEDAScalersStarted	scaledobject/auth-service-keda	Started scalers watch
+2026-05-05T04:21:21Z	Normal	ScaledObjectReady	scaledobject/auth-service-keda	ScaledObject is ready for scaling
+2026-05-05T04:23:01Z	Normal	Pulling	pod/k6-auth-test-gradual-auth-service-k1-gradual-rep1-gz6w4	Pulling image "grafana/k6:latest"
+2026-05-05T04:23:01Z	Normal	SuccessfulCreate	job/k6-auth-test-gradual-auth-service-k1-gradual-rep1	Created pod: k6-auth-test-gradual-auth-service-k1-gradual-rep1-gz6w4
+2026-05-05T04:23:01Z	Normal	Scheduled	pod/k6-auth-test-gradual-auth-service-k1-gradual-rep1-gz6w4	Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-k1-gradual-rep1-gz6w4 to aks-userpool-16719200-vmss00001l
+2026-05-05T04:23:03Z	Normal	Pulled	pod/k6-auth-test-gradual-auth-service-k1-gradual-rep1-gz6w4	Successfully pulled image "grafana/k6:latest" in 1.44s (1.44s including waiting). Image size: 33688197 bytes.
+2026-05-05T04:23:03Z	Normal	Created	pod/k6-auth-test-gradual-auth-service-k1-gradual-rep1-gz6w4	Created container: k6
+2026-05-05T04:23:03Z	Normal	Started	pod/k6-auth-test-gradual-auth-service-k1-gradual-rep1-gz6w4	Started container k6
+2026-05-05T04:23:52Z	Normal	Pulling	pod/auth-service-55bd95c686-nxgzt	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-05T04:23:52Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-nxgzt
+2026-05-05T04:23:52Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 1 to 2
+2026-05-05T04:23:52Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 2; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: auth-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+2026-05-05T04:23:52Z	Normal	Scheduled	pod/auth-service-55bd95c686-nxgzt	Successfully assigned ecommerce/auth-service-55bd95c686-nxgzt to aks-userpool-16719200-vmss00001l
+2026-05-05T04:23:53Z	Normal	Pulled	pod/auth-service-55bd95c686-nxgzt	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 230ms (230ms including waiting). Image size: 129975007 bytes.
+2026-05-05T04:23:53Z	Normal	Created	pod/auth-service-55bd95c686-nxgzt	Created container: auth-service
+2026-05-05T04:23:53Z	Normal	Started	pod/auth-service-55bd95c686-nxgzt	Started container auth-service
+2026-05-05T04:24:22Z	Normal	Pulling	pod/auth-service-55bd95c686-wqk78	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-05T04:24:22Z	Normal	Pulled	pod/auth-service-55bd95c686-wqk78	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 109ms (109ms including waiting). Image size: 129975007 bytes.
+2026-05-05T04:24:22Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-wqk78
+2026-05-05T04:24:22Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 3; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: auth-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+2026-05-05T04:24:22Z	Normal	Scheduled	pod/auth-service-55bd95c686-wqk78	Successfully assigned ecommerce/auth-service-55bd95c686-wqk78 to aks-userpool-16719200-vmss00001l
+2026-05-05T04:24:23Z	Normal	Created	pod/auth-service-55bd95c686-wqk78	Created container: auth-service
+2026-05-05T04:24:23Z	Normal	Started	pod/auth-service-55bd95c686-wqk78	Started container auth-service
+2026-05-05T04:27:07Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-vv5tf
+2026-05-05T04:27:07Z	Normal	ScalingReplicaSet	deployment/auth-service	(combined from similar events): Scaled up replica set auth-service-55bd95c686 from 3 to 4
+2026-05-05T04:27:07Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 4; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: auth-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+2026-05-05T04:27:07Z	Normal	Scheduled	pod/auth-service-55bd95c686-vv5tf	Successfully assigned ecommerce/auth-service-55bd95c686-vv5tf to aks-userpool-16719200-vmss00001l
+2026-05-05T04:27:08Z	Normal	Pulling	pod/auth-service-55bd95c686-vv5tf	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-05T04:27:08Z	Normal	Pulled	pod/auth-service-55bd95c686-vv5tf	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 170ms (170ms including waiting). Image size: 129975007 bytes.
+2026-05-05T04:27:08Z	Normal	Created	pod/auth-service-55bd95c686-vv5tf	Created container: auth-service
+2026-05-05T04:27:08Z	Normal	Started	pod/auth-service-55bd95c686-vv5tf	Started container auth-service
+2026-05-05T04:28:07Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 5; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: auth-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+2026-05-05T04:28:07Z	Normal	Scheduled	pod/auth-service-55bd95c686-7h7vq	Successfully assigned ecommerce/auth-service-55bd95c686-7h7vq to aks-userpool-16719200-vmss00001l
+2026-05-05T04:28:08Z	Normal	Pulling	pod/auth-service-55bd95c686-7h7vq	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-05T04:28:08Z	Normal	Pulled	pod/auth-service-55bd95c686-7h7vq	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 144ms (144ms including waiting). Image size: 129975007 bytes.
+2026-05-05T04:28:08Z	Normal	Created	pod/auth-service-55bd95c686-7h7vq	Created container: auth-service
+2026-05-05T04:28:08Z	Normal	Started	pod/auth-service-55bd95c686-7h7vq	Started container auth-service
+2026-05-05T04:35:35Z	Normal	Completed	job/k6-auth-test-gradual-auth-service-k1-gradual-rep1	Job completed

@@ -16,10 +16,12 @@
 #
 # Usage:
 #   chmod +x scripts/run-experiment.sh
-#   ./scripts/run-experiment.sh                     # Run ALL 180 experiments
-#   ./scripts/run-experiment.sh --service shipping-rate-service  # Only shipping experiments (90 runs)
-#   ./scripts/run-experiment.sh --resume            # Resume from last completed run
-#   ./scripts/run-experiment.sh --dry-run           # Print plan without executing
+#   ./scripts/run-experiment.sh                                # Run ALL 180 experiments
+#   ./scripts/run-experiment.sh --service shipping-rate-service # Only shipping experiments (90 runs)
+#   ./scripts/run-experiment.sh --service auth-service          # Only auth experiments (90 runs)
+#   ./scripts/run-experiment.sh --first --resume                # Resume the 36-run first sweep
+#   ./scripts/run-experiment.sh --resume                        # Resume from last completed run
+#   ./scripts/run-experiment.sh --dry-run                       # Print plan without executing
 #
 # ============================================================================
 
@@ -914,7 +916,7 @@ main() {
         echo "Usage: $0 [OPTIONS]"
         echo ""
         echo "Options:"
-        echo "  --service NAME     Only run for specific service (shipping-rate-service|auth-service|product-service)"
+        echo "  --service NAME     Only run for specific service (shipping-rate-service|auth-service)"
         echo "  --config  NAME     Only run specific config (b1|b2|h1|h2|h3|k1)"
         echo "  --pattern NAME     Only run specific pattern (gradual|spike|oscillating)"
         echo "  --resume           Resume from last completed run"
@@ -935,6 +937,23 @@ main() {
   log "  THESIS EXPERIMENT RUNNER"
   log "  Started: $(date -Iseconds)"
   log "================================================================"
+
+  if [[ -n "${filter_service}" ]]; then
+    local service_supported=false
+    local active_services
+    active_services=$(IFS=,; echo "${SERVICES[*]}")
+    for service in "${SERVICES[@]}"; do
+      if [[ "${service}" == "${filter_service}" ]]; then
+        service_supported=true
+        break
+      fi
+    done
+    if ! ${service_supported}; then
+      log_error "Unsupported --service '${filter_service}'. Active core runner supports: ${active_services}"
+      log_error "product-service is appendix-only and is not part of the active core matrix runner."
+      exit 1
+    fi
+  fi
 
   # Build run list
   local runs=()
@@ -975,6 +994,11 @@ main() {
   log "  Product load:   base=${PRODUCT_BASE_RPS} peak=${PRODUCT_PEAK_RPS} page_size=${PRODUCT_PAGE_SIZE} max_page=${PRODUCT_MAX_PAGE}"
   log "  Auth load:      base=${AUTH_BASE_RPS} peak=${AUTH_PEAK_RPS} me=${AUTH_ME_PERCENT}% login=${AUTH_LOGIN_PERCENT}% users=${NUM_TEST_USERS}"
   log ""
+
+  if [[ ${pending_runs} -eq 0 ]]; then
+    log_warn "No pending runs matched the requested filters."
+    exit 0
+  fi
 
   if ${dry_run}; then
     log "${YELLOW}DRY RUN — Execution plan:${NC}"

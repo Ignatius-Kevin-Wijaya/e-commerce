@@ -1,0 +1,22 @@
+{
+  "run_id": "shipping-rate-service_k1_gradual_rep1",
+  "service": "shipping-rate-service",
+  "config": "k1",
+  "pattern": "gradual",
+  "repetition": 1,
+  "start_epoch": 1777942921,
+  "end_epoch": 1777944071,
+  "duration_seconds": 1150,
+  "k6_job_name": "k6-shipping-test-gradual-shipping-rate-service-k1-gradual-rep1",
+  "target_url": "http://shipping-rate-service.ecommerce.svc.cluster.local:8006",
+  "load_profile": {
+    "version": "wait-bound-v1",
+    "base_vus": 10,
+    "peak_vus": 80,
+    "shipping_max_items": 4,
+    "shipping_min_weight_grams": 200,
+    "shipping_max_weight_grams": 2500,
+    "shipping_destination_zones": "domestic,regional,remote"
+  },
+  "timestamp": "2026-05-05T01:21:11+00:00"
+}
