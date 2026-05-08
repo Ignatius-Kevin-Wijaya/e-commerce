@@ -1,0 +1,28 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-05-07T00:49:51Z	Normal	Killing	pod/shipping-rate-service-68467f5cb-nxnqg	Stopping container shipping-rate-service
+2026-05-07T00:49:51Z	Normal	Killing	pod/shipping-rate-service-68467f5cb-snxj8	Stopping container shipping-rate-service
+2026-05-07T00:49:51Z	Normal	Killing	pod/shipping-rate-service-68467f5cb-w6msr	Stopping container shipping-rate-service
+2026-05-07T00:49:51Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-68467f5cb	Deleted pod: shipping-rate-service-68467f5cb-nxnqg
+2026-05-07T00:49:51Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-68467f5cb	Deleted pod: shipping-rate-service-68467f5cb-snxj8
+2026-05-07T00:49:51Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-68467f5cb	Deleted pod: shipping-rate-service-68467f5cb-w6msr
+2026-05-07T00:49:51Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled down replica set shipping-rate-service-68467f5cb from 4 to 1
+2026-05-07T00:53:38Z	Normal	SuccessfulCreate	job/k6-shipping-test-spike-shipping-rate-service-h1-spike-rep2	Created pod: k6-shipping-test-spike-shipping-rate-service-h1-spike-rep2c265h
+2026-05-07T00:53:38Z	Normal	Scheduled	pod/k6-shipping-test-spike-shipping-rate-service-h1-spike-rep2c265h	Successfully assigned ecommerce/k6-shipping-test-spike-shipping-rate-service-h1-spike-rep2c265h to aks-userpool-16719200-vmss00001o
+2026-05-07T00:53:39Z	Normal	Pulled	pod/k6-shipping-test-spike-shipping-rate-service-h1-spike-rep2c265h	Container image "grafana/k6:0.46.0" already present on machine
+2026-05-07T00:53:39Z	Normal	Created	pod/k6-shipping-test-spike-shipping-rate-service-h1-spike-rep2c265h	Created container: k6
+2026-05-07T00:53:39Z	Normal	Started	pod/k6-shipping-test-spike-shipping-rate-service-h1-spike-rep2c265h	Started container k6
+2026-05-07T00:56:44Z	Normal	Pulling	pod/shipping-rate-service-68467f5cb-6vz2d	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-05-07T00:56:44Z	Normal	Pulling	pod/shipping-rate-service-68467f5cb-f5x28	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-05-07T00:56:44Z	Normal	SuccessfulCreate	replicaset/shipping-rate-service-68467f5cb	Created pod: shipping-rate-service-68467f5cb-f5x28
+2026-05-07T00:56:44Z	Normal	SuccessfulCreate	replicaset/shipping-rate-service-68467f5cb	Created pod: shipping-rate-service-68467f5cb-6vz2d
+2026-05-07T00:56:44Z	Normal	SuccessfulRescale	horizontalpodautoscaler/shipping-rate-service-hpa-default	New size: 3; reason: cpu resource utilization (percentage of request) above target
+2026-05-07T00:56:44Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled up replica set shipping-rate-service-68467f5cb from 1 to 3
+2026-05-07T00:56:44Z	Normal	Scheduled	pod/shipping-rate-service-68467f5cb-f5x28	Successfully assigned ecommerce/shipping-rate-service-68467f5cb-f5x28 to aks-userpool-16719200-vmss00001o
+2026-05-07T00:56:44Z	Normal	Scheduled	pod/shipping-rate-service-68467f5cb-6vz2d	Successfully assigned ecommerce/shipping-rate-service-68467f5cb-6vz2d to aks-userpool-16719200-vmss00001o
+2026-05-07T00:56:45Z	Normal	Pulled	pod/shipping-rate-service-68467f5cb-6vz2d	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 315ms (315ms including waiting). Image size: 61321205 bytes.
+2026-05-07T00:56:45Z	Normal	Created	pod/shipping-rate-service-68467f5cb-6vz2d	Created container: shipping-rate-service
+2026-05-07T00:56:45Z	Normal	Started	pod/shipping-rate-service-68467f5cb-6vz2d	Started container shipping-rate-service
+2026-05-07T00:56:45Z	Normal	Pulled	pod/shipping-rate-service-68467f5cb-f5x28	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 323ms (323ms including waiting). Image size: 61321205 bytes.
+2026-05-07T00:56:45Z	Normal	Created	pod/shipping-rate-service-68467f5cb-f5x28	Created container: shipping-rate-service
+2026-05-07T00:56:45Z	Normal	Started	pod/shipping-rate-service-68467f5cb-f5x28	Started container shipping-rate-service
+2026-05-07T01:05:43Z	Warning	BackoffLimitExceeded	job/k6-shipping-test-spike-shipping-rate-service-h1-spike-rep2	Job has reached the specified backoff limit

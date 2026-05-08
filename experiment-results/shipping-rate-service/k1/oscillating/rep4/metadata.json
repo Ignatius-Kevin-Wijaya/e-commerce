@@ -1,0 +1,22 @@
+{
+  "run_id": "shipping-rate-service_k1_oscillating_rep4",
+  "service": "shipping-rate-service",
+  "config": "k1",
+  "pattern": "oscillating",
+  "repetition": 4,
+  "start_epoch": 1778163829,
+  "end_epoch": 1778165037,
+  "duration_seconds": 1208,
+  "k6_job_name": "k6-shipping-test-oscillating-shipping-rate-service-k1--c2d522b3",
+  "target_url": "http://shipping-rate-service.ecommerce.svc.cluster.local:8006",
+  "load_profile": {
+    "version": "wait-bound-v1",
+    "base_vus": 10,
+    "peak_vus": 80,
+    "shipping_max_items": 4,
+    "shipping_min_weight_grams": 200,
+    "shipping_max_weight_grams": 2500,
+    "shipping_destination_zones": "domestic,regional,remote"
+  },
+  "timestamp": "2026-05-07T14:43:57+00:00"
+}
