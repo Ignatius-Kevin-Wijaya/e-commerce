@@ -1,0 +1,52 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-05-09T11:51:45Z	Normal	KEDAScalersStarted	scaledobject/auth-service-keda	Scaler prometheus is built
+2026-05-09T11:52:18Z	Normal	Killing	pod/auth-service-55bd95c686-cbwsh	Stopping container auth-service
+2026-05-09T11:52:18Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-cbwsh
+2026-05-09T11:52:18Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-55bd95c686 from 5 to 4
+2026-05-09T11:52:18Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 4; reason: All metrics below target
+2026-05-09T11:52:46Z	Normal	KEDAScalersStopped	scaledobject/auth-service-keda	Stopped scalers watch
+2026-05-09T11:52:46Z	Warning	ScaledObjectDeleted	scaledobject/auth-service-keda	ScaledObject was deleted
+2026-05-09T11:52:47Z	Normal	Killing	pod/auth-service-55bd95c686-9gsf2	Stopping container auth-service
+2026-05-09T11:52:47Z	Normal	Killing	pod/auth-service-55bd95c686-dmthh	Stopping container auth-service
+2026-05-09T11:52:47Z	Normal	Killing	pod/auth-service-55bd95c686-q5j6w	Stopping container auth-service
+2026-05-09T11:52:47Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-dmthh
+2026-05-09T11:52:47Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-55bd95c686 from 4 to 1
+2026-05-09T11:54:55Z	Normal	KEDAScalersStarted	scaledobject/auth-service-keda	Scaler prometheus is built
+2026-05-09T11:54:55Z	Normal	KEDAScalersStarted	scaledobject/auth-service-keda	Started scalers watch
+2026-05-09T11:54:55Z	Normal	ScaledObjectReady	scaledobject/auth-service-keda	ScaledObject is ready for scaling
+2026-05-09T11:56:34Z	Normal	SuccessfulCreate	job/k6-auth-test-spike-auth-service-k1-spike-rep4	Created pod: k6-auth-test-spike-auth-service-k1-spike-rep4-9q95j
+2026-05-09T11:56:34Z	Normal	Scheduled	pod/k6-auth-test-spike-auth-service-k1-spike-rep4-9q95j	Successfully assigned ecommerce/k6-auth-test-spike-auth-service-k1-spike-rep4-9q95j to aks-userpool-16719200-vmss00001s
+2026-05-09T11:56:35Z	Normal	Pulling	pod/k6-auth-test-spike-auth-service-k1-spike-rep4-9q95j	Pulling image "grafana/k6:latest"
+2026-05-09T11:56:36Z	Normal	Pulled	pod/k6-auth-test-spike-auth-service-k1-spike-rep4-9q95j	Successfully pulled image "grafana/k6:latest" in 1.457s (1.457s including waiting). Image size: 33688197 bytes.
+2026-05-09T11:56:36Z	Normal	Created	pod/k6-auth-test-spike-auth-service-k1-spike-rep4-9q95j	Created container: k6
+2026-05-09T11:56:36Z	Normal	Started	pod/k6-auth-test-spike-auth-service-k1-spike-rep4-9q95j	Started container k6
+2026-05-09T11:57:25Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-x7q5l
+2026-05-09T11:57:25Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 1 to 2
+2026-05-09T11:57:25Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 2; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: auth-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+2026-05-09T11:57:25Z	Normal	Scheduled	pod/auth-service-55bd95c686-x7q5l	Successfully assigned ecommerce/auth-service-55bd95c686-x7q5l to aks-userpool-16719200-vmss00001s
+2026-05-09T11:57:26Z	Normal	Pulling	pod/auth-service-55bd95c686-x7q5l	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-09T11:57:26Z	Normal	Pulled	pod/auth-service-55bd95c686-x7q5l	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 263ms (263ms including waiting). Image size: 129975007 bytes.
+2026-05-09T11:57:26Z	Normal	Created	pod/auth-service-55bd95c686-x7q5l	Created container: auth-service
+2026-05-09T11:57:26Z	Normal	Started	pod/auth-service-55bd95c686-x7q5l	Started container auth-service
+2026-05-09T11:57:55Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-q7wnl
+2026-05-09T11:57:55Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 3; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: auth-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+2026-05-09T11:57:55Z	Normal	Scheduled	pod/auth-service-55bd95c686-q7wnl	Successfully assigned ecommerce/auth-service-55bd95c686-q7wnl to aks-userpool-16719200-vmss00001s
+2026-05-09T11:57:56Z	Normal	Pulling	pod/auth-service-55bd95c686-q7wnl	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-09T11:57:56Z	Normal	Pulled	pod/auth-service-55bd95c686-q7wnl	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 132ms (132ms including waiting). Image size: 129975007 bytes.
+2026-05-09T11:57:56Z	Normal	Created	pod/auth-service-55bd95c686-q7wnl	Created container: auth-service
+2026-05-09T11:57:56Z	Normal	Started	pod/auth-service-55bd95c686-q7wnl	Started container auth-service
+2026-05-09T11:59:41Z	Normal	Pulling	pod/auth-service-55bd95c686-r7tvn	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-09T11:59:41Z	Normal	Pulled	pod/auth-service-55bd95c686-r7tvn	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 208ms (208ms including waiting). Image size: 129975007 bytes.
+2026-05-09T11:59:41Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 3 to 4
+2026-05-09T11:59:41Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 4; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: auth-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+2026-05-09T11:59:41Z	Normal	Scheduled	pod/auth-service-55bd95c686-r7tvn	Successfully assigned ecommerce/auth-service-55bd95c686-r7tvn to aks-userpool-16719200-vmss00001s
+2026-05-09T11:59:42Z	Normal	Created	pod/auth-service-55bd95c686-r7tvn	Created container: auth-service
+2026-05-09T11:59:42Z	Normal	Started	pod/auth-service-55bd95c686-r7tvn	Started container auth-service
+2026-05-09T11:59:53Z	Warning	Unhealthy	pod/auth-service-55bd95c686-x7q5l	Readiness probe failed: Get "http://10.244.1.137:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-05-09T11:59:56Z	Normal	Pulling	pod/auth-service-55bd95c686-5wjfk	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-09T11:59:56Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 5; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: auth-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+2026-05-09T11:59:56Z	Normal	Scheduled	pod/auth-service-55bd95c686-5wjfk	Successfully assigned ecommerce/auth-service-55bd95c686-5wjfk to aks-userpool-16719200-vmss00001s
+2026-05-09T11:59:57Z	Normal	Pulled	pod/auth-service-55bd95c686-5wjfk	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 144ms (144ms including waiting). Image size: 129975007 bytes.
+2026-05-09T11:59:57Z	Normal	Created	pod/auth-service-55bd95c686-5wjfk	Created container: auth-service
+2026-05-09T11:59:57Z	Normal	Started	pod/auth-service-55bd95c686-5wjfk	Started container auth-service
+2026-05-09T12:09:08Z	Warning	BackoffLimitExceeded	job/k6-auth-test-spike-auth-service-k1-spike-rep4	Job has reached the specified backoff limit

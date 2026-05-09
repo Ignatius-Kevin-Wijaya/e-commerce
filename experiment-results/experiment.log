@@ -6263,3 +6263,289 @@
 [0;36m[2026-05-09 10:54:01][0m [0;32m✅ Pre-flight passed: auth-service is ready[0m
 [0;36m[2026-05-09 10:54:01][0m [0;34m── Starting k6 load test: k6-auth-test-gradual-auth-service-k1-gradual-rep5 (pattern: gradual)[0m
 [0;36m[2026-05-09 10:54:05][0m [0;34m── Waiting for k6 job to complete (timeout: 900s)...[0m
+[0;36m[2026-05-09 11:06:41][0m [0;32m✅ k6 job completed in 756s[0m
+[0;36m[2026-05-09 11:06:41][0m [0;34m── Waiting 180s before data export...[0m
+[0;36m[2026-05-09 11:09:41][0m [0;34m── Exporting k6 results...[0m
+[0;36m[2026-05-09 11:09:43][0m [1;33m⚠️  Could not copy k6 JSON results[0m
+[0;36m[2026-05-09 11:09:44][0m [0;32m✅ k6 results exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_gradual_rep5-1778323752/[0m
+[0;36m[2026-05-09 11:09:44][0m [0;34m── Exporting Prometheus metrics...[0m
+[0;36m[2026-05-09 11:09:51][0m [0;32m✅ Prometheus metrics exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_gradual_rep5-1778323752/[0m
+[0;36m[2026-05-09 11:09:52][0m [0;32m✅ Run auth-service_k1_gradual_rep5 completed in 1239s (~20m)[0m
+[0;36m[2026-05-09 11:09:52][0m 
+[0;36m[2026-05-09 11:09:52][0m ╔══════════════════════════════════════════════════════════════╗
+[0;36m[2026-05-09 11:09:52][0m ║  Progress: 65/72 | ETA: 2h 38m | Done: 172/180
+[0;36m[2026-05-09 11:09:52][0m ╚══════════════════════════════════════════════════════════════╝
+[0;36m[2026-05-09 11:09:52][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-05-09 11:09:52][0m   RUN: auth-service_k1_spike_rep2
+[0;36m[2026-05-09 11:09:52][0m   Service: auth-service | Config: k1 | Pattern: spike | Rep: 2
+[0;36m[2026-05-09 11:09:52][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-05-09 11:09:52][0m [0;34m── Resetting cluster state for auth-service...[0m
+[0;36m[2026-05-09 11:09:52][0m [0;34m── Cleaning up all autoscalers for auth-service...[0m
+[0;36m[2026-05-09 11:10:58][0m [0;34m── Waiting for auth-service to return to the 1-replica baseline...[0m
+[0;36m[2026-05-09 11:11:00][0m [0;32m✅ auth-service reached 1/1 ready replicas during cleanup[0m
+[0;36m[2026-05-09 11:11:00][0m [0;34m── Deleting leftover k6 jobs...[0m
+[0;36m[2026-05-09 11:11:01][0m [0;34m── Waiting 120s for cluster stabilization...[0m
+[0;36m[2026-05-09 11:13:04][0m [0;32m✅ auth-service reached 1/1 ready replicas during post-reset stabilization[0m
+[0;36m[2026-05-09 11:13:04][0m [0;32m✅ Cluster state reset complete for auth-service[0m
+[0;36m[2026-05-09 11:13:04][0m [0;34m── Applying configuration: k1 (k1-keda.yaml) for auth-service[0m
+[0;36m[2026-05-09 11:13:08][0m [0;32m✅ auth-service reached 1/1 ready replicas during config apply (k1)[0m
+[0;36m[2026-05-09 11:13:08][0m [0;34m── Waiting 90s for metrics to baseline...[0m
+[0;36m[2026-05-09 11:14:40][0m [0;32m✅ auth-service reached 1/1 ready replicas during post-config stabilization (k1)[0m
+[0;36m[2026-05-09 11:14:40][0m [0;32m✅ Configuration k1 applied for auth-service[0m
+[0;36m[2026-05-09 11:14:40][0m [0;34m── Pre-flight: verifying auth-service is ready on /ready...[0m
+[0;36m[2026-05-09 11:14:41][0m [0;32m✅ Pre-flight passed: auth-service is ready[0m
+[0;36m[2026-05-09 11:14:41][0m [0;34m── Starting k6 load test: k6-auth-test-spike-auth-service-k1-spike-rep2 (pattern: spike)[0m
+[0;36m[2026-05-09 11:14:45][0m [0;34m── Waiting for k6 job to complete (timeout: 900s)...[0m
+[0;36m[2026-05-09 11:27:53][0m [1;33m⚠️  k6 job reached terminal failed state after 788s (threshold failures are still valid data)[0m
+[0;36m[2026-05-09 11:27:53][0m [0;34m── Waiting 180s before data export...[0m
+[0;36m[2026-05-09 11:30:53][0m [0;34m── Exporting k6 results...[0m
+[0;36m[2026-05-09 11:30:55][0m [1;33m⚠️  Could not copy k6 JSON results[0m
+[0;36m[2026-05-09 11:30:56][0m [0;32m✅ k6 results exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_spike_rep2-1778324992/[0m
+[0;36m[2026-05-09 11:30:56][0m [0;34m── Exporting Prometheus metrics...[0m
+[0;36m[2026-05-09 11:31:02][0m [0;32m✅ Prometheus metrics exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_spike_rep2-1778324992/[0m
+[0;36m[2026-05-09 11:31:03][0m [0;32m✅ Run auth-service_k1_spike_rep2 completed in 1270s (~21m)[0m
+[0;36m[2026-05-09 11:31:03][0m 
+[0;36m[2026-05-09 11:31:03][0m ╔══════════════════════════════════════════════════════════════╗
+[0;36m[2026-05-09 11:31:03][0m ║  Progress: 66/72 | ETA: 2h 18m | Done: 173/180
+[0;36m[2026-05-09 11:31:03][0m ╚══════════════════════════════════════════════════════════════╝
+[0;36m[2026-05-09 11:31:03][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-05-09 11:31:03][0m   RUN: auth-service_k1_spike_rep3
+[0;36m[2026-05-09 11:31:03][0m   Service: auth-service | Config: k1 | Pattern: spike | Rep: 3
+[0;36m[2026-05-09 11:31:03][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-05-09 11:31:03][0m [0;34m── Resetting cluster state for auth-service...[0m
+[0;36m[2026-05-09 11:31:03][0m [0;34m── Cleaning up all autoscalers for auth-service...[0m
+[0;36m[2026-05-09 11:32:09][0m [0;34m── Waiting for auth-service to return to the 1-replica baseline...[0m
+[0;36m[2026-05-09 11:32:12][0m [0;32m✅ auth-service reached 1/1 ready replicas during cleanup[0m
+[0;36m[2026-05-09 11:32:12][0m [0;34m── Deleting leftover k6 jobs...[0m
+[0;36m[2026-05-09 11:32:13][0m [0;34m── Waiting 120s for cluster stabilization...[0m
+[0;36m[2026-05-09 11:34:15][0m [0;32m✅ auth-service reached 1/1 ready replicas during post-reset stabilization[0m
+[0;36m[2026-05-09 11:34:15][0m [0;32m✅ Cluster state reset complete for auth-service[0m
+[0;36m[2026-05-09 11:34:15][0m [0;34m── Applying configuration: k1 (k1-keda.yaml) for auth-service[0m
+[0;36m[2026-05-09 11:34:19][0m [0;32m✅ auth-service reached 1/1 ready replicas during config apply (k1)[0m
+[0;36m[2026-05-09 11:34:19][0m [0;34m── Waiting 90s for metrics to baseline...[0m
+[0;36m[2026-05-09 11:35:51][0m [0;32m✅ auth-service reached 1/1 ready replicas during post-config stabilization (k1)[0m
+[0;36m[2026-05-09 11:35:51][0m [0;32m✅ Configuration k1 applied for auth-service[0m
+[0;36m[2026-05-09 11:35:51][0m [0;34m── Pre-flight: verifying auth-service is ready on /ready...[0m
+[0;36m[2026-05-09 11:35:52][0m [0;32m✅ Pre-flight passed: auth-service is ready[0m
+[0;36m[2026-05-09 11:35:52][0m [0;34m── Starting k6 load test: k6-auth-test-spike-auth-service-k1-spike-rep3 (pattern: spike)[0m
+[0;36m[2026-05-09 11:35:56][0m [0;34m── Waiting for k6 job to complete (timeout: 900s)...[0m
+[0;36m[2026-05-09 11:48:31][0m [1;33m⚠️  k6 job reached terminal failed state after 755s (threshold failures are still valid data)[0m
+[0;36m[2026-05-09 11:48:31][0m [0;34m── Waiting 180s before data export...[0m
+[0;36m[2026-05-09 11:51:31][0m [0;34m── Exporting k6 results...[0m
+[0;36m[2026-05-09 11:51:33][0m [1;33m⚠️  Could not copy k6 JSON results[0m
+[0;36m[2026-05-09 11:51:34][0m [0;32m✅ k6 results exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_spike_rep3-1778326263/[0m
+[0;36m[2026-05-09 11:51:34][0m [0;34m── Exporting Prometheus metrics...[0m
+[0;36m[2026-05-09 11:51:41][0m [0;32m✅ Prometheus metrics exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_spike_rep3-1778326263/[0m
+[0;36m[2026-05-09 11:51:42][0m [0;32m✅ Run auth-service_k1_spike_rep3 completed in 1238s (~20m)[0m
+[0;36m[2026-05-09 11:51:42][0m 
+[0;36m[2026-05-09 11:51:42][0m ╔══════════════════════════════════════════════════════════════╗
+[0;36m[2026-05-09 11:51:42][0m ║  Progress: 67/72 | ETA: 1h 58m | Done: 174/180
+[0;36m[2026-05-09 11:51:42][0m ╚══════════════════════════════════════════════════════════════╝
+[0;36m[2026-05-09 11:51:42][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-05-09 11:51:42][0m   RUN: auth-service_k1_spike_rep4
+[0;36m[2026-05-09 11:51:42][0m   Service: auth-service | Config: k1 | Pattern: spike | Rep: 4
+[0;36m[2026-05-09 11:51:42][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-05-09 11:51:42][0m [0;34m── Resetting cluster state for auth-service...[0m
+[0;36m[2026-05-09 11:51:42][0m [0;34m── Cleaning up all autoscalers for auth-service...[0m
+[0;36m[2026-05-09 11:52:47][0m [0;34m── Waiting for auth-service to return to the 1-replica baseline...[0m
+[0;36m[2026-05-09 11:52:50][0m [0;32m✅ auth-service reached 1/1 ready replicas during cleanup[0m
+[0;36m[2026-05-09 11:52:50][0m [0;34m── Deleting leftover k6 jobs...[0m
+[0;36m[2026-05-09 11:52:51][0m [0;34m── Waiting 120s for cluster stabilization...[0m
+[0;36m[2026-05-09 11:54:53][0m [0;32m✅ auth-service reached 1/1 ready replicas during post-reset stabilization[0m
+[0;36m[2026-05-09 11:54:53][0m [0;32m✅ Cluster state reset complete for auth-service[0m
+[0;36m[2026-05-09 11:54:53][0m [0;34m── Applying configuration: k1 (k1-keda.yaml) for auth-service[0m
+[0;36m[2026-05-09 11:54:57][0m [0;32m✅ auth-service reached 1/1 ready replicas during config apply (k1)[0m
+[0;36m[2026-05-09 11:54:57][0m [0;34m── Waiting 90s for metrics to baseline...[0m
+[0;36m[2026-05-09 11:56:29][0m [0;32m✅ auth-service reached 1/1 ready replicas during post-config stabilization (k1)[0m
+[0;36m[2026-05-09 11:56:29][0m [0;32m✅ Configuration k1 applied for auth-service[0m
+[0;36m[2026-05-09 11:56:29][0m [0;34m── Pre-flight: verifying auth-service is ready on /ready...[0m
+[0;36m[2026-05-09 11:56:31][0m [0;32m✅ Pre-flight passed: auth-service is ready[0m
+[0;36m[2026-05-09 11:56:31][0m [0;34m── Starting k6 load test: k6-auth-test-spike-auth-service-k1-spike-rep4 (pattern: spike)[0m
+[0;36m[2026-05-09 11:56:34][0m [0;34m── Waiting for k6 job to complete (timeout: 900s)...[0m
+[0;36m[2026-05-09 12:09:09][0m [1;33m⚠️  k6 job reached terminal failed state after 755s (threshold failures are still valid data)[0m
+[0;36m[2026-05-09 12:09:09][0m [0;34m── Waiting 180s before data export...[0m
+[0;36m[2026-05-09 12:12:09][0m [0;34m── Exporting k6 results...[0m
+[0;36m[2026-05-09 12:12:11][0m [1;33m⚠️  Could not copy k6 JSON results[0m
+[0;36m[2026-05-09 12:12:12][0m [0;32m✅ k6 results exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_spike_rep4-1778327502/[0m
+[0;36m[2026-05-09 12:12:12][0m [0;34m── Exporting Prometheus metrics...[0m
+[0;36m[2026-05-09 12:12:18][0m [0;32m✅ Prometheus metrics exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_spike_rep4-1778327502/[0m
+[0;36m[2026-05-09 12:12:19][0m [0;32m✅ Run auth-service_k1_spike_rep4 completed in 1236s (~20m)[0m
+[0;36m[2026-05-09 12:12:19][0m 
+[0;36m[2026-05-09 12:12:19][0m ╔══════════════════════════════════════════════════════════════╗
+[0;36m[2026-05-09 12:12:19][0m ║  Progress: 68/72 | ETA: 1h 39m | Done: 175/180
+[0;36m[2026-05-09 12:12:19][0m ╚══════════════════════════════════════════════════════════════╝
+[0;36m[2026-05-09 12:12:19][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-05-09 12:12:19][0m   RUN: auth-service_k1_spike_rep5
+[0;36m[2026-05-09 12:12:19][0m   Service: auth-service | Config: k1 | Pattern: spike | Rep: 5
+[0;36m[2026-05-09 12:12:19][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-05-09 12:12:19][0m [0;34m── Resetting cluster state for auth-service...[0m
+[0;36m[2026-05-09 12:12:19][0m [0;34m── Cleaning up all autoscalers for auth-service...[0m
+[0;36m[2026-05-09 12:13:25][0m [0;34m── Waiting for auth-service to return to the 1-replica baseline...[0m
+[0;36m[2026-05-09 12:13:27][0m [0;32m✅ auth-service reached 1/1 ready replicas during cleanup[0m
+[0;36m[2026-05-09 12:13:27][0m [0;34m── Deleting leftover k6 jobs...[0m
+[0;36m[2026-05-09 12:13:28][0m [0;34m── Waiting 120s for cluster stabilization...[0m
+[0;36m[2026-05-09 12:15:30][0m [0;32m✅ auth-service reached 1/1 ready replicas during post-reset stabilization[0m
+[0;36m[2026-05-09 12:15:30][0m [0;32m✅ Cluster state reset complete for auth-service[0m
+[0;36m[2026-05-09 12:15:30][0m [0;34m── Applying configuration: k1 (k1-keda.yaml) for auth-service[0m
+[0;36m[2026-05-09 12:15:34][0m [0;32m✅ auth-service reached 1/1 ready replicas during config apply (k1)[0m
+[0;36m[2026-05-09 12:15:34][0m [0;34m── Waiting 90s for metrics to baseline...[0m
+[0;36m[2026-05-09 12:17:07][0m [0;32m✅ auth-service reached 1/1 ready replicas during post-config stabilization (k1)[0m
+[0;36m[2026-05-09 12:17:07][0m [0;32m✅ Configuration k1 applied for auth-service[0m
+[0;36m[2026-05-09 12:17:07][0m [0;34m── Pre-flight: verifying auth-service is ready on /ready...[0m
+[0;36m[2026-05-09 12:17:08][0m [0;32m✅ Pre-flight passed: auth-service is ready[0m
+[0;36m[2026-05-09 12:17:08][0m [0;34m── Starting k6 load test: k6-auth-test-spike-auth-service-k1-spike-rep5 (pattern: spike)[0m
+[0;36m[2026-05-09 12:17:13][0m [0;34m── Waiting for k6 job to complete (timeout: 900s)...[0m
+[0;36m[2026-05-09 12:29:48][0m [1;33m⚠️  k6 job reached terminal failed state after 755s (threshold failures are still valid data)[0m
+[0;36m[2026-05-09 12:29:48][0m [0;34m── Waiting 180s before data export...[0m
+[0;36m[2026-05-09 12:32:48][0m [0;34m── Exporting k6 results...[0m
+[0;36m[2026-05-09 12:32:50][0m [1;33m⚠️  Could not copy k6 JSON results[0m
+[0;36m[2026-05-09 12:32:50][0m [0;32m✅ k6 results exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_spike_rep5-1778328739/[0m
+[0;36m[2026-05-09 12:32:51][0m [0;34m── Exporting Prometheus metrics...[0m
+[0;36m[2026-05-09 12:32:58][0m [0;32m✅ Prometheus metrics exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_spike_rep5-1778328739/[0m
+[0;36m[2026-05-09 12:32:59][0m [0;32m✅ Run auth-service_k1_spike_rep5 completed in 1239s (~20m)[0m
+[0;36m[2026-05-09 12:32:59][0m 
+[0;36m[2026-05-09 12:32:59][0m ╔══════════════════════════════════════════════════════════════╗
+[0;36m[2026-05-09 12:32:59][0m ║  Progress: 69/72 | ETA: 1h 19m | Done: 176/180
+[0;36m[2026-05-09 12:32:59][0m ╚══════════════════════════════════════════════════════════════╝
+[0;36m[2026-05-09 12:32:59][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-05-09 12:32:59][0m   RUN: auth-service_k1_oscillating_rep2
+[0;36m[2026-05-09 12:32:59][0m   Service: auth-service | Config: k1 | Pattern: oscillating | Rep: 2
+[0;36m[2026-05-09 12:32:59][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-05-09 12:32:59][0m [0;34m── Resetting cluster state for auth-service...[0m
+[0;36m[2026-05-09 12:32:59][0m [0;34m── Cleaning up all autoscalers for auth-service...[0m
+[0;36m[2026-05-09 12:34:05][0m [0;34m── Waiting for auth-service to return to the 1-replica baseline...[0m
+[0;36m[2026-05-09 12:34:07][0m [0;32m✅ auth-service reached 1/1 ready replicas during cleanup[0m
+[0;36m[2026-05-09 12:34:07][0m [0;34m── Deleting leftover k6 jobs...[0m
+[0;36m[2026-05-09 12:34:08][0m [0;34m── Waiting 120s for cluster stabilization...[0m
+[0;36m[2026-05-09 12:36:11][0m [0;32m✅ auth-service reached 1/1 ready replicas during post-reset stabilization[0m
+[0;36m[2026-05-09 12:36:11][0m [0;32m✅ Cluster state reset complete for auth-service[0m
+[0;36m[2026-05-09 12:36:11][0m [0;34m── Applying configuration: k1 (k1-keda.yaml) for auth-service[0m
+[0;36m[2026-05-09 12:36:14][0m [0;32m✅ auth-service reached 1/1 ready replicas during config apply (k1)[0m
+[0;36m[2026-05-09 12:36:14][0m [0;34m── Waiting 90s for metrics to baseline...[0m
+[0;36m[2026-05-09 12:37:46][0m [0;32m✅ auth-service reached 1/1 ready replicas during post-config stabilization (k1)[0m
+[0;36m[2026-05-09 12:37:46][0m [0;32m✅ Configuration k1 applied for auth-service[0m
+[0;36m[2026-05-09 12:37:46][0m [0;34m── Pre-flight: verifying auth-service is ready on /ready...[0m
+[0;36m[2026-05-09 12:37:48][0m [0;32m✅ Pre-flight passed: auth-service is ready[0m
+[0;36m[2026-05-09 12:37:48][0m [0;34m── Starting k6 load test: k6-auth-test-oscillating-auth-service-k1-oscillating-rep2 (pattern: oscillating)[0m
+[0;36m[2026-05-09 12:37:52][0m [0;34m── Waiting for k6 job to complete (timeout: 900s)...[0m
+[0;36m[2026-05-09 12:50:27][0m [1;33m⚠️  k6 job reached terminal failed state after 755s (threshold failures are still valid data)[0m
+[0;36m[2026-05-09 12:50:27][0m [0;34m── Waiting 180s before data export...[0m
+[0;36m[2026-05-09 12:53:27][0m [0;34m── Exporting k6 results...[0m
+[0;36m[2026-05-09 12:53:28][0m [1;33m⚠️  Could not copy k6 JSON results[0m
+[0;36m[2026-05-09 12:53:29][0m [0;32m✅ k6 results exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_oscillating_rep2-1778329979/[0m
+[0;36m[2026-05-09 12:53:30][0m [0;34m── Exporting Prometheus metrics...[0m
+[0;36m[2026-05-09 12:53:36][0m [0;32m✅ Prometheus metrics exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_oscillating_rep2-1778329979/[0m
+[0;36m[2026-05-09 12:53:37][0m [0;32m✅ Run auth-service_k1_oscillating_rep2 completed in 1237s (~20m)[0m
+[0;36m[2026-05-09 12:53:37][0m 
+[0;36m[2026-05-09 12:53:37][0m ╔══════════════════════════════════════════════════════════════╗
+[0;36m[2026-05-09 12:53:37][0m ║  Progress: 70/72 | ETA: 0h 59m | Done: 177/180
+[0;36m[2026-05-09 12:53:37][0m ╚══════════════════════════════════════════════════════════════╝
+[0;36m[2026-05-09 12:53:37][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-05-09 12:53:37][0m   RUN: auth-service_k1_oscillating_rep3
+[0;36m[2026-05-09 12:53:37][0m   Service: auth-service | Config: k1 | Pattern: oscillating | Rep: 3
+[0;36m[2026-05-09 12:53:37][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-05-09 12:53:37][0m [0;34m── Resetting cluster state for auth-service...[0m
+[0;36m[2026-05-09 12:53:37][0m [0;34m── Cleaning up all autoscalers for auth-service...[0m
+[0;36m[2026-05-09 12:54:42][0m [0;34m── Waiting for auth-service to return to the 1-replica baseline...[0m
+[0;36m[2026-05-09 12:54:45][0m [0;32m✅ auth-service reached 1/1 ready replicas during cleanup[0m
+[0;36m[2026-05-09 12:54:45][0m [0;34m── Deleting leftover k6 jobs...[0m
+[0;36m[2026-05-09 12:54:46][0m [0;34m── Waiting 120s for cluster stabilization...[0m
+[0;36m[2026-05-09 12:56:48][0m [0;32m✅ auth-service reached 1/1 ready replicas during post-reset stabilization[0m
+[0;36m[2026-05-09 12:56:48][0m [0;32m✅ Cluster state reset complete for auth-service[0m
+[0;36m[2026-05-09 12:56:48][0m [0;34m── Applying configuration: k1 (k1-keda.yaml) for auth-service[0m
+[0;36m[2026-05-09 12:56:52][0m [0;32m✅ auth-service reached 1/1 ready replicas during config apply (k1)[0m
+[0;36m[2026-05-09 12:56:52][0m [0;34m── Waiting 90s for metrics to baseline...[0m
+[0;36m[2026-05-09 12:58:24][0m [0;32m✅ auth-service reached 1/1 ready replicas during post-config stabilization (k1)[0m
+[0;36m[2026-05-09 12:58:24][0m [0;32m✅ Configuration k1 applied for auth-service[0m
+[0;36m[2026-05-09 12:58:24][0m [0;34m── Pre-flight: verifying auth-service is ready on /ready...[0m
+[0;36m[2026-05-09 12:58:26][0m [0;32m✅ Pre-flight passed: auth-service is ready[0m
+[0;36m[2026-05-09 12:58:26][0m [0;34m── Starting k6 load test: k6-auth-test-oscillating-auth-service-k1-oscillating-rep3 (pattern: oscillating)[0m
+[0;36m[2026-05-09 12:58:30][0m [0;34m── Waiting for k6 job to complete (timeout: 900s)...[0m
+[0;36m[2026-05-09 13:11:06][0m [1;33m⚠️  k6 job reached terminal failed state after 756s (threshold failures are still valid data)[0m
+[0;36m[2026-05-09 13:11:06][0m [0;34m── Waiting 180s before data export...[0m
+[0;36m[2026-05-09 13:14:06][0m [0;34m── Exporting k6 results...[0m
+[0;36m[2026-05-09 13:14:08][0m [1;33m⚠️  Could not copy k6 JSON results[0m
+[0;36m[2026-05-09 13:14:08][0m [0;32m✅ k6 results exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_oscillating_rep3-1778331217/[0m
+[0;36m[2026-05-09 13:14:09][0m [0;34m── Exporting Prometheus metrics...[0m
+[0;36m[2026-05-09 13:14:15][0m [0;32m✅ Prometheus metrics exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_oscillating_rep3-1778331217/[0m
+[0;36m[2026-05-09 13:14:16][0m [0;32m✅ Run auth-service_k1_oscillating_rep3 completed in 1238s (~20m)[0m
+[0;36m[2026-05-09 13:14:16][0m 
+[0;36m[2026-05-09 13:14:16][0m ╔══════════════════════════════════════════════════════════════╗
+[0;36m[2026-05-09 13:14:16][0m ║  Progress: 71/72 | ETA: 0h 39m | Done: 178/180
+[0;36m[2026-05-09 13:14:16][0m ╚══════════════════════════════════════════════════════════════╝
+[0;36m[2026-05-09 13:14:16][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-05-09 13:14:16][0m   RUN: auth-service_k1_oscillating_rep4
+[0;36m[2026-05-09 13:14:16][0m   Service: auth-service | Config: k1 | Pattern: oscillating | Rep: 4
+[0;36m[2026-05-09 13:14:16][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-05-09 13:14:16][0m [0;34m── Resetting cluster state for auth-service...[0m
+[0;36m[2026-05-09 13:14:16][0m [0;34m── Cleaning up all autoscalers for auth-service...[0m
+[0;36m[2026-05-09 13:15:22][0m [0;34m── Waiting for auth-service to return to the 1-replica baseline...[0m
+[0;36m[2026-05-09 13:15:25][0m [0;32m✅ auth-service reached 1/1 ready replicas during cleanup[0m
+[0;36m[2026-05-09 13:15:25][0m [0;34m── Deleting leftover k6 jobs...[0m
+[0;36m[2026-05-09 13:15:26][0m [0;34m── Waiting 120s for cluster stabilization...[0m
+[0;36m[2026-05-09 13:17:28][0m [0;32m✅ auth-service reached 1/1 ready replicas during post-reset stabilization[0m
+[0;36m[2026-05-09 13:17:28][0m [0;32m✅ Cluster state reset complete for auth-service[0m
+[0;36m[2026-05-09 13:17:28][0m [0;34m── Applying configuration: k1 (k1-keda.yaml) for auth-service[0m
+[0;36m[2026-05-09 13:17:32][0m [0;32m✅ auth-service reached 1/1 ready replicas during config apply (k1)[0m
+[0;36m[2026-05-09 13:17:32][0m [0;34m── Waiting 90s for metrics to baseline...[0m
+[0;36m[2026-05-09 13:19:04][0m [0;32m✅ auth-service reached 1/1 ready replicas during post-config stabilization (k1)[0m
+[0;36m[2026-05-09 13:19:04][0m [0;32m✅ Configuration k1 applied for auth-service[0m
+[0;36m[2026-05-09 13:19:04][0m [0;34m── Pre-flight: verifying auth-service is ready on /ready...[0m
+[0;36m[2026-05-09 13:19:05][0m [0;32m✅ Pre-flight passed: auth-service is ready[0m
+[0;36m[2026-05-09 13:19:05][0m [0;34m── Starting k6 load test: k6-auth-test-oscillating-auth-service-k1-oscillating-rep4 (pattern: oscillating)[0m
+[0;36m[2026-05-09 13:19:09][0m [0;34m── Waiting for k6 job to complete (timeout: 900s)...[0m
+[0;36m[2026-05-09 13:31:45][0m [1;33m⚠️  k6 job reached terminal failed state after 756s (threshold failures are still valid data)[0m
+[0;36m[2026-05-09 13:31:45][0m [0;34m── Waiting 180s before data export...[0m
+[0;36m[2026-05-09 13:34:45][0m [0;34m── Exporting k6 results...[0m
+[0;36m[2026-05-09 13:34:47][0m [1;33m⚠️  Could not copy k6 JSON results[0m
+[0;36m[2026-05-09 13:34:47][0m [0;32m✅ k6 results exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_oscillating_rep4-1778332456/[0m
+[0;36m[2026-05-09 13:34:48][0m [0;34m── Exporting Prometheus metrics...[0m
+[0;36m[2026-05-09 13:34:54][0m [0;32m✅ Prometheus metrics exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_oscillating_rep4-1778332456/[0m
+[0;36m[2026-05-09 13:34:55][0m [0;32m✅ Run auth-service_k1_oscillating_rep4 completed in 1238s (~20m)[0m
+[0;36m[2026-05-09 13:34:55][0m 
+[0;36m[2026-05-09 13:34:55][0m ╔══════════════════════════════════════════════════════════════╗
+[0;36m[2026-05-09 13:34:55][0m ║  Progress: 72/72 | ETA: 0h 19m | Done: 179/180
+[0;36m[2026-05-09 13:34:55][0m ╚══════════════════════════════════════════════════════════════╝
+[0;36m[2026-05-09 13:34:55][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-05-09 13:34:55][0m   RUN: auth-service_k1_oscillating_rep5
+[0;36m[2026-05-09 13:34:55][0m   Service: auth-service | Config: k1 | Pattern: oscillating | Rep: 5
+[0;36m[2026-05-09 13:34:55][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;36m[2026-05-09 13:34:55][0m [0;34m── Resetting cluster state for auth-service...[0m
+[0;36m[2026-05-09 13:34:55][0m [0;34m── Cleaning up all autoscalers for auth-service...[0m
+[0;36m[2026-05-09 13:36:01][0m [0;34m── Waiting for auth-service to return to the 1-replica baseline...[0m
+[0;36m[2026-05-09 13:36:04][0m [0;32m✅ auth-service reached 1/1 ready replicas during cleanup[0m
+[0;36m[2026-05-09 13:36:04][0m [0;34m── Deleting leftover k6 jobs...[0m
+[0;36m[2026-05-09 13:36:05][0m [0;34m── Waiting 120s for cluster stabilization...[0m
+[0;36m[2026-05-09 13:38:07][0m [0;32m✅ auth-service reached 1/1 ready replicas during post-reset stabilization[0m
+[0;36m[2026-05-09 13:38:07][0m [0;32m✅ Cluster state reset complete for auth-service[0m
+[0;36m[2026-05-09 13:38:07][0m [0;34m── Applying configuration: k1 (k1-keda.yaml) for auth-service[0m
+[0;36m[2026-05-09 13:38:11][0m [0;32m✅ auth-service reached 1/1 ready replicas during config apply (k1)[0m
+[0;36m[2026-05-09 13:38:11][0m [0;34m── Waiting 90s for metrics to baseline...[0m
+[0;36m[2026-05-09 13:39:43][0m [0;32m✅ auth-service reached 1/1 ready replicas during post-config stabilization (k1)[0m
+[0;36m[2026-05-09 13:39:43][0m [0;32m✅ Configuration k1 applied for auth-service[0m
+[0;36m[2026-05-09 13:39:43][0m [0;34m── Pre-flight: verifying auth-service is ready on /ready...[0m
+[0;36m[2026-05-09 13:39:44][0m [0;32m✅ Pre-flight passed: auth-service is ready[0m
+[0;36m[2026-05-09 13:39:44][0m [0;34m── Starting k6 load test: k6-auth-test-oscillating-auth-service-k1-oscillating-rep5 (pattern: oscillating)[0m
+[0;36m[2026-05-09 13:39:49][0m [0;34m── Waiting for k6 job to complete (timeout: 900s)...[0m
+[0;36m[2026-05-09 13:52:24][0m [1;33m⚠️  k6 job reached terminal failed state after 755s (threshold failures are still valid data)[0m
+[0;36m[2026-05-09 13:52:24][0m [0;34m── Waiting 180s before data export...[0m
+[0;36m[2026-05-09 13:55:24][0m [0;34m── Exporting k6 results...[0m
+[0;36m[2026-05-09 13:55:25][0m [1;33m⚠️  Could not copy k6 JSON results[0m
+[0;36m[2026-05-09 13:55:26][0m [0;32m✅ k6 results exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_oscillating_rep5-1778333695/[0m
+[0;36m[2026-05-09 13:55:27][0m [0;34m── Exporting Prometheus metrics...[0m
+[0;36m[2026-05-09 13:55:33][0m [0;32m✅ Prometheus metrics exported to /home/kevin/e-commerce/experiment-results/.tmp/auth-service_k1_oscillating_rep5-1778333695/[0m
+[0;36m[2026-05-09 13:55:35][0m [0;32m✅ Run auth-service_k1_oscillating_rep5 completed in 1238s (~20m)[0m
+[0;36m[2026-05-09 13:55:35][0m 
+[0;36m[2026-05-09 13:55:35][0m ================================================================
+[0;36m[2026-05-09 13:55:35][0m   EXPERIMENT COMPLETE
+[0;36m[2026-05-09 13:55:35][0m   Finished: 2026-05-09T13:55:35+00:00
+[0;36m[2026-05-09 13:55:35][0m   Total elapsed: 23h 50m
+[0;36m[2026-05-09 13:55:35][0m   Results saved to: /home/kevin/e-commerce/experiment-results/
+[0;36m[2026-05-09 13:55:35][0m ================================================================
+[0;36m[2026-05-09 13:55:35][0m [0;34m── Cleaning up all autoscalers for shipping-rate-service...[0m
+[0;36m[2026-05-09 13:56:40][0m [0;34m── Waiting for shipping-rate-service to return to the 1-replica baseline...[0m
+[0;36m[2026-05-09 13:56:43][0m [0;32m✅ shipping-rate-service reached 1/1 ready replicas during cleanup[0m
+[0;36m[2026-05-09 13:56:43][0m [0;34m── Cleaning up all autoscalers for auth-service...[0m
+[0;36m[2026-05-09 13:57:48][0m [0;34m── Waiting for auth-service to return to the 1-replica baseline...[0m
+[0;36m[2026-05-09 13:57:51][0m [0;32m✅ auth-service reached 1/1 ready replicas during cleanup[0m
+[0;36m[2026-05-09 13:57:51][0m [0;32m✅ All done! Don't forget: az aks stop --resource-group ecommerce --name ecommerce-aks[0m
