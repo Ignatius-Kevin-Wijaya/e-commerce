@@ -1,0 +1,45 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-05-09T01:37:10Z	Normal	Killing	pod/auth-service-55bd95c686-h5grw	Stopping container auth-service
+2026-05-09T01:37:10Z	Normal	Killing	pod/auth-service-55bd95c686-hch8n	Stopping container auth-service
+2026-05-09T01:37:10Z	Normal	Killing	pod/auth-service-55bd95c686-m884h	Stopping container auth-service
+2026-05-09T01:37:10Z	Normal	Killing	pod/auth-service-55bd95c686-rm52v	Stopping container auth-service
+2026-05-09T01:37:10Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-hch8n
+2026-05-09T01:37:10Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-rm52v
+2026-05-09T01:37:10Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-m884h
+2026-05-09T01:37:10Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-h5grw
+2026-05-09T01:37:10Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-55bd95c686 from 5 to 1
+2026-05-09T01:40:57Z	Normal	SuccessfulCreate	job/k6-auth-test-oscillating-auth-service-h1-oscillating-rep5	Created pod: k6-auth-test-oscillating-auth-service-h1-oscillating-rep5-29nk5
+2026-05-09T01:40:57Z	Normal	Scheduled	pod/k6-auth-test-oscillating-auth-service-h1-oscillating-rep5-29nk5	Successfully assigned ecommerce/k6-auth-test-oscillating-auth-service-h1-oscillating-rep5-29nk5 to aks-userpool-16719200-vmss00001s
+2026-05-09T01:40:58Z	Normal	Pulling	pod/k6-auth-test-oscillating-auth-service-h1-oscillating-rep5-29nk5	Pulling image "grafana/k6:latest"
+2026-05-09T01:40:59Z	Normal	Pulled	pod/k6-auth-test-oscillating-auth-service-h1-oscillating-rep5-29nk5	Successfully pulled image "grafana/k6:latest" in 1.408s (1.408s including waiting). Image size: 33688197 bytes.
+2026-05-09T01:40:59Z	Normal	Created	pod/k6-auth-test-oscillating-auth-service-h1-oscillating-rep5-29nk5	Created container: k6
+2026-05-09T01:40:59Z	Normal	Started	pod/k6-auth-test-oscillating-auth-service-h1-oscillating-rep5-29nk5	Started container k6
+2026-05-09T01:42:03Z	Normal	Pulling	pod/auth-service-55bd95c686-2hqwc	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-09T01:42:03Z	Normal	Pulling	pod/auth-service-55bd95c686-jdg97	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-09T01:42:03Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-2hqwc
+2026-05-09T01:42:03Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-jdg97
+2026-05-09T01:42:03Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-default	New size: 3; reason: cpu resource utilization (percentage of request) above target
+2026-05-09T01:42:03Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 1 to 3
+2026-05-09T01:42:03Z	Normal	Scheduled	pod/auth-service-55bd95c686-2hqwc	Successfully assigned ecommerce/auth-service-55bd95c686-2hqwc to aks-userpool-16719200-vmss00001s
+2026-05-09T01:42:03Z	Normal	Scheduled	pod/auth-service-55bd95c686-jdg97	Successfully assigned ecommerce/auth-service-55bd95c686-jdg97 to aks-userpool-16719200-vmss00001s
+2026-05-09T01:42:04Z	Normal	Pulled	pod/auth-service-55bd95c686-2hqwc	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 355ms (355ms including waiting). Image size: 129975007 bytes.
+2026-05-09T01:42:04Z	Normal	Created	pod/auth-service-55bd95c686-2hqwc	Created container: auth-service
+2026-05-09T01:42:04Z	Normal	Started	pod/auth-service-55bd95c686-2hqwc	Started container auth-service
+2026-05-09T01:42:04Z	Normal	Pulled	pod/auth-service-55bd95c686-jdg97	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 339ms (339ms including waiting). Image size: 129975007 bytes.
+2026-05-09T01:42:04Z	Normal	Created	pod/auth-service-55bd95c686-jdg97	Created container: auth-service
+2026-05-09T01:42:04Z	Normal	Started	pod/auth-service-55bd95c686-jdg97	Started container auth-service
+2026-05-09T01:45:03Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-hwqch
+2026-05-09T01:45:03Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-5slsp
+2026-05-09T01:45:03Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-default	New size: 5; reason: cpu resource utilization (percentage of request) above target
+2026-05-09T01:45:03Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 3 to 5
+2026-05-09T01:45:03Z	Normal	Scheduled	pod/auth-service-55bd95c686-hwqch	Successfully assigned ecommerce/auth-service-55bd95c686-hwqch to aks-userpool-16719200-vmss00001s
+2026-05-09T01:45:03Z	Normal	Scheduled	pod/auth-service-55bd95c686-5slsp	Successfully assigned ecommerce/auth-service-55bd95c686-5slsp to aks-userpool-16719200-vmss00001s
+2026-05-09T01:45:04Z	Normal	Pulling	pod/auth-service-55bd95c686-5slsp	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-09T01:45:04Z	Normal	Pulled	pod/auth-service-55bd95c686-5slsp	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 242ms (242ms including waiting). Image size: 129975007 bytes.
+2026-05-09T01:45:04Z	Normal	Created	pod/auth-service-55bd95c686-5slsp	Created container: auth-service
+2026-05-09T01:45:04Z	Normal	Started	pod/auth-service-55bd95c686-5slsp	Started container auth-service
+2026-05-09T01:45:04Z	Normal	Pulling	pod/auth-service-55bd95c686-hwqch	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-09T01:45:04Z	Normal	Pulled	pod/auth-service-55bd95c686-hwqch	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 388ms (388ms including waiting). Image size: 129975007 bytes.
+2026-05-09T01:45:04Z	Normal	Created	pod/auth-service-55bd95c686-hwqch	Created container: auth-service
+2026-05-09T01:45:04Z	Normal	Started	pod/auth-service-55bd95c686-hwqch	Started container auth-service
+2026-05-09T01:53:31Z	Warning	BackoffLimitExceeded	job/k6-auth-test-oscillating-auth-service-h1-oscillating-rep5	Job has reached the specified backoff limit

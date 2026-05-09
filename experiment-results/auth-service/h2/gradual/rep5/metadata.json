@@ -1,0 +1,21 @@
+{
+  "run_id": "auth-service_h2_gradual_rep5",
+  "service": "auth-service",
+  "config": "h2",
+  "pattern": "gradual",
+  "repetition": 5,
+  "start_epoch": 1778295334,
+  "end_epoch": 1778296512,
+  "duration_seconds": 1178,
+  "k6_job_name": "k6-auth-test-gradual-auth-service-h2-gradual-rep5",
+  "target_url": "http://auth-service.ecommerce.svc.cluster.local:8001",
+  "load_profile": {
+    "version": "recovery-v2",
+    "base_rps": 10,
+    "peak_rps": 40,
+    "auth_me_percent": 70,
+    "auth_login_percent": 30,
+    "num_test_users": 120
+  },
+  "timestamp": "2026-05-09T03:15:12+00:00"
+}

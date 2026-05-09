@@ -1,0 +1,9 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-05-08T16:26:28Z	Normal	Scheduled	pod/k6-auth-test-spike-auth-service-b1-spike-rep5-92wzw	Successfully assigned ecommerce/k6-auth-test-spike-auth-service-b1-spike-rep5-92wzw to aks-userpool-16719200-vmss00001s
+2026-05-08T16:26:28Z	Normal	SuccessfulCreate	job/k6-auth-test-spike-auth-service-b1-spike-rep5	Created pod: k6-auth-test-spike-auth-service-b1-spike-rep5-92wzw
+2026-05-08T16:26:29Z	Normal	Pulling	pod/k6-auth-test-spike-auth-service-b1-spike-rep5-92wzw	Pulling image "grafana/k6:latest"
+2026-05-08T16:26:30Z	Normal	Pulled	pod/k6-auth-test-spike-auth-service-b1-spike-rep5-92wzw	Successfully pulled image "grafana/k6:latest" in 1.478s (1.478s including waiting). Image size: 33688197 bytes.
+2026-05-08T16:26:30Z	Normal	Created	pod/k6-auth-test-spike-auth-service-b1-spike-rep5-92wzw	Created container: k6
+2026-05-08T16:26:30Z	Normal	Started	pod/k6-auth-test-spike-auth-service-b1-spike-rep5-92wzw	Started container k6
+2026-05-08T16:35:11Z	Warning	Unhealthy	pod/auth-service-55bd95c686-cwhvq	Readiness probe failed: Get "http://10.244.0.183:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-05-08T16:39:13Z	Warning	BackoffLimitExceeded	job/k6-auth-test-spike-auth-service-b1-spike-rep5	Job has reached the specified backoff limit

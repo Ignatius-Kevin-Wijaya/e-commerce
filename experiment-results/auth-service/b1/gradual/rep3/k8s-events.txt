@@ -1,0 +1,9 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-05-08T14:27:32Z	Normal	Scheduled	pod/k6-auth-test-gradual-auth-service-b1-gradual-rep3-68brk	Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-b1-gradual-rep3-68brk to aks-userpool-16719200-vmss00001s
+2026-05-08T14:27:32Z	Normal	SuccessfulCreate	job/k6-auth-test-gradual-auth-service-b1-gradual-rep3	Created pod: k6-auth-test-gradual-auth-service-b1-gradual-rep3-68brk
+2026-05-08T14:27:33Z	Normal	Pulling	pod/k6-auth-test-gradual-auth-service-b1-gradual-rep3-68brk	Pulling image "grafana/k6:latest"
+2026-05-08T14:27:34Z	Normal	Pulled	pod/k6-auth-test-gradual-auth-service-b1-gradual-rep3-68brk	Successfully pulled image "grafana/k6:latest" in 1.459s (1.459s including waiting). Image size: 33688197 bytes.
+2026-05-08T14:27:34Z	Normal	Created	pod/k6-auth-test-gradual-auth-service-b1-gradual-rep3-68brk	Created container: k6
+2026-05-08T14:27:34Z	Normal	Started	pod/k6-auth-test-gradual-auth-service-b1-gradual-rep3-68brk	Started container k6
+2026-05-08T14:35:15Z	Warning	Unhealthy	pod/auth-service-55bd95c686-cwhvq	Readiness probe failed: Get "http://10.244.0.183:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-05-08T14:40:06Z	Warning	BackoffLimitExceeded	job/k6-auth-test-gradual-auth-service-b1-gradual-rep3	Job has reached the specified backoff limit

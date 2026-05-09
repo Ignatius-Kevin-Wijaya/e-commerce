@@ -1,0 +1,45 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-05-08T22:01:07Z	Normal	Killing	pod/auth-service-55bd95c686-5rpx5	Stopping container auth-service
+2026-05-08T22:01:07Z	Normal	Killing	pod/auth-service-55bd95c686-8ghb5	Stopping container auth-service
+2026-05-08T22:01:07Z	Normal	Killing	pod/auth-service-55bd95c686-jkbsg	Stopping container auth-service
+2026-05-08T22:01:07Z	Normal	Killing	pod/auth-service-55bd95c686-jpjzg	Stopping container auth-service
+2026-05-08T22:01:07Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-jkbsg
+2026-05-08T22:01:07Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-8ghb5
+2026-05-08T22:01:07Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-5rpx5
+2026-05-08T22:01:07Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-jpjzg
+2026-05-08T22:01:07Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-55bd95c686 from 5 to 1
+2026-05-08T22:04:54Z	Normal	Scheduled	pod/k6-auth-test-gradual-auth-service-h1-gradual-rep2-2tfqg	Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-h1-gradual-rep2-2tfqg to aks-userpool-16719200-vmss00001s
+2026-05-08T22:04:54Z	Normal	SuccessfulCreate	job/k6-auth-test-gradual-auth-service-h1-gradual-rep2	Created pod: k6-auth-test-gradual-auth-service-h1-gradual-rep2-2tfqg
+2026-05-08T22:04:55Z	Normal	Pulling	pod/k6-auth-test-gradual-auth-service-h1-gradual-rep2-2tfqg	Pulling image "grafana/k6:latest"
+2026-05-08T22:04:56Z	Normal	Pulled	pod/k6-auth-test-gradual-auth-service-h1-gradual-rep2-2tfqg	Successfully pulled image "grafana/k6:latest" in 1.426s (1.426s including waiting). Image size: 33688197 bytes.
+2026-05-08T22:04:56Z	Normal	Created	pod/k6-auth-test-gradual-auth-service-h1-gradual-rep2-2tfqg	Created container: k6
+2026-05-08T22:04:56Z	Normal	Started	pod/k6-auth-test-gradual-auth-service-h1-gradual-rep2-2tfqg	Started container k6
+2026-05-08T22:06:00Z	Normal	Scheduled	pod/auth-service-55bd95c686-dzlks	Successfully assigned ecommerce/auth-service-55bd95c686-dzlks to aks-userpool-16719200-vmss00001s
+2026-05-08T22:06:00Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-dzlks
+2026-05-08T22:06:00Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-default	New size: 2; reason: cpu resource utilization (percentage of request) above target
+2026-05-08T22:06:00Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 1 to 2
+2026-05-08T22:06:01Z	Normal	Pulling	pod/auth-service-55bd95c686-dzlks	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-08T22:06:01Z	Normal	Pulled	pod/auth-service-55bd95c686-dzlks	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 250ms (250ms including waiting). Image size: 129975007 bytes.
+2026-05-08T22:06:01Z	Normal	Created	pod/auth-service-55bd95c686-dzlks	Created container: auth-service
+2026-05-08T22:06:01Z	Normal	Started	pod/auth-service-55bd95c686-dzlks	Started container auth-service
+2026-05-08T22:09:00Z	Normal	Scheduled	pod/auth-service-55bd95c686-bmkqh	Successfully assigned ecommerce/auth-service-55bd95c686-bmkqh to aks-userpool-16719200-vmss00001s
+2026-05-08T22:09:00Z	Normal	Scheduled	pod/auth-service-55bd95c686-fxl6w	Successfully assigned ecommerce/auth-service-55bd95c686-fxl6w to aks-userpool-16719200-vmss00001s
+2026-05-08T22:09:00Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-fxl6w
+2026-05-08T22:09:00Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-default	New size: 4; reason: cpu resource utilization (percentage of request) above target
+2026-05-08T22:09:00Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 2 to 4
+2026-05-08T22:09:01Z	Normal	Pulling	pod/auth-service-55bd95c686-bmkqh	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-08T22:09:01Z	Normal	Pulled	pod/auth-service-55bd95c686-bmkqh	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 235ms (235ms including waiting). Image size: 129975007 bytes.
+2026-05-08T22:09:01Z	Normal	Created	pod/auth-service-55bd95c686-bmkqh	Created container: auth-service
+2026-05-08T22:09:01Z	Normal	Started	pod/auth-service-55bd95c686-bmkqh	Started container auth-service
+2026-05-08T22:09:01Z	Normal	Pulling	pod/auth-service-55bd95c686-fxl6w	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-08T22:09:01Z	Normal	Pulled	pod/auth-service-55bd95c686-fxl6w	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 281ms (281ms including waiting). Image size: 129975007 bytes.
+2026-05-08T22:09:01Z	Normal	Created	pod/auth-service-55bd95c686-fxl6w	Created container: auth-service
+2026-05-08T22:09:01Z	Normal	Started	pod/auth-service-55bd95c686-fxl6w	Started container auth-service
+2026-05-08T22:11:01Z	Normal	Scheduled	pod/auth-service-55bd95c686-95wdx	Successfully assigned ecommerce/auth-service-55bd95c686-95wdx to aks-userpool-16719200-vmss00001s
+2026-05-08T22:11:01Z	Normal	Pulling	pod/auth-service-55bd95c686-95wdx	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-08T22:11:01Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-default	New size: 5; reason: cpu resource utilization (percentage of request) above target
+2026-05-08T22:11:01Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 4 to 5
+2026-05-08T22:11:02Z	Normal	Pulled	pod/auth-service-55bd95c686-95wdx	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 203ms (203ms including waiting). Image size: 129975007 bytes.
+2026-05-08T22:11:02Z	Normal	Created	pod/auth-service-55bd95c686-95wdx	Created container: auth-service
+2026-05-08T22:11:02Z	Normal	Started	pod/auth-service-55bd95c686-95wdx	Started container auth-service
+2026-05-08T22:17:28Z	Normal	Completed	job/k6-auth-test-gradual-auth-service-h1-gradual-rep2	Job completed

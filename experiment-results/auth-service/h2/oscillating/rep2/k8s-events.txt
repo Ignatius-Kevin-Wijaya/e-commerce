@@ -1,0 +1,64 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-05-09T04:37:39Z	Normal	SuccessfulCreate	job/k6-auth-test-oscillating-auth-service-h2-oscillating-rep2	Created pod: k6-auth-test-oscillating-auth-service-h2-oscillating-rep2-dsdbt
+2026-05-09T04:37:39Z	Normal	Scheduled	pod/k6-auth-test-oscillating-auth-service-h2-oscillating-rep2-dsdbt	Successfully assigned ecommerce/k6-auth-test-oscillating-auth-service-h2-oscillating-rep2-dsdbt to aks-userpool-16719200-vmss00001s
+2026-05-09T04:37:40Z	Normal	Pulling	pod/k6-auth-test-oscillating-auth-service-h2-oscillating-rep2-dsdbt	Pulling image "grafana/k6:latest"
+2026-05-09T04:37:41Z	Normal	Pulled	pod/k6-auth-test-oscillating-auth-service-h2-oscillating-rep2-dsdbt	Successfully pulled image "grafana/k6:latest" in 1.481s (1.481s including waiting). Image size: 33688197 bytes.
+2026-05-09T04:37:41Z	Normal	Created	pod/k6-auth-test-oscillating-auth-service-h2-oscillating-rep2-dsdbt	Created container: k6
+2026-05-09T04:37:41Z	Normal	Started	pod/k6-auth-test-oscillating-auth-service-h2-oscillating-rep2-dsdbt	Started container k6
+2026-05-09T04:39:00Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-46f8x
+2026-05-09T04:39:00Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-6svz5
+2026-05-09T04:39:00Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-tuned	New size: 4; reason: cpu resource utilization (percentage of request) above target
+2026-05-09T04:39:00Z	Normal	Scheduled	pod/auth-service-55bd95c686-46f8x	Successfully assigned ecommerce/auth-service-55bd95c686-46f8x to aks-userpool-16719200-vmss00001s
+2026-05-09T04:39:00Z	Normal	Scheduled	pod/auth-service-55bd95c686-6svz5	Successfully assigned ecommerce/auth-service-55bd95c686-6svz5 to aks-userpool-16719200-vmss00001s
+2026-05-09T04:39:00Z	Normal	Scheduled	pod/auth-service-55bd95c686-9s6kf	Successfully assigned ecommerce/auth-service-55bd95c686-9s6kf to aks-userpool-16719200-vmss00001s
+2026-05-09T04:39:01Z	Normal	Pulling	pod/auth-service-55bd95c686-46f8x	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-09T04:39:01Z	Normal	Pulled	pod/auth-service-55bd95c686-46f8x	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 406ms (406ms including waiting). Image size: 129975007 bytes.
+2026-05-09T04:39:01Z	Normal	Created	pod/auth-service-55bd95c686-46f8x	Created container: auth-service
+2026-05-09T04:39:01Z	Normal	Started	pod/auth-service-55bd95c686-46f8x	Started container auth-service
+2026-05-09T04:39:01Z	Normal	Pulling	pod/auth-service-55bd95c686-6svz5	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-09T04:39:01Z	Normal	Pulled	pod/auth-service-55bd95c686-6svz5	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 362ms (362ms including waiting). Image size: 129975007 bytes.
+2026-05-09T04:39:01Z	Normal	Created	pod/auth-service-55bd95c686-6svz5	Created container: auth-service
+2026-05-09T04:39:01Z	Normal	Started	pod/auth-service-55bd95c686-6svz5	Started container auth-service
+2026-05-09T04:39:01Z	Normal	Pulling	pod/auth-service-55bd95c686-9s6kf	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-09T04:39:01Z	Normal	Pulled	pod/auth-service-55bd95c686-9s6kf	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 421ms (421ms including waiting). Image size: 129975007 bytes.
+2026-05-09T04:39:01Z	Normal	Created	pod/auth-service-55bd95c686-9s6kf	Created container: auth-service
+2026-05-09T04:39:01Z	Normal	Started	pod/auth-service-55bd95c686-9s6kf	Started container auth-service
+2026-05-09T04:41:00Z	Normal	Scheduled	pod/auth-service-55bd95c686-jx2tj	Successfully assigned ecommerce/auth-service-55bd95c686-jx2tj to aks-userpool-16719200-vmss00001s
+2026-05-09T04:41:01Z	Normal	Pulling	pod/auth-service-55bd95c686-jx2tj	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-09T04:41:01Z	Normal	Pulled	pod/auth-service-55bd95c686-jx2tj	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 253ms (253ms including waiting). Image size: 129975007 bytes.
+2026-05-09T04:41:01Z	Normal	Created	pod/auth-service-55bd95c686-jx2tj	Created container: auth-service
+2026-05-09T04:41:01Z	Normal	Started	pod/auth-service-55bd95c686-jx2tj	Started container auth-service
+2026-05-09T04:43:15Z	Normal	Killing	pod/auth-service-55bd95c686-jx2tj	Stopping container auth-service
+2026-05-09T04:43:15Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-jx2tj
+2026-05-09T04:44:00Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 4 to 5
+2026-05-09T04:44:00Z	Normal	Scheduled	pod/auth-service-55bd95c686-j69m4	Successfully assigned ecommerce/auth-service-55bd95c686-j69m4 to aks-userpool-16719200-vmss00001s
+2026-05-09T04:44:01Z	Normal	Pulling	pod/auth-service-55bd95c686-j69m4	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-09T04:44:01Z	Normal	Pulled	pod/auth-service-55bd95c686-j69m4	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 190ms (190ms including waiting). Image size: 129975007 bytes.
+2026-05-09T04:44:01Z	Normal	Created	pod/auth-service-55bd95c686-j69m4	Created container: auth-service
+2026-05-09T04:44:02Z	Normal	Started	pod/auth-service-55bd95c686-j69m4	Started container auth-service
+2026-05-09T04:46:16Z	Normal	Killing	pod/auth-service-55bd95c686-j69m4	Stopping container auth-service
+2026-05-09T04:46:16Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-55bd95c686 from 5 to 4
+2026-05-09T04:46:46Z	Normal	Killing	pod/auth-service-55bd95c686-9s6kf	Stopping container auth-service
+2026-05-09T04:46:46Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-tuned	New size: 3; reason: All metrics below target
+2026-05-09T04:46:47Z	Warning	Unhealthy	pod/auth-service-55bd95c686-9s6kf	Readiness probe failed: Get "http://10.244.1.1:8001/ready": dial tcp 10.244.1.1:8001: connect: connection refused
+2026-05-09T04:47:01Z	Normal	Pulling	pod/auth-service-55bd95c686-jdqzk	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-09T04:47:01Z	Normal	Pulling	pod/auth-service-55bd95c686-vcjvj	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-09T04:47:01Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-tuned	New size: 5; reason: cpu resource utilization (percentage of request) above target
+2026-05-09T04:47:01Z	Normal	Scheduled	pod/auth-service-55bd95c686-vcjvj	Successfully assigned ecommerce/auth-service-55bd95c686-vcjvj to aks-userpool-16719200-vmss00001s
+2026-05-09T04:47:01Z	Normal	Scheduled	pod/auth-service-55bd95c686-jdqzk	Successfully assigned ecommerce/auth-service-55bd95c686-jdqzk to aks-userpool-16719200-vmss00001s
+2026-05-09T04:47:02Z	Normal	Pulled	pod/auth-service-55bd95c686-jdqzk	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 246ms (246ms including waiting). Image size: 129975007 bytes.
+2026-05-09T04:47:02Z	Normal	Created	pod/auth-service-55bd95c686-jdqzk	Created container: auth-service
+2026-05-09T04:47:02Z	Normal	Started	pod/auth-service-55bd95c686-jdqzk	Started container auth-service
+2026-05-09T04:47:02Z	Normal	Pulled	pod/auth-service-55bd95c686-vcjvj	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 262ms (262ms including waiting). Image size: 129975007 bytes.
+2026-05-09T04:47:02Z	Normal	Created	pod/auth-service-55bd95c686-vcjvj	Created container: auth-service
+2026-05-09T04:47:02Z	Normal	Started	pod/auth-service-55bd95c686-vcjvj	Started container auth-service
+2026-05-09T04:47:27Z	Warning	Unhealthy	pod/auth-service-55bd95c686-46f8x	Readiness probe failed: Get "http://10.244.1.137:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-05-09T04:50:13Z	Warning	BackoffLimitExceeded	job/k6-auth-test-oscillating-auth-service-h2-oscillating-rep2	Job has reached the specified backoff limit
+2026-05-09T04:50:16Z	Normal	Killing	pod/auth-service-55bd95c686-jdqzk	Stopping container auth-service
+2026-05-09T04:50:16Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-jdqzk
+2026-05-09T04:50:16Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-tuned	New size: 4; reason: All metrics below target
+2026-05-09T04:51:16Z	Normal	Killing	pod/auth-service-55bd95c686-46f8x	Stopping container auth-service
+2026-05-09T04:51:16Z	Normal	Killing	pod/auth-service-55bd95c686-6svz5	Stopping container auth-service
+2026-05-09T04:51:16Z	Normal	Killing	pod/auth-service-55bd95c686-vcjvj	Stopping container auth-service
+2026-05-09T04:51:16Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-tuned	New size: 1; reason: All metrics below target
+2026-05-09T04:51:16Z	Normal	ScalingReplicaSet	deployment/auth-service	(combined from similar events): Scaled down replica set auth-service-55bd95c686 from 4 to 1

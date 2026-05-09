@@ -1,0 +1,9 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-05-08T17:45:39Z	Normal	Scheduled	pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep5-bf99j	Successfully assigned ecommerce/k6-auth-test-oscillating-auth-service-b1-oscillating-rep5-bf99j to aks-userpool-16719200-vmss00001s
+2026-05-08T17:45:39Z	Normal	SuccessfulCreate	job/k6-auth-test-oscillating-auth-service-b1-oscillating-rep5	Created pod: k6-auth-test-oscillating-auth-service-b1-oscillating-rep5-bf99j
+2026-05-08T17:45:40Z	Normal	Pulling	pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep5-bf99j	Pulling image "grafana/k6:latest"
+2026-05-08T17:45:41Z	Normal	Pulled	pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep5-bf99j	Successfully pulled image "grafana/k6:latest" in 1.454s (1.454s including waiting). Image size: 33688197 bytes.
+2026-05-08T17:45:41Z	Normal	Created	pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep5-bf99j	Created container: k6
+2026-05-08T17:45:41Z	Normal	Started	pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep5-bf99j	Started container k6
+2026-05-08T17:55:07Z	Warning	Unhealthy	pod/auth-service-55bd95c686-cwhvq	Readiness probe failed: Get "http://10.244.0.183:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-05-08T17:58:31Z	Warning	BackoffLimitExceeded	job/k6-auth-test-oscillating-auth-service-b1-oscillating-rep5	Job has reached the specified backoff limit

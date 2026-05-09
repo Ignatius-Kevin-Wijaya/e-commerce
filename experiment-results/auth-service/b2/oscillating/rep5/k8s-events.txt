@@ -1,0 +1,39 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-05-08T21:41:12Z	Normal	Killing	pod/auth-service-55bd95c686-5n28z	Stopping container auth-service
+2026-05-08T21:41:12Z	Normal	Killing	pod/auth-service-55bd95c686-lw9gf	Stopping container auth-service
+2026-05-08T21:41:12Z	Normal	Killing	pod/auth-service-55bd95c686-pv8s7	Stopping container auth-service
+2026-05-08T21:41:12Z	Normal	Killing	pod/auth-service-55bd95c686-tkssz	Stopping container auth-service
+2026-05-08T21:41:12Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-tkssz
+2026-05-08T21:41:12Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-5n28z
+2026-05-08T21:41:12Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-lw9gf
+2026-05-08T21:41:12Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-pv8s7
+2026-05-08T21:41:12Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-55bd95c686 from 5 to 1
+2026-05-08T21:41:13Z	Warning	Unhealthy	pod/auth-service-55bd95c686-tkssz	Readiness probe failed: Get "http://10.244.1.193:8001/ready": dial tcp 10.244.1.193:8001: connect: connection refused
+2026-05-08T21:43:18Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 1 to 5
+2026-05-08T21:43:19Z	Normal	Scheduled	pod/auth-service-55bd95c686-5rpx5	Successfully assigned ecommerce/auth-service-55bd95c686-5rpx5 to aks-userpool-16719200-vmss00001s
+2026-05-08T21:43:19Z	Normal	Pulling	pod/auth-service-55bd95c686-5rpx5	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-08T21:43:19Z	Normal	Scheduled	pod/auth-service-55bd95c686-8ghb5	Successfully assigned ecommerce/auth-service-55bd95c686-8ghb5 to aks-userpool-16719200-vmss00001s
+2026-05-08T21:43:19Z	Normal	Pulling	pod/auth-service-55bd95c686-8ghb5	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-08T21:43:19Z	Normal	Scheduled	pod/auth-service-55bd95c686-jkbsg	Successfully assigned ecommerce/auth-service-55bd95c686-jkbsg to aks-userpool-16719200-vmss00001s
+2026-05-08T21:43:19Z	Normal	Pulling	pod/auth-service-55bd95c686-jkbsg	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-08T21:43:19Z	Normal	Scheduled	pod/auth-service-55bd95c686-jpjzg	Successfully assigned ecommerce/auth-service-55bd95c686-jpjzg to aks-userpool-16719200-vmss00001s
+2026-05-08T21:43:19Z	Normal	Pulling	pod/auth-service-55bd95c686-jpjzg	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-08T21:43:20Z	Normal	Pulled	pod/auth-service-55bd95c686-5rpx5	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 544ms (544ms including waiting). Image size: 129975007 bytes.
+2026-05-08T21:43:20Z	Normal	Created	pod/auth-service-55bd95c686-5rpx5	Created container: auth-service
+2026-05-08T21:43:20Z	Normal	Started	pod/auth-service-55bd95c686-5rpx5	Started container auth-service
+2026-05-08T21:43:20Z	Normal	Pulled	pod/auth-service-55bd95c686-8ghb5	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 410ms (410ms including waiting). Image size: 129975007 bytes.
+2026-05-08T21:43:20Z	Normal	Created	pod/auth-service-55bd95c686-8ghb5	Created container: auth-service
+2026-05-08T21:43:20Z	Normal	Started	pod/auth-service-55bd95c686-8ghb5	Started container auth-service
+2026-05-08T21:43:20Z	Normal	Pulled	pod/auth-service-55bd95c686-jkbsg	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 450ms (450ms including waiting). Image size: 129975007 bytes.
+2026-05-08T21:43:20Z	Normal	Created	pod/auth-service-55bd95c686-jkbsg	Created container: auth-service
+2026-05-08T21:43:20Z	Normal	Started	pod/auth-service-55bd95c686-jkbsg	Started container auth-service
+2026-05-08T21:43:20Z	Normal	Pulled	pod/auth-service-55bd95c686-jpjzg	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 445ms (445ms including waiting). Image size: 129975007 bytes.
+2026-05-08T21:43:20Z	Normal	Created	pod/auth-service-55bd95c686-jpjzg	Created container: auth-service
+2026-05-08T21:43:20Z	Normal	Started	pod/auth-service-55bd95c686-jpjzg	Started container auth-service
+2026-05-08T21:45:16Z	Normal	Scheduled	pod/k6-auth-test-oscillating-auth-service-b2-oscillating-rep5-6jxgs	Successfully assigned ecommerce/k6-auth-test-oscillating-auth-service-b2-oscillating-rep5-6jxgs to aks-userpool-16719200-vmss00001s
+2026-05-08T21:45:16Z	Normal	SuccessfulCreate	job/k6-auth-test-oscillating-auth-service-b2-oscillating-rep5	Created pod: k6-auth-test-oscillating-auth-service-b2-oscillating-rep5-6jxgs
+2026-05-08T21:45:17Z	Normal	Pulling	pod/k6-auth-test-oscillating-auth-service-b2-oscillating-rep5-6jxgs	Pulling image "grafana/k6:latest"
+2026-05-08T21:45:18Z	Normal	Pulled	pod/k6-auth-test-oscillating-auth-service-b2-oscillating-rep5-6jxgs	Successfully pulled image "grafana/k6:latest" in 1.39s (1.39s including waiting). Image size: 33688197 bytes.
+2026-05-08T21:45:18Z	Normal	Created	pod/k6-auth-test-oscillating-auth-service-b2-oscillating-rep5-6jxgs	Created container: k6
+2026-05-08T21:45:18Z	Normal	Started	pod/k6-auth-test-oscillating-auth-service-b2-oscillating-rep5-6jxgs	Started container k6
+2026-05-08T21:57:50Z	Normal	Completed	job/k6-auth-test-oscillating-auth-service-b2-oscillating-rep5	Job completed

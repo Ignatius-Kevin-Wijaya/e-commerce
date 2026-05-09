@@ -1,0 +1,42 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-05-08T19:21:42Z	Normal	Killing	pod/auth-service-55bd95c686-gcjk5	Stopping container auth-service
+2026-05-08T19:21:42Z	Normal	Killing	pod/auth-service-55bd95c686-gh259	Stopping container auth-service
+2026-05-08T19:21:42Z	Normal	Killing	pod/auth-service-55bd95c686-sw42j	Stopping container auth-service
+2026-05-08T19:21:42Z	Normal	Killing	pod/auth-service-55bd95c686-wscz4	Stopping container auth-service
+2026-05-08T19:21:42Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-wscz4
+2026-05-08T19:21:42Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-gcjk5
+2026-05-08T19:21:42Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-sw42j
+2026-05-08T19:21:42Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-gh259
+2026-05-08T19:21:42Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-55bd95c686 from 5 to 1
+2026-05-08T19:23:48Z	Normal	Scheduled	pod/auth-service-55bd95c686-rh4bj	Successfully assigned ecommerce/auth-service-55bd95c686-rh4bj to aks-userpool-16719200-vmss00001s
+2026-05-08T19:23:48Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-rh4bj
+2026-05-08T19:23:48Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 1 to 5
+2026-05-08T19:23:49Z	Normal	Scheduled	pod/auth-service-55bd95c686-hb6q4	Successfully assigned ecommerce/auth-service-55bd95c686-hb6q4 to aks-userpool-16719200-vmss00001s
+2026-05-08T19:23:49Z	Normal	Pulling	pod/auth-service-55bd95c686-hb6q4	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-08T19:23:49Z	Normal	Pulling	pod/auth-service-55bd95c686-rh4bj	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-08T19:23:49Z	Normal	Scheduled	pod/auth-service-55bd95c686-xflmf	Successfully assigned ecommerce/auth-service-55bd95c686-xflmf to aks-userpool-16719200-vmss00001s
+2026-05-08T19:23:49Z	Normal	Pulling	pod/auth-service-55bd95c686-xflmf	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-08T19:23:49Z	Normal	Scheduled	pod/auth-service-55bd95c686-zkqvr	Successfully assigned ecommerce/auth-service-55bd95c686-zkqvr to aks-userpool-16719200-vmss00001s
+2026-05-08T19:23:49Z	Normal	Pulling	pod/auth-service-55bd95c686-zkqvr	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-08T19:23:49Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-hb6q4
+2026-05-08T19:23:49Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-xflmf
+2026-05-08T19:23:49Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-zkqvr
+2026-05-08T19:23:50Z	Normal	Pulled	pod/auth-service-55bd95c686-hb6q4	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 515ms (515ms including waiting). Image size: 129975007 bytes.
+2026-05-08T19:23:50Z	Normal	Created	pod/auth-service-55bd95c686-hb6q4	Created container: auth-service
+2026-05-08T19:23:50Z	Normal	Started	pod/auth-service-55bd95c686-hb6q4	Started container auth-service
+2026-05-08T19:23:50Z	Normal	Pulled	pod/auth-service-55bd95c686-rh4bj	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 558ms (558ms including waiting). Image size: 129975007 bytes.
+2026-05-08T19:23:50Z	Normal	Created	pod/auth-service-55bd95c686-rh4bj	Created container: auth-service
+2026-05-08T19:23:50Z	Normal	Started	pod/auth-service-55bd95c686-rh4bj	Started container auth-service
+2026-05-08T19:23:50Z	Normal	Pulled	pod/auth-service-55bd95c686-xflmf	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 587ms (587ms including waiting). Image size: 129975007 bytes.
+2026-05-08T19:23:50Z	Normal	Created	pod/auth-service-55bd95c686-xflmf	Created container: auth-service
+2026-05-08T19:23:50Z	Normal	Started	pod/auth-service-55bd95c686-xflmf	Started container auth-service
+2026-05-08T19:23:50Z	Normal	Pulled	pod/auth-service-55bd95c686-zkqvr	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 455ms (455ms including waiting). Image size: 129975007 bytes.
+2026-05-08T19:23:50Z	Normal	Created	pod/auth-service-55bd95c686-zkqvr	Created container: auth-service
+2026-05-08T19:23:50Z	Normal	Started	pod/auth-service-55bd95c686-zkqvr	Started container auth-service
+2026-05-08T19:25:46Z	Normal	Scheduled	pod/k6-auth-test-spike-auth-service-b2-spike-rep2-qbtfg	Successfully assigned ecommerce/k6-auth-test-spike-auth-service-b2-spike-rep2-qbtfg to aks-userpool-16719200-vmss00001s
+2026-05-08T19:25:46Z	Normal	SuccessfulCreate	job/k6-auth-test-spike-auth-service-b2-spike-rep2	Created pod: k6-auth-test-spike-auth-service-b2-spike-rep2-qbtfg
+2026-05-08T19:25:47Z	Normal	Pulling	pod/k6-auth-test-spike-auth-service-b2-spike-rep2-qbtfg	Pulling image "grafana/k6:latest"
+2026-05-08T19:25:48Z	Normal	Pulled	pod/k6-auth-test-spike-auth-service-b2-spike-rep2-qbtfg	Successfully pulled image "grafana/k6:latest" in 1.576s (1.576s including waiting). Image size: 33688197 bytes.
+2026-05-08T19:25:48Z	Normal	Created	pod/k6-auth-test-spike-auth-service-b2-spike-rep2-qbtfg	Created container: k6
+2026-05-08T19:25:48Z	Normal	Started	pod/k6-auth-test-spike-auth-service-b2-spike-rep2-qbtfg	Started container k6
+2026-05-08T19:38:20Z	Normal	Completed	job/k6-auth-test-spike-auth-service-b2-spike-rep2	Job completed
