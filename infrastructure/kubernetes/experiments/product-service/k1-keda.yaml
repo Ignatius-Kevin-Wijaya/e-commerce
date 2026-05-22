@@ -31,9 +31,24 @@ spec:
   scaleTargetRef:
     name: product-service
   minReplicaCount: 1        # Match HPA minReplicas for fair comparison
-  maxReplicaCount: 5         # Match HPA maxReplicas for fair comparison
-  cooldownPeriod: 30         # Match H2/H3 scaleDown stabilizationWindowSeconds
-  pollingInterval: 15        # Match HPA control loop interval for fairness
+  maxReplicaCount: 5        # Match HPA maxReplicas for fair comparison
+  cooldownPeriod: 30        # Match H2/H3 scaleDown stabilizationWindowSeconds
+  pollingInterval: 15       # Match HPA control loop interval for fairness
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleUp:
+          stabilizationWindowSeconds: 0
+          policies:
+            - type: Pods
+              value: 5
+              periodSeconds: 15
+        scaleDown:
+          stabilizationWindowSeconds: 30
+          policies:
+            - type: Percent
+              value: 100
+              periodSeconds: 15
   triggers:
     - type: prometheus
       metadata:
