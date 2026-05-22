@@ -3,35 +3,19 @@ kind: ScaledObject
 metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"labels":{"experiment":"k1-keda"},"name":"shipping-rate-service-keda","namespace":"ecommerce"},"spec":{"advanced":{"horizontalPodAutoscalerConfig":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":15,"type":"Percent","value":100}],"stabilizationWindowSeconds":30},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Pods","value":5}],"stabilizationWindowSeconds":0}}}},"cooldownPeriod":30,"maxReplicaCount":5,"minReplicaCount":1,"pollingInterval":15,"scaleTargetRef":{"name":"shipping-rate-service"},"triggers":[{"metadata":{"metricName":"http_requests_per_second","query":"sum(rate(http_requests_total{job=\"shipping-rate-service\"}[1m]))\n","serverAddress":"http://prometheus.monitoring.svc.cluster.local:9090","threshold":"15"},"type":"prometheus"}]}}
-  creationTimestamp: "2026-05-22T15:15:26Z"
+      {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"labels":{"experiment":"k1-keda"},"name":"shipping-rate-service-keda","namespace":"ecommerce"},"spec":{"cooldownPeriod":30,"maxReplicaCount":5,"minReplicaCount":1,"pollingInterval":15,"scaleTargetRef":{"name":"shipping-rate-service"},"triggers":[{"metadata":{"metricName":"http_requests_per_second","query":"sum(rate(http_requests_total{job=\"shipping-rate-service\"}[1m]))\n","serverAddress":"http://prometheus.monitoring.svc.cluster.local:9090","threshold":"15"},"type":"prometheus"}]}}
+  creationTimestamp: "2026-05-05T01:04:15Z"
   finalizers:
   - finalizer.keda.sh
-  generation: 2
+  generation: 1
   labels:
     experiment: k1-keda
     scaledobject.keda.sh/name: shipping-rate-service-keda
   name: shipping-rate-service-keda
   namespace: ecommerce
-  resourceVersion: "4378350"
-  uid: d9c33102-1086-4595-b5cd-76a5e2cb44f1
+  resourceVersion: "2929128"
+  uid: a5be2809-0208-4cb0-92a5-826873e50806
 spec:
-  advanced:
-    horizontalPodAutoscalerConfig:
-      behavior:
-        scaleDown:
-          policies:
-          - periodSeconds: 15
-            type: Percent
-            value: 100
-          stabilizationWindowSeconds: 30
-        scaleUp:
-          policies:
-          - periodSeconds: 15
-            type: Pods
-            value: 5
-          stabilizationWindowSeconds: 0
-    scalingModifiers: {}
   cooldownPeriod: 30
   maxReplicaCount: 5
   minReplicaCount: 1
@@ -66,7 +50,7 @@ status:
   externalMetricNames:
   - s0-prometheus
   hpaName: keda-hpa-shipping-rate-service-keda
-  lastActiveTime: "2026-05-22T15:32:42Z"
+  lastActiveTime: "2026-05-05T01:21:01Z"
   originalReplicaCount: 1
   scaleTargetGVKR:
     group: apps
