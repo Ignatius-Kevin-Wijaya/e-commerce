@@ -1,0 +1,59 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-05-23T14:18:59Z	Normal	KEDAScalersStarted	scaledobject/auth-service-keda	Scaler prometheus is built
+2026-05-23T14:18:59Z	Normal	KEDAScalersStarted	scaledobject/auth-service-keda	Started scalers watch
+2026-05-23T14:18:59Z	Normal	ScaledObjectReady	scaledobject/auth-service-keda	ScaledObject is ready for scaling
+2026-05-23T14:20:39Z	Normal	Scheduled	pod/k6-auth-test-gradual-auth-service-k1-gradual-rep1-6lrwq	Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-k1-gradual-rep1-6lrwq to aks-userpool-16719200-vmss00001y
+2026-05-23T14:20:39Z	Normal	Pulling	pod/k6-auth-test-gradual-auth-service-k1-gradual-rep1-6lrwq	Pulling image "grafana/k6:latest"
+2026-05-23T14:20:39Z	Normal	SuccessfulCreate	job/k6-auth-test-gradual-auth-service-k1-gradual-rep1	Created pod: k6-auth-test-gradual-auth-service-k1-gradual-rep1-6lrwq
+2026-05-23T14:20:45Z	Normal	Pulled	pod/k6-auth-test-gradual-auth-service-k1-gradual-rep1-6lrwq	Successfully pulled image "grafana/k6:latest" in 5.077s (5.077s including waiting). Image size: 33785360 bytes.
+2026-05-23T14:20:45Z	Normal	Created	pod/k6-auth-test-gradual-auth-service-k1-gradual-rep1-6lrwq	Created container: k6
+2026-05-23T14:20:45Z	Normal	Started	pod/k6-auth-test-gradual-auth-service-k1-gradual-rep1-6lrwq	Started container k6
+2026-05-23T14:21:44Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 1 to 2
+2026-05-23T14:21:44Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 2; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: auth-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+2026-05-23T14:21:45Z	Normal	Scheduled	pod/auth-service-55bd95c686-gz5s9	Successfully assigned ecommerce/auth-service-55bd95c686-gz5s9 to aks-userpool-16719200-vmss00001y
+2026-05-23T14:21:45Z	Normal	Pulling	pod/auth-service-55bd95c686-gz5s9	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-23T14:21:45Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-gz5s9
+2026-05-23T14:21:48Z	Normal	Pulled	pod/auth-service-55bd95c686-gz5s9	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 3.233s (3.233s including waiting). Image size: 129975007 bytes.
+2026-05-23T14:21:48Z	Normal	Created	pod/auth-service-55bd95c686-gz5s9	Created container: auth-service
+2026-05-23T14:21:48Z	Normal	Started	pod/auth-service-55bd95c686-gz5s9	Started container auth-service
+2026-05-23T14:23:45Z	Normal	Scheduled	pod/auth-service-55bd95c686-v5mdj	Successfully assigned ecommerce/auth-service-55bd95c686-v5mdj to aks-userpool-16719200-vmss00001y
+2026-05-23T14:23:45Z	Normal	Pulling	pod/auth-service-55bd95c686-v5mdj	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-23T14:23:45Z	Normal	Pulled	pod/auth-service-55bd95c686-v5mdj	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 201ms (201ms including waiting). Image size: 129975007 bytes.
+2026-05-23T14:23:45Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-v5mdj
+2026-05-23T14:23:45Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 2 to 3
+2026-05-23T14:23:45Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 3; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: auth-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+2026-05-23T14:23:46Z	Normal	Created	pod/auth-service-55bd95c686-v5mdj	Created container: auth-service
+2026-05-23T14:23:46Z	Normal	Started	pod/auth-service-55bd95c686-v5mdj	Started container auth-service
+2026-05-23T14:25:00Z	Normal	Scheduled	pod/auth-service-55bd95c686-tjdsl	Successfully assigned ecommerce/auth-service-55bd95c686-tjdsl to aks-userpool-16719200-vmss00001y
+2026-05-23T14:25:00Z	Normal	Pulling	pod/auth-service-55bd95c686-tjdsl	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-23T14:25:00Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-tjdsl
+2026-05-23T14:25:00Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 3 to 4
+2026-05-23T14:25:00Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 4; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: auth-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+2026-05-23T14:25:01Z	Normal	Pulled	pod/auth-service-55bd95c686-tjdsl	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 168ms (168ms including waiting). Image size: 129975007 bytes.
+2026-05-23T14:25:01Z	Normal	Created	pod/auth-service-55bd95c686-tjdsl	Created container: auth-service
+2026-05-23T14:25:01Z	Normal	Started	pod/auth-service-55bd95c686-tjdsl	Started container auth-service
+2026-05-23T14:25:45Z	Normal	Scheduled	pod/auth-service-55bd95c686-58qz7	Successfully assigned ecommerce/auth-service-55bd95c686-58qz7 to aks-userpool-16719200-vmss00001y
+2026-05-23T14:25:45Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-58qz7
+2026-05-23T14:25:45Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 4 to 5
+2026-05-23T14:25:45Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 5; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: auth-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+2026-05-23T14:25:46Z	Normal	Pulling	pod/auth-service-55bd95c686-58qz7	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-05-23T14:25:46Z	Normal	Pulled	pod/auth-service-55bd95c686-58qz7	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 122ms (122ms including waiting). Image size: 129975007 bytes.
+2026-05-23T14:25:46Z	Normal	Created	pod/auth-service-55bd95c686-58qz7	Created container: auth-service
+2026-05-23T14:25:46Z	Normal	Started	pod/auth-service-55bd95c686-58qz7	Started container auth-service
+2026-05-23T14:32:46Z	Normal	Killing	pod/auth-service-55bd95c686-tjdsl	Stopping container auth-service
+2026-05-23T14:32:46Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-tjdsl
+2026-05-23T14:32:46Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-55bd95c686 from 5 to 4
+2026-05-23T14:32:46Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 4; reason: All metrics below target
+2026-05-23T14:33:01Z	Normal	Killing	pod/auth-service-55bd95c686-58qz7	Stopping container auth-service
+2026-05-23T14:33:01Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-58qz7
+2026-05-23T14:33:01Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-55bd95c686 from 4 to 3
+2026-05-23T14:33:01Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 3; reason: All metrics below target
+2026-05-23T14:33:16Z	Normal	Killing	pod/auth-service-55bd95c686-gz5s9	Stopping container auth-service
+2026-05-23T14:33:16Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-gz5s9
+2026-05-23T14:33:16Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-55bd95c686 from 3 to 2
+2026-05-23T14:33:16Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 2; reason: All metrics below target
+2026-05-23T14:33:17Z	Normal	Completed	job/k6-auth-test-gradual-auth-service-k1-gradual-rep1	Job completed
+2026-05-23T14:33:46Z	Normal	Killing	pod/auth-service-55bd95c686-v5mdj	Stopping container auth-service
+2026-05-23T14:33:46Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-v5mdj
+2026-05-23T14:33:46Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-55bd95c686 from 2 to 1
+2026-05-23T14:33:46Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-auth-service-keda	New size: 1; reason: All metrics below target

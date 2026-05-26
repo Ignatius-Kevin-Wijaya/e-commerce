@@ -1,0 +1,90 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"labels":{"experiment":"k1-keda"},"name":"shipping-rate-service-keda","namespace":"ecommerce"},"spec":{"advanced":{"horizontalPodAutoscalerConfig":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":15,"type":"Percent","value":100}],"stabilizationWindowSeconds":30},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Pods","value":5}],"stabilizationWindowSeconds":0}}}},"cooldownPeriod":30,"maxReplicaCount":5,"minReplicaCount":1,"pollingInterval":15,"scaleTargetRef":{"name":"shipping-rate-service"},"triggers":[{"metadata":{"metricName":"http_requests_per_second","query":"sum(rate(http_requests_total{job=\"shipping-rate-service\"}[1m]))\n","serverAddress":"http://prometheus.monitoring.svc.cluster.local:9090","threshold":"15"},"type":"prometheus"}]}}
+  creationTimestamp: "2026-05-23T09:37:20Z"
+  labels:
+    app.kubernetes.io/managed-by: keda-operator
+    app.kubernetes.io/name: keda-hpa-shipping-rate-service-keda
+    app.kubernetes.io/part-of: shipping-rate-service-keda
+    app.kubernetes.io/version: main
+    experiment: k1-keda
+    scaledobject.keda.sh/name: shipping-rate-service-keda
+  name: keda-hpa-shipping-rate-service-keda
+  namespace: ecommerce
+  ownerReferences:
+  - apiVersion: keda.sh/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ScaledObject
+    name: shipping-rate-service-keda
+    uid: bf82f7dc-ff52-4e35-87c9-8c2349a16b2c
+  resourceVersion: "4709803"
+  uid: 594cbc11-80b9-4c4d-a490-6831ed9643d0
+spec:
+  behavior:
+    scaleDown:
+      policies:
+      - periodSeconds: 15
+        type: Percent
+        value: 100
+      selectPolicy: Max
+      stabilizationWindowSeconds: 30
+    scaleUp:
+      policies:
+      - periodSeconds: 15
+        type: Pods
+        value: 5
+      selectPolicy: Max
+      stabilizationWindowSeconds: 0
+  maxReplicas: 5
+  metrics:
+  - external:
+      metric:
+        name: s0-prometheus
+        selector:
+          matchLabels:
+            scaledobject.keda.sh/name: shipping-rate-service-keda
+      target:
+        averageValue: "15"
+        type: AverageValue
+    type: External
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: shipping-rate-service
+status:
+  conditions:
+  - lastTransitionTime: "2026-05-23T09:37:35Z"
+    message: recommended size matches current size
+    reason: ReadyForNewScale
+    status: "True"
+    type: AbleToScale
+  - lastTransitionTime: "2026-05-23T09:37:37Z"
+    message: 'the HPA was able to successfully calculate a replica count from external
+      metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name:
+      shipping-rate-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},})'
+    reason: ValidMetricFound
+    status: "True"
+    type: ScalingActive
+  - lastTransitionTime: "2026-05-23T09:49:24Z"
+    message: the desired count is within the acceptable range
+    reason: DesiredWithinRange
+    status: "False"
+    type: ScalingLimited
+  currentMetrics:
+  - external:
+      current:
+        averageValue: 155m
+      metric:
+        name: s0-prometheus
+        selector:
+          matchLabels:
+            scaledobject.keda.sh/name: shipping-rate-service-keda
+    type: External
+  currentReplicas: 1
+  desiredReplicas: 1
+  lastScaleTime: "2026-05-23T09:51:39Z"
