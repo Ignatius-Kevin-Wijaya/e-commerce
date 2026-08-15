@@ -2,7 +2,6 @@
 # HPA using HTTP request rate per second as scaling metric
 # Same metric as K1 (KEDA) but via HPA engine — THE FAIRNESS CONTROL
 # threshold: 5 RPS/pod (must match K1 exactly for fair comparison)
-# auth metric window: 30s
 # Uses same aggressive behavior as H2
 #
 # PREREQUISITE: prometheus-adapter must be installed:
@@ -15,9 +14,6 @@
 #   Triggering at 5 req/s lets request-based autoscaling react before the pod collapses.
 # Expected: For CPU-bound auth-service, H3 may show minimal improvement over H1/H2
 #   once scaling is calibrated to engage before saturation.
-# This auth path uses a dedicated 30s request-rate metric so we can reduce
-# control-loop lag under 10s spike / oscillating transitions without mutating
-# the frozen shipping-rate-service methodology.
 #
 # Usage:
 #   kubectl apply -f b1-underprovisioned.yaml -n ecommerce   # Reset to 1 replica first
@@ -43,7 +39,7 @@ spec:
     - type: Pods
       pods:
         metric:
-          name: auth_http_requests_per_second_30s
+          name: http_requests_per_second
         target:
           type: AverageValue
           averageValue: "5"     # Same threshold as K1 KEDA — critical for fairness

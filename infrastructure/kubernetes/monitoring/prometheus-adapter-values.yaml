@@ -41,7 +41,6 @@ rules:
     # ── RULE 1 (HIGHEST PRIORITY): http_requests_per_second ──────────────────
     # Maps http_requests_total → http_requests_per_second using 1m rate window.
     # Used by H3 (HPA + custom metric). Must be semantically identical to K1 (KEDA).
-    # This rule remains frozen for the accepted shipping-rate-service methodology.
     #
     # FAIRNESS PROOF (H3 vs K1, threshold = 50 req/s per pod):
     #   H3 path: adapter returns per-pod rate via sum(...) by (pod)
@@ -68,27 +67,12 @@ rules:
         as: "http_requests_per_second"
       metricsQuery: 'sum(rate(<<.Series>>{<<.LabelMatchers>>}[1m])) by (<<.GroupBy>>)'
 
-    # Auth-only request-rate metric using a shorter window for fast 10s spike /
-    # oscillating transitions. This keeps the accepted shipping 1m metric frozen
-    # while allowing a fair auth-only H3 vs K1 control-loop experiment.
-    - seriesQuery: 'http_requests_total{namespace!="",pod!="",job="auth-service"}'
-      resources:
-        overrides:
-          namespace:
-            resource: namespace
-          pod:
-            resource: pod
-      name:
-        matches: "^http_requests_total$"
-        as: "auth_http_requests_per_second_30s"
-      metricsQuery: 'sum(rate(<<.Series>>{<<.LabelMatchers>>}[30s])) by (<<.GroupBy>>)'
-
     # No generic default rules.
     #
     # Thesis rationale:
     # - H1/H2 use metrics-server for CPU and do not depend on prometheus-adapter.
     # - K1 uses the Prometheus scaler directly and does not depend on adapter rules.
-    # - H3 currently needs the shipping 1m metric plus the auth-only 30s metric.
+    # - H3 only needs the single pods/http_requests_per_second custom metric.
     #
     # Keeping the generic Helm defaults forces the adapter to relist a much wider
     # metric universe (container_* plus many namespace-scoped series), which has
@@ -100,12 +84,10 @@ rules:
 #
 # 1. Confirm metric is registered in the Custom Metrics API:
 #    kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 | \
-#      python3 -c "import json,sys; [print(r['name']) for r in json.load(sys.stdin)['resources'] if 'requests_per_second' in r['name']]"
+#      python3 -c "import json,sys; [print(r['name']) for r in json.load(sys.stdin)['resources'] if 'http_requests_per_second' in r['name']]"
 #    Expected output:
 #      namespaces/http_requests_per_second
 #      pods/http_requests_per_second
-#      namespaces/auth_http_requests_per_second_30s
-#      pods/auth_http_requests_per_second_30s
 #
 # 2. Confirm per-pod values are returned (not <unknown>):
 #    kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/ecommerce/pods/*/http_requests_per_second" | python3 -m json.tool
