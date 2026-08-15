@@ -1,0 +1,186 @@
+# k6 Auth-Service CALIBRATION probe — vus ladder (TEMPORARY, not part of the 90-run matrix)
+#
+# Purpose: find PEAK_VUS for the auth ramping-vus migration by measuring the
+# steady-state B1 vs B2 validity gate at several VU levels. B1/B2 are fixed-replica,
+# so a constant-hold closed-loop probe is sufficient — no autoscaler dynamics involved.
+#
+# Reuses the real auth workload (70% GET /auth/me + 30% POST /auth/login, 120-user
+# token pool) so per-request CPU cost matches the production load profile.
+#
+# Driven by scripts/calibrate-auth-vus.sh (clones this Job per VU level).
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-auth-calib-script
+  namespace: ecommerce
+data:
+  load-test.js: |
+    import http from 'k6/http';
+    import { check } from 'k6';
+    import { SharedArray } from 'k6/data';
+
+    const PEAK_VUS = parseInt(__ENV.PEAK_VUS || '120', 10);
+    const HOLD = __ENV.HOLD_DURATION || '3m';
+    const NUM_USERS = parseInt(__ENV.NUM_TEST_USERS || '120', 10);
+    const AUTH_ME_PERCENT = parseInt(__ENV.AUTH_ME_PERCENT || '70', 10);
+    const AUTH_LOGIN_PERCENT = parseInt(__ENV.AUTH_LOGIN_PERCENT || '30', 10);
+    const MIX_TOTAL = Math.max(AUTH_ME_PERCENT + AUTH_LOGIN_PERCENT, 1);
+    const AUTH_ME_THRESHOLD = AUTH_ME_PERCENT / MIX_TOTAL;
+
+    export const options = {
+      scenarios: {
+        calib: {
+          executor: 'ramping-vus',
+          startVUs: 10,
+          stages: [
+            { duration: '30s', target: PEAK_VUS }, // ramp to target
+            { duration: HOLD,  target: PEAK_VUS }, // hold — steady-state measurement window
+          ],
+          gracefulRampDown: '10s',
+        },
+      },
+      // No thresholds that abort — we WANT to observe breach.
+    };
+
+    const BASE_URL = __ENV.TARGET_URL || 'http://auth-service.ecommerce.svc.cluster.local:8001';
+    const GATEWAY_SECRET = __ENV.INTERNAL_GATEWAY_SECRET || '';
+    const JSON_HEADERS = {
+      'Content-Type': 'application/json',
+      'X-Internal-Gateway-Secret': GATEWAY_SECRET,
+    };
+
+    const testUsers = new SharedArray('users', function () {
+      const users = [];
+      for (let i = 0; i < NUM_USERS; i++) {
+        users.push({
+          email: `loadtest_user_${i}@example.com`,
+          username: `loadtest_user_${i}`,
+          password: 'LoadTest_P@ss_2026!',
+        });
+      }
+      return users;
+    });
+
+    function randomUser() {
+      return testUsers[Math.floor(Math.random() * testUsers.length)];
+    }
+
+    export function setup() {
+      console.log(`Seeding and pre-authenticating ${NUM_USERS} users...`);
+      const tokens = [];
+      for (let i = 0; i < NUM_USERS; i++) {
+        const user = testUsers[i];
+        http.post(
+          `${BASE_URL}/auth/register`,
+          JSON.stringify({
+            email: user.email,
+            username: user.username,
+            password: user.password,
+            full_name: `Load Test User ${i}`,
+          }),
+          { headers: JSON_HEADERS }
+        );
+        const loginRes = http.post(
+          `${BASE_URL}/auth/login`,
+          JSON.stringify({ email: user.email, password: user.password }),
+          { headers: JSON_HEADERS }
+        );
+        if (loginRes.status === 200) {
+          try {
+            const body = JSON.parse(loginRes.body);
+            if (body.access_token) tokens.push(body.access_token);
+          } catch (e) { /* ignore */ }
+        }
+      }
+      if (tokens.length === 0) throw new Error('No tokens obtained during setup');
+      console.log(`Pre-auth complete: ${tokens.length}/${NUM_USERS} tokens obtained`);
+      return { tokens };
+    }
+
+    function runAuthMe(data) {
+      const token = data.tokens[Math.floor(Math.random() * data.tokens.length)];
+      const res = http.get(`${BASE_URL}/auth/me`, {
+        headers: {
+          'X-Internal-Gateway-Secret': GATEWAY_SECRET,
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      check(res, { 'me status is 200': (r) => r.status === 200 });
+    }
+
+    function runLogin() {
+      const user = randomUser();
+      const res = http.post(
+        `${BASE_URL}/auth/login`,
+        JSON.stringify({ email: user.email, password: user.password }),
+        { headers: JSON_HEADERS }
+      );
+      check(res, { 'login status is 200': (r) => r.status === 200 });
+    }
+
+    export default function (data) {
+      if (Math.random() < AUTH_ME_THRESHOLD) {
+        runAuthMe(data);
+        return;
+      }
+      runLogin();
+    }
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k6-auth-calib
+  namespace: ecommerce
+  labels:
+    app: k6
+    target: auth-service
+spec:
+  # Suspended so `kubectl apply -f` creates this only as a clonable template — it
+  # never runs load itself. The driver clones it per VU level with suspend:false.
+  suspend: true
+  ttlSecondsAfterFinished: 120
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: k6
+        target: auth-service
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: k6
+          image: grafana/k6:latest
+          command: ["k6", "run", "/scripts/load-test.js"]
+          env:
+            - name: TARGET_URL
+              value: "http://auth-service.ecommerce.svc.cluster.local:8001"
+            - name: PEAK_VUS
+              value: "120"
+            - name: HOLD_DURATION
+              value: "3m"
+            - name: NUM_TEST_USERS
+              value: "120"
+            - name: AUTH_ME_PERCENT
+              value: "70"
+            - name: AUTH_LOGIN_PERCENT
+              value: "30"
+            - name: INTERNAL_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: internal-gateway-secret
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1500m"
+              memory: "1Gi"
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+      volumes:
+        - name: scripts
+          configMap:
+            name: k6-auth-calib-script
