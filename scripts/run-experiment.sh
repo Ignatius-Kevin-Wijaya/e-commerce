@@ -35,6 +35,7 @@ RESULTS_BASE_DIR="$(pwd)/experiment-results"
 LOG_FILE="${RESULTS_BASE_DIR}/experiment.log"
 STATE_FILE="${RESULTS_BASE_DIR}/.experiment-state"
 PROM_URL="http://prometheus.${MONITORING_NS}.svc.cluster.local:9090"
+RUN_HELPER="$(pwd)/scripts/run-experiment-helper.js"
 
 # Experiment matrix
 SERVICES=("shipping-rate-service" "auth-service")
@@ -47,6 +48,7 @@ RESET_WAIT=120       # Wait after cleanup for stabilization
 STABILIZE_WAIT=90    # Wait after config apply for metrics baseline
 K6_TIMEOUT=900       # 15 min max per k6 job (12 min test + buffer)
 EXPORT_WAIT=180       # Wait before data export (3 mins for cooldown capture)
+PROM_EXPORT_TIMEOUT="${PROM_EXPORT_TIMEOUT:-120s}"
 
 # Load profile knobs (override via env for calibration ladders)
 PRODUCT_BASE_RPS="${PRODUCT_BASE_RPS:-20}"
@@ -138,8 +140,6 @@ get_k6_job_file() {
 create_k6_job_from_yaml() {
   local yaml_file=$1 template_name=$2 new_name=$3 service=$4
   K6_YAML_FILE="${yaml_file}" \
-  K6_TEMPLATE_NAME="${template_name}" \
-  K6_NEW_NAME="${new_name}" \
   K6_SERVICE="${service}" \
   PRODUCT_BASE_RPS="${PRODUCT_BASE_RPS}" \
   PRODUCT_PEAK_RPS="${PRODUCT_PEAK_RPS}" \
@@ -157,69 +157,7 @@ create_k6_job_from_yaml() {
   AUTH_ME_PERCENT="${AUTH_ME_PERCENT}" \
   AUTH_LOGIN_PERCENT="${AUTH_LOGIN_PERCENT}" \
   NUM_TEST_USERS="${NUM_TEST_USERS}" \
-  python3 - <<'PYEOF'
-import os
-import sys
-
-try:
-    import yaml
-except ImportError:
-    sys.exit(1)
-
-
-def set_env(env_list, name, value):
-    for item in env_list:
-        if item.get("name") == name:
-            item["value"] = str(value)
-            item.pop("valueFrom", None)
-            return
-    env_list.append({"name": name, "value": str(value)})
-
-
-yaml_file = os.environ["K6_YAML_FILE"]
-template_name = os.environ["K6_TEMPLATE_NAME"]
-new_name = os.environ["K6_NEW_NAME"]
-service = os.environ["K6_SERVICE"]
-
-with open(yaml_file) as f:
-    docs = list(yaml.safe_load_all(f))
-
-for doc in docs:
-    if doc and doc.get("kind") == "Job" and doc.get("metadata", {}).get("name") == template_name:
-        doc["metadata"]["name"] = new_name
-        for field in ("resourceVersion", "uid", "creationTimestamp", "generation", "selfLink", "annotations"):
-            doc["metadata"].pop(field, None)
-        doc.pop("status", None)
-
-        container = doc["spec"]["template"]["spec"]["containers"][0]
-        env_list = container.setdefault("env", [])
-
-        if service == "product-service":
-            set_env(env_list, "BASE_RPS", os.environ["PRODUCT_BASE_RPS"])
-            set_env(env_list, "PEAK_RPS", os.environ["PRODUCT_PEAK_RPS"])
-            set_env(env_list, "PRODUCT_PAGE_SIZE", os.environ["PRODUCT_PAGE_SIZE"])
-            set_env(env_list, "PRODUCT_MAX_PAGE", os.environ["PRODUCT_MAX_PAGE"])
-            set_env(env_list, "PRODUCT_SEARCH_TERMS", os.environ["PRODUCT_SEARCH_TERMS"])
-        elif service == "shipping-rate-service":
-            set_env(env_list, "BASE_VUS", os.environ["SHIPPING_BASE_VUS"])
-            set_env(env_list, "PEAK_VUS", os.environ["SHIPPING_PEAK_VUS"])
-            set_env(env_list, "SHIPPING_MAX_ITEMS", os.environ["SHIPPING_MAX_ITEMS"])
-            set_env(env_list, "SHIPPING_MIN_WEIGHT_GRAMS", os.environ["SHIPPING_MIN_WEIGHT_GRAMS"])
-            set_env(env_list, "SHIPPING_MAX_WEIGHT_GRAMS", os.environ["SHIPPING_MAX_WEIGHT_GRAMS"])
-            set_env(env_list, "SHIPPING_DESTINATION_ZONES", os.environ["SHIPPING_DESTINATION_ZONES"])
-        else:
-            set_env(env_list, "BASE_RPS", os.environ["AUTH_BASE_RPS"])
-            set_env(env_list, "PEAK_RPS", os.environ["AUTH_PEAK_RPS"])
-            set_env(env_list, "AUTH_ME_PERCENT", os.environ["AUTH_ME_PERCENT"])
-            set_env(env_list, "AUTH_LOGIN_PERCENT", os.environ["AUTH_LOGIN_PERCENT"])
-            set_env(env_list, "NUM_TEST_USERS", os.environ["NUM_TEST_USERS"])
-
-        print(yaml.dump(doc, default_flow_style=False, sort_keys=False))
-        sys.exit(0)
-
-print(f"ERROR: Job template '{template_name}' not found in {yaml_file}", file=sys.stderr)
-sys.exit(1)
-PYEOF
+  node "${RUN_HELPER}" clone-job "${yaml_file}" "${template_name}" "${new_name}" "${service}"
 }
 
 get_k6_job_name() {
@@ -384,18 +322,7 @@ apply_k6_configmaps() {
 
   local k6_file
   for k6_file in "${k6_files[@]}"; do
-    K6_YAML_FILE="${k6_file}" python3 - <<'PYEOF' | kubectl apply -f - -n "${NAMESPACE}" >&2
-import os
-from pathlib import Path
-
-content = Path(os.environ["K6_YAML_FILE"]).read_text()
-docs = [doc.strip() for doc in content.split("---") if doc.strip()]
-
-for doc in docs:
-    if "\nkind: ConfigMap" in f"\n{doc}\n":
-        print("---")
-        print(doc)
-PYEOF
+    node "${RUN_HELPER}" print-configmaps "${k6_file}" | kubectl apply -f - -n "${NAMESPACE}" >&2
   done
 }
 
@@ -558,19 +485,16 @@ run_k6_test() {
       | kubectl apply -f - -n "${NAMESPACE}" >&2; then
     job_created=true
   else
-    log_warn "python3+pyyaml not available, falling back to sed-based patching..."
-    # Fallback: use sed to patch the name inline from the YAML file
-    python3 -c "
-import re, sys
-with open('${k6_yaml_file}') as f: content = f.read()
-docs = content.split('---')
-for doc in docs:
-    if 'kind: Job' in doc and 'name: ${job_base_name}' in doc:
-        doc = re.sub(r'(name: )${job_base_name}', r'\\g<1>${job_run_name}', doc, count=1)
-        print('---')
-        print(doc)
-        sys.exit(0)
-" | kubectl apply -f - -n "${NAMESPACE}" >&2 && job_created=true
+    log_warn "Helper-based job patching failed, falling back to name-only sed patching..."
+    awk -v target="${job_base_name}" '
+      BEGIN { RS="---"; ORS="" }
+      $0 ~ /kind:[[:space:]]*Job/ && $0 ~ ("name:[[:space:]]*" target) {
+        print "---\n" $0
+        exit
+      }
+    ' "${k6_yaml_file}" \
+      | sed "0,/name: ${job_base_name}/s//name: ${job_run_name}/" \
+      | kubectl apply -f - -n "${NAMESPACE}" >&2 && job_created=true
   fi
 
   if ! ${job_created}; then
@@ -696,9 +620,9 @@ export_prometheus_metrics() {
     local query="${query_pair%%|*}"
     local name="${query_pair##*|}"
     local encoded_query
-    encoded_query=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${query}'))" 2>/dev/null || echo "${query}")
+    encoded_query=$(node "${RUN_HELPER}" urlencode "${query}" 2>/dev/null || echo "${query}")
 
-    kubectl exec -n "${MONITORING_NS}" "${prom_pod}" -- \
+    timeout "${PROM_EXPORT_TIMEOUT}" kubectl exec -n "${MONITORING_NS}" "${prom_pod}" -- \
       wget -q -O - "http://localhost:9090/api/v1/query_range?query=${encoded_query}&start=${start_time}&end=${end_time}&step=15" \
       > "${results_dir}/prom_${name}.json" 2>/dev/null || {
         log_error "Failed to export ${name}"
@@ -707,81 +631,22 @@ export_prometheus_metrics() {
     if [[ ! -s "${results_dir}/prom_${name}.json" ]]; then
       log_error "Prometheus export ${name} is missing or empty"
       export_failed=true
+    elif grep -q '"result":\[\]' "${results_dir}/prom_${name}.json"; then
+      # A 200/"success" response with an empty result set means Prometheus had
+      # NO data for the run window — the TSDB was wiped by a restart/OOM. The
+      # old `! -s` check missed this because the 63-byte body is non-empty.
+      log_error "Prometheus export ${name} returned an EMPTY result set — Prometheus lost data for this run window (restart/OOM)"
+      export_failed=true
     fi
   done
 
   local hpa_name scaledobject_name
   hpa_name=$(hpa_name_for_config "${service}" "${config}")
   scaledobject_name=$(scaledobject_name_for_config "${service}" "${config}")
-  local event_filter_script
-  read -r -d '' event_filter_script <<'PYEOF' || true
-import datetime as dt
-import json
-import sys
-
-service, job_name, hpa_name, scaledobject_name, run_start_epoch = sys.argv[1:]
-run_start_epoch = float(run_start_epoch)
-names = [name for name in (service, job_name, hpa_name, scaledobject_name) if name]
-
-def parse_event_epoch(event):
-    candidates = (
-        event.get("eventTime"),
-        event.get("series", {}).get("lastObservedTime"),
-        event.get("lastTimestamp"),
-        event.get("firstTimestamp"),
-        event.get("metadata", {}).get("creationTimestamp"),
-    )
-    for raw in candidates:
-        if not raw:
-            continue
-        try:
-            return dt.datetime.fromisoformat(raw.replace("Z", "+00:00")).timestamp()
-        except ValueError:
-            continue
-    return None
-
-def is_relevant(event):
-    obj = event.get("involvedObject", {})
-    object_name = obj.get("name", "")
-    message = event.get("message", "")
-    haystacks = (object_name, message)
-    return any(name and any(name in hay for hay in haystacks) for name in names)
-
-payload = json.load(sys.stdin)
-items = payload.get("items", [])
-filtered = []
-for event in items:
-    event_epoch = parse_event_epoch(event)
-    if event_epoch is None or event_epoch < run_start_epoch - 30:
-        continue
-    if not is_relevant(event):
-        continue
-    filtered.append((event_epoch, event))
-
-filtered.sort(key=lambda item: item[0])
-print("TIMESTAMP\tTYPE\tREASON\tOBJECT\tMESSAGE")
-for event_epoch, event in filtered:
-    obj = event.get("involvedObject", {})
-    object_ref = f"{obj.get('kind', '').lower()}/{obj.get('name', '')}".strip("/")
-    message = event.get("message", "").replace("\t", " ").replace("\n", " ")
-    timestamp = dt.datetime.fromtimestamp(event_epoch, tz=dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    print(
-        "\t".join(
-            [
-                timestamp,
-                event.get("type", ""),
-                event.get("reason", ""),
-                object_ref,
-                message,
-            ]
-        )
-    )
-PYEOF
-
   # Export only events from the current run window so old k6 jobs / stale pod
   # history cannot leak into a fresh result directory.
-  kubectl get events -n "${NAMESPACE}" -o json 2>/dev/null | \
-    python3 -c "${event_filter_script}" "${service}" "${job_name}" "${hpa_name}" "${scaledobject_name}" "${run_start_epoch}" \
+  timeout "${PROM_EXPORT_TIMEOUT}" kubectl get events -n "${NAMESPACE}" -o json 2>/dev/null | \
+    node "${RUN_HELPER}" filter-events "${service}" "${job_name}" "${hpa_name}" "${scaledobject_name}" "${run_start_epoch}" \
     > "${results_dir}/k8s-events.txt" || true
 
   # Export only the autoscaler objects relevant to the current run.
@@ -841,7 +706,10 @@ execute_single_run() {
 
   # Step 5: Export data
   export_k6_results "${job_name}" "${results_dir}"
-  export_prometheus_metrics "${service}" "${config}" "${job_name}" "${results_dir}" "${run_start}"
+  # Capture export health: empty/failed Prometheus series must block completion
+  # so --resume re-runs the run instead of silently accepting unusable data.
+  local export_status=0
+  export_prometheus_metrics "${service}" "${config}" "${job_name}" "${results_dir}" "${run_start}" || export_status=$?
 
   # Step 6: Record metadata
   local run_end
@@ -887,7 +755,15 @@ EOF
   # Step 7: Cleanup k6 job
   kubectl delete job "${job_name}" -n "${NAMESPACE}" --ignore-not-found 2>/dev/null || true
 
-  # Mark as completed
+  # Mark as completed — ONLY if the data export was fully valid. A run whose
+  # Prometheus series came back empty/failed is left un-marked (no DONE entry),
+  # so --resume re-executes it. Artifacts are still kept on disk for inspection.
+  if [[ "${export_status}" -ne 0 ]]; then
+    log_error "Run ${rid} executed but data export FAILED (empty/failed Prometheus series). NOT marking complete — re-run with --resume."
+    RUN_DURATION="${run_duration}"
+    return 0
+  fi
+
   mark_completed "${rid}"
 
   log_success "Run ${rid} completed in ${run_duration}s (~$((run_duration / 60))m)"
