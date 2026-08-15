@@ -71,21 +71,32 @@ data:
       const tokens = [];
       for (let i = 0; i < NUM_USERS; i++) {
         const user = testUsers[i];
-        http.post(
-          `${BASE_URL}/auth/register`,
-          JSON.stringify({
-            email: user.email,
-            username: user.username,
-            password: user.password,
-            full_name: `Load Test User ${i}`,
-          }),
-          { headers: JSON_HEADERS }
-        );
-        const loginRes = http.post(
+        // Login first; register only on failure. See k6-auth-job.yaml — the
+        // unconditional register emitted exactly NUM_USERS failures per run
+        // before any load, which is why every rung reported ~1.2% err with
+        // checks_failed = 0.
+        let loginRes = http.post(
           `${BASE_URL}/auth/login`,
           JSON.stringify({ email: user.email, password: user.password }),
           { headers: JSON_HEADERS }
         );
+        if (loginRes.status !== 200) {
+          http.post(
+            `${BASE_URL}/auth/register`,
+            JSON.stringify({
+              email: user.email,
+              username: user.username,
+              password: user.password,
+              full_name: `Load Test User ${i}`,
+            }),
+            { headers: JSON_HEADERS }
+          );
+          loginRes = http.post(
+            `${BASE_URL}/auth/login`,
+            JSON.stringify({ email: user.email, password: user.password }),
+            { headers: JSON_HEADERS }
+          );
+        }
         if (loginRes.status === 200) {
           try {
             const body = JSON.parse(loginRes.body);

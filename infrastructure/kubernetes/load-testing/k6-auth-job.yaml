@@ -86,22 +86,37 @@ data:
       for (let i = 0; i < NUM_USERS; i++) {
         const user = testUsers[i];
 
-        http.post(
-          `${BASE_URL}/auth/register`,
-          JSON.stringify({
-            email: user.email,
-            username: user.username,
-            password: user.password,
-            full_name: `Load Test User ${i}`,
-          }),
-          { headers: JSON_HEADERS }
-        );
-
-        const loginRes = http.post(
+        // Login first, and register only if that fails. Registering
+        // unconditionally made every run emit exactly NUM_USERS failed
+        // /auth/register calls, because the users already exist from the
+        // first run onward. That put a constant ~120 failures into
+        // http_req_failed BEFORE any load was applied, which is the entire
+        // reported error rate on otherwise-clean auth runs (e.g. b2/gradual
+        // rep1: 120 out of 17339 = 0.69%, with checks_failed = 0).
+        let loginRes = http.post(
           `${BASE_URL}/auth/login`,
           JSON.stringify({ email: user.email, password: user.password }),
           { headers: JSON_HEADERS }
         );
+
+        if (loginRes.status !== 200) {
+          http.post(
+            `${BASE_URL}/auth/register`,
+            JSON.stringify({
+              email: user.email,
+              username: user.username,
+              password: user.password,
+              full_name: `Load Test User ${i}`,
+            }),
+            { headers: JSON_HEADERS }
+          );
+
+          loginRes = http.post(
+            `${BASE_URL}/auth/login`,
+            JSON.stringify({ email: user.email, password: user.password }),
+            { headers: JSON_HEADERS }
+          );
+        }
 
         if (loginRes.status === 200) {
           try {
@@ -254,22 +269,37 @@ data:
       for (let i = 0; i < NUM_USERS; i++) {
         const user = testUsers[i];
 
-        http.post(
-          `${BASE_URL}/auth/register`,
-          JSON.stringify({
-            email: user.email,
-            username: user.username,
-            password: user.password,
-            full_name: `Load Test User ${i}`,
-          }),
-          { headers: JSON_HEADERS }
-        );
-
-        const loginRes = http.post(
+        // Login first, and register only if that fails. Registering
+        // unconditionally made every run emit exactly NUM_USERS failed
+        // /auth/register calls, because the users already exist from the
+        // first run onward. That put a constant ~120 failures into
+        // http_req_failed BEFORE any load was applied, which is the entire
+        // reported error rate on otherwise-clean auth runs (e.g. b2/gradual
+        // rep1: 120 out of 17339 = 0.69%, with checks_failed = 0).
+        let loginRes = http.post(
           `${BASE_URL}/auth/login`,
           JSON.stringify({ email: user.email, password: user.password }),
           { headers: JSON_HEADERS }
         );
+
+        if (loginRes.status !== 200) {
+          http.post(
+            `${BASE_URL}/auth/register`,
+            JSON.stringify({
+              email: user.email,
+              username: user.username,
+              password: user.password,
+              full_name: `Load Test User ${i}`,
+            }),
+            { headers: JSON_HEADERS }
+          );
+
+          loginRes = http.post(
+            `${BASE_URL}/auth/login`,
+            JSON.stringify({ email: user.email, password: user.password }),
+            { headers: JSON_HEADERS }
+          );
+        }
 
         if (loginRes.status === 200) {
           try {
@@ -429,22 +459,37 @@ data:
       for (let i = 0; i < NUM_USERS; i++) {
         const user = testUsers[i];
 
-        http.post(
-          `${BASE_URL}/auth/register`,
-          JSON.stringify({
-            email: user.email,
-            username: user.username,
-            password: user.password,
-            full_name: `Load Test User ${i}`,
-          }),
-          { headers: JSON_HEADERS }
-        );
-
-        const loginRes = http.post(
+        // Login first, and register only if that fails. Registering
+        // unconditionally made every run emit exactly NUM_USERS failed
+        // /auth/register calls, because the users already exist from the
+        // first run onward. That put a constant ~120 failures into
+        // http_req_failed BEFORE any load was applied, which is the entire
+        // reported error rate on otherwise-clean auth runs (e.g. b2/gradual
+        // rep1: 120 out of 17339 = 0.69%, with checks_failed = 0).
+        let loginRes = http.post(
           `${BASE_URL}/auth/login`,
           JSON.stringify({ email: user.email, password: user.password }),
           { headers: JSON_HEADERS }
         );
+
+        if (loginRes.status !== 200) {
+          http.post(
+            `${BASE_URL}/auth/register`,
+            JSON.stringify({
+              email: user.email,
+              username: user.username,
+              password: user.password,
+              full_name: `Load Test User ${i}`,
+            }),
+            { headers: JSON_HEADERS }
+          );
+
+          loginRes = http.post(
+            `${BASE_URL}/auth/login`,
+            JSON.stringify({ email: user.email, password: user.password }),
+            { headers: JSON_HEADERS }
+          );
+        }
 
         if (loginRes.status === 200) {
           try {
