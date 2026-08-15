@@ -64,8 +64,8 @@ SHIPPING_MIN_WEIGHT_GRAMS="${SHIPPING_MIN_WEIGHT_GRAMS:-200}"
 SHIPPING_MAX_WEIGHT_GRAMS="${SHIPPING_MAX_WEIGHT_GRAMS:-2500}"
 SHIPPING_DESTINATION_ZONES="${SHIPPING_DESTINATION_ZONES:-domestic,regional,remote}"
 
-AUTH_BASE_RPS="${AUTH_BASE_RPS:-10}"
-AUTH_PEAK_RPS="${AUTH_PEAK_RPS:-40}"
+AUTH_BASE_VUS="${AUTH_BASE_VUS:-3}"
+AUTH_PEAK_VUS="${AUTH_PEAK_VUS:-12}"
 AUTH_ME_PERCENT="${AUTH_ME_PERCENT:-70}"
 AUTH_LOGIN_PERCENT="${AUTH_LOGIN_PERCENT:-30}"
 NUM_TEST_USERS="${NUM_TEST_USERS:-120}"
@@ -152,8 +152,8 @@ create_k6_job_from_yaml() {
   SHIPPING_MIN_WEIGHT_GRAMS="${SHIPPING_MIN_WEIGHT_GRAMS}" \
   SHIPPING_MAX_WEIGHT_GRAMS="${SHIPPING_MAX_WEIGHT_GRAMS}" \
   SHIPPING_DESTINATION_ZONES="${SHIPPING_DESTINATION_ZONES}" \
-  AUTH_BASE_RPS="${AUTH_BASE_RPS}" \
-  AUTH_PEAK_RPS="${AUTH_PEAK_RPS}" \
+  AUTH_BASE_VUS="${AUTH_BASE_VUS}" \
+  AUTH_PEAK_VUS="${AUTH_PEAK_VUS}" \
   AUTH_ME_PERCENT="${AUTH_ME_PERCENT}" \
   AUTH_LOGIN_PERCENT="${AUTH_LOGIN_PERCENT}" \
   NUM_TEST_USERS="${NUM_TEST_USERS}" \
@@ -242,6 +242,7 @@ service_base_vus() {
   local service=$1
   case "${service}" in
     shipping-rate-service) echo "${SHIPPING_BASE_VUS}" ;;
+    auth-service) echo "${AUTH_BASE_VUS}" ;;
     *) echo "" ;;
   esac
 }
@@ -250,15 +251,17 @@ service_peak_vus() {
   local service=$1
   case "${service}" in
     shipping-rate-service) echo "${SHIPPING_PEAK_VUS}" ;;
+    auth-service) echo "${AUTH_PEAK_VUS}" ;;
     *) echo "" ;;
   esac
 }
 
+# RPS knobs remain only for product-service, the one open-loop workload left.
 service_base_rps() {
   local service=$1
   case "${service}" in
     product-service) echo "${PRODUCT_BASE_RPS}" ;;
-    *) echo "${AUTH_BASE_RPS}" ;;
+    *) echo "" ;;
   esac
 }
 
@@ -266,14 +269,14 @@ service_peak_rps() {
   local service=$1
   case "${service}" in
     product-service) echo "${PRODUCT_PEAK_RPS}" ;;
-    *) echo "${AUTH_PEAK_RPS}" ;;
+    *) echo "" ;;
   esac
 }
 
 service_profile_version() {
   local service=$1
   case "${service}" in
-    auth-service) echo "recovery-v2" ;;
+    auth-service) echo "closed-loop-vus-v3" ;;
     product-service) echo "product-recovery-v1" ;;
     shipping-rate-service) echo "wait-bound-v1" ;;
     *) echo "unknown" ;;
@@ -731,10 +734,10 @@ execute_single_run() {
   "target_url": "http://${service}.${NAMESPACE}.svc.cluster.local:$(service_port "${service}")",
   "load_profile": {
     "version": "$(service_profile_version "${service}")",
-    $(if [[ "${service}" == "shipping-rate-service" ]]; then
-      printf '"base_vus": %s,\n    "peak_vus": %s' "$(service_base_vus "${service}")" "$(service_peak_vus "${service}")"
-    else
+    $(if [[ "${service}" == "product-service" ]]; then
       printf '"base_rps": %s,\n    "peak_rps": %s' "$(service_base_rps "${service}")" "$(service_peak_rps "${service}")"
+    else
+      printf '"base_vus": %s,\n    "peak_vus": %s' "$(service_base_vus "${service}")" "$(service_peak_vus "${service}")"
     fi)$(if [[ "${service}" == "product-service" ]]; then
       printf ',\n    "page_size": %s,\n    "max_page": %s,\n    "search_terms": "%s"' "${PRODUCT_PAGE_SIZE}" "${PRODUCT_MAX_PAGE}" "${PRODUCT_SEARCH_TERMS}"
     elif [[ "${service}" == "shipping-rate-service" ]]; then
@@ -868,7 +871,7 @@ main() {
   log "  Pending:        ${pending_runs}"
   log "  Estimated time: ${est_time}"
   log "  Product load:   base=${PRODUCT_BASE_RPS} peak=${PRODUCT_PEAK_RPS} page_size=${PRODUCT_PAGE_SIZE} max_page=${PRODUCT_MAX_PAGE}"
-  log "  Auth load:      base=${AUTH_BASE_RPS} peak=${AUTH_PEAK_RPS} me=${AUTH_ME_PERCENT}% login=${AUTH_LOGIN_PERCENT}% users=${NUM_TEST_USERS}"
+  log "  Auth load:      base=${AUTH_BASE_VUS}vus peak=${AUTH_PEAK_VUS}vus me=${AUTH_ME_PERCENT}% login=${AUTH_LOGIN_PERCENT}% users=${NUM_TEST_USERS}"
   log ""
 
   if [[ ${pending_runs} -eq 0 ]]; then

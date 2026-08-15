@@ -75,8 +75,8 @@ function commandCloneJob(yamlFile, templateName, newName, service) {
       SHIPPING_DESTINATION_ZONES: process.env.SHIPPING_DESTINATION_ZONES,
     },
     "auth-service": {
-      BASE_RPS: process.env.AUTH_BASE_RPS,
-      PEAK_RPS: process.env.AUTH_PEAK_RPS,
+      BASE_VUS: process.env.AUTH_BASE_VUS,
+      PEAK_VUS: process.env.AUTH_PEAK_VUS,
       AUTH_ME_PERCENT: process.env.AUTH_ME_PERCENT,
       AUTH_LOGIN_PERCENT: process.env.AUTH_LOGIN_PERCENT,
       NUM_TEST_USERS: process.env.NUM_TEST_USERS,
