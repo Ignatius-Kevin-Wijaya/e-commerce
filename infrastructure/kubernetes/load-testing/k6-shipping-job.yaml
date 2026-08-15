@@ -48,6 +48,12 @@ data:
           gracefulRampDown: '30s',
         },
       },
+      // See k6-auth-job.yaml: without this, k6 VUs keep HTTP/1.1 connections
+      // alive for the whole run and kube-proxy balances per NEW connection, so
+      // autoscaler-added pods get zero traffic. Confirmed on the 2026-06 data:
+      // all 20 shipping spike runs had ONE pod at ~380m CPU and every other pod
+      // at 1-4m, while B2's five FIXED pods spread evenly (167/124/122/106/76m).
+      noConnectionReuse: true,
       thresholds: {
         // B1 is expected to breach these; that is the thesis finding, not a failure
         http_req_duration: ['p(95)<3000'],
@@ -137,6 +143,9 @@ data:
           gracefulRampDown: '30s',
         },
       },
+      // See the gradual scenario above: without this, autoscaler-added pods
+      // receive zero traffic because k6 VUs hold keep-alive connections.
+      noConnectionReuse: true,
       thresholds: {
         http_req_duration: ['p(95)<3000'],
         http_req_failed:   ['rate<0.10'],
@@ -236,6 +245,9 @@ data:
           gracefulRampDown: '30s',
         },
       },
+      // See the gradual scenario above: without this, autoscaler-added pods
+      // receive zero traffic because k6 VUs hold keep-alive connections.
+      noConnectionReuse: true,
       thresholds: {
         http_req_duration: ['p(95)<3000'],
         http_req_failed:   ['rate<0.10'],

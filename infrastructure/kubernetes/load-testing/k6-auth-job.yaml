@@ -29,9 +29,11 @@ data:
     // B1/B2: B2 (5 pods) saturates at ~55 req/s and its throughput knee is
     // 12 VUS; B1 (1 pod) is already pinned at ~12 req/s. PEAK_VUS=12 gives a
     // 4.8x throughput / 25x median B1-vs-B2 validity gate with zero
-    // load-phase errors on B2. BASE_VUS=3 keeps a single pod comfortable so
-    // autoscalers start from a quiet baseline.
-    const BASE_VUS = parseInt(__ENV.BASE_VUS || '3', 10);
+    // load-phase errors on B2. BASE_VUS=1 yields ~6 req/s, which against the
+    // 5 req/s/pod H3/K1 trigger settles at ~2 replicas — reproducing the 2->5
+    // dynamic range of the old 10 RPS open-loop baseline. (Measured: 2 VUS
+    // settles at 3 replicas, so 3 VUS would reach 4 and leave nothing to scale.)
+    const BASE_VUS = parseInt(__ENV.BASE_VUS || '1', 10);
     const PEAK_VUS = parseInt(__ENV.PEAK_VUS || '12', 10);
     const NUM_USERS = parseInt(__ENV.NUM_TEST_USERS || '120', 10);
     const AUTH_ME_PERCENT = parseInt(__ENV.AUTH_ME_PERCENT || '70', 10);
@@ -53,6 +55,14 @@ data:
           ],
         },
       },
+      // Every request opens a fresh connection. k6 VUs otherwise hold HTTP/1.1
+      // keep-alive connections for the whole run, and kube-proxy load-balances
+      // per NEW connection — so pods added by the autoscaler AFTER the VUs
+      // connected receive zero traffic and scaling cannot reduce latency.
+      // These tests hit the Service ClusterIP directly, bypassing the NGINX
+      // ingress that would re-resolve endpoints in production; disabling reuse
+      // restores that realistic redistribution rather than distorting it.
+      noConnectionReuse: true,
       thresholds: {
         http_req_duration: ['p(95)<2000'],
         http_req_failed: ['rate<0.05'],
@@ -214,9 +224,11 @@ data:
     // B1/B2: B2 (5 pods) saturates at ~55 req/s and its throughput knee is
     // 12 VUS; B1 (1 pod) is already pinned at ~12 req/s. PEAK_VUS=12 gives a
     // 4.8x throughput / 25x median B1-vs-B2 validity gate with zero
-    // load-phase errors on B2. BASE_VUS=3 keeps a single pod comfortable so
-    // autoscalers start from a quiet baseline.
-    const BASE_VUS = parseInt(__ENV.BASE_VUS || '3', 10);
+    // load-phase errors on B2. BASE_VUS=1 yields ~6 req/s, which against the
+    // 5 req/s/pod H3/K1 trigger settles at ~2 replicas — reproducing the 2->5
+    // dynamic range of the old 10 RPS open-loop baseline. (Measured: 2 VUS
+    // settles at 3 replicas, so 3 VUS would reach 4 and leave nothing to scale.)
+    const BASE_VUS = parseInt(__ENV.BASE_VUS || '1', 10);
     const PEAK_VUS = parseInt(__ENV.PEAK_VUS || '12', 10);
     const NUM_USERS = parseInt(__ENV.NUM_TEST_USERS || '120', 10);
     const AUTH_ME_PERCENT = parseInt(__ENV.AUTH_ME_PERCENT || '70', 10);
@@ -239,6 +251,14 @@ data:
           ],
         },
       },
+      // Every request opens a fresh connection. k6 VUs otherwise hold HTTP/1.1
+      // keep-alive connections for the whole run, and kube-proxy load-balances
+      // per NEW connection — so pods added by the autoscaler AFTER the VUs
+      // connected receive zero traffic and scaling cannot reduce latency.
+      // These tests hit the Service ClusterIP directly, bypassing the NGINX
+      // ingress that would re-resolve endpoints in production; disabling reuse
+      // restores that realistic redistribution rather than distorting it.
+      noConnectionReuse: true,
       thresholds: {
         http_req_duration: ['p(95)<2000'],
         http_req_failed: ['rate<0.05'],
@@ -400,9 +420,11 @@ data:
     // B1/B2: B2 (5 pods) saturates at ~55 req/s and its throughput knee is
     // 12 VUS; B1 (1 pod) is already pinned at ~12 req/s. PEAK_VUS=12 gives a
     // 4.8x throughput / 25x median B1-vs-B2 validity gate with zero
-    // load-phase errors on B2. BASE_VUS=3 keeps a single pod comfortable so
-    // autoscalers start from a quiet baseline.
-    const BASE_VUS = parseInt(__ENV.BASE_VUS || '3', 10);
+    // load-phase errors on B2. BASE_VUS=1 yields ~6 req/s, which against the
+    // 5 req/s/pod H3/K1 trigger settles at ~2 replicas — reproducing the 2->5
+    // dynamic range of the old 10 RPS open-loop baseline. (Measured: 2 VUS
+    // settles at 3 replicas, so 3 VUS would reach 4 and leave nothing to scale.)
+    const BASE_VUS = parseInt(__ENV.BASE_VUS || '1', 10);
     const PEAK_VUS = parseInt(__ENV.PEAK_VUS || '12', 10);
     const NUM_USERS = parseInt(__ENV.NUM_TEST_USERS || '120', 10);
     const AUTH_ME_PERCENT = parseInt(__ENV.AUTH_ME_PERCENT || '70', 10);
@@ -432,6 +454,14 @@ data:
           ],
         },
       },
+      // Every request opens a fresh connection. k6 VUs otherwise hold HTTP/1.1
+      // keep-alive connections for the whole run, and kube-proxy load-balances
+      // per NEW connection — so pods added by the autoscaler AFTER the VUs
+      // connected receive zero traffic and scaling cannot reduce latency.
+      // These tests hit the Service ClusterIP directly, bypassing the NGINX
+      // ingress that would re-resolve endpoints in production; disabling reuse
+      // restores that realistic redistribution rather than distorting it.
+      noConnectionReuse: true,
       thresholds: {
         http_req_duration: ['p(95)<2000'],
         http_req_failed: ['rate<0.05'],
@@ -596,7 +626,7 @@ spec:
             - name: TARGET_URL
               value: "http://auth-service.ecommerce.svc.cluster.local:8001"
             - name: BASE_VUS
-              value: "3"
+              value: "1"
             - name: PEAK_VUS
               value: "12"
             - name: AUTH_ME_PERCENT
@@ -653,7 +683,7 @@ spec:
             - name: TARGET_URL
               value: "http://auth-service.ecommerce.svc.cluster.local:8001"
             - name: BASE_VUS
-              value: "3"
+              value: "1"
             - name: PEAK_VUS
               value: "12"
             - name: AUTH_ME_PERCENT
@@ -710,7 +740,7 @@ spec:
             - name: TARGET_URL
               value: "http://auth-service.ecommerce.svc.cluster.local:8001"
             - name: BASE_VUS
-              value: "3"
+              value: "1"
             - name: PEAK_VUS
               value: "12"
             - name: AUTH_ME_PERCENT
