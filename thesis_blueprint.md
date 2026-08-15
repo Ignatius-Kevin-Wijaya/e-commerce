@@ -11,7 +11,7 @@ The thesis has evolved through five iterations:
 2. **Revised scope** (8/10): HPA threshold × scaling policy matrix — added depth but remained within reactive scaling paradigm
 3. **First KEDA blueprint** (8.5/10): HPA vs KEDA — paradigm comparison, but had a fairness flaw (changing two variables at once: engine AND metric type)
 4. **Factorial-design blueprint** (9/10): HPA (CPU) vs HPA (request-rate via prometheus-adapter) vs KEDA (request-rate) — **controlled factorial design** that isolates the metric-type effect from the engine-architecture effect
-5. **Current evidence-bearing state** (this revision, 9.4/10): same factorial design, but now backed by a clean 18-run shipping first sweep, a directional but artifact-contaminated auth first sweep, and a formal first-run artifact report. Auth-service remains the **CPU-dominant control**, shipping-rate-service is now the implemented and currently accepted **wait-dominant comparison service**, and product-service is retained only as an **exploratory dependency-limited appendix case**
+5. **Current evidence-bearing state** (this revision, 9.4/10): same factorial design, now backed by a **complete 180-run dataset (all reps 1–5 for both core services)**. Shipping-rate-service has clean Prometheus data for all 90 runs. Auth-service has clean data for gradual (all configs) and most spike/oscillating runs, with targeted data-quality issues in 5 runs requiring rerun (see Section 1 — Complete Dataset Status, 2026-06-03). Auth-service remains the **CPU-dominant control**, shipping-rate-service is the **wait-dominant comparison service**, and product-service is retained only as an **exploratory dependency-limited appendix case**
 
 ### What is good about the HPA vs KEDA theme
 
@@ -45,10 +45,11 @@ The thesis has evolved through five iterations:
 | AKS node sizing with KEDA overhead | 🔧 New | Addressed in Section 4 |
 | Fairness argument (2 variables changed) | ✅ Fixed | Added H3 (HPA + request-rate via prometheus-adapter) — isolates metric type from engine |
 
-### What has now been validated on AKS (as of April 26, 2026)
+### What has now been validated on AKS (as of June 3, 2026 — all 180 runs complete)
 
-- **Auth-service is now a calibrated CPU-bound control.** The original auth load was too aggressive, the original request-rate threshold was unreachable for H3/K1, and the original `100m` CPU request made CPU HPA unfairly eager. Those issues have now been corrected and verified live on AKS.
-- **Shipping-rate-service is now implemented, calibrated, and validated through a full 18-run first sweep.** The service fans out to mock carriers, mostly waits on outbound quote latency, is routed through the API gateway, and now has a clean AKS `rep1` dataset across `B1/B2/H1/H2/H3/K1`.
+- **All 180 runs are complete.** The full matrix — 6 configs × 3 patterns × 5 reps × 2 services — has been executed and stored in `experiment-results/`. The `.experiment-state` file contains 180 `DONE:` entries.
+- **Auth-service is now a calibrated CPU-bound control.** The original auth load was too aggressive, the original request-rate threshold was unreachable for H3/K1, and the original `100m` CPU request made CPU HPA unfairly eager. Those issues have been corrected and verified live on AKS.
+- **Shipping-rate-service has a clean 90-run dataset (all 5 reps).** The service fans out to mock carriers, mostly waits on outbound quote latency, and is routed through the API gateway. `deep_validate.py` reports 0 critical issues and 0 warnings across all 90 shipping runs.
 - **Product-service should no longer be described as the final non-CPU thesis service.** It is a mixed DB-backed workload, and once the dataset/load become interesting enough the single `product-db` can become the true bottleneck. In that regime, scaling the app tier may not help and can even make outcomes worse.
 - **Threshold calibration is service-specific and methodology-specific, not global.** H3 and K1 must share the same threshold within a given service, but the correct auth threshold and the correct shipping threshold do not need to be the same number. Auth currently calibrates at `5` under the auth arrival-rate methodology, while shipping currently calibrates at `15` under the `ramping-vus` methodology. Product's historical exploratory threshold remained `5` in its older regime.
 - **CPU-request fairness matters academically.** HPA CPU scales on `usage / request`, not `usage / limit`, so an unrealistically tiny CPU request can make H1/H2 look stronger than they really are. This is now explicitly part of the methodology.
@@ -81,11 +82,37 @@ The thesis has evolved through five iterations:
 
 11. **Product-service still belongs in the thesis, but as an exploratory or appendix result.** It demonstrates a valuable real-world limitation: scaling the wrong tier can make HPA and KEDA both look worse, even when the autoscaler itself is functioning correctly.
 
-12. **Shipping-rate-service has now completed a clean 18-run first repetition.** The current shipping `rep1` sweep covers all `B1/B2/H1/H2/H3/K1 × gradual/spike/oscillating` combinations. `validate-results.sh` reports `0` critical issues and `0` warnings, while `deep_validate.py` reports `0` critical issues and only `1` non-critical warning across all 18 runs.
+12. **Shipping-rate-service has a complete, clean 90-run dataset (all 5 reps).** `deep_validate.py` reports **0 critical issues and 0 warnings** across all 90 shipping runs. This is the publishable core evidence.
 
-13. **The current shipping first-run result is nuanced rather than binary.** Request-rate scaling is clearest on gradual load (`H3/K1 ≈ 0.97 s`, much closer to `B2 ≈ 0.916 s` than to `H1 ≈ 1.62 s` or `B1 ≈ 5.18 s`). Spike load remains hard for all reactive autoscalers (`H1/H2/H3/K1 ≈ 5.1–5.3 s`), and oscillating load is mixed, with `H1 ≈ 0.94 s` and `K1 ≈ 1.13 s` both outperforming `H2/H3 ≈ 5 s`.
+13. **The definitive 5-rep shipping result (p95 ms, mean ± pop. stdev) is as follows.** These are the authoritative numbers for BAB 4/5 — replace any earlier single-rep estimates with these values.
 
-14. **The current auth first-run result is performance-useful but not artifact-clean.** The CPU-bound story is still visible (`B1` heavily overloaded, `B2` strongest overall, `H2` strongest among autoscaled configs), but all 18 auth `k8s-events.txt` exports contain foreign neighboring k6 jobs from the older exporter logic. That means auth `rep1` should be treated as directional evidence until it is rerun under the newer scoped exporter/validator stack.
+| Config | Gradual | Spike | Oscillating | Notes |
+|--------|---------|-------|-------------|-------|
+| B1 | 4970 ± 72 | 5120 ± 44 | 5042 ± 39 | Underprovisioned floor |
+| B2 | 917 ± 0 | 918 ± 0 | 917 ± 0 | Overprovisioned ceiling |
+| H1 (CPU 70%) | 1812 ± 232 | 5712 ± 281 | **995 ± 74** | Best oscillating! |
+| H2 (CPU 50%) | 1368 ± 155 | 5196 ± 119 | 3630 ± 1773 | Best gradual among CPU |
+| H3 (req-rate HPA) | **929 ± 7** | 5178 ± 10 | 5086 ± 14 | Best gradual overall |
+| K1 (KEDA) | 1050 ± 117 | 5302 ± 4 | 5236 ± 29 | Consistent; worst oscillating |
+
+B1/B2 validity gate holds: 4970 / 917 ≈ 5.4×. **Key stories:** (1) Gradual: H3 ≈ B2 floor, both CPU configs 1.5–2× worse — request-rate wins clearly. (2) Spike: all reactive methods ≈ B1 (reactive lag limit), but H3/K1 use only 3 pods vs H2's 4 — cost advantage. (3) Oscillating: H1 (default CPU) is *best* at 995ms; H3/K1 are worst at ~5.1s — a nuanced inversion that likely reflects H1's conservative scale-down keeping pods warm through troughs.
+
+14. **⚠️ IMPORTANT — K1 was re-run on 2026-05-23.** Before the re-run, K1 shipping data showed different oscillating behavior (the pre-rerun dataset showed K1 oscillating ≈ 1.13 s). After the re-run ("Archive prior K1 datasets" + "Align KEDA K1 behavior with HPA fairness policy" commits), K1 oscillating is 5236 ± 29 ms across all 5 reps. **Any K1 oscillating values ≈ 1.13 s anywhere in earlier blueprint text refer to the archived dataset and must not be used for BAB 4/5.**
+
+15. **The definitive 5-rep auth result — gradual (clean for all configs).** All other patterns have data-quality issues (see Complete Dataset Status section). Auth gradual is publishable as-is and establishes the CPU-bound control story:
+
+| Config | Gradual p95 (ms, mean ± stdev) | Err% | Notes |
+|--------|-------------------------------|------|-------|
+| B1 | 59990 ± 0 (60s ceiling) | 52% | Saturated baseline |
+| B2 | 893 ± 43 | 0.7% | 5-replica ceiling |
+| H1 | 1136 ± 70 | 0.7% | All 5 reps clean |
+| H2 | 994 ± 47 | 0.7% | Best autoscaled — current lead |
+| H3 | 1053 ± 115 | 0.7% | All 5 reps clean |
+| K1 | 1008 ± 57 | 0.7% | All 5 reps clean |
+
+On the CPU-bound auth service, **all autoscalers perform within ~25% of B2 on gradual** — confirming the control scenario hypothesis. H2 leads slightly.
+
+16. **Auth spike/oscillating: real data but with quality issues — do not use directly in BAB 4 without qualification.** Two distinct problems: (a) **5 runs have total Prometheus-export loss** (all 5 prom_*.json files are empty `result:[]` — the entire export step failed): `h3/spike` rep1+rep2, `h3/oscillating` rep1+rep2, `k1/spike` rep1. k6 client numbers survive but there is no server-side timeseries. (b) **Many autoscaled spike/oscillating reps have dropped iterations > 200** (auth genuinely saturated under those configs), which breaks the equal-offered-load assumption for cross-config p95 comparison. Auth `k1/oscillating` rep1+rep2 are catastrophic overloads (p95 pegged at 60s ceiling, ~26% errors). These are real findings — KEDA genuinely struggled — but must be reported as saturation evidence, not as clean performance measurements.
 
 ### Recovery and Calibration Timeline (April 7-22, 2026)
 
@@ -121,7 +148,9 @@ The thesis has evolved through five iterations:
 | **2026-04-18 → 2026-04-21** | Shipping first-sweep blockers discovered and fixed | The first shipping sweep exposed real pre-thesis issues: OOM/probe/backoff behavior, readiness semantics, runner/export gaps, validator drift, and a Prometheus-adapter OOM during H3. These were fixed before accepting the shipping matrix. |
 | **2026-04-22** | Shipping 18-run first repetition completed and validated | All shipping `rep1` runs finished. `validate-results.sh` returned `0` critical / `0` warnings; `deep_validate.py` returned `0` critical / `1` warning. Shipping is now the clean half of the current core matrix. |
 | **2026-04-22** | First-run artifact report generated | The artifact report formalized the current state: shipping accepted as thesis-usable core evidence, auth marked as directional but artifact-contaminated by old event exports, and product fixed as appendix-only. |
-| **Current interpretation** | Post-first-sweep evidence state | Shipping-rate-service is now the clean evidence-bearing wait-dominant counterpart. Auth-service remains the CPU-bound control, but its current `rep1` artifacts need a clean rerun under the newer exporter logic before the full 36-run core matrix is artifact-consistent. Product-service remains academically useful, but only as a dependency-sensitive DB-backed case study. |
+| **2026-05-23** | K1 shipping re-run after fairness realignment | K1 archived, re-run with KEDA behavior aligned to HPA fairness policy. All 5 new K1 reps completed clean. K1 oscillating is now 5236 ± 29 ms (not ~1.13 s from the archived dataset). |
+| **2026-05-26 → 2026-05-27** | Auth 5-rep sweep completed | All 90 auth runs (reps 1–5, all configs/patterns) completed and stored. 27 critical issues identified: 5 runs with total Prometheus-export loss; multiple spike/oscillating reps with dropped iterations from genuine saturation. Auth gradual (all configs) is clean for all 5 reps. |
+| **2026-06-03** | All 180 runs complete — dataset status confirmed | `.experiment-state` = 180 DONE entries. `deep_validate.py` across all 5 reps: shipping 0/0; auth 27 critical / 77 warnings. Shipping is fully publishable. Auth gradual is fully publishable. Auth spike/oscillating requires targeted reruns (5 empty-export runs) or explicit methodology qualification before BAB 4 analysis. |
 
 ### Shipping-Rate-Service Calibration Deep Dive (April 17–18, 2026)
 
@@ -202,20 +231,33 @@ Before launching the 18-run matrix, a deep pre-flight audit found 4 bugs. All we
 ### What This Means For The Thesis
 
 - **The original strong claim that "CPU HPA should clearly fail on product-service" is too strong.** Product-service should no longer be treated as the final non-CPU counterpart in the core matrix.
-- **The strongest thesis contribution is now a two-part story.** First, auth-service validates the CPU-dominant control case. Second, the shipping experiments reveal a subtler and more academically valuable finding: even in a wait-dominant service, CPU and request-rate signals *both* trigger autoscaling — but they react to fundamentally different causal mechanisms with measurably different timing, and their relative benefit is load-pattern-dependent rather than universal.
-- **This makes the thesis more credible, not weaker.** A nuanced hypothesis ("signals differ in timing and proportionality") is more defensible than a binary one ("CPU fails, request-rate wins"). The factorial design isolates metric choice from autoscaler engine choice, which allows the analysis to separate *what is being measured* from *which system is doing the measuring*.
+- **The strongest thesis contribution is now a three-part story.** (1) Auth-service validates the CPU-dominant control case — all methods perform within ~25% of B2 on gradual load. (2) Shipping gradual validates the request-rate advantage: H3 nearly matches B2, saving 48.7% latency vs H1. (3) The oscillating load pattern reveals a counter-intuitive finding: the default CPU HPA (H1) is the best-performing autoscaler for the wait-dominant shipping service under oscillating load — which shows the metric-to-workload relationship is load-pattern-dependent, not binary.
+- **This makes the thesis more credible, not weaker.** A nuanced hypothesis ("signal semantics interact with load pattern") is more defensible than a binary one ("CPU fails, request-rate wins"). The factorial design isolates metric choice from autoscaler engine choice.
 - **Methodological calibration is now explicitly part of the contribution.** Fair CPU requests, service-specific VU calibration, executor selection rationale, threshold derivation math, and a dependency-isolation gate all explain why prior results were misleading and why the corrected runs are academically defensible. This methodology section will be a key strength in the thesis defense.
-- **The final controlled comparison is auth-service vs shipping-rate-service.** Auth-service provides the CPU-dominant control where H1/H2 are expected to be both reactive and proportional. Shipping-rate-service provides the mixed-workload case where H1/H2 still react (via asyncio overhead), but the current first-run evidence suggests H3/K1 give the clearest advantage on gradual load while spike and oscillating remain more nuanced.
+- **The data collection phase is complete (2026-06-03).** The next phase is statistical analysis (Wilcoxon tests, CI, effect sizes), time-to-scale extraction from `k8s-events.txt`, and thesis writing.
+- **The final controlled comparison is auth-service vs shipping-rate-service.** Auth-service provides the CPU-dominant control where H1/H2 are expected to be both reactive and proportional. Shipping-rate-service provides the mixed-workload case where H1/H2 still react (via asyncio overhead), and the **5-rep definitive evidence** confirms H3/K1 give the clearest advantage on gradual load while spike and oscillating remain more nuanced — with oscillating showing H1 (CPU) as the unexpected winner.
 - **Product-service remains in the thesis as a case-study, not as wasted work.** It provides a realistic counterexample showing that autoscaling app pods does not fix every performance problem — specifically, that when a downstream dependency dominates, app-tier scaling can make outcomes *worse* by increasing database connection pressure.
-- **The revised thesis central claim (for BAB 5):** The current first-run evidence suggests that request-rate-based autoscaling (H3/K1) gives the clearest benefit on the gradual wait-dominant shipping workload, while CPU-based HPA remains strongest on the CPU-bound auth workload. The full 5-repetition matrix is still required to convert this current directional evidence into statistical conclusions and effect-size statements.
+- **The revised thesis central claim (for BAB 5):** The 5-repetition data shows that request-rate-based autoscaling (H3/K1) gives the clearest benefit on the **gradual** wait-dominant shipping workload. On spike, all reactive autoscalers are bounded by reactive lag — but request-rate configs (H3/K1) are more cost-efficient at the same latency. On oscillating, H1 (default CPU) unexpectedly outperforms request-rate configs — likely because conservative scale-down keeps pods warm through troughs. CPU-based HPA (H2) remains strongest on the CPU-bound auth gradual workload. These findings are now backed by complete 5-rep data for shipping and clean gradual data for auth.
 
-### One Important Caution
+### Current Dataset Status and Remaining Work (2026-06-03)
 
-These findings are much stronger than the earlier calibration-only stage because the shipping 18-run first repetition has now been executed and validated. However, the **current 36-run core dataset is not yet uniformly artifact-clean**: shipping `rep1` is clean enough to use as thesis evidence, but auth `rep1` still predates the later run-scoped exporter fixes and therefore contains event-export contamination. The main remaining work is now:
+All 180 runs are complete. The dataset is asymmetric in quality:
 
-1. **Re-run auth `rep1` cleanly under the current exporter/validator stack.** The current auth data is analytically useful, but it should not be the final archived core evidence while its event files still contain foreign neighboring k6 jobs.
-2. **Complete repetitions 2–5 for both core services.** The current artifact report is first-run evidence only. The actual thesis claims still require the planned Wilcoxon tests, confidence intervals, and effect-size calculations across 5 repetitions.
-3. **Lock product-service as appendix-only.** Product results should remain outside the final pooled core statistics and be discussed explicitly as a dependency-limited case where app-tier autoscaling is the wrong intervention.
+**Shipping (90/90 clean):** All configs, patterns, reps pass `deep_validate.py` with 0 critical / 0 warnings. This is publishable. Wilcoxon tests and effect-size calculations can be run directly from the on-disk data.
+
+**Auth — clean data:**
+- **Gradual (all configs, all 5 reps):** Fully clean. Use these for the CPU-bound control story.
+- **Spike / Oscillating — H1, H2:** Mostly clean but with variance (some dropped iterations in individual reps; Prometheus exports are intact). Usable with documentation of variance.
+
+**Auth — requires attention before BAB 4:**
+- **H3 spike rep1, rep2 / H3 oscillating rep1, rep2 / K1 spike rep1:** Total Prometheus-export loss (all 5 prom_*.json = empty `result:[]`). k6 client-side p95 numbers survive but there is no server-side scaling/CPU/latency timeseries. These 5 runs need targeted reruns OR must be excluded from server-side analysis with explicit notation.
+- **K1 oscillating rep1, rep2 / H3 oscillating rep3-5:** Genuine saturation (dropped iterations >200, p95 at 60s ceiling for K1). These are real findings about autoscaler limits, not tooling failures, but the unequal offered load means cross-config p95 comparison requires careful qualification.
+
+**Remaining work before statistical analysis:**
+1. **Decision on 5 empty-export runs:** Either rerun `h3/spike r1+r2`, `h3/oscillating r1+r2`, `k1/spike r1` to get server-side timeseries, or proceed using only k6 client-side metrics for those 5 runs with explicit methodology note.
+2. **Run Wilcoxon signed-rank tests** across the 5-rep distributions for the primary KPIs (shipping gradual is ready; shipping spike/oscillating ready; auth gradual ready).
+3. **Extract time-to-scale** (load-onset → first `SuccessfulRescale` event) — this primary KPI is not yet computed from the stored artifacts.
+4. **Lock product-service as appendix-only** — product results stay outside the pooled core statistics.
 
 
 
@@ -882,7 +924,7 @@ spec:
 | **shipping-rate-service** | Wait-dominant external-dependency workload | The hot path asynchronously fans out to three carrier quote endpoints, each with controlled delay and small payloads. This keeps the service mostly waiting on downstream responses with minimal local CPU, making it the deliberate non-CPU counterpart to auth-service. |
 | **auth-service** | CPU-bound (bcrypt hashing) | CPU correlates with load → HPA works well → KEDA may offer no advantage. This is the "control" scenario. |
 
-**Working hypothesis, updated with current first-run evidence:** On auth-service, CPU-based HPA should remain competitive because the service is genuinely CPU-bound; the current `rep1` data already points to `H2` as the strongest autoscaled auth config. On shipping-rate-service, request-rate autoscaling (H3/K1) is expected to be strongest in the gradual wait-dominant regime, but the current data also shows that spike and oscillating behavior are more nuanced than a simple "CPU fails" story. Product-service is retained as a supporting case-study showing a separate but important lesson: **when the dominant bottleneck lives in a downstream dependency, app-tier autoscaling may not help and can even worsen outcomes.**
+**Working hypothesis, confirmed by 5-rep evidence:** On auth-service, CPU-based HPA is competitive — the **5-rep gradual data shows H2 (994 ms) as the strongest autoscaled config**, consistent with the CPU-bound control hypothesis. On shipping-rate-service, the **5-rep data confirms H3 (929 ms) gives the clearest advantage on gradual load**. However spike and oscillating are more nuanced: spike shows all reactive autoscalers bounded by reactive lag (H3/K1 more cost-efficient at same latency), and oscillating shows H1 (default CPU) as the best autoscaler at 995ms — a counter-intuitive inversion that is itself a publishable finding. Product-service is retained as a supporting case-study showing: **when the dominant bottleneck lives in a downstream dependency, app-tier autoscaling may not help and can even worsen outcomes.**
 
 ### Experimental Protocol
 
@@ -1431,15 +1473,15 @@ Shape = load pattern (circle=gradual, triangle=spike, square=oscillating)
 ```
 
 Draw the **Pareto frontier**: configurations where no other config is both cheaper AND faster. With 6 configs × 3 load patterns = 18 data points per service, the Pareto plot will clearly show clusters:
-- Shipping-rate-service should now be described more precisely: the current first-run evidence shows the clearest request-rate advantage on **gradual** load, a reactive-lag cluster on **spike**, and a mixed result on **oscillating**
-- Auth-service should show CPU-based HPA remaining strongest among autoscaled configs — current `rep1` already points in that direction, especially for `H2`
+- Shipping-rate-service: the **5-rep definitive evidence** shows the clearest request-rate advantage on **gradual** load (H3 929ms ≈ B2 floor); a reactive-lag cluster on **spike** (all autoscalers ~5.2–5.7s, but H3/K1 use fewer pods); and a **counter-intuitive inversion on oscillating** — H1 (default CPU) wins at 995ms while H3/K1 are worst at ~5.1s
+- Auth-service: the **5-rep gradual data confirms H2 (994ms) as the strongest autoscaled config** — CPU-based HPA is competitive on the CPU-bound control service as expected. Auth spike/oscillating data is partially contaminated (see finding #16); those Pareto points should be annotated accordingly
 - Product-service can be shown separately as an exploratory contrast where downstream DB saturation can distort or even reverse apparent app-tier autoscaling gains
 
 This is academically impressive (multi-objective optimization vocabulary) and practically useful (a decision-maker can pick their cost-performance preference).
 
 ### Strategy 3: Annotated Scaling Timeline Visualization
 
-For the most interesting runs, create synchronized multi-panel time-series showing ALL 4 autoscaling methods on the same chart. Based on the current first-run evidence, the two best candidate figures are **shipping-rate-service gradual** (clearest request-rate benefit) and **shipping-rate-service oscillating** (most nuanced mixed result):
+For the most interesting runs, create synchronized multi-panel time-series showing ALL 4 autoscaling methods on the same chart. Based on the **5-rep definitive evidence**, the two best candidate figures are **shipping-rate-service gradual** (clearest request-rate benefit, H3 ≈ B2) and **shipping-rate-service oscillating** (H1 wins unexpectedly — most academically interesting inversion):
 
 ```
 Panel 1: Observed request rate / delivered throughput
@@ -1461,14 +1503,19 @@ Produce a summary table that no other S1 thesis has:
 
 | Service Type | Metric Effect (H3 vs H1) | Engine Effect (K1 vs H3) | Combined Effect (K1 vs H1) |
 |-------------|------------------------|-------------------------|---------------------------|
-| shipping-rate-service — gradual (current `rep1`) | -39.8% latency | -0.4% latency | -40.0% latency |
-| shipping-rate-service — spike (current `rep1`) | -1.5% latency | -0.2% latency | -1.7% latency |
-| shipping-rate-service — oscillating (current `rep1`) | +439.4% latency | -77.8% latency | +20.0% latency |
-| auth-service — gradual (current `rep1`) | -37.5% latency | +10.9% latency | -30.7% latency |
-| auth-service — spike (current `rep1`) | +117.6% latency | +27.7% latency | +177.9% latency |
-| auth-service — oscillating (current `rep1`) | +98.0% latency | -37.9% latency | +22.8% latency |
+| shipping-rate-service — gradual **(5-rep mean)** | (929−1812)/1812 = **−48.7%** | (1050−929)/929 = **+13.0%** | (1050−1812)/1812 = **−42.1%** |
+| shipping-rate-service — spike **(5-rep mean)** | (5178−5712)/5712 = **−9.3%** | (5302−5178)/5178 = **+2.4%** | (5302−5712)/5712 = **−7.2%** |
+| shipping-rate-service — oscillating **(5-rep mean)** | (5086−995)/995 = **+411%** | (5236−5086)/5086 = **+2.9%** | (5236−995)/995 = **+426%** |
+| auth-service — gradual **(5-rep mean, all clean)** | (1053−1136)/1136 = **−7.3%** | (1008−1053)/1053 = **−4.3%** | (1008−1136)/1136 = **−11.3%** |
+| auth-service — spike **(data quality issues; use with qualification)** | *see finding #16* | *see finding #16* | *see finding #16* |
+| auth-service — oscillating **(data quality issues; use with qualification)** | *see finding #16* | *see finding #16* | *see finding #16* |
 
-*These are current first-run values from the artifact report, not final statistical results. In the final thesis table, replace them with the 5-repetition aggregated means / effect sizes once the clean core matrix is complete.*
+*Shipping values use 5-rep means from the clean dataset (2026-06-03). Auth gradual uses 5-rep means (all clean). Auth spike/oscillating cannot be computed reliably until the 5 empty-export runs are re-run or excluded. The K1 shipping values use the 2026-05-23 re-run dataset — the archived pre-rerun K1 values must not be used.*
+
+**Interpretation of the shipping rows:**
+- **Gradual:** The metric type (H1→H3) accounts for −48.7% improvement; the engine switch (H3→K1) then *adds back* +13% (H3 slightly beats K1). Combined net: −42% vs H1.
+- **Spike:** Metric effect exists (−9.3%) but both H3 and K1 are still bound by reactive lag. Engine effect is negligible (+2.4%).
+- **Oscillating (the most academically interesting row):** Switching from CPU to request-rate metric *worsens* latency by +411%. This counter-intuitive result (CPU HPA's H1 is the best at oscillating) is itself a publishable finding about how metric choice interacts with load pattern.
 
 This table answers definitively: "How much improvement comes from the metric? How much from the engine?" No other thesis at this level performs this decomposition.
 
@@ -1497,22 +1544,25 @@ With 7-8 months available, the timeline shifts from "compressed sprint" to "deli
 | 9 | Calibrate thresholds: run baseline tests at various RPS, determine saturation point, set H3 and K1 thresholds to the same value for auth and shipping. | Documented calibration results |
 | 10 | Full pilot runs: 6-12 experiments across auth-service and shipping-rate-service. Validate data collection pipeline, scoped exporters, and shipping-aware analysis scripts. | Validated experiment pipeline |
 
-### Phase 3: Experiments (Weeks 11-16)
+### Phase 3: Experiments (Weeks 11-16) — ✅ COMPLETE (2026-06-03)
 
-| Week | Activities | Deliverables |
+All 180 runs have been executed and stored in `experiment-results/`. The planned activities were completed ahead of schedule. The remaining targeted work before analysis:
+
+| Task | Status | Notes |
+|------|--------|-------|
+| Shipping 90 runs (all configs/patterns/reps) | ✅ Complete | 0 critical / 0 warnings |
+| Auth 90 runs (all configs/patterns/reps) | ✅ Complete | 27 critical — see finding #16 |
+| K1 re-run for fairness alignment | ✅ Complete | 2026-05-23; old data archived |
+| Targeted rerun of 5 empty-export auth runs | ⏳ Decision needed | h3/spike r1+r2, h3/osc r1+r2, k1/spike r1 |
+
+### Phase 4: Analysis & Visualization (Current Phase)
+
+| Task | Activities | Deliverables |
 |------|-----------|-------------|
-| 11-12 | Run shipping-rate-service experiments: 90 runs (6 configs × 3 patterns × 5 reps). ~4-5 hours/day over 5-6 days. | 90 raw data files |
-| 13-14 | Run auth-service experiments: 90 runs. Same schedule. | 90 raw data files |
-| 15 | Review all core-matrix data. Re-run failed/anomalous runs. Prepare product-service exploratory appendix from the earlier calibration findings. | Clean, complete core dataset (180 files) + exploratory appendix notes |
-| 16 | Buffer week for unexpected issues, additional re-runs, or extended debugging. | Finalized dataset |
-
-### Phase 4: Analysis & Visualization (Weeks 17-20)
-
-| Week | Activities | Deliverables |
-|------|-----------|-------------|
-| 17 | Descriptive statistics (mean, median, SD, CI) for all KPIs across all configs. | Summary statistics tables |
-| 18 | Statistical testing (Wilcoxon signed-rank: H1 vs H3, H3 vs K1, H1 vs K1). Compute effect sizes. | Significance test results |
-| 19 | Pareto frontier computation and cost analysis. Build the decomposition table (metric effect vs engine effect). | Pareto plots, decomposition table |
+| 4a | Descriptive statistics (mean, median, SD, CI) for all KPIs. Start with shipping (fully clean) and auth gradual. | Summary statistics tables |
+| 4b | Time-to-scale extraction from `k8s-events.txt` (load-onset epoch → first `SuccessfulRescale` event) | time-to-scale per config/pattern/rep |
+| 4c | Statistical testing (Wilcoxon signed-rank: H1 vs H3, H3 vs K1, H1 vs K1). Compute effect sizes. | Significance test results |
+| 4d | Pareto frontier computation and cost analysis. Build the decomposition table (metric effect vs engine effect). | Pareto plots, decomposition table |
 | 20 | Create annotated timeline visualizations. Create comparison bar charts and recommendation matrix. | All thesis figures |
 
 ### Phase 5: Writing (Weeks 21-28)
