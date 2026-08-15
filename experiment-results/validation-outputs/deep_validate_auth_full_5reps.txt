@@ -1,0 +1,1021 @@
+﻿================================================================================
+  DEEP EXPERIMENT VALIDATION
+  Checking run quality for the selected scope
+================================================================================
+
+
+────────────────────────────────────────────────────────────────────────────────
+  DETAILED RESULTS PER RUN
+────────────────────────────────────────────────────────────────────────────────
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_b1_gradual_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: err=54.0% | reqs=13565
+    🟡 [A2] Prometheus has 2 scrape gaps >30s (max gap: 510s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟢 [A1] dropped_iterations = 3774 (expected for the under-provisioned lower bound)
+    🟢 [A1-RPS] Total HTTP requests = 13565 (79% of expected 17100 for gradual base=10 peak=40)
+    🟢 [B1] Error rate 53.97% — EXPECTED for under-provisioned baseline
+    🟢 [DURATION] Duration: 1217s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_b1_gradual_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=59990ms | err=51.8% | reqs=13830
+    🟡 [A2] Prometheus has 1 scrape gaps >30s (max gap: 540s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟢 [A1] dropped_iterations = 3509 (expected for the under-provisioned lower bound)
+    🟢 [A1-RPS] Total HTTP requests = 13830 (81% of expected 17100 for gradual base=10 peak=40)
+    🟢 [B1] Error rate 51.78% — EXPECTED for under-provisioned baseline
+    🟢 [DURATION] Duration: 1193s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_b1_gradual_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=59990ms | err=52.3% | reqs=13763
+    🟡 [A2] Prometheus has 1 scrape gaps >30s (max gap: 510s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟢 [A1] dropped_iterations = 3576 (expected for the under-provisioned lower bound)
+    🟢 [A1-RPS] Total HTTP requests = 13763 (80% of expected 17100 for gradual base=10 peak=40)
+    🟢 [B1] Error rate 52.33% — EXPECTED for under-provisioned baseline
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_b1_gradual_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=59990ms | err=50.3% | reqs=13588
+    🟡 [A2] Prometheus has 1 scrape gaps >30s (max gap: 480s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟢 [A1] dropped_iterations = 3751 (expected for the under-provisioned lower bound)
+    🟢 [A1-RPS] Total HTTP requests = 13588 (79% of expected 17100 for gradual base=10 peak=40)
+    🟢 [B1] Error rate 50.26% — EXPECTED for under-provisioned baseline
+    🟢 [DURATION] Duration: 1176s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_b1_gradual_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=59990ms | err=51.9% | reqs=13837
+    🟡 [A2] Prometheus has 1 scrape gaps >30s (max gap: 480s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟢 [A1] dropped_iterations = 3502 (expected for the under-provisioned lower bound)
+    🟢 [A1-RPS] Total HTTP requests = 13837 (81% of expected 17100 for gradual base=10 peak=40)
+    🟢 [B1] Error rate 51.89% — EXPECTED for under-provisioned baseline
+    🟢 [DURATION] Duration: 1175s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_b1_spike_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: err=58.1% | reqs=15642
+    🟡 [A2] Prometheus has 1 scrape gaps >30s (max gap: 600s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟢 [A1] dropped_iterations = 6047 (expected for the under-provisioned lower bound)
+    🟢 [A1-RPS] Total HTTP requests = 15642 (73% of expected 21450 for spike base=10 peak=40)
+    🟢 [B1] Error rate 58.10% — EXPECTED for under-provisioned baseline
+    🟢 [DURATION] Duration: 1227s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_b1_spike_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=59990ms | err=58.5% | reqs=15986
+    🟡 [A2] Prometheus has 1 scrape gaps >30s (max gap: 600s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟢 [A1] dropped_iterations = 5703 (expected for the under-provisioned lower bound)
+    🟢 [A1-RPS] Total HTTP requests = 15986 (75% of expected 21450 for spike base=10 peak=40)
+    🟢 [B1] Error rate 58.54% — EXPECTED for under-provisioned baseline
+    🟢 [DURATION] Duration: 1204s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_b1_spike_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=59990ms | err=59.2% | reqs=15628
+    🟡 [A2] Prometheus has 1 scrape gaps >30s (max gap: 585s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟢 [A1] dropped_iterations = 6061 (expected for the under-provisioned lower bound)
+    🟢 [A1-RPS] Total HTTP requests = 15628 (73% of expected 21450 for spike base=10 peak=40)
+    🟢 [B1] Error rate 59.23% — EXPECTED for under-provisioned baseline
+    🟢 [DURATION] Duration: 1199s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_b1_spike_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=59990ms | err=58.5% | reqs=15829
+    🟡 [A2] Prometheus has 1 scrape gaps >30s (max gap: 585s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟢 [A1] dropped_iterations = 5860 (expected for the under-provisioned lower bound)
+    🟢 [A1-RPS] Total HTTP requests = 15829 (74% of expected 21450 for spike base=10 peak=40)
+    🟢 [B1] Error rate 58.51% — EXPECTED for under-provisioned baseline
+    🟢 [DURATION] Duration: 1198s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_b1_spike_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=59990ms | err=58.8% | reqs=15597
+    🟡 [A2] Prometheus has 1 scrape gaps >30s (max gap: 570s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟢 [A1] dropped_iterations = 6092 (expected for the under-provisioned lower bound)
+    🟢 [A1-RPS] Total HTTP requests = 15597 (73% of expected 21450 for spike base=10 peak=40)
+    🟢 [B1] Error rate 58.79% — EXPECTED for under-provisioned baseline
+    🟢 [DURATION] Duration: 1188s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_b1_oscillating_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: err=48.8% | reqs=12546
+    🟡 [A2] Prometheus has 2 scrape gaps >30s (max gap: 330s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟢 [A1] dropped_iterations = 3743 (expected for the under-provisioned lower bound)
+    🟢 [A1-RPS] Total HTTP requests = 12546 (78% of expected 16050 for oscillating base=10 peak=40)
+    🟢 [B1] Error rate 48.81% — EXPECTED for under-provisioned baseline
+    🟢 [DURATION] Duration: 1209s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_b1_oscillating_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=59990ms | err=46.0% | reqs=12373
+    🟡 [A2] Prometheus has 2 scrape gaps >30s (max gap: 420s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟢 [A1] dropped_iterations = 3916 (expected for the under-provisioned lower bound)
+    🟢 [A1-RPS] Total HTTP requests = 12373 (77% of expected 16050 for oscillating base=10 peak=40)
+    🟢 [B1] Error rate 46.05% — EXPECTED for under-provisioned baseline
+    🟢 [DURATION] Duration: 1181s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_b1_oscillating_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=59990ms | err=46.8% | reqs=12427
+    🟡 [A2] Prometheus has 2 scrape gaps >30s (max gap: 300s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟢 [A1] dropped_iterations = 3862 (expected for the under-provisioned lower bound)
+    🟢 [A1-RPS] Total HTTP requests = 12427 (77% of expected 16050 for oscillating base=10 peak=40)
+    🟢 [B1] Error rate 46.78% — EXPECTED for under-provisioned baseline
+    🟢 [DURATION] Duration: 1187s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_b1_oscillating_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=59990ms | err=40.5% | reqs=12566
+    🟡 [A2] Prometheus has 3 scrape gaps >30s (max gap: 225s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟢 [A1] dropped_iterations = 3723 (expected for the under-provisioned lower bound)
+    🟢 [A1-RPS] Total HTTP requests = 12566 (78% of expected 16050 for oscillating base=10 peak=40)
+    🟢 [B1] Error rate 40.53% — EXPECTED for under-provisioned baseline
+    🟢 [DURATION] Duration: 1193s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_b1_oscillating_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=59990ms | err=40.0% | reqs=12306
+    🟡 [A2] Prometheus has 2 scrape gaps >30s (max gap: 405s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟢 [A1] dropped_iterations = 3983 (expected for the under-provisioned lower bound)
+    🟢 [A1-RPS] Total HTTP requests = 12306 (77% of expected 16050 for oscillating base=10 peak=40)
+    🟢 [B1] Error rate 40.02% — EXPECTED for under-provisioned baseline
+    🟢 [DURATION] Duration: 1198s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_b2_gradual_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=897ms | err=0.7% | reqs=17339
+    🟢 [C3] B2 p95 latency = 897ms — as expected for config b2
+    🟢 [DURATION] Duration: 1223s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_b2_gradual_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=825ms | err=0.7% | reqs=17339
+    🟢 [C3] B2 p95 latency = 825ms — as expected for config b2
+    🟢 [DURATION] Duration: 1200s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_b2_gradual_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=936ms | err=0.7% | reqs=17339
+    🟢 [C3] B2 p95 latency = 936ms — as expected for config b2
+    🟢 [DURATION] Duration: 1195s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_b2_gradual_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=939ms | err=0.7% | reqs=17339
+    🟢 [C3] B2 p95 latency = 939ms — as expected for config b2
+    🟢 [DURATION] Duration: 1199s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_b2_gradual_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=867ms | err=0.7% | reqs=17339
+    🟢 [C3] B2 p95 latency = 867ms — as expected for config b2
+    🟢 [DURATION] Duration: 1193s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_b2_spike_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1340ms | err=0.6% | reqs=21689
+    🟢 [C3] B2 p95 latency = 1340ms — as expected for config b2
+    🟢 [DURATION] Duration: 1217s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_b2_spike_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1200ms | err=0.6% | reqs=21689
+    🟢 [C3] B2 p95 latency = 1200ms — as expected for config b2
+    🟢 [DURATION] Duration: 1192s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_b2_spike_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1100ms | err=0.6% | reqs=21689
+    🟢 [C3] B2 p95 latency = 1100ms — as expected for config b2
+    🟢 [DURATION] Duration: 1195s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_b2_spike_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1310ms | err=0.6% | reqs=21689
+    🟢 [C3] B2 p95 latency = 1310ms — as expected for config b2
+    🟢 [DURATION] Duration: 1195s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_b2_spike_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1110ms | err=0.6% | reqs=21689
+    🟢 [C3] B2 p95 latency = 1110ms — as expected for config b2
+    🟢 [DURATION] Duration: 1195s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_b2_oscillating_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=996ms | err=0.7% | reqs=16289
+    🟢 [C3] B2 p95 latency = 996ms — as expected for config b2
+    🟢 [DURATION] Duration: 1217s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_b2_oscillating_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=918ms | err=0.7% | reqs=16289
+    🟢 [C3] B2 p95 latency = 918ms — as expected for config b2
+    🟢 [DURATION] Duration: 1195s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_b2_oscillating_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1020ms | err=0.7% | reqs=16289
+    🟢 [C3] B2 p95 latency = 1020ms — as expected for config b2
+    🟢 [DURATION] Duration: 1195s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_b2_oscillating_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=884ms | err=0.7% | reqs=16289
+    🟢 [C3] B2 p95 latency = 884ms — as expected for config b2
+    🟢 [DURATION] Duration: 1194s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_b2_oscillating_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=986ms | err=0.7% | reqs=16289
+    🟢 [C3] B2 p95 latency = 986ms — as expected for config b2
+    🟢 [DURATION] Duration: 1194s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h1_gradual_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1080ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 6
+    🟢 [C2] Autoscaler h1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1199s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h1_gradual_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1120ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [2, 4, 4] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 7
+    🟢 [C2] Autoscaler h1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1176s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h1_gradual_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1270ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 5
+    🟢 [C2] Autoscaler h1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h1_gradual_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1130ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [B4] Thrashing detected: 9 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h1_gradual_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1080ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 4] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 7
+    🟢 [C2] Autoscaler h1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1178s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_h1_spike_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=13520ms | err=2.0% | reqs=21551
+    🟡 [A1] dropped_iterations = 138 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [4, 5, 5] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 7
+    🟢 [C2] Autoscaler h1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1199s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_h1_spike_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=7150ms | err=0.9% | reqs=21666
+    🟡 [A1] dropped_iterations = 23 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 5
+    🟢 [C2] Autoscaler h1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_h1_spike_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=48040ms | err=4.8% | reqs=20794
+    🔴 [A1] dropped_iterations = 895 (k6 could not maintain target RPS)
+    🟡 [A2] Prometheus has 1 scrape gaps >30s (max gap: 90s)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 5, 5] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 7
+    🟢 [C2] Autoscaler h1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1178s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_h1_spike_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=11050ms | err=1.0% | reqs=21688
+    🟡 [A1] dropped_iterations = 1 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 5
+    🟢 [C2] Autoscaler h1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_h1_spike_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=31020ms | err=3.3% | reqs=21227
+    🔴 [A1] dropped_iterations = 462 (k6 could not maintain target RPS)
+    🟡 [A2] Prometheus has 1 scrape gaps >30s (max gap: 45s)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [5, 5, 5] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 7
+    🟢 [C2] Autoscaler h1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1183s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_h1_oscillating_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=11330ms | err=1.4% | reqs=16223
+    🟡 [A1] dropped_iterations = 66 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 4
+    🟢 [C2] Autoscaler h1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1184s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_h1_oscillating_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=7500ms | err=1.6% | reqs=16256
+    🟡 [A1] dropped_iterations = 33 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 5
+    🟢 [C2] Autoscaler h1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1178s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h1_oscillating_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=7270ms | err=1.0% | reqs=16289
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 5
+    🟢 [C2] Autoscaler h1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_h1_oscillating_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=7540ms | err=1.7% | reqs=16259
+    🟡 [A1] dropped_iterations = 30 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 5
+    🟢 [C2] Autoscaler h1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_h1_oscillating_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=9000ms | err=1.6% | reqs=16208
+    🟡 [A1] dropped_iterations = 81 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 5
+    🟢 [C2] Autoscaler h1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h2_gradual_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=941ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 5, 5] — acceptable for auth autoscaler run
+    🟢 [B4] Thrashing detected: 9 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h2 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h2_gradual_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=947ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [4, 4, 4] — acceptable for auth autoscaler run
+    🟢 [B4] Thrashing detected: 11 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h2 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1176s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h2_gradual_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1070ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 4, 4] — acceptable for auth autoscaler run
+    🟢 [B4] Thrashing detected: 11 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h2 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1176s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h2_gradual_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1000ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [4, 5, 5] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 5
+    🟢 [C2] Autoscaler h2 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1176s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h2_gradual_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1010ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [4, 4, 4] — acceptable for auth autoscaler run
+    🟢 [B4] Thrashing detected: 11 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h2 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1178s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h2_spike_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1500ms | err=0.6% | reqs=21689
+    🟢 [A4] Ready replicas in the post-warm-up load window = [4, 4, 5] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 6
+    🟢 [C2] Autoscaler h2 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1176s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h2_spike_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=3810ms | err=0.6% | reqs=21689
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 4, 4] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 8
+    🟢 [C2] Autoscaler h2 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1179s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h2_spike_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1310ms | err=0.6% | reqs=21689
+    🟢 [A4] Ready replicas in the post-warm-up load window = [4, 4, 4] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 6
+    🟢 [C2] Autoscaler h2 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_h2_spike_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=9250ms | err=1.1% | reqs=21680
+    🟡 [A1] dropped_iterations = 9 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [B4] Thrashing detected: 12 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h2 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1178s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_h2_spike_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=7970ms | err=1.0% | reqs=21685
+    🟡 [A1] dropped_iterations = 4 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 4] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 8
+    🟢 [C2] Autoscaler h2 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_h2_oscillating_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=11190ms | err=2.3% | reqs=16124
+    🟡 [A1] dropped_iterations = 165 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [4, 4, 4] — acceptable for auth autoscaler run
+    🟢 [B4] Thrashing detected: 13 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h2 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1178s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h2_oscillating_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=7030ms | err=0.8% | reqs=16289
+    🟢 [A4] Ready replicas in the post-warm-up load window = [4, 4, 4] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 8
+    🟢 [C2] Autoscaler h2 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1176s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_h2_oscillating_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=22200ms | err=2.5% | reqs=16048
+    🔴 [A1] dropped_iterations = 241 (k6 could not maintain target RPS)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [B4] Thrashing detected: 10 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h2 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h2_oscillating_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1670ms | err=0.7% | reqs=16289
+    🟢 [A4] Ready replicas in the post-warm-up load window = [4, 4, 5] — acceptable for auth autoscaler run
+    🟢 [B4] Scaling events: 6
+    🟢 [C2] Autoscaler h2 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1176s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_h2_oscillating_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=18060ms | err=2.1% | reqs=16163
+    🟡 [A1] dropped_iterations = 126 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [B4] Thrashing detected: 16 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h2 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h3_gradual_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=924ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 14 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h3 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1228s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h3_gradual_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1260ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 4] — acceptable for auth autoscaler run
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 11 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h3 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1178s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h3_gradual_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1080ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 4] — acceptable for auth autoscaler run
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 10 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h3 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1182s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h3_gradual_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=993ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 11 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h3 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1190s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h3_gradual_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1010ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 12 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h3 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_h3_spike_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1550ms | err=0.6% | reqs=21689
+    🔴 [A2] prom_http_requests_rate.json has ZERO result series
+    🔴 [B5] prom_http_requests_rate.json has ZERO result series — Prometheus is NOT scraping!
+    🔴 [B5] prom_cpu_usage.json has ZERO result series — Prometheus is NOT scraping!
+    🟡 [A4] Replica count metrics missing/empty — cannot verify replicas at load onset
+    🟡 [REPLICA] prom_replica_count.json has 0 result series (kube-state-metrics may not have been running)
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 12 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [DURATION] Duration: 1218s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_h3_spike_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=2090ms | err=0.6% | reqs=21689
+    🔴 [A2] prom_http_requests_rate.json has ZERO result series
+    🔴 [B5] prom_http_requests_rate.json has ZERO result series — Prometheus is NOT scraping!
+    🔴 [B5] prom_cpu_usage.json has ZERO result series — Prometheus is NOT scraping!
+    🟡 [A4] Replica count metrics missing/empty — cannot verify replicas at load onset
+    🟡 [REPLICA] prom_replica_count.json has 0 result series (kube-state-metrics may not have been running)
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 22 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [DURATION] Duration: 1209s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_h3_spike_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=4190ms | err=0.6% | reqs=21689
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 11 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h3 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_h3_spike_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=30110ms | err=4.8% | reqs=21343
+    🔴 [A1] dropped_iterations = 346 (k6 could not maintain target RPS)
+    🟡 [A2] Prometheus max scrape gap = 30s (slightly elevated)
+    🟡 [H3] Observed one transient FailedGetPodsMetric on auth-service, but HPA recovered and continued scaling
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 10 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h3 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1179s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_h3_spike_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=5170ms | err=0.8% | reqs=21684
+    🟡 [A1] dropped_iterations = 5 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 5] — acceptable for auth autoscaler run
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 11 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h3 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_h3_oscillating_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=9170ms | err=1.0% | reqs=16289
+    🔴 [A2] prom_http_requests_rate.json has ZERO result series
+    🔴 [B5] prom_http_requests_rate.json has ZERO result series — Prometheus is NOT scraping!
+    🔴 [B5] prom_cpu_usage.json has ZERO result series — Prometheus is NOT scraping!
+    🟡 [A4] Replica count metrics missing/empty — cannot verify replicas at load onset
+    🟡 [REPLICA] prom_replica_count.json has 0 result series (kube-state-metrics may not have been running)
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 25 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [DURATION] Duration: 1208s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_h3_oscillating_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=26750ms | err=3.4% | reqs=16090
+    🔴 [A2] prom_http_requests_rate.json has ZERO result series
+    🔴 [B5] prom_http_requests_rate.json has ZERO result series — Prometheus is NOT scraping!
+    🔴 [B5] prom_cpu_usage.json has ZERO result series — Prometheus is NOT scraping!
+    🟡 [A1] dropped_iterations = 199 (small under-delivery)
+    🟡 [A4] Replica count metrics missing/empty — cannot verify replicas at load onset
+    🟡 [H3] Observed one transient FailedGetPodsMetric on auth-service, but HPA recovered and continued scaling
+    🟡 [REPLICA] prom_replica_count.json has 0 result series (kube-state-metrics may not have been running)
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 27 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [DURATION] Duration: 1210s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_h3_oscillating_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=37840ms | err=5.3% | reqs=15907
+    🔴 [A1] dropped_iterations = 382 (k6 could not maintain target RPS)
+    🟡 [A2] Prometheus max scrape gap = 30s (slightly elevated)
+    🟡 [H3] Observed one transient FailedGetPodsMetric on auth-service, but HPA recovered and continued scaling
+    🟡 [B1] Error rate 5.31% on H3 — check custom metric adapter
+    🟢 [A4] Ready replicas in the post-warm-up load window = [4, 4, 4] — acceptable for auth autoscaler run
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 12 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h3 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_h3_oscillating_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=29580ms | err=4.8% | reqs=15973
+    🔴 [A1] dropped_iterations = 316 (k6 could not maintain target RPS)
+    🟡 [H3] Observed one transient FailedGetPodsMetric on auth-service, but HPA recovered and continued scaling
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 5] — acceptable for auth autoscaler run
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 11 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h3 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1177s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_h3_oscillating_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=38340ms | err=5.0% | reqs=15890
+    🔴 [A1] dropped_iterations = 399 (k6 could not maintain target RPS)
+    🟡 [A2] Prometheus max scrape gap = 30s (slightly elevated)
+    🟡 [H3] Observed one transient FailedGetPodsMetric on auth-service, but HPA recovered and continued scaling
+    🟢 [A4] Ready replicas in the post-warm-up load window = [2, 4, 4] — acceptable for auth autoscaler run
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 10 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler h3 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1179s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_k1_gradual_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1110ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 4, 4] — acceptable for auth autoscaler run
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 25 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1182s (19m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_k1_gradual_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=969ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 4] — acceptable for auth autoscaler run
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 30 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1238s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_k1_gradual_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=981ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 4, 4] — acceptable for auth autoscaler run
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 30 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1243s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_k1_gradual_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=953ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 30 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1238s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS | auth-service_k1_gradual_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1030ms | err=0.7% | reqs=17339
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 30 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1237s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_k1_spike_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: err=52.5% | reqs=16291
+    🔴 [A1] dropped_iterations = 5398 (k6 could not maintain target RPS)
+    🔴 [A2] prom_http_requests_rate.json has ZERO result series
+    🔴 [B5] prom_http_requests_rate.json has ZERO result series — Prometheus is NOT scraping!
+    🔴 [B5] prom_cpu_usage.json has ZERO result series — Prometheus is NOT scraping!
+    🟡 [A1-RPS] Total HTTP requests = 16291 (76% of expected 21450 for spike base=10 peak=40)
+    🟡 [A4] Replica count metrics missing/empty — cannot verify replicas at load onset
+    🟡 [B1] Error rate 52.51% on K1 — check if KEDA scaled properly
+    🟡 [REPLICA] prom_replica_count.json has 0 result series (kube-state-metrics may not have been running)
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 40 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [DURATION] Duration: 1217s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_k1_spike_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=9260ms | err=0.8% | reqs=21673
+    🟡 [A1] dropped_iterations = 16 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 5, 4] — acceptable for auth autoscaler run
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 17 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1226s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_k1_spike_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=27190ms | err=3.4% | reqs=21462
+    🔴 [A1] dropped_iterations = 227 (k6 could not maintain target RPS)
+    🟡 [A2] Prometheus max scrape gap = 30s (slightly elevated)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 5] — acceptable for auth autoscaler run
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 24 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1236s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_k1_spike_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=6780ms | err=1.0% | reqs=21679
+    🟡 [A1] dropped_iterations = 10 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 4] — acceptable for auth autoscaler run
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 26 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1239s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_k1_spike_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=9990ms | err=1.8% | reqs=21553
+    🟡 [A1] dropped_iterations = 136 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [4, 4, 4] — acceptable for auth autoscaler run
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 25 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1238s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_k1_oscillating_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: err=27.6% | reqs=15124
+    🔴 [A1] dropped_iterations = 1165 (k6 could not maintain target RPS)
+    🔴 [A2] Prometheus has 3 scrape gaps >30s (max gap: 135s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟡 [B1] Error rate 27.59% on K1 — check if KEDA scaled properly
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 20 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 4 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1242s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_k1_oscillating_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: err=25.7% | reqs=14608
+    🔴 [A1] dropped_iterations = 1681 (k6 could not maintain target RPS)
+    🟡 [A2] Prometheus has 2 scrape gaps >30s (max gap: 225s)
+    🟡 [B1] Error rate 25.73% on K1 — check if KEDA scaled properly
+    🟢 [A4] Ready replicas in the post-warm-up load window = [5, 5, 5] — acceptable for auth autoscaler run
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 22 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1303s (21m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_k1_oscillating_rep3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=14290ms | err=1.8% | reqs=16286
+    🟡 [A1] dropped_iterations = 3 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 5] — acceptable for auth autoscaler run
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 27 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1243s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_k1_oscillating_rep4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=11440ms | err=1.6% | reqs=16279
+    🟡 [A1] dropped_iterations = 10 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 24 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1239s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_k1_oscillating_rep5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=12830ms | err=1.1% | reqs=16284
+    🟡 [A1] dropped_iterations = 5 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 3, 3] — acceptable for auth autoscaler run
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 26 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1243s (20m)
+
+
+================================================================================
+  SUMMARY MATRIX
+================================================================================
+
+Run ID                                        Status       p95(ms)    Err%     Reqs    
+─────────────────────────────────────────────────────────────────────────────────────
+auth-service_b1_gradual_rep1                  🟡 WARN       N/A        54.0     13565   
+auth-service_b1_gradual_rep2                  🟡 WARN       59990      51.8     13830   
+auth-service_b1_gradual_rep3                  🟡 WARN       59990      52.3     13763   
+auth-service_b1_gradual_rep4                  🟡 WARN       59990      50.3     13588   
+auth-service_b1_gradual_rep5                  🟡 WARN       59990      51.9     13837   
+auth-service_b1_spike_rep1                    🟡 WARN       N/A        58.1     15642   
+auth-service_b1_spike_rep2                    🟡 WARN       59990      58.5     15986   
+auth-service_b1_spike_rep3                    🟡 WARN       59990      59.2     15628   
+auth-service_b1_spike_rep4                    🟡 WARN       59990      58.5     15829   
+auth-service_b1_spike_rep5                    🟡 WARN       59990      58.8     15597   
+auth-service_b1_oscillating_rep1              🟡 WARN       N/A        48.8     12546   
+auth-service_b1_oscillating_rep2              🟡 WARN       59990      46.0     12373   
+auth-service_b1_oscillating_rep3              🟡 WARN       59990      46.8     12427   
+auth-service_b1_oscillating_rep4              🟡 WARN       59990      40.5     12566   
+auth-service_b1_oscillating_rep5              🟡 WARN       59990      40.0     12306   
+auth-service_b2_gradual_rep1                  ✅ OK         897        0.7      17339   
+auth-service_b2_gradual_rep2                  ✅ OK         825        0.7      17339   
+auth-service_b2_gradual_rep3                  ✅ OK         936        0.7      17339   
+auth-service_b2_gradual_rep4                  ✅ OK         939        0.7      17339   
+auth-service_b2_gradual_rep5                  ✅ OK         867        0.7      17339   
+auth-service_b2_spike_rep1                    ✅ OK         1340       0.6      21689   
+auth-service_b2_spike_rep2                    ✅ OK         1200       0.6      21689   
+auth-service_b2_spike_rep3                    ✅ OK         1100       0.6      21689   
+auth-service_b2_spike_rep4                    ✅ OK         1310       0.6      21689   
+auth-service_b2_spike_rep5                    ✅ OK         1110       0.6      21689   
+auth-service_b2_oscillating_rep1              ✅ OK         996        0.7      16289   
+auth-service_b2_oscillating_rep2              ✅ OK         918        0.7      16289   
+auth-service_b2_oscillating_rep3              ✅ OK         1020       0.7      16289   
+auth-service_b2_oscillating_rep4              ✅ OK         884        0.7      16289   
+auth-service_b2_oscillating_rep5              ✅ OK         986        0.7      16289   
+auth-service_h1_gradual_rep1                  ✅ OK         1080       0.7      17339   
+auth-service_h1_gradual_rep2                  ✅ OK         1120       0.7      17339   
+auth-service_h1_gradual_rep3                  ✅ OK         1270       0.7      17339   
+auth-service_h1_gradual_rep4                  ✅ OK         1130       0.7      17339   
+auth-service_h1_gradual_rep5                  ✅ OK         1080       0.7      17339   
+auth-service_h1_spike_rep1                    🟡 WARN       13520      2.0      21551   
+auth-service_h1_spike_rep2                    🟡 WARN       7150       0.9      21666   
+auth-service_h1_spike_rep3                    🔴 CRIT       48040      4.8      20794   
+auth-service_h1_spike_rep4                    🟡 WARN       11050      1.0      21688   
+auth-service_h1_spike_rep5                    🔴 CRIT       31020      3.3      21227   
+auth-service_h1_oscillating_rep1              🟡 WARN       11330      1.4      16223   
+auth-service_h1_oscillating_rep2              🟡 WARN       7500       1.6      16256   
+auth-service_h1_oscillating_rep3              ✅ OK         7270       1.0      16289   
+auth-service_h1_oscillating_rep4              🟡 WARN       7540       1.7      16259   
+auth-service_h1_oscillating_rep5              🟡 WARN       9000       1.6      16208   
+auth-service_h2_gradual_rep1                  ✅ OK         941        0.7      17339   
+auth-service_h2_gradual_rep2                  ✅ OK         947        0.7      17339   
+auth-service_h2_gradual_rep3                  ✅ OK         1070       0.7      17339   
+auth-service_h2_gradual_rep4                  ✅ OK         1000       0.7      17339   
+auth-service_h2_gradual_rep5                  ✅ OK         1010       0.7      17339   
+auth-service_h2_spike_rep1                    ✅ OK         1500       0.6      21689   
+auth-service_h2_spike_rep2                    ✅ OK         3810       0.6      21689   
+auth-service_h2_spike_rep3                    ✅ OK         1310       0.6      21689   
+auth-service_h2_spike_rep4                    🟡 WARN       9250       1.1      21680   
+auth-service_h2_spike_rep5                    🟡 WARN       7970       1.0      21685   
+auth-service_h2_oscillating_rep1              🟡 WARN       11190      2.3      16124   
+auth-service_h2_oscillating_rep2              ✅ OK         7030       0.8      16289   
+auth-service_h2_oscillating_rep3              🔴 CRIT       22200      2.5      16048   
+auth-service_h2_oscillating_rep4              ✅ OK         1670       0.7      16289   
+auth-service_h2_oscillating_rep5              🟡 WARN       18060      2.1      16163   
+auth-service_h3_gradual_rep1                  ✅ OK         924        0.7      17339   
+auth-service_h3_gradual_rep2                  ✅ OK         1260       0.7      17339   
+auth-service_h3_gradual_rep3                  ✅ OK         1080       0.7      17339   
+auth-service_h3_gradual_rep4                  ✅ OK         993        0.7      17339   
+auth-service_h3_gradual_rep5                  ✅ OK         1010       0.7      17339   
+auth-service_h3_spike_rep1                    🔴 CRIT       1550       0.6      21689   
+auth-service_h3_spike_rep2                    🔴 CRIT       2090       0.6      21689   
+auth-service_h3_spike_rep3                    ✅ OK         4190       0.6      21689   
+auth-service_h3_spike_rep4                    🔴 CRIT       30110      4.8      21343   
+auth-service_h3_spike_rep5                    🟡 WARN       5170       0.8      21684   
+auth-service_h3_oscillating_rep1              🔴 CRIT       9170       1.0      16289   
+auth-service_h3_oscillating_rep2              🔴 CRIT       26750      3.4      16090   
+auth-service_h3_oscillating_rep3              🔴 CRIT       37840      5.3      15907   
+auth-service_h3_oscillating_rep4              🔴 CRIT       29580      4.8      15973   
+auth-service_h3_oscillating_rep5              🔴 CRIT       38340      5.0      15890   
+auth-service_k1_gradual_rep1                  ✅ OK         1110       0.7      17339   
+auth-service_k1_gradual_rep2                  ✅ OK         969        0.7      17339   
+auth-service_k1_gradual_rep3                  ✅ OK         981        0.7      17339   
+auth-service_k1_gradual_rep4                  ✅ OK         953        0.7      17339   
+auth-service_k1_gradual_rep5                  ✅ OK         1030       0.7      17339   
+auth-service_k1_spike_rep1                    🔴 CRIT       N/A        52.5     16291   
+auth-service_k1_spike_rep2                    🟡 WARN       9260       0.8      21673   
+auth-service_k1_spike_rep3                    🔴 CRIT       27190      3.4      21462   
+auth-service_k1_spike_rep4                    🟡 WARN       6780       1.0      21679   
+auth-service_k1_spike_rep5                    🟡 WARN       9990       1.8      21553   
+auth-service_k1_oscillating_rep1              🔴 CRIT       N/A        27.6     15124   
+auth-service_k1_oscillating_rep2              🔴 CRIT       N/A        25.7     14608   
+auth-service_k1_oscillating_rep3              🟡 WARN       14290      1.8      16286   
+auth-service_k1_oscillating_rep4              🟡 WARN       11440      1.6      16279   
+auth-service_k1_oscillating_rep5              🟡 WARN       12830      1.1      16284   
+
+================================================================================
+  FINAL VERDICT
+================================================================================
+  Total runs analyzed:   90/90
+  🔴 Critical issues:    27
+  🟡 Warnings:           77
+
+  ⛔ EXPERIMENT HAS CRITICAL ISSUES — some runs may need to be re-executed.
+  ⚠️  77 warnings detected — review individually above.
+

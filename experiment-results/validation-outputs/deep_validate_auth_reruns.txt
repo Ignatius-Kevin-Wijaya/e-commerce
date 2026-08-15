@@ -1,0 +1,143 @@
+﻿================================================================================
+  DEEP EXPERIMENT VALIDATION
+  Checking for both data quality and selected-scope completeness
+================================================================================
+
+
+────────────────────────────────────────────────────────────────────────────────
+  DETAILED RESULTS PER RUN
+────────────────────────────────────────────────────────────────────────────────
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_h3_spike_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=1550ms | err=0.6% | reqs=21689
+    🔴 [A2] prom_http_requests_rate.json has ZERO result series
+    🔴 [B5] prom_http_requests_rate.json has ZERO result series — Prometheus is NOT scraping!
+    🔴 [B5] prom_cpu_usage.json has ZERO result series — Prometheus is NOT scraping!
+    🟡 [A4] Replica count metrics missing/empty — cannot verify replicas at load onset
+    🟡 [REPLICA] prom_replica_count.json has 0 result series (kube-state-metrics may not have been running)
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 12 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [DURATION] Duration: 1218s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_h3_spike_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=2090ms | err=0.6% | reqs=21689
+    🔴 [A2] prom_http_requests_rate.json has ZERO result series
+    🔴 [B5] prom_http_requests_rate.json has ZERO result series — Prometheus is NOT scraping!
+    🔴 [B5] prom_cpu_usage.json has ZERO result series — Prometheus is NOT scraping!
+    🟡 [A4] Replica count metrics missing/empty — cannot verify replicas at load onset
+    🟡 [REPLICA] prom_replica_count.json has 0 result series (kube-state-metrics may not have been running)
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 22 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [DURATION] Duration: 1209s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_h3_oscillating_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=9170ms | err=1.0% | reqs=16289
+    🔴 [A2] prom_http_requests_rate.json has ZERO result series
+    🔴 [B5] prom_http_requests_rate.json has ZERO result series — Prometheus is NOT scraping!
+    🔴 [B5] prom_cpu_usage.json has ZERO result series — Prometheus is NOT scraping!
+    🟡 [A4] Replica count metrics missing/empty — cannot verify replicas at load onset
+    🟡 [REPLICA] prom_replica_count.json has 0 result series (kube-state-metrics may not have been running)
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 25 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [DURATION] Duration: 1208s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_h3_oscillating_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=26750ms | err=3.4% | reqs=16090
+    🔴 [A2] prom_http_requests_rate.json has ZERO result series
+    🔴 [B5] prom_http_requests_rate.json has ZERO result series — Prometheus is NOT scraping!
+    🔴 [B5] prom_cpu_usage.json has ZERO result series — Prometheus is NOT scraping!
+    🟡 [A1] dropped_iterations = 199 (small under-delivery)
+    🟡 [A4] Replica count metrics missing/empty — cannot verify replicas at load onset
+    🟡 [H3] Observed one transient FailedGetPodsMetric on auth-service, but HPA recovered and continued scaling
+    🟡 [REPLICA] prom_replica_count.json has 0 result series (kube-state-metrics may not have been running)
+    🟢 [H3] HPA status references pods/http_requests_per_second
+    🟢 [B4] Thrashing detected: 27 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [DURATION] Duration: 1210s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_k1_spike_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: err=52.5% | reqs=16291
+    🔴 [A1] dropped_iterations = 5398 (k6 could not maintain target RPS)
+    🔴 [A2] prom_http_requests_rate.json has ZERO result series
+    🔴 [B5] prom_http_requests_rate.json has ZERO result series — Prometheus is NOT scraping!
+    🔴 [B5] prom_cpu_usage.json has ZERO result series — Prometheus is NOT scraping!
+    🟡 [A1-RPS] Total HTTP requests = 16291 (76% of expected 21450 for spike base=10 peak=40)
+    🟡 [A4] Replica count metrics missing/empty — cannot verify replicas at load onset
+    🟡 [B1] Error rate 52.51% on K1 — check if KEDA scaled properly
+    🟡 [REPLICA] prom_replica_count.json has 0 result series (kube-state-metrics may not have been running)
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 40 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [DURATION] Duration: 1217s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🟡 WARNING | auth-service_k1_spike_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: p95=9260ms | err=0.8% | reqs=21673
+    🟡 [A1] dropped_iterations = 16 (small under-delivery)
+    🟢 [A4] Ready replicas in the post-warm-up load window = [3, 5, 4] — acceptable for auth autoscaler run
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 17 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1226s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_k1_oscillating_rep1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: err=27.6% | reqs=15124
+    🔴 [A1] dropped_iterations = 1165 (k6 could not maintain target RPS)
+    🔴 [A2] Prometheus has 3 scrape gaps >30s (max gap: 135s)
+    🟡 [A4] Could not identify the active load window from Prometheus RPS data
+    🟡 [B1] Error rate 27.59% on K1 — check if KEDA scaled properly
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 20 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 4 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1242s (20m)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 CRITICAL | auth-service_k1_oscillating_rep2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  k6 Summary: err=25.7% | reqs=14608
+    🔴 [A1] dropped_iterations = 1681 (k6 could not maintain target RPS)
+    🟡 [A2] Prometheus has 2 scrape gaps >30s (max gap: 225s)
+    🟡 [B1] Error rate 25.73% on K1 — check if KEDA scaled properly
+    🟢 [A4] Ready replicas in the post-warm-up load window = [5, 5, 5] — acceptable for auth autoscaler run
+    🟢 [A5] KEDA ScaledObject Ready: True ✅
+    🟢 [B4] Thrashing detected: 22 scaling events (>8) — this is VALID DATA for thesis
+    🟢 [C2] Autoscaler k1 scaled auth-service to 5 replicas — EXPECTED for CPU-bound service
+    🟢 [DURATION] Duration: 1303s (21m)
+
+
+================================================================================
+  SUMMARY MATRIX
+================================================================================
+
+Run ID                                        Status       p95(ms)    Err%     Reqs    
+─────────────────────────────────────────────────────────────────────────────────────
+auth-service_h3_spike_rep1                    🔴 CRIT       1550       0.6      21689   
+auth-service_h3_spike_rep2                    🔴 CRIT       2090       0.6      21689   
+auth-service_h3_oscillating_rep1              🔴 CRIT       9170       1.0      16289   
+auth-service_h3_oscillating_rep2              🔴 CRIT       26750      3.4      16090   
+auth-service_k1_spike_rep1                    🔴 CRIT       N/A        52.5     16291   
+auth-service_k1_spike_rep2                    🟡 WARN       9260       0.8      21673   
+auth-service_k1_oscillating_rep1              🔴 CRIT       N/A        27.6     15124   
+auth-service_k1_oscillating_rep2              🔴 CRIT       N/A        25.7     14608   
+
+================================================================================
+  FINAL VERDICT
+================================================================================
+  Total runs analyzed:   8/8
+  🔴 Critical issues:    19
+  🟡 Warnings:           19
+
+  ⛔ EXPERIMENT HAS CRITICAL ISSUES — some runs may need to be re-executed.
+  ⚠️  19 warnings detected — review individually above.
+

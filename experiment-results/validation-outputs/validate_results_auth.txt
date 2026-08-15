@@ -1,0 +1,194 @@
+================================================================
+  EXPERIMENT RESULTS VALIDATION
+================================================================
+
+── auth-service_b1_gradual_rep1 ──
+  🟢 INFO: k6 dropped 3774 iterations (expected for under-provisioned baseline)
+  🟢 INFO: Error rate 53.97% (expected for under-provisioned baseline)
+  🟡 WARNING: 1 Prometheus scrape gaps >30s
+
+── auth-service_b1_gradual_rep2 ──
+  🟢 INFO: k6 dropped 3509 iterations (expected for under-provisioned baseline)
+  🟢 INFO: Error rate 51.78% (expected for under-provisioned baseline)
+  🟡 WARNING: 1 Prometheus scrape gaps >30s
+
+── auth-service_b1_gradual_rep3 ──
+  🟢 INFO: k6 dropped 3576 iterations (expected for under-provisioned baseline)
+  🟢 INFO: Error rate 52.33% (expected for under-provisioned baseline)
+  🟡 WARNING: 1 Prometheus scrape gaps >30s
+
+── auth-service_b1_gradual_rep4 ──
+  🟢 INFO: k6 dropped 3751 iterations (expected for under-provisioned baseline)
+  🟢 INFO: Error rate 50.26% (expected for under-provisioned baseline)
+  🟡 WARNING: 1 Prometheus scrape gaps >30s
+
+── auth-service_b1_gradual_rep5 ──
+  🟢 INFO: k6 dropped 3502 iterations (expected for under-provisioned baseline)
+  🟢 INFO: Error rate 51.89% (expected for under-provisioned baseline)
+  🟡 WARNING: 1 Prometheus scrape gaps >30s
+
+── auth-service_b1_oscillating_rep1 ──
+  🟢 INFO: k6 dropped 3743 iterations (expected for under-provisioned baseline)
+  🟢 INFO: Error rate 48.81% (expected for under-provisioned baseline)
+  🟡 WARNING: 2 Prometheus scrape gaps >30s
+
+── auth-service_b1_oscillating_rep2 ──
+  🟢 INFO: k6 dropped 3916 iterations (expected for under-provisioned baseline)
+  🟢 INFO: Error rate 46.05% (expected for under-provisioned baseline)
+  🟡 WARNING: 2 Prometheus scrape gaps >30s
+
+── auth-service_b1_oscillating_rep3 ──
+  🟢 INFO: k6 dropped 3862 iterations (expected for under-provisioned baseline)
+  🟢 INFO: Error rate 46.78% (expected for under-provisioned baseline)
+  🟡 WARNING: 2 Prometheus scrape gaps >30s
+
+── auth-service_b1_oscillating_rep4 ──
+  🟢 INFO: k6 dropped 3723 iterations (expected for under-provisioned baseline)
+  🟢 INFO: Error rate 40.53% (expected for under-provisioned baseline)
+  🟡 WARNING: 3 Prometheus scrape gaps >30s
+
+── auth-service_b1_oscillating_rep5 ──
+  🟢 INFO: k6 dropped 3983 iterations (expected for under-provisioned baseline)
+  🟢 INFO: Error rate 40.02% (expected for under-provisioned baseline)
+  🟡 WARNING: 2 Prometheus scrape gaps >30s
+
+── auth-service_b1_spike_rep1 ──
+  🟢 INFO: k6 dropped 6047 iterations (expected for under-provisioned baseline)
+  🟢 INFO: Error rate 58.10% (expected for under-provisioned baseline)
+  🟡 WARNING: 1 Prometheus scrape gaps >30s
+
+── auth-service_b1_spike_rep2 ──
+  🟢 INFO: k6 dropped 5703 iterations (expected for under-provisioned baseline)
+  🟢 INFO: Error rate 58.54% (expected for under-provisioned baseline)
+  🟡 WARNING: 1 Prometheus scrape gaps >30s
+
+── auth-service_b1_spike_rep3 ──
+  🟢 INFO: k6 dropped 6061 iterations (expected for under-provisioned baseline)
+  🟢 INFO: Error rate 59.23% (expected for under-provisioned baseline)
+  🟡 WARNING: 1 Prometheus scrape gaps >30s
+
+── auth-service_b1_spike_rep4 ──
+  🟢 INFO: k6 dropped 5860 iterations (expected for under-provisioned baseline)
+  🟢 INFO: Error rate 58.51% (expected for under-provisioned baseline)
+  🟡 WARNING: 1 Prometheus scrape gaps >30s
+
+── auth-service_b1_spike_rep5 ──
+  🟢 INFO: k6 dropped 6092 iterations (expected for under-provisioned baseline)
+  🟢 INFO: Error rate 58.79% (expected for under-provisioned baseline)
+  🟡 WARNING: 1 Prometheus scrape gaps >30s
+
+── auth-service_h1_oscillating_rep1 ──
+  🟡 WARNING: k6 dropped 66 iterations (small under-delivery)
+
+── auth-service_h1_oscillating_rep2 ──
+  🟡 WARNING: k6 dropped 33 iterations (small under-delivery)
+
+── auth-service_h1_oscillating_rep4 ──
+  🟡 WARNING: k6 dropped 30 iterations (small under-delivery)
+
+── auth-service_h1_oscillating_rep5 ──
+  🟡 WARNING: k6 dropped 81 iterations (small under-delivery)
+
+── auth-service_h1_spike_rep1 ──
+  🟡 WARNING: k6 dropped 138 iterations (small under-delivery)
+
+── auth-service_h1_spike_rep2 ──
+  🟡 WARNING: k6 dropped 23 iterations (small under-delivery)
+
+── auth-service_h1_spike_rep3 ──
+  🔴 CRITICAL: k6 dropped 895 iterations (under-delivered RPS)
+  🟡 WARNING: 1 Prometheus scrape gaps >30s
+
+── auth-service_h1_spike_rep4 ──
+  🟡 WARNING: k6 dropped 1 iterations (small under-delivery)
+
+── auth-service_h1_spike_rep5 ──
+  🔴 CRITICAL: k6 dropped 462 iterations (under-delivered RPS)
+  🟡 WARNING: 1 Prometheus scrape gaps >30s
+
+── auth-service_h2_oscillating_rep1 ──
+  🟡 WARNING: k6 dropped 165 iterations (small under-delivery)
+
+── auth-service_h2_oscillating_rep3 ──
+  🔴 CRITICAL: k6 dropped 241 iterations (under-delivered RPS)
+
+── auth-service_h2_oscillating_rep5 ──
+  🟡 WARNING: k6 dropped 126 iterations (small under-delivery)
+
+── auth-service_h2_spike_rep4 ──
+  🟡 WARNING: k6 dropped 9 iterations (small under-delivery)
+
+── auth-service_h2_spike_rep5 ──
+  🟡 WARNING: k6 dropped 4 iterations (small under-delivery)
+
+── auth-service_h3_oscillating_rep1 ──
+  🔴 CRITICAL: Prometheus data is empty or all zeros
+
+── auth-service_h3_oscillating_rep2 ──
+  🟡 WARNING: k6 dropped 199 iterations (small under-delivery)
+  🔴 CRITICAL: Prometheus data is empty or all zeros
+
+── auth-service_h3_oscillating_rep3 ──
+  🔴 CRITICAL: k6 dropped 382 iterations (under-delivered RPS)
+  🟡 WARNING: Error rate 5.31%
+
+── auth-service_h3_oscillating_rep4 ──
+  🔴 CRITICAL: k6 dropped 316 iterations (under-delivered RPS)
+
+── auth-service_h3_oscillating_rep5 ──
+  🔴 CRITICAL: k6 dropped 399 iterations (under-delivered RPS)
+
+── auth-service_h3_spike_rep1 ──
+  🔴 CRITICAL: Prometheus data is empty or all zeros
+
+── auth-service_h3_spike_rep2 ──
+  🔴 CRITICAL: Prometheus data is empty or all zeros
+
+── auth-service_h3_spike_rep4 ──
+  🔴 CRITICAL: k6 dropped 346 iterations (under-delivered RPS)
+
+── auth-service_h3_spike_rep5 ──
+  🟡 WARNING: k6 dropped 5 iterations (small under-delivery)
+
+── auth-service_k1_oscillating_rep1 ──
+  🔴 CRITICAL: k6 dropped 1165 iterations (under-delivered RPS)
+  🔴 CRITICAL: Error rate 27.59%
+  🔴 CRITICAL: 3 Prometheus scrape gaps >30s
+
+── auth-service_k1_oscillating_rep2 ──
+  🔴 CRITICAL: k6 dropped 1681 iterations (under-delivered RPS)
+  🔴 CRITICAL: Error rate 25.73%
+  🟡 WARNING: 2 Prometheus scrape gaps >30s
+
+── auth-service_k1_oscillating_rep3 ──
+  🟡 WARNING: k6 dropped 3 iterations (small under-delivery)
+
+── auth-service_k1_oscillating_rep4 ──
+  🟡 WARNING: k6 dropped 10 iterations (small under-delivery)
+
+── auth-service_k1_oscillating_rep5 ──
+  🟡 WARNING: k6 dropped 5 iterations (small under-delivery)
+
+── auth-service_k1_spike_rep1 ──
+  🔴 CRITICAL: k6 dropped 5398 iterations (under-delivered RPS)
+  🔴 CRITICAL: Error rate 52.51%
+  🔴 CRITICAL: Prometheus data is empty or all zeros
+
+── auth-service_k1_spike_rep2 ──
+  🟡 WARNING: k6 dropped 16 iterations (small under-delivery)
+
+── auth-service_k1_spike_rep3 ──
+  🔴 CRITICAL: k6 dropped 227 iterations (under-delivered RPS)
+
+── auth-service_k1_spike_rep4 ──
+  🟡 WARNING: k6 dropped 10 iterations (small under-delivery)
+
+── auth-service_k1_spike_rep5 ──
+  🟡 WARNING: k6 dropped 136 iterations (small under-delivery)
+
+================================================================
+  RESULTS: 90 runs scanned
+    🔴 Critical issues: 20
+    🟡 Warnings:        38
+    🟢 Info:            30
+================================================================
