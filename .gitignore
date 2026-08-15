@@ -58,6 +58,9 @@ test_output.txt
 .tools/
 .codex
 .codex-tmp/
+# Bundled Windows Python runtime (~289MB) used to run the validators locally.
+# Environment-specific and reproducible from python.org — never commit it.
+tools/
 
 # Thesis / generated artifacts
 thesis-figures/
@@ -67,6 +70,8 @@ experiment-results/artifacts/
 experiment-results/live_validation.log
 experiment-results/watcher.log
 experiment-results/shipping-run-*.log
+experiment-results/.experiment-state.bak-*
+calib-logs/
 *.pdf
 *.md
 !/thesis_blueprint.md
