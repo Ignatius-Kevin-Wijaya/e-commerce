@@ -20,8 +20,8 @@ NAMESPACE="${NAMESPACE:-ecommerce}"
 DEPLOYMENT="${DEPLOYMENT:-auth-service}"
 LOAD_PATTERN="${LOAD_PATTERN:-spike}"
 JOB_NAME="auth-${MODE}-${LOAD_PATTERN}-smoke"
-BASE_RPS="${AUTH_BASE_RPS:-10}"
-PEAK_RPS="${AUTH_PEAK_RPS:-40}"
+BASE_VUS="${AUTH_BASE_VUS:-2}"
+PEAK_VUS="${AUTH_PEAK_VUS:-12}"
 AUTH_ME_PERCENT="${AUTH_ME_PERCENT:-70}"
 AUTH_LOGIN_PERCENT="${AUTH_LOGIN_PERCENT:-30}"
 NUM_TEST_USERS="${NUM_TEST_USERS:-120}"
@@ -97,10 +97,10 @@ spec:
           env:
             - name: TARGET_URL
               value: "${TARGET_URL}"
-            - name: BASE_RPS
-              value: "${BASE_RPS}"
-            - name: PEAK_RPS
-              value: "${PEAK_RPS}"
+            - name: BASE_VUS
+              value: "${BASE_VUS}"
+            - name: PEAK_VUS
+              value: "${PEAK_VUS}"
             - name: AUTH_ME_PERCENT
               value: "${AUTH_ME_PERCENT}"
             - name: AUTH_LOGIN_PERCENT
@@ -133,7 +133,7 @@ spec:
 YAML
 
 echo "=== ${MODE} auth smoke start ==="
-echo "pattern=${LOAD_PATTERN} base_rps=${BASE_RPS} peak_rps=${PEAK_RPS} me=${AUTH_ME_PERCENT}% login=${AUTH_LOGIN_PERCENT}% users=${NUM_TEST_USERS}"
+echo "pattern=${LOAD_PATTERN} base_vus=${BASE_VUS} peak_vus=${PEAK_VUS} me=${AUTH_ME_PERCENT}% login=${AUTH_LOGIN_PERCENT}% users=${NUM_TEST_USERS}"
 
 for sample in $(seq 1 "${SAMPLES}"); do
   echo "=== ${MODE} sample ${sample}/${SAMPLES} ==="
