@@ -1,5 +1,6 @@
-# Prometheus for AKS — with resource requests to prevent BestEffort eviction
-# Blueprint Section 4, Layer 4: cpu 100m/500m, memory 256Mi/512Mi
+# Prometheus for AKS — persistent storage + headroom so an OOM/restart cannot
+# wipe the TSDB mid-campaign (root cause of the empty auth-service exports).
+# Storage: PVC (was emptyDir). cpu 100m/500m, memory 512Mi/1Gi. retention 2d.
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -158,6 +159,11 @@ metadata:
   namespace: monitoring
 spec:
   replicas: 1
+  # Recreate (not RollingUpdate): a ReadWriteOnce PVC cannot be attached to the
+  # old and new pod simultaneously, so a rolling update would deadlock on the
+  # volume. Recreate tears down the old pod before starting the new one.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: prometheus
@@ -166,6 +172,15 @@ spec:
       labels:
         app: prometheus
     spec:
+      # prom/prometheus runs as uid/gid 65534 (nobody). A freshly provisioned
+      # Azure Disk PVC is root-owned, so without fsGroup the container cannot
+      # write to /prometheus ("permission denied" → panic on startup). fsGroup
+      # makes the kubelet chown the mounted volume to gid 65534. (emptyDir never
+      # needed this because it is created writable for the pod.)
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
       serviceAccountName: prometheus
       containers:
         - name: prometheus
@@ -173,16 +188,20 @@ spec:
           args:
             - "--config.file=/etc/prometheus/prometheus.yaml"
             - "--storage.tsdb.path=/prometheus"
-            - "--storage.tsdb.retention.time=30d"
+            # 2d is ample: each run exports its metrics within ~3 min of finishing.
+            # The old 30d retention only bloated the in-memory head against the
+            # 512Mi limit, which is what drove the OOM/restart + TSDB loss.
+            - "--storage.tsdb.retention.time=2d"
+            - "--storage.tsdb.retention.size=8GB"
           ports:
             - containerPort: 9090
           resources:
             requests:
               cpu: "100m"
-              memory: "256Mi"
+              memory: "512Mi"
             limits:
               cpu: "500m"
-              memory: "512Mi"
+              memory: "1Gi"
           volumeMounts:
             - name: prometheus-config
               mountPath: /etc/prometheus/
@@ -193,7 +212,20 @@ spec:
           configMap:
             name: prometheus-config
         - name: prometheus-storage
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: prometheus-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-pvc
+  namespace: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
 ---
 apiVersion: v1
 kind: Service
