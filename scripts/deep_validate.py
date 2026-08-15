@@ -18,7 +18,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-RESULTS_DIR = Path("/home/kevin/Projects/e-commerce/experiment-results")
+RESULTS_DIR = Path(__file__).resolve().parent.parent / "experiment-results"
 SERVICES = ["shipping-rate-service", "auth-service"]
 CONFIGS = ["b1", "b2", "h1", "h2", "h3", "k1"]
 PATTERNS = ["gradual", "spike", "oscillating"]
