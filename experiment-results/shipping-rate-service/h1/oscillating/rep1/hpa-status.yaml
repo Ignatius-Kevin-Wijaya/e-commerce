@@ -4,13 +4,13 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"labels":{"experiment":"h1-hpa-default"},"name":"shipping-rate-service-hpa-default","namespace":"ecommerce"},"spec":{"maxReplicas":5,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":70,"type":"Utilization"}},"type":"Resource"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"shipping-rate-service"}}}
-  creationTimestamp: "2026-05-04T22:50:04Z"
+  creationTimestamp: "2026-08-15T19:04:47Z"
   labels:
     experiment: h1-hpa-default
   name: shipping-rate-service-hpa-default
   namespace: ecommerce
-  resourceVersion: "2886282"
-  uid: 393ad373-6673-4e4a-8fe0-ac7d994041ea
+  resourceVersion: "5406661"
+  uid: 8a7ca426-59a3-4452-a951-f8b3f9cb8eef
 spec:
   maxReplicas: 5
   metrics:
@@ -27,18 +27,18 @@ spec:
     name: shipping-rate-service
 status:
   conditions:
-  - lastTransitionTime: "2026-05-04T22:50:19Z"
+  - lastTransitionTime: "2026-08-15T19:05:02Z"
     message: the HPA controller was able to update the target scale to 4
     reason: SucceededRescale
     status: "True"
     type: AbleToScale
-  - lastTransitionTime: "2026-05-04T22:50:19Z"
+  - lastTransitionTime: "2026-08-15T19:05:02Z"
     message: the HPA was able to successfully calculate a replica count from cpu resource
       utilization (percentage of request)
     reason: ValidMetricFound
     status: "True"
     type: ScalingActive
-  - lastTransitionTime: "2026-05-04T22:50:19Z"
+  - lastTransitionTime: "2026-08-15T19:05:02Z"
     message: the desired count is within the acceptable range
     reason: DesiredWithinRange
     status: "False"
@@ -52,4 +52,4 @@ status:
     type: Resource
   currentReplicas: 5
   desiredReplicas: 4
-  lastScaleTime: "2026-05-04T23:06:50Z"
+  lastScaleTime: "2026-08-15T19:21:34Z"

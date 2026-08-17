@@ -4,18 +4,18 @@
   "config": "k1",
   "pattern": "spike",
   "repetition": 4,
-  "start_epoch": 1779555665,
-  "end_epoch": 1779556904,
-  "duration_seconds": 1239,
+  "start_epoch": 1786977514,
+  "end_epoch": 1786978751,
+  "duration_seconds": 1237,
   "k6_job_name": "k6-auth-test-spike-auth-service-k1-spike-rep4",
   "target_url": "http://auth-service.ecommerce.svc.cluster.local:8001",
   "load_profile": {
-    "version": "recovery-v2",
-    "base_rps": 10,
-    "peak_rps": 40,
+    "version": "closed-loop-vus-v3",
+    "base_vus": 1,
+    "peak_vus": 12,
     "auth_me_percent": 70,
     "auth_login_percent": 30,
     "num_test_users": 120
   },
-  "timestamp": "2026-05-23T17:21:44+00:00"
+  "timestamp": "2026-08-17T14:59:11+00:00"
 }

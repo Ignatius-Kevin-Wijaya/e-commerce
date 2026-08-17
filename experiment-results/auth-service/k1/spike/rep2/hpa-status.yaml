@@ -3,8 +3,8 @@ kind: HorizontalPodAutoscaler
 metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"labels":{"experiment":"k1-keda"},"name":"auth-service-keda","namespace":"ecommerce"},"spec":{"advanced":{"horizontalPodAutoscalerConfig":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":15,"type":"Percent","value":100}],"stabilizationWindowSeconds":30},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Pods","value":5}],"stabilizationWindowSeconds":0}}}},"cooldownPeriod":30,"maxReplicaCount":5,"minReplicaCount":1,"pollingInterval":15,"scaleTargetRef":{"name":"auth-service"},"triggers":[{"metadata":{"metricName":"auth_http_requests_per_second_30s","query":"sum(rate(http_requests_total{job=\"auth-service\"}[30s]))\n","serverAddress":"http://prometheus.monitoring.svc.cluster.local:9090","threshold":"5"},"type":"prometheus"}]}}
-  creationTimestamp: "2026-05-26T18:39:28Z"
+      {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"labels":{"experiment":"k1-keda"},"name":"auth-service-keda","namespace":"ecommerce"},"spec":{"advanced":{"horizontalPodAutoscalerConfig":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":15,"type":"Percent","value":100}],"stabilizationWindowSeconds":30},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Pods","value":5}],"stabilizationWindowSeconds":0}}}},"cooldownPeriod":30,"maxReplicaCount":5,"minReplicaCount":1,"pollingInterval":15,"scaleTargetRef":{"name":"auth-service"},"triggers":[{"metadata":{"metricName":"http_requests_per_second","query":"sum(rate(http_requests_total{job=\"auth-service\"}[1m]))\n","serverAddress":"http://prometheus.monitoring.svc.cluster.local:9090","threshold":"5"},"type":"prometheus"}]}}
+  creationTimestamp: "2026-08-17T14:00:23Z"
   labels:
     app.kubernetes.io/managed-by: keda-operator
     app.kubernetes.io/name: keda-hpa-auth-service-keda
@@ -20,9 +20,9 @@ metadata:
     controller: true
     kind: ScaledObject
     name: auth-service-keda
-    uid: aab69b5d-a762-43a8-b51d-3240985bc13d
-  resourceVersion: "5006532"
-  uid: 17c70cb2-66ea-4efb-9cba-f122d76c315c
+    uid: 6e105374-717c-4a27-8d5a-8fd7aa3c7bbd
+  resourceVersion: "6203241"
+  uid: 7aba6e35-cf28-4a70-a904-a93182bb1ed2
 spec:
   behavior:
     scaleDown:
@@ -58,19 +58,19 @@ spec:
     name: auth-service
 status:
   conditions:
-  - lastTransitionTime: "2026-05-26T18:39:43Z"
+  - lastTransitionTime: "2026-08-17T14:00:38Z"
     message: recommended size matches current size
     reason: ReadyForNewScale
     status: "True"
     type: AbleToScale
-  - lastTransitionTime: "2026-05-26T18:39:43Z"
+  - lastTransitionTime: "2026-08-17T14:00:38Z"
     message: 'the HPA was able to successfully calculate a replica count from external
       metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name:
       auth-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},})'
     reason: ValidMetricFound
     status: "True"
     type: ScalingActive
-  - lastTransitionTime: "2026-05-26T18:52:15Z"
+  - lastTransitionTime: "2026-08-17T14:14:40Z"
     message: the desired count is within the acceptable range
     reason: DesiredWithinRange
     status: "False"
@@ -87,4 +87,4 @@ status:
     type: External
   currentReplicas: 1
   desiredReplicas: 1
-  lastScaleTime: "2026-05-26T18:54:00Z"
+  lastScaleTime: "2026-08-17T14:15:40Z"

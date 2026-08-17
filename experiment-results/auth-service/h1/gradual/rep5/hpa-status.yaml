@@ -4,13 +4,13 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"labels":{"experiment":"h1-hpa-default"},"name":"auth-service-hpa-default","namespace":"ecommerce"},"spec":{"maxReplicas":5,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":70,"type":"Utilization"}},"type":"Resource"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"auth-service"}}}
-  creationTimestamp: "2026-05-08T23:02:09Z"
+  creationTimestamp: "2026-08-16T22:30:21Z"
   labels:
     experiment: h1-hpa-default
   name: auth-service-hpa-default
   namespace: ecommerce
-  resourceVersion: "4009063"
-  uid: ed66b4b0-ce38-430a-bb61-344575dd2490
+  resourceVersion: "5913105"
+  uid: dea21844-d3d0-4d7f-9f82-0bbd07583d6d
 spec:
   maxReplicas: 5
   metrics:
@@ -27,19 +27,19 @@ spec:
     name: auth-service
 status:
   conditions:
-  - lastTransitionTime: "2026-05-08T23:02:24Z"
+  - lastTransitionTime: "2026-08-16T22:30:36Z"
     message: recent recommendations were higher than current one, applying the highest
       recent recommendation
     reason: ScaleDownStabilized
     status: "True"
     type: AbleToScale
-  - lastTransitionTime: "2026-05-08T23:02:24Z"
+  - lastTransitionTime: "2026-08-16T22:30:36Z"
     message: the HPA was able to successfully calculate a replica count from cpu resource
       utilization (percentage of request)
     reason: ValidMetricFound
     status: "True"
     type: ScalingActive
-  - lastTransitionTime: "2026-05-08T23:10:09Z"
+  - lastTransitionTime: "2026-08-16T22:36:52Z"
     message: the desired replica count is more than the maximum replica count
     reason: TooManyReplicas
     status: "True"
@@ -48,9 +48,9 @@ status:
   - resource:
       current:
         averageUtilization: 0
-        averageValue: 2m
+        averageValue: 1m
       name: cpu
     type: Resource
   currentReplicas: 5
   desiredReplicas: 5
-  lastScaleTime: "2026-05-08T23:10:09Z"
+  lastScaleTime: "2026-08-16T22:36:52Z"

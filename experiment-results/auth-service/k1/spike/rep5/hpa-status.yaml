@@ -4,7 +4,7 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"labels":{"experiment":"k1-keda"},"name":"auth-service-keda","namespace":"ecommerce"},"spec":{"advanced":{"horizontalPodAutoscalerConfig":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":15,"type":"Percent","value":100}],"stabilizationWindowSeconds":30},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Pods","value":5}],"stabilizationWindowSeconds":0}}}},"cooldownPeriod":30,"maxReplicaCount":5,"minReplicaCount":1,"pollingInterval":15,"scaleTargetRef":{"name":"auth-service"},"triggers":[{"metadata":{"metricName":"http_requests_per_second","query":"sum(rate(http_requests_total{job=\"auth-service\"}[1m]))\n","serverAddress":"http://prometheus.monitoring.svc.cluster.local:9090","threshold":"5"},"type":"prometheus"}]}}
-  creationTimestamp: "2026-05-23T17:25:00Z"
+  creationTimestamp: "2026-08-17T15:02:26Z"
   labels:
     app.kubernetes.io/managed-by: keda-operator
     app.kubernetes.io/name: keda-hpa-auth-service-keda
@@ -20,9 +20,9 @@ metadata:
     controller: true
     kind: ScaledObject
     name: auth-service-keda
-    uid: 1b9238ed-a2ea-45b0-b6de-39e2be7c51bc
-  resourceVersion: "4856309"
-  uid: 7f353479-a577-44e2-a845-2d67b104e4d4
+    uid: 44e85bc2-afe7-46b7-9879-7c0c5c197d7a
+  resourceVersion: "6222797"
+  uid: 20b57e04-9cfb-4eeb-bdb7-cad1e1a1d9c3
 spec:
   behavior:
     scaleDown:
@@ -58,19 +58,19 @@ spec:
     name: auth-service
 status:
   conditions:
-  - lastTransitionTime: "2026-05-23T17:25:15Z"
+  - lastTransitionTime: "2026-08-17T15:02:41Z"
     message: recommended size matches current size
     reason: ReadyForNewScale
     status: "True"
     type: AbleToScale
-  - lastTransitionTime: "2026-05-23T17:25:15Z"
+  - lastTransitionTime: "2026-08-17T15:02:41Z"
     message: 'the HPA was able to successfully calculate a replica count from external
       metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name:
       auth-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},})'
     reason: ValidMetricFound
     status: "True"
     type: ScalingActive
-  - lastTransitionTime: "2026-05-23T17:37:46Z"
+  - lastTransitionTime: "2026-08-17T15:16:27Z"
     message: the desired count is within the acceptable range
     reason: DesiredWithinRange
     status: "False"
@@ -87,4 +87,4 @@ status:
     type: External
   currentReplicas: 1
   desiredReplicas: 1
-  lastScaleTime: "2026-05-23T17:39:46Z"
+  lastScaleTime: "2026-08-17T15:17:42Z"

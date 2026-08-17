@@ -4,7 +4,7 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"labels":{"experiment":"k1-keda"},"name":"auth-service-keda","namespace":"ecommerce"},"spec":{"advanced":{"horizontalPodAutoscalerConfig":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":15,"type":"Percent","value":100}],"stabilizationWindowSeconds":30},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Pods","value":5}],"stabilizationWindowSeconds":0}}}},"cooldownPeriod":30,"maxReplicaCount":5,"minReplicaCount":1,"pollingInterval":15,"scaleTargetRef":{"name":"auth-service"},"triggers":[{"metadata":{"metricName":"http_requests_per_second","query":"sum(rate(http_requests_total{job=\"auth-service\"}[1m]))\n","serverAddress":"http://prometheus.monitoring.svc.cluster.local:9090","threshold":"5"},"type":"prometheus"}]}}
-  creationTimestamp: "2026-05-23T19:08:24Z"
+  creationTimestamp: "2026-08-17T16:45:38Z"
   finalizers:
   - finalizer.keda.sh
   generation: 2
@@ -13,8 +13,8 @@ metadata:
     scaledobject.keda.sh/name: auth-service-keda
   name: auth-service-keda
   namespace: ecommerce
-  resourceVersion: "4890263"
-  uid: 454f4ef2-bef2-4480-b4aa-4846dbe81653
+  resourceVersion: "6256451"
+  uid: c7ba5237-2389-457a-ac98-61f0b4940b1e
 spec:
   advanced:
     horizontalPodAutoscalerConfig:
@@ -66,7 +66,7 @@ status:
   externalMetricNames:
   - s0-prometheus
   hpaName: keda-hpa-auth-service-keda
-  lastActiveTime: "2026-05-23T19:25:39Z"
+  lastActiveTime: "2026-08-17T17:02:54Z"
   originalReplicaCount: 1
   scaleTargetGVKR:
     group: apps

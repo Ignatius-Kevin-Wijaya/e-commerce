@@ -3,14 +3,14 @@ kind: HorizontalPodAutoscaler
 metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"labels":{"experiment":"h3-hpa-custom-metric"},"name":"auth-service-hpa-custom","namespace":"ecommerce"},"spec":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":15,"type":"Percent","value":100}],"stabilizationWindowSeconds":30},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Pods","value":5}],"stabilizationWindowSeconds":0}},"maxReplicas":5,"metrics":[{"pods":{"metric":{"name":"auth_http_requests_per_second_30s"},"target":{"averageValue":"5","type":"AverageValue"}},"type":"Pods"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"auth-service"}}}
-  creationTimestamp: "2026-06-03T13:02:41Z"
+      {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"labels":{"experiment":"h3-hpa-custom-metric"},"name":"auth-service-hpa-custom","namespace":"ecommerce"},"spec":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":15,"type":"Percent","value":100}],"stabilizationWindowSeconds":30},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Pods","value":5}],"stabilizationWindowSeconds":0}},"maxReplicas":5,"metrics":[{"pods":{"metric":{"name":"http_requests_per_second"},"target":{"averageValue":"5","type":"AverageValue"}},"type":"Pods"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"auth-service"}}}
+  creationTimestamp: "2026-08-17T10:18:11Z"
   labels:
     experiment: h3-hpa-custom-metric
   name: auth-service-hpa-custom
   namespace: ecommerce
-  resourceVersion: "5041040"
-  uid: 0bb5cd78-5007-4580-aade-090114a4c883
+  resourceVersion: "6132572"
+  uid: 9c4cec83-a5a0-4b80-b380-94d866f32b2d
 spec:
   behavior:
     scaleDown:
@@ -31,7 +31,7 @@ spec:
   metrics:
   - pods:
       metric:
-        name: auth_http_requests_per_second_30s
+        name: http_requests_per_second
       target:
         averageValue: "5"
         type: AverageValue
@@ -43,18 +43,18 @@ spec:
     name: auth-service
 status:
   conditions:
-  - lastTransitionTime: "2026-06-03T13:02:56Z"
+  - lastTransitionTime: "2026-08-17T10:18:26Z"
     message: recommended size matches current size
     reason: ReadyForNewScale
     status: "True"
     type: AbleToScale
-  - lastTransitionTime: "2026-06-03T13:14:12Z"
+  - lastTransitionTime: "2026-08-17T10:18:26Z"
     message: the HPA was able to successfully calculate a replica count from pods
-      metric auth_http_requests_per_second_30s
+      metric http_requests_per_second
     reason: ValidMetricFound
     status: "True"
     type: ScalingActive
-  - lastTransitionTime: "2026-06-03T13:15:28Z"
+  - lastTransitionTime: "2026-08-17T10:32:14Z"
     message: the desired count is within the acceptable range
     reason: DesiredWithinRange
     status: "False"
@@ -64,8 +64,8 @@ status:
       current:
         averageValue: 133m
       metric:
-        name: auth_http_requests_per_second_30s
+        name: http_requests_per_second
     type: Pods
   currentReplicas: 1
   desiredReplicas: 1
-  lastScaleTime: "2026-06-03T13:17:13Z"
+  lastScaleTime: "2026-08-17T10:33:29Z"

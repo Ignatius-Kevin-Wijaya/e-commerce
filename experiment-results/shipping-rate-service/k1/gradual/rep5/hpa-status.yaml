@@ -4,7 +4,7 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"labels":{"experiment":"k1-keda"},"name":"shipping-rate-service-keda","namespace":"ecommerce"},"spec":{"advanced":{"horizontalPodAutoscalerConfig":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":15,"type":"Percent","value":100}],"stabilizationWindowSeconds":30},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Pods","value":5}],"stabilizationWindowSeconds":0}}}},"cooldownPeriod":30,"maxReplicaCount":5,"minReplicaCount":1,"pollingInterval":15,"scaleTargetRef":{"name":"shipping-rate-service"},"triggers":[{"metadata":{"metricName":"http_requests_per_second","query":"sum(rate(http_requests_total{job=\"shipping-rate-service\"}[1m]))\n","serverAddress":"http://prometheus.monitoring.svc.cluster.local:9090","threshold":"15"},"type":"prometheus"}]}}
-  creationTimestamp: "2026-05-23T10:37:59Z"
+  creationTimestamp: "2026-08-16T07:37:36Z"
   labels:
     app.kubernetes.io/managed-by: keda-operator
     app.kubernetes.io/name: keda-hpa-shipping-rate-service-keda
@@ -20,9 +20,9 @@ metadata:
     controller: true
     kind: ScaledObject
     name: shipping-rate-service-keda
-    uid: 83e3e0db-f410-4c40-b8bc-cb443f3fe769
-  resourceVersion: "4728783"
-  uid: aa1bba22-d3d9-4fc7-96ea-f938de21611c
+    uid: c6869ae4-a530-413d-b754-708002962af8
+  resourceVersion: "5638848"
+  uid: b56da71e-7643-4de4-aa57-332d5cb1ec18
 spec:
   behavior:
     scaleDown:
@@ -58,19 +58,19 @@ spec:
     name: shipping-rate-service
 status:
   conditions:
-  - lastTransitionTime: "2026-05-23T10:38:15Z"
+  - lastTransitionTime: "2026-08-16T07:37:51Z"
     message: recommended size matches current size
     reason: ReadyForNewScale
     status: "True"
     type: AbleToScale
-  - lastTransitionTime: "2026-05-23T10:38:15Z"
+  - lastTransitionTime: "2026-08-16T07:37:51Z"
     message: 'the HPA was able to successfully calculate a replica count from external
       metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name:
       shipping-rate-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},})'
     reason: ValidMetricFound
     status: "True"
     type: ScalingActive
-  - lastTransitionTime: "2026-05-23T10:50:01Z"
+  - lastTransitionTime: "2026-08-16T07:49:53Z"
     message: the desired count is within the acceptable range
     reason: DesiredWithinRange
     status: "False"
@@ -78,7 +78,7 @@ status:
   currentMetrics:
   - external:
       current:
-        averageValue: 133m
+        averageValue: 155m
       metric:
         name: s0-prometheus
         selector:
@@ -87,4 +87,4 @@ status:
     type: External
   currentReplicas: 1
   desiredReplicas: 1
-  lastScaleTime: "2026-05-23T10:52:16Z"
+  lastScaleTime: "2026-08-16T07:51:53Z"

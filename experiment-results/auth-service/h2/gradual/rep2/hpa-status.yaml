@@ -4,13 +4,13 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"labels":{"experiment":"h2-hpa-tuned"},"name":"auth-service-hpa-tuned","namespace":"ecommerce"},"spec":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":15,"type":"Percent","value":100}],"stabilizationWindowSeconds":30},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Pods","value":5}],"stabilizationWindowSeconds":0}},"maxReplicas":5,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":50,"type":"Utilization"}},"type":"Resource"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"auth-service"}}}
-  creationTimestamp: "2026-05-09T01:58:55Z"
+  creationTimestamp: "2026-08-17T02:26:32Z"
   labels:
     experiment: h2-hpa-tuned
   name: auth-service-hpa-tuned
   namespace: ecommerce
-  resourceVersion: "4065636"
-  uid: d0ddaaf2-aef9-4e17-aee6-20dc4c82e090
+  resourceVersion: "5986421"
+  uid: eecea757-3f71-40e2-af06-262002d4ca8d
 spec:
   behavior:
     scaleDown:
@@ -42,18 +42,18 @@ spec:
     name: auth-service
 status:
   conditions:
-  - lastTransitionTime: "2026-05-09T01:59:10Z"
+  - lastTransitionTime: "2026-08-17T02:26:47Z"
     message: recommended size matches current size
     reason: ReadyForNewScale
     status: "True"
     type: AbleToScale
-  - lastTransitionTime: "2026-05-09T01:59:10Z"
+  - lastTransitionTime: "2026-08-17T02:26:47Z"
     message: the HPA was able to successfully calculate a replica count from cpu resource
       utilization (percentage of request)
     reason: ValidMetricFound
     status: "True"
     type: ScalingActive
-  - lastTransitionTime: "2026-05-09T02:15:12Z"
+  - lastTransitionTime: "2026-08-17T02:43:03Z"
     message: the desired replica count is less than the minimum replica count
     reason: TooFewReplicas
     status: "True"
@@ -62,9 +62,9 @@ status:
   - resource:
       current:
         averageUtilization: 0
-        averageValue: 1m
+        averageValue: 2m
       name: cpu
     type: Resource
   currentReplicas: 1
   desiredReplicas: 1
-  lastScaleTime: "2026-05-09T02:14:12Z"
+  lastScaleTime: "2026-08-17T02:42:03Z"

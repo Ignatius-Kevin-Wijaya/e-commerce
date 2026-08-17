@@ -4,13 +4,13 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"labels":{"experiment":"h3-hpa-custom-metric"},"name":"shipping-rate-service-hpa-custom","namespace":"ecommerce"},"spec":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":15,"type":"Percent","value":100}],"stabilizationWindowSeconds":30},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Pods","value":5}],"stabilizationWindowSeconds":0}},"maxReplicas":5,"metrics":[{"pods":{"metric":{"name":"http_requests_per_second"},"target":{"averageValue":"15","type":"AverageValue"}},"type":"Pods"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"shipping-rate-service"}}}
-  creationTimestamp: "2026-05-07T08:31:53Z"
+  creationTimestamp: "2026-08-16T03:24:04Z"
   labels:
     experiment: h3-hpa-custom-metric
   name: shipping-rate-service-hpa-custom
   namespace: ecommerce
-  resourceVersion: "3397642"
-  uid: a594dc37-e642-4bd3-8a92-4a4f5d7b0ef3
+  resourceVersion: "5559287"
+  uid: ffeb43fa-761d-4a91-88e2-7c677bee6741
 spec:
   behavior:
     scaleDown:
@@ -43,18 +43,18 @@ spec:
     name: shipping-rate-service
 status:
   conditions:
-  - lastTransitionTime: "2026-05-07T08:32:08Z"
+  - lastTransitionTime: "2026-08-16T03:24:19Z"
     message: recommended size matches current size
     reason: ReadyForNewScale
     status: "True"
     type: AbleToScale
-  - lastTransitionTime: "2026-05-07T08:32:08Z"
+  - lastTransitionTime: "2026-08-16T03:24:19Z"
     message: the HPA was able to successfully calculate a replica count from pods
       metric http_requests_per_second
     reason: ValidMetricFound
     status: "True"
     type: ScalingActive
-  - lastTransitionTime: "2026-05-07T08:32:08Z"
+  - lastTransitionTime: "2026-08-16T03:36:20Z"
     message: the desired count is within the acceptable range
     reason: DesiredWithinRange
     status: "False"
@@ -62,10 +62,10 @@ status:
   currentMetrics:
   - pods:
       current:
-        averageValue: 133m
+        averageValue: 155m
       metric:
         name: http_requests_per_second
     type: Pods
   currentReplicas: 1
   desiredReplicas: 1
-  lastScaleTime: "2026-05-07T08:45:55Z"
+  lastScaleTime: "2026-08-16T03:38:05Z"

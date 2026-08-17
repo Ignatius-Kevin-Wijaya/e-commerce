@@ -1,9 +1,8 @@
 TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
-2026-05-08T16:46:16Z	Normal	Scheduled	pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep2-bd68h	Successfully assigned ecommerce/k6-auth-test-oscillating-auth-service-b1-oscillating-rep2-bd68h to aks-userpool-16719200-vmss00001s
-2026-05-08T16:46:16Z	Normal	Pulling	pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep2-bd68h	Pulling image "grafana/k6:latest"
-2026-05-08T16:46:16Z	Normal	SuccessfulCreate	job/k6-auth-test-oscillating-auth-service-b1-oscillating-rep2	Created pod: k6-auth-test-oscillating-auth-service-b1-oscillating-rep2-bd68h
-2026-05-08T16:46:18Z	Normal	Pulled	pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep2-bd68h	Successfully pulled image "grafana/k6:latest" in 1.504s (1.505s including waiting). Image size: 33688197 bytes.
-2026-05-08T16:46:18Z	Normal	Created	pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep2-bd68h	Created container: k6
-2026-05-08T16:46:18Z	Normal	Started	pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep2-bd68h	Started container k6
-2026-05-08T16:55:06Z	Warning	Unhealthy	pod/auth-service-55bd95c686-cwhvq	Readiness probe failed: Get "http://10.244.0.183:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
-2026-05-08T16:58:54Z	Warning	BackoffLimitExceeded	job/k6-auth-test-oscillating-auth-service-b1-oscillating-rep2	Job has reached the specified backoff limit
+2026-08-16T14:56:12Z	Normal	SuccessfulCreate	job/k6-auth-test-oscillating-auth-service-b1-oscillating-rep2	Created pod: k6-auth-test-oscillating-auth-service-b1-oscillating-rep2-kc6jn
+2026-08-16T14:56:12Z	Normal	Scheduled	pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep2-kc6jn	Successfully assigned ecommerce/k6-auth-test-oscillating-auth-service-b1-oscillating-rep2-kc6jn to aks-userpool-16719200-vmss00002e
+2026-08-16T14:56:13Z	Normal	Pulling	pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep2-kc6jn	Pulling image "grafana/k6:latest"
+2026-08-16T14:56:14Z	Normal	Pulled	pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep2-kc6jn	Successfully pulled image "grafana/k6:latest" in 1.458s (1.458s including waiting). Image size: 34791087 bytes.
+2026-08-16T14:56:15Z	Normal	Created	pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep2-kc6jn	Created container: k6
+2026-08-16T14:56:15Z	Normal	Started	pod/k6-auth-test-oscillating-auth-service-b1-oscillating-rep2-kc6jn	Started container k6
+2026-08-16T15:08:46Z	Warning	BackoffLimitExceeded	job/k6-auth-test-oscillating-auth-service-b1-oscillating-rep2	Job has reached the specified backoff limit

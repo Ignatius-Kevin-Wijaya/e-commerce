@@ -4,13 +4,13 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"labels":{"experiment":"h1-hpa-default"},"name":"auth-service-hpa-default","namespace":"ecommerce"},"spec":{"maxReplicas":5,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":70,"type":"Utilization"}},"type":"Resource"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"auth-service"}}}
-  creationTimestamp: "2026-05-08T23:21:47Z"
+  creationTimestamp: "2026-08-16T23:09:46Z"
   labels:
     experiment: h1-hpa-default
   name: auth-service-hpa-default
   namespace: ecommerce
-  resourceVersion: "4015205"
-  uid: 298ba9d7-e35c-4786-95de-c9bf26b9c561
+  resourceVersion: "5925419"
+  uid: 1c20dba0-1822-4d73-bbbd-3dd6483c31a9
 spec:
   maxReplicas: 5
   metrics:
@@ -27,19 +27,19 @@ spec:
     name: auth-service
 status:
   conditions:
-  - lastTransitionTime: "2026-05-08T23:22:02Z"
+  - lastTransitionTime: "2026-08-16T23:10:01Z"
     message: recent recommendations were higher than current one, applying the highest
       recent recommendation
     reason: ScaleDownStabilized
     status: "True"
     type: AbleToScale
-  - lastTransitionTime: "2026-05-08T23:22:02Z"
+  - lastTransitionTime: "2026-08-16T23:10:01Z"
     message: the HPA was able to successfully calculate a replica count from cpu resource
       utilization (percentage of request)
     reason: ValidMetricFound
     status: "True"
     type: ScalingActive
-  - lastTransitionTime: "2026-05-08T23:27:02Z"
+  - lastTransitionTime: "2026-08-16T23:14:47Z"
     message: the desired replica count is more than the maximum replica count
     reason: TooManyReplicas
     status: "True"
@@ -53,4 +53,4 @@ status:
     type: Resource
   currentReplicas: 5
   desiredReplicas: 5
-  lastScaleTime: "2026-05-08T23:27:02Z"
+  lastScaleTime: "2026-08-16T23:14:47Z"

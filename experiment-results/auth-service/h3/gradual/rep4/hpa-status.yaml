@@ -4,13 +4,13 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"labels":{"experiment":"h3-hpa-custom-metric"},"name":"auth-service-hpa-custom","namespace":"ecommerce"},"spec":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":15,"type":"Percent","value":100}],"stabilizationWindowSeconds":30},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Pods","value":5}],"stabilizationWindowSeconds":0}},"maxReplicas":5,"metrics":[{"pods":{"metric":{"name":"http_requests_per_second"},"target":{"averageValue":"5","type":"AverageValue"}},"type":"Pods"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"auth-service"}}}
-  creationTimestamp: "2026-05-09T06:34:00Z"
+  creationTimestamp: "2026-08-17T08:00:39Z"
   labels:
     experiment: h3-hpa-custom-metric
   name: auth-service-hpa-custom
   namespace: ecommerce
-  resourceVersion: "4154211"
-  uid: e3a7fc5e-4d46-4b28-8b7e-5106e32b11c6
+  resourceVersion: "6089580"
+  uid: 4a6d246c-70f0-438d-9205-b7532e2a4074
 spec:
   behavior:
     scaleDown:
@@ -43,18 +43,18 @@ spec:
     name: auth-service
 status:
   conditions:
-  - lastTransitionTime: "2026-05-09T06:34:15Z"
+  - lastTransitionTime: "2026-08-17T08:00:54Z"
     message: recommended size matches current size
     reason: ReadyForNewScale
     status: "True"
     type: AbleToScale
-  - lastTransitionTime: "2026-05-09T06:34:15Z"
+  - lastTransitionTime: "2026-08-17T08:00:54Z"
     message: the HPA was able to successfully calculate a replica count from pods
       metric http_requests_per_second
     reason: ValidMetricFound
     status: "True"
     type: ScalingActive
-  - lastTransitionTime: "2026-05-09T06:46:47Z"
+  - lastTransitionTime: "2026-08-17T08:14:55Z"
     message: the desired count is within the acceptable range
     reason: DesiredWithinRange
     status: "False"
@@ -68,4 +68,4 @@ status:
     type: Pods
   currentReplicas: 1
   desiredReplicas: 1
-  lastScaleTime: "2026-05-09T06:48:33Z"
+  lastScaleTime: "2026-08-17T08:15:55Z"

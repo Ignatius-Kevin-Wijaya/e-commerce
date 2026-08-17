@@ -4,18 +4,18 @@
   "config": "h1",
   "pattern": "gradual",
   "repetition": 1,
-  "start_epoch": 1777747679,
-  "end_epoch": 1777748878,
-  "duration_seconds": 1199,
+  "start_epoch": 1786914561,
+  "end_epoch": 1786915742,
+  "duration_seconds": 1181,
   "k6_job_name": "k6-auth-test-gradual-auth-service-h1-gradual-rep1",
   "target_url": "http://auth-service.ecommerce.svc.cluster.local:8001",
   "load_profile": {
-    "version": "recovery-v2",
-    "base_rps": 10,
-    "peak_rps": 40,
+    "version": "closed-loop-vus-v3",
+    "base_vus": 1,
+    "peak_vus": 12,
     "auth_me_percent": 70,
     "auth_login_percent": 30,
     "num_test_users": 120
   },
-  "timestamp": "2026-05-03T02:07:58+07:00"
+  "timestamp": "2026-08-16T21:29:02+00:00"
 }

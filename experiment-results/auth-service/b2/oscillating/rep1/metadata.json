@@ -4,18 +4,18 @@
   "config": "b2",
   "pattern": "oscillating",
   "repetition": 1,
-  "start_epoch": 1777743764,
-  "end_epoch": 1777744981,
-  "duration_seconds": 1217,
+  "start_epoch": 1786908593,
+  "end_epoch": 1786909788,
+  "duration_seconds": 1195,
   "k6_job_name": "k6-auth-test-oscillating-auth-service-b2-oscillating-rep1",
   "target_url": "http://auth-service.ecommerce.svc.cluster.local:8001",
   "load_profile": {
-    "version": "recovery-v2",
-    "base_rps": 10,
-    "peak_rps": 40,
+    "version": "closed-loop-vus-v3",
+    "base_vus": 1,
+    "peak_vus": 12,
     "auth_me_percent": 70,
     "auth_login_percent": 30,
     "num_test_users": 120
   },
-  "timestamp": "2026-05-03T01:03:01+07:00"
+  "timestamp": "2026-08-16T19:49:48+00:00"
 }

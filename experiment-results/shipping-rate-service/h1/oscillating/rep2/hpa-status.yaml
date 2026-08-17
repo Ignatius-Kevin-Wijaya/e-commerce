@@ -4,13 +4,13 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"labels":{"experiment":"h1-hpa-default"},"name":"shipping-rate-service-hpa-default","namespace":"ecommerce"},"spec":{"maxReplicas":5,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":70,"type":"Utilization"}},"type":"Resource"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"shipping-rate-service"}}}
-  creationTimestamp: "2026-05-07T02:08:39Z"
+  creationTimestamp: "2026-08-15T19:24:01Z"
   labels:
     experiment: h1-hpa-default
   name: shipping-rate-service-hpa-default
   namespace: ecommerce
-  resourceVersion: "3275763"
-  uid: eed1031f-7a6e-46dc-b5e8-1871b1dbb119
+  resourceVersion: "5412185"
+  uid: 2a7d8170-97b1-4dce-adda-38141c91f2ce
 spec:
   maxReplicas: 5
   metrics:
@@ -27,18 +27,19 @@ spec:
     name: shipping-rate-service
 status:
   conditions:
-  - lastTransitionTime: "2026-05-07T02:08:54Z"
-    message: the HPA controller was able to update the target scale to 4
-    reason: SucceededRescale
+  - lastTransitionTime: "2026-08-15T19:24:16Z"
+    message: recent recommendations were higher than current one, applying the highest
+      recent recommendation
+    reason: ScaleDownStabilized
     status: "True"
     type: AbleToScale
-  - lastTransitionTime: "2026-05-07T02:08:54Z"
+  - lastTransitionTime: "2026-08-15T19:24:16Z"
     message: the HPA was able to successfully calculate a replica count from cpu resource
       utilization (percentage of request)
     reason: ValidMetricFound
     status: "True"
     type: ScalingActive
-  - lastTransitionTime: "2026-05-07T02:08:54Z"
+  - lastTransitionTime: "2026-08-15T19:24:16Z"
     message: the desired count is within the acceptable range
     reason: DesiredWithinRange
     status: "False"
@@ -50,6 +51,6 @@ status:
         averageValue: 1m
       name: cpu
     type: Resource
-  currentReplicas: 5
+  currentReplicas: 4
   desiredReplicas: 4
-  lastScaleTime: "2026-05-07T02:25:26Z"
+  lastScaleTime: "2026-08-15T19:31:47Z"

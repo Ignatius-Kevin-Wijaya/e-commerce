@@ -1,41 +1,44 @@
 TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
-2026-05-09T02:39:49Z	Normal	SuccessfulCreate	job/k6-auth-test-gradual-auth-service-h2-gradual-rep4	Created pod: k6-auth-test-gradual-auth-service-h2-gradual-rep4-fkqkn
-2026-05-09T02:39:49Z	Normal	Scheduled	pod/k6-auth-test-gradual-auth-service-h2-gradual-rep4-fkqkn	Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-h2-gradual-rep4-fkqkn to aks-userpool-16719200-vmss00001s
-2026-05-09T02:39:50Z	Normal	Pulling	pod/k6-auth-test-gradual-auth-service-h2-gradual-rep4-fkqkn	Pulling image "grafana/k6:latest"
-2026-05-09T02:39:51Z	Normal	Pulled	pod/k6-auth-test-gradual-auth-service-h2-gradual-rep4-fkqkn	Successfully pulled image "grafana/k6:latest" in 1.496s (1.496s including waiting). Image size: 33688197 bytes.
-2026-05-09T02:39:51Z	Normal	Created	pod/k6-auth-test-gradual-auth-service-h2-gradual-rep4-fkqkn	Created container: k6
-2026-05-09T02:39:51Z	Normal	Started	pod/k6-auth-test-gradual-auth-service-h2-gradual-rep4-fkqkn	Started container k6
-2026-05-09T02:40:55Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-7bg9l
-2026-05-09T02:40:55Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-tuned	New size: 4; reason: cpu resource utilization (percentage of request) above target
-2026-05-09T02:40:55Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 1 to 4
-2026-05-09T02:40:55Z	Normal	Scheduled	pod/auth-service-55bd95c686-7bg9l	Successfully assigned ecommerce/auth-service-55bd95c686-7bg9l to aks-userpool-16719200-vmss00001s
-2026-05-09T02:40:55Z	Normal	Scheduled	pod/auth-service-55bd95c686-ggp5d	Successfully assigned ecommerce/auth-service-55bd95c686-ggp5d to aks-userpool-16719200-vmss00001s
-2026-05-09T02:40:55Z	Normal	Scheduled	pod/auth-service-55bd95c686-n2vnh	Successfully assigned ecommerce/auth-service-55bd95c686-n2vnh to aks-userpool-16719200-vmss00001s
-2026-05-09T02:40:56Z	Normal	Pulling	pod/auth-service-55bd95c686-7bg9l	Pulling image "ecommerce.azurecr.io/auth-service:latest"
-2026-05-09T02:40:56Z	Normal	Pulling	pod/auth-service-55bd95c686-ggp5d	Pulling image "ecommerce.azurecr.io/auth-service:latest"
-2026-05-09T02:40:56Z	Normal	Pulling	pod/auth-service-55bd95c686-n2vnh	Pulling image "ecommerce.azurecr.io/auth-service:latest"
-2026-05-09T02:40:57Z	Normal	Pulled	pod/auth-service-55bd95c686-7bg9l	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 424ms (424ms including waiting). Image size: 129975007 bytes.
-2026-05-09T02:40:57Z	Normal	Created	pod/auth-service-55bd95c686-7bg9l	Created container: auth-service
-2026-05-09T02:40:57Z	Normal	Started	pod/auth-service-55bd95c686-7bg9l	Started container auth-service
-2026-05-09T02:40:57Z	Normal	Pulled	pod/auth-service-55bd95c686-ggp5d	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 395ms (395ms including waiting). Image size: 129975007 bytes.
-2026-05-09T02:40:57Z	Normal	Created	pod/auth-service-55bd95c686-ggp5d	Created container: auth-service
-2026-05-09T02:40:57Z	Normal	Started	pod/auth-service-55bd95c686-ggp5d	Started container auth-service
-2026-05-09T02:40:57Z	Normal	Pulled	pod/auth-service-55bd95c686-n2vnh	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 425ms (425ms including waiting). Image size: 129975007 bytes.
-2026-05-09T02:40:57Z	Normal	Created	pod/auth-service-55bd95c686-n2vnh	Created container: auth-service
-2026-05-09T02:40:57Z	Normal	Started	pod/auth-service-55bd95c686-n2vnh	Started container auth-service
-2026-05-09T02:43:56Z	Normal	Pulling	pod/auth-service-55bd95c686-t5556	Pulling image "ecommerce.azurecr.io/auth-service:latest"
-2026-05-09T02:43:56Z	Normal	Pulled	pod/auth-service-55bd95c686-t5556	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 191ms (191ms including waiting). Image size: 129975007 bytes.
-2026-05-09T02:43:56Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-t5556
-2026-05-09T02:43:56Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-tuned	New size: 5; reason: cpu resource utilization (percentage of request) above target
-2026-05-09T02:43:56Z	Normal	Scheduled	pod/auth-service-55bd95c686-t5556	Successfully assigned ecommerce/auth-service-55bd95c686-t5556 to aks-userpool-16719200-vmss00001s
-2026-05-09T02:43:57Z	Normal	Created	pod/auth-service-55bd95c686-t5556	Created container: auth-service
-2026-05-09T02:43:57Z	Normal	Started	pod/auth-service-55bd95c686-t5556	Started container auth-service
-2026-05-09T02:52:23Z	Normal	Completed	job/k6-auth-test-gradual-auth-service-h2-gradual-rep4	Job completed
-2026-05-09T02:53:11Z	Normal	Killing	pod/auth-service-55bd95c686-7bg9l	Stopping container auth-service
-2026-05-09T02:53:11Z	Normal	Killing	pod/auth-service-55bd95c686-ggp5d	Stopping container auth-service
-2026-05-09T02:53:11Z	Normal	Killing	pod/auth-service-55bd95c686-n2vnh	Stopping container auth-service
-2026-05-09T02:53:11Z	Normal	Killing	pod/auth-service-55bd95c686-t5556	Stopping container auth-service
-2026-05-09T02:53:11Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-7bg9l
-2026-05-09T02:53:11Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-n2vnh
-2026-05-09T02:53:11Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-tuned	New size: 1; reason: All metrics below target
-2026-05-09T02:53:11Z	Normal	ScalingReplicaSet	deployment/auth-service	(combined from similar events): Scaled down replica set auth-service-55bd95c686 from 5 to 1
+2026-08-17T03:07:27Z	Normal	Pulling	pod/k6-auth-test-gradual-auth-service-h2-gradual-rep4-l25r6	Pulling image "grafana/k6:latest"
+2026-08-17T03:07:27Z	Normal	SuccessfulCreate	job/k6-auth-test-gradual-auth-service-h2-gradual-rep4	Created pod: k6-auth-test-gradual-auth-service-h2-gradual-rep4-l25r6
+2026-08-17T03:07:27Z	Normal	Scheduled	pod/k6-auth-test-gradual-auth-service-h2-gradual-rep4-l25r6	Successfully assigned ecommerce/k6-auth-test-gradual-auth-service-h2-gradual-rep4-l25r6 to aks-userpool-16719200-vmss00002e
+2026-08-17T03:07:29Z	Normal	Pulled	pod/k6-auth-test-gradual-auth-service-h2-gradual-rep4-l25r6	Successfully pulled image "grafana/k6:latest" in 1.395s (1.395s including waiting). Image size: 34791087 bytes.
+2026-08-17T03:07:29Z	Normal	Created	pod/k6-auth-test-gradual-auth-service-h2-gradual-rep4-l25r6	Created container: k6
+2026-08-17T03:07:29Z	Normal	Started	pod/k6-auth-test-gradual-auth-service-h2-gradual-rep4-l25r6	Started container k6
+2026-08-17T03:08:48Z	Normal	Pulling	pod/auth-service-55bd95c686-ptthl	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-08-17T03:08:48Z	Normal	Pulling	pod/auth-service-55bd95c686-sc9pk	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-08-17T03:08:48Z	Normal	Pulling	pod/auth-service-55bd95c686-xxct4	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-08-17T03:08:48Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-ptthl
+2026-08-17T03:08:48Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-xxct4
+2026-08-17T03:08:48Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-tuned	New size: 4; reason: cpu resource utilization (percentage of request) above target
+2026-08-17T03:08:48Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 1 to 4
+2026-08-17T03:08:48Z	Normal	Scheduled	pod/auth-service-55bd95c686-ptthl	Successfully assigned ecommerce/auth-service-55bd95c686-ptthl to aks-userpool-16719200-vmss00002d
+2026-08-17T03:08:48Z	Normal	Scheduled	pod/auth-service-55bd95c686-xxct4	Successfully assigned ecommerce/auth-service-55bd95c686-xxct4 to aks-userpool-16719200-vmss00002d
+2026-08-17T03:08:48Z	Normal	Scheduled	pod/auth-service-55bd95c686-sc9pk	Successfully assigned ecommerce/auth-service-55bd95c686-sc9pk to aks-userpool-16719200-vmss00002e
+2026-08-17T03:08:49Z	Normal	Pulled	pod/auth-service-55bd95c686-ptthl	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 301ms (301ms including waiting). Image size: 129975007 bytes.
+2026-08-17T03:08:49Z	Normal	Created	pod/auth-service-55bd95c686-ptthl	Created container: auth-service
+2026-08-17T03:08:49Z	Normal	Started	pod/auth-service-55bd95c686-ptthl	Started container auth-service
+2026-08-17T03:08:49Z	Normal	Pulled	pod/auth-service-55bd95c686-sc9pk	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 260ms (260ms including waiting). Image size: 129975007 bytes.
+2026-08-17T03:08:49Z	Normal	Created	pod/auth-service-55bd95c686-sc9pk	Created container: auth-service
+2026-08-17T03:08:49Z	Normal	Started	pod/auth-service-55bd95c686-sc9pk	Started container auth-service
+2026-08-17T03:08:49Z	Normal	Pulled	pod/auth-service-55bd95c686-xxct4	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 301ms (301ms including waiting). Image size: 129975007 bytes.
+2026-08-17T03:08:49Z	Normal	Created	pod/auth-service-55bd95c686-xxct4	Created container: auth-service
+2026-08-17T03:08:49Z	Normal	Started	pod/auth-service-55bd95c686-xxct4	Started container auth-service
+2026-08-17T03:10:48Z	Normal	Pulling	pod/auth-service-55bd95c686-fzg6p	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-08-17T03:10:48Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-tuned	New size: 5; reason: cpu resource utilization (percentage of request) above target
+2026-08-17T03:10:48Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 4 to 5
+2026-08-17T03:10:48Z	Normal	Scheduled	pod/auth-service-55bd95c686-fzg6p	Successfully assigned ecommerce/auth-service-55bd95c686-fzg6p to aks-userpool-16719200-vmss00002d
+2026-08-17T03:10:49Z	Normal	Pulled	pod/auth-service-55bd95c686-fzg6p	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 251ms (251ms including waiting). Image size: 129975007 bytes.
+2026-08-17T03:10:49Z	Normal	Created	pod/auth-service-55bd95c686-fzg6p	Created container: auth-service
+2026-08-17T03:10:49Z	Normal	Started	pod/auth-service-55bd95c686-fzg6p	Started container auth-service
+2026-08-17T03:20:01Z	Normal	Completed	job/k6-auth-test-gradual-auth-service-h2-gradual-rep4	Job completed
+2026-08-17T03:21:04Z	Normal	Killing	pod/auth-service-55bd95c686-fzg6p	Stopping container auth-service
+2026-08-17T03:21:04Z	Normal	Killing	pod/auth-service-55bd95c686-ptthl	Stopping container auth-service
+2026-08-17T03:21:04Z	Normal	Killing	pod/auth-service-55bd95c686-xxct4	Stopping container auth-service
+2026-08-17T03:21:04Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-xxct4
+2026-08-17T03:21:04Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-ptthl
+2026-08-17T03:21:04Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-tuned	New size: 2; reason: All metrics below target
+2026-08-17T03:21:04Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-55bd95c686 from 5 to 2
+2026-08-17T03:21:34Z	Normal	Killing	pod/auth-service-55bd95c686-sc9pk	Stopping container auth-service
+2026-08-17T03:21:34Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-tuned	New size: 1; reason: All metrics below target
+2026-08-17T03:21:34Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-55bd95c686 from 2 to 1
