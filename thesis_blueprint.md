@@ -11,7 +11,7 @@ The thesis has evolved through five iterations:
 2. **Revised scope** (8/10): HPA threshold × scaling policy matrix — added depth but remained within reactive scaling paradigm
 3. **First KEDA blueprint** (8.5/10): HPA vs KEDA — paradigm comparison, but had a fairness flaw (changing two variables at once: engine AND metric type)
 4. **Factorial-design blueprint** (9/10): HPA (CPU) vs HPA (request-rate via prometheus-adapter) vs KEDA (request-rate) — **controlled factorial design** that isolates the metric-type effect from the engine-architecture effect
-5. **Current evidence-bearing state** (this revision, 9.4/10): same factorial design, now backed by a **complete 180-run dataset (all reps 1–5 for both core services)**. Shipping-rate-service has clean Prometheus data for all 90 runs. Auth-service has clean data for gradual (all configs) and most spike/oscillating runs, with targeted data-quality issues in 5 runs requiring rerun (see Section 1 — Complete Dataset Status, 2026-06-03). Auth-service remains the **CPU-dominant control**, shipping-rate-service is the **wait-dominant comparison service**, and product-service is retained only as an **exploratory dependency-limited appendix case**
+5. **Current evidence-bearing state** (this revision): same factorial design, backed by a **complete, uniformly clean 180-run dataset** re-run 2026-08-15→17 after the connection-reuse defect was found and fixed (finding #12). **All 180 runs report 0.00% error with valid Prometheus exports**; `validate-results.sh` returns 0 critical / 0 warnings / 0 info and `deep_validate.py` returns 0 critical. The earlier asymmetry — clean shipping versus partially contaminated auth — is gone: migrating auth to closed-loop `ramping-vus` eliminated the open-loop saturation meltdowns entirely. Auth-service remains the **CPU-dominant control**, shipping-rate-service is the **wait-dominant comparison service**, and product-service is retained only as an **exploratory dependency-limited appendix case**
 
 ### What is good about the HPA vs KEDA theme
 
@@ -82,37 +82,53 @@ The thesis has evolved through five iterations:
 
 11. **Product-service still belongs in the thesis, but as an exploratory or appendix result.** It demonstrates a valuable real-world limitation: scaling the wrong tier can make HPA and KEDA both look worse, even when the autoscaler itself is functioning correctly.
 
-12. **Shipping-rate-service has a complete, clean 90-run dataset (all 5 reps).** `deep_validate.py` reports **0 critical issues and 0 warnings** across all 90 shipping runs. This is the publishable core evidence.
+12. **🚨 ALL PRE-2026-08-15 RESULTS ARE SUPERSEDED. The entire 180-run dataset was re-run after a load-generator defect was found and fixed.** k6 VUs held HTTP/1.1 keep-alive connections for the whole run, and kube-proxy load-balances per *new* connection — so pods added by the autoscaler after the VUs connected received **zero traffic**, and scaling up could not reduce latency. Measured on the old data: in **20 of 20** autoscaled shipping spike runs, ONE pod ran at 367–396m CPU while every other pod sat at 1–4m. The control that proves it: B2's five *fixed* pods spread evenly (167/124/122/106/76m), because its pods existed before the VUs connected. Fixed by `noConnectionReuse: true` in all six k6 scenarios (commit `7fde0a2`). Justification for BAB 3: the tests hit the Service ClusterIP directly, bypassing the NGINX ingress that re-resolves endpoints in production, so disabling reuse restores realistic redistribution rather than distorting the workload. **Any number in this document dated before 2026-08-15 is an artifact and must not be used.**
 
-13. **The definitive 5-rep shipping result (p95 ms, mean ± pop. stdev) is as follows.** These are the authoritative numbers for BAB 4/5 — replace any earlier single-rep estimates with these values.
+13. **The definitive 180-run result (p95 ms, mean ± pop. stdev, 5 reps).** Campaign ran 2026-08-15 06:11 → 08-17 17:05 UTC. **Every run reports 0.00% error** (shipping h3/oscillating 0.01%) with a valid Prometheus export. `validate-results.sh`: 180 runs, **0 critical / 0 warnings / 0 info**. `deep_validate.py`: **0 critical**, 19 warnings (all stale heuristics on auth b1 that still assume the retired open-loop profile). These are the authoritative numbers for BAB 4/5.
 
-| Config | Gradual | Spike | Oscillating | Notes |
-|--------|---------|-------|-------------|-------|
-| B1 | 4970 ± 72 | 5120 ± 44 | 5042 ± 39 | Underprovisioned floor |
-| B2 | 917 ± 0 | 918 ± 0 | 917 ± 0 | Overprovisioned ceiling |
-| H1 (CPU 70%) | 1812 ± 232 | 5712 ± 281 | **995 ± 74** | Best oscillating! |
-| H2 (CPU 50%) | 1368 ± 155 | 5196 ± 119 | 3630 ± 1773 | Best gradual among CPU |
-| H3 (req-rate HPA) | **929 ± 7** | 5178 ± 10 | 5086 ± 14 | Best gradual overall |
-| K1 (KEDA) | 1050 ± 117 | 5302 ± 4 | 5236 ± 29 | Consistent; worst oscillating |
+**shipping-rate-service (wait-dominant — the comparison service):**
 
-B1/B2 validity gate holds: 4970 / 917 ≈ 5.4×. **Key stories:** (1) Gradual: H3 ≈ B2 floor, both CPU configs 1.5–2× worse — request-rate wins clearly. (2) Spike: all reactive methods ≈ B1 (reactive lag limit), but H3/K1 use only 3 pods vs H2's 4 — cost advantage. (3) Oscillating: H1 (default CPU) is *best* at 995ms; H3/K1 are worst at ~5.1s — a nuanced inversion that likely reflects H1's conservative scale-down keeping pods warm through troughs.
+| Config | Gradual | Spike | Oscillating |
+|--------|---------|-------|-------------|
+| B1 | 3218 ± 22 | 3324 ± 22 | 3272 ± 15 |
+| B2 | 917 ± 0 | 917 ± 0 | 916 ± 0 |
+| H1 (CPU 70%) | 920 ± 2 | 1101 ± 177 | **2656 ± 486** |
+| H2 (CPU 50%) | 918 ± 1 | 993 ± 109 | 3008 ± 409 |
+| H3 (req-rate HPA) | 917 ± 0 | 987 ± 64 | 3096 ± 22 |
+| K1 (req-rate KEDA) | **916 ± 0** | **941 ± 10** | 2748 ± 596 |
 
-14. **⚠️ IMPORTANT — K1 was re-run on 2026-05-23.** Before the re-run, K1 shipping data showed different oscillating behavior (the pre-rerun dataset showed K1 oscillating ≈ 1.13 s). After the re-run ("Archive prior K1 datasets" + "Align KEDA K1 behavior with HPA fairness policy" commits), K1 oscillating is 5236 ± 29 ms across all 5 reps. **Any K1 oscillating values ≈ 1.13 s anywhere in earlier blueprint text refer to the archived dataset and must not be used for BAB 4/5.**
+**auth-service (CPU-bound — the control):**
 
-15. **The definitive 5-rep auth result — gradual (clean for all configs).** All other patterns have data-quality issues (see Complete Dataset Status section). Auth gradual is publishable as-is and establishes the CPU-bound control story:
+| Config | Gradual | Spike | Oscillating |
+|--------|---------|-------|-------------|
+| B1 | 3376 ± 79 | 4560 ± 102 | 3134 ± 102 |
+| B2 | 1134 ± 12 | 1452 ± 21 | 1154 ± 27 |
+| H1 | 1164 ± 22 | 1496 ± 24 | 1170 ± 19 |
+| H2 | **1132 ± 16** | 1486 ± 85 | **1160 ± 32** |
+| H3 | 1160 ± 22 | **1462 ± 57** | 1188 ± 25 |
+| K1 | 1150 ± 20 | 1476 ± 38 | 1260 ± 25 |
 
-| Config | Gradual p95 (ms, mean ± stdev) | Err% | Notes |
-|--------|-------------------------------|------|-------|
-| B1 | 59990 ± 0 (60s ceiling) | 52% | Saturated baseline |
-| B2 | 893 ± 43 | 0.7% | 5-replica ceiling |
-| H1 | 1136 ± 70 | 0.7% | All 5 reps clean |
-| H2 | 994 ± 47 | 0.7% | Best autoscaled — current lead |
-| H3 | 1053 ± 115 | 0.7% | All 5 reps clean |
-| K1 | 1008 ± 57 | 0.7% | All 5 reps clean |
+B2 reproduces at 916–917 ms ± 0 across all 15 shipping runs — an exceptionally tight control, which is what licenses treating the differences above as signal.
 
-On the CPU-bound auth service, **all autoscalers perform within ~25% of B2 on gradual** — confirming the control scenario hypothesis. H2 leads slightly.
+14. **⭐ THE HEADLINE — normalise as the fraction of the B1→B2 gap closed by the best autoscaler.** This removes the two services' different absolute floors and makes the result a single clean statement:
 
-16. **Auth spike/oscillating: real data but with quality issues — do not use directly in BAB 4 without qualification.** Two distinct problems: (a) **5 runs have total Prometheus-export loss** (all 5 prom_*.json files are empty `result:[]` — the entire export step failed): `h3/spike` rep1+rep2, `h3/oscillating` rep1+rep2, `k1/spike` rep1. k6 client numbers survive but there is no server-side timeseries. (b) **Many autoscaled spike/oscillating reps have dropped iterations > 200** (auth genuinely saturated under those configs), which breaks the equal-offered-load assumption for cross-config p95 comparison. Auth `k1/oscillating` rep1+rep2 are catastrophic overloads (p95 pegged at 60s ceiling, ~26% errors). These are real findings — KEDA genuinely struggled — but must be reported as saturation evidence, not as clean performance measurements.
+| Condition | Best autoscaler | Gap closed |
+|-----------|-----------------|-----------|
+| shipping gradual | K1 916 ms | **100%** |
+| shipping spike | K1 941 ms | **99%** |
+| **shipping oscillating** | **H1 2656 ms** | **26%** ← the only failure |
+| auth gradual | H2 1132 ms | **100%** |
+| auth spike | H3 1462 ms | **99.7%** |
+| auth oscillating | H2 1160 ms | **99.7%** |
+
+**Five of six conditions are effectively solved by any autoscaler. Exactly one fails: wait-dominant workload under oscillating load.** That single cell is the thesis contribution. **Mechanism:** shipping's service time is ~900 ms (async carrier-mock fan-out) versus auth's ~70–170 ms. Against a 90 s oscillation period, shipping gets too few service-times per cycle to drain in-flight work and converge, so replica count tracks the load permanently out of phase; auth converges within a fraction of a cycle. **Scope caveat for BAB 5:** shipping is the only wait-dominant workload tested, so this is a mechanism-supported single-workload finding, not a general law — frame it as such.
+
+15. **Secondary effects — both real, both small, and both visible only where autoscaling is stressed (shipping spike).**
+    - **Metric (CPU vs request-rate):** request-rate 941/987 vs CPU 993/1101 ≈ **10%** advantage. A tie in all five other conditions. On shipping oscillating, CPU is marginally *better* (H1 2656 is the best of a bad set).
+    - **Engine (H3 vs K1, identical metric and threshold — the fairness control):** K1 941 ± 10 vs H3 987 ± 64. KEDA is ~**5% faster and 6× more stable**. This is the cleanest engine result in the dataset and the factorial design's main payoff; the pre-fix data could not show it because connection pinning swamped the effect. Elsewhere a tie; on auth oscillating HPA wins (1188 vs 1260).
+    - **⚠️ The old "request-rate gives −49% on gradual" claim is dead.** All four autoscalers now sit on the B2 floor on gradual (916–920 ms, a 4 ms spread = noise). That gap was entirely connection pinning: request-rate scaled *earlier*, so more pods existed while VUs were still opening new connections. The apparent metric advantage was really "scaled earlier, caught more new connections."
+
+16. **The auth open-loop meltdowns are gone.** The old auth data (B1 at 60 s / 52% error, K1 spike 22 644 ms / 11.9% bimodal) was an artifact of the `ramping-arrival-rate` executor, which drops iterations under saturation and therefore delivered *unequal load* to different configs — making cross-config p95 meaningless. auth-service was migrated to closed-loop `ramping-vus` (commit `2bbdb1f`, `BASE_VUS=1`, `PEAK_VUS=12`, calibrated against fixed-replica B1/B2 ladders). Every auth run now reports 0.00% error with tight SDs. A separate fix removed a constant measurement artifact: `setup()` unconditionally re-registered 120 existing users, injecting exactly 120 failures per run *before any load* — which was the entire reported "0.7% error" on otherwise-clean auth runs (commit `a39b1f2`).
 
 ### Recovery and Calibration Timeline (April 7-22, 2026)
 
@@ -148,9 +164,12 @@ On the CPU-bound auth service, **all autoscalers perform within ~25% of B2 on gr
 | **2026-04-18 → 2026-04-21** | Shipping first-sweep blockers discovered and fixed | The first shipping sweep exposed real pre-thesis issues: OOM/probe/backoff behavior, readiness semantics, runner/export gaps, validator drift, and a Prometheus-adapter OOM during H3. These were fixed before accepting the shipping matrix. |
 | **2026-04-22** | Shipping 18-run first repetition completed and validated | All shipping `rep1` runs finished. `validate-results.sh` returned `0` critical / `0` warnings; `deep_validate.py` returned `0` critical / `1` warning. Shipping is now the clean half of the current core matrix. |
 | **2026-04-22** | First-run artifact report generated | The artifact report formalized the current state: shipping accepted as thesis-usable core evidence, auth marked as directional but artifact-contaminated by old event exports, and product fixed as appendix-only. |
-| **2026-05-23** | K1 shipping re-run after fairness realignment | K1 archived, re-run with KEDA behavior aligned to HPA fairness policy. All 5 new K1 reps completed clean. K1 oscillating is now 5236 ± 29 ms (not ~1.13 s from the archived dataset). |
+| **2026-05-23** | K1 shipping re-run after fairness realignment | K1 archived, re-run with KEDA behavior aligned to HPA fairness policy. All 5 new K1 reps completed clean. K1 oscillating measured 5236 ± 29 ms. *(Superseded by the 2026-08 re-run — see finding #12. Current value: 2748 ± 596 ms.)* |
 | **2026-05-26 → 2026-05-27** | Auth 5-rep sweep completed | All 90 auth runs (reps 1–5, all configs/patterns) completed and stored. 27 critical issues identified: 5 runs with total Prometheus-export loss; multiple spike/oscillating reps with dropped iterations from genuine saturation. Auth gradual (all configs) is clean for all 5 reps. |
 | **2026-06-03** | All 180 runs complete — dataset status confirmed | `.experiment-state` = 180 DONE entries. `deep_validate.py` across all 5 reps: shipping 0/0; auth 27 critical / 77 warnings. Shipping is fully publishable. Auth gradual is fully publishable. Auth spike/oscillating requires targeted reruns (5 empty-export runs) or explicit methodology qualification before BAB 4 analysis. |
+| **2026-08-15** | Connection-reuse defect found and fixed | Per-pod CPU analysis showed 20/20 autoscaled shipping spike runs had ONE pod at 367–396 m and all others at 1–4 m, while B2's fixed pods spread evenly — proving autoscaler-added pods never received traffic under k6 keep-alive. Fixed with `noConnectionReuse: true` in all six scenarios. |
+| **2026-08-15** | auth-service migrated to closed-loop `ramping-vus` | Replaced `ramping-arrival-rate`, which dropped iterations under saturation and delivered unequal load across configs. PEAK_VUS=12 / BASE_VUS=1 calibrated against fixed-replica B1/B2 ladders. Eliminated all auth meltdowns (was B1 60 s/52% err; now 0.00% err everywhere). |
+| **2026-08-15→17** | Full 180-run re-run | 58.9 h on `ecommerce-vm`. All 180 runs 0.00% error, valid Prometheus exports. `validate-results.sh` 0/0/0; `deep_validate.py` 0 critical. This is the definitive dataset. |
 
 ### Shipping-Rate-Service Calibration Deep Dive (April 17–18, 2026)
 
@@ -185,7 +204,16 @@ This section records the full reasoning chain behind each calibration decision f
 - **CPU not throttled** — at VU=100 the pod is CPU-throttled (500 m against a 500 m limit), which distorts the CPU-HPA comparison because throttling makes CPU appear to plateau even though load is still increasing
 - **Below the 10 s carrier timeout** — p99 at VU=80 stays below 10 s, so there is no carrier-timeout error contamination
 
-**Thesis implication:** The B1/B2 gate (5.56× ratio) is the scientific validity gate for the entire matrix. If B2 (5 pods) cannot outperform B1 (1 pod) significantly, the workload is not app-tier-sensitive and autoscaler comparison is meaningless. A 5.56× ratio is a strong gate. For context, a ratio of 2–3× is considered acceptable; >5× is excellent. This gate figure will be reported in BAB 3 (Metode Penelitian) as the load calibration evidence.
+**⚠️ Calibration provenance:** the ladder above was measured in April 2026 with HTTP keep-alive still enabled, so its absolute p95 values (5.10 s at VU=80) do not match the final dataset. **PEAK_VUS = 80 remains the correct choice** — the ladder's purpose was to pick a VU level with 0% errors, no CPU throttling, and clear B1/B2 separation, and all three still hold post-fix. Only the absolute latencies shifted.
+
+**Thesis implication — report the *measured* gate, not the calibration-ladder gate.** The B1/B2 ratio is the scientific validity gate: if B2 (5 pods) cannot outperform B1 (1 pod) significantly, the workload is not app-tier-sensitive and autoscaler comparison is meaningless. Measured on the final 180-run dataset:
+
+| Service | Gradual | Spike | Oscillating |
+|---------|---------|-------|-------------|
+| shipping-rate-service | 3.51× | 3.62× | 3.57× |
+| auth-service | 2.98× | 3.14× | 2.72× |
+
+Every cell clears the gate. Shipping sits at ~3.5–3.6× and auth at ~2.7–3.1×, all within the accepted 2–3×+ band, with shipping comfortably above it. The gate is narrower than the 5.56× quoted from the April ladder because disabling connection reuse improved B1 (a single pod no longer suffers keep-alive queueing) far more than B2. **Report these six figures in BAB 3 (Metode Penelitian) as the load calibration evidence — not the 5.56×, which was measured under the defective generator.**
 
 #### Why the Service Is Not Purely Wait-Dominant at High VUs
 
@@ -239,7 +267,25 @@ Before launching the 18-run matrix, a deep pre-flight audit found 4 bugs. All we
 - **Product-service remains in the thesis as a case-study, not as wasted work.** It provides a realistic counterexample showing that autoscaling app pods does not fix every performance problem — specifically, that when a downstream dependency dominates, app-tier scaling can make outcomes *worse* by increasing database connection pressure.
 - **The revised thesis central claim (for BAB 5):** The 5-repetition data shows that request-rate-based autoscaling (H3/K1) gives the clearest benefit on the **gradual** wait-dominant shipping workload. On spike, all reactive autoscalers are bounded by reactive lag — but request-rate configs (H3/K1) are more cost-efficient at the same latency. On oscillating, H1 (default CPU) unexpectedly outperforms request-rate configs — likely because conservative scale-down keeps pods warm through troughs. CPU-based HPA (H2) remains strongest on the CPU-bound auth gradual workload. These findings are now backed by complete 5-rep data for shipping and clean gradual data for auth.
 
-### Current Dataset Status and Remaining Work (2026-06-03)
+### Dataset Status (CURRENT — 2026-08-17)
+
+**All 180 runs are complete and uniformly clean.** Every run reports 0.00% error (shipping h3/oscillating 0.01%) with a valid Prometheus export.
+
+| Validator | Result |
+|-----------|--------|
+| `validate-results.sh` | 180 runs — **0 critical, 0 warnings, 0 info** |
+| `deep_validate.py` (5 reps, `--strict-matrix`) | 180/180 — **0 critical**, 19 warnings |
+
+The 19 warnings are all on auth `b1` and are **stale validator heuristics, not data defects**: `B1-LOW` expects the open-loop meltdown that closed-loop VUs no longer produce, and `A1-RPS` compares against the retired `base=10/peak=40` **RPS** profile, which is meaningless for VU-driven load. `deep_validate.py` should be updated to branch on `load_profile.version == "closed-loop-vus-v3"`.
+
+**No runs require rerun or qualification.** Both services are fully usable for BAB 4, including all spike and oscillating cells.
+
+---
+
+<details>
+<summary><strong>⚠️ SUPERSEDED — dataset status as of 2026-06-03 (kept for provenance only; do not use)</strong></summary>
+
+The assessment below describes the **pre-fix** dataset, which was discarded in the 2026-08 re-run. Its conclusions about which runs were clean no longer apply — and note that its "clean shipping, 0 critical / 0 warnings" verdict was itself misleading, because the validators had no check for load distribution across pods and therefore could not detect that autoscaler-added pods were receiving zero traffic (finding #12).
 
 All 180 runs are complete. The dataset is asymmetric in quality:
 
@@ -258,6 +304,8 @@ All 180 runs are complete. The dataset is asymmetric in quality:
 2. **Run Wilcoxon signed-rank tests** across the 5-rep distributions for the primary KPIs (shipping gradual is ready; shipping spike/oscillating ready; auth gradual ready).
 3. **Extract time-to-scale** (load-onset → first `SuccessfulRescale` event) — this primary KPI is not yet computed from the stored artifacts.
 4. **Lock product-service as appendix-only** — product results stay outside the pooled core statistics.
+
+</details>
 
 
 
@@ -924,7 +972,7 @@ spec:
 | **shipping-rate-service** | Wait-dominant external-dependency workload | The hot path asynchronously fans out to three carrier quote endpoints, each with controlled delay and small payloads. This keeps the service mostly waiting on downstream responses with minimal local CPU, making it the deliberate non-CPU counterpart to auth-service. |
 | **auth-service** | CPU-bound (bcrypt hashing) | CPU correlates with load → HPA works well → KEDA may offer no advantage. This is the "control" scenario. |
 
-**Working hypothesis, confirmed by 5-rep evidence:** On auth-service, CPU-based HPA is competitive — the **5-rep gradual data shows H2 (994 ms) as the strongest autoscaled config**, consistent with the CPU-bound control hypothesis. On shipping-rate-service, the **5-rep data confirms H3 (929 ms) gives the clearest advantage on gradual load**. However spike and oscillating are more nuanced: spike shows all reactive autoscalers bounded by reactive lag (H3/K1 more cost-efficient at same latency), and oscillating shows H1 (default CPU) as the best autoscaler at 995ms — a counter-intuitive inversion that is itself a publishable finding. Product-service is retained as a supporting case-study showing: **when the dominant bottleneck lives in a downstream dependency, app-tier autoscaling may not help and can even worsen outcomes.**
+**Working hypothesis, revised against the post-fix 180-run evidence (2026-08-17):** The control behaves exactly as predicted — on CPU-bound auth-service every autoscaler lands within 1–3% of B2 on all three patterns, so metric and engine choice are both immaterial there. What did *not* survive is the expected wait-dominant advantage for request-rate: on shipping gradual all four autoscalers sit on the B2 floor (916–920 ms, a 4 ms spread), because the original −49% gap was a load-generator artifact (finding #12). The surviving result is **conditional**: metric and engine matter only where autoscaling is genuinely stressed — shipping **spike**, where request-rate gains ~10% and KEDA a further ~5% with 6× better stability. And the dominant effect is neither metric nor engine but **workload × load-pattern**: shipping **oscillating** is the single condition where every configuration fails (closing only 26% of the B1→B2 gap versus ≥99% everywhere else). Product-service is retained as a supporting case-study showing: **when the dominant bottleneck lives in a downstream dependency, app-tier autoscaling may not help and can even worsen outcomes.**
 
 ### Experimental Protocol
 
@@ -1473,8 +1521,8 @@ Shape = load pattern (circle=gradual, triangle=spike, square=oscillating)
 ```
 
 Draw the **Pareto frontier**: configurations where no other config is both cheaper AND faster. With 6 configs × 3 load patterns = 18 data points per service, the Pareto plot will clearly show clusters:
-- Shipping-rate-service: the **5-rep definitive evidence** shows the clearest request-rate advantage on **gradual** load (H3 929ms ≈ B2 floor); a reactive-lag cluster on **spike** (all autoscalers ~5.2–5.7s, but H3/K1 use fewer pods); and a **counter-intuitive inversion on oscillating** — H1 (default CPU) wins at 995ms while H3/K1 are worst at ~5.1s
-- Auth-service: the **5-rep gradual data confirms H2 (994ms) as the strongest autoscaled config** — CPU-based HPA is competitive on the CPU-bound control service as expected. Auth spike/oscillating data is partially contaminated (see finding #16); those Pareto points should be annotated accordingly
+- Shipping-rate-service (post-fix 180-run data): on **gradual** all four autoscalers collapse onto the B2 floor (916–920 ms) — a single Pareto cluster where only cost separates them; on **spike** a genuine frontier emerges (K1 941 ms < H3 987 < H2 993 < H1 1101, all ≈3× better than B1 3324); on **oscillating** every config is dominated, sitting at 2656–3096 ms against a 916 ms floor — plot these as a failure cluster, not a frontier
+- Auth-service: every autoscaler is within 1–3% of B2 on **all three** patterns (gradual 1132–1164 ms, spike 1462–1496, oscillating 1160–1260), so the Pareto plot is a single tight cluster per pattern — CPU-based HPA is fully competitive on the CPU-bound control, as predicted. The earlier contamination caveat no longer applies: after the ramping-vus migration every auth run is 0.00% error (finding #16)
 - Product-service can be shown separately as an exploratory contrast where downstream DB saturation can distort or even reverse apparent app-tier autoscaling gains
 
 This is academically impressive (multi-objective optimization vocabulary) and practically useful (a decision-maker can pick their cost-performance preference).
@@ -1503,21 +1551,20 @@ Produce a summary table that no other S1 thesis has:
 
 | Service Type | Metric Effect (H3 vs H1) | Engine Effect (K1 vs H3) | Combined Effect (K1 vs H1) |
 |-------------|------------------------|-------------------------|---------------------------|
-| shipping-rate-service — gradual **(5-rep mean)** | (929−1812)/1812 = **−48.7%** | (1050−929)/929 = **+13.0%** | (1050−1812)/1812 = **−42.1%** |
-| shipping-rate-service — spike **(5-rep mean)** | (5178−5712)/5712 = **−9.3%** | (5302−5178)/5178 = **+2.4%** | (5302−5712)/5712 = **−7.2%** |
-| shipping-rate-service — oscillating **(5-rep mean)** | (5086−995)/995 = **+411%** | (5236−5086)/5086 = **+2.9%** | (5236−995)/995 = **+426%** |
-| auth-service — gradual **(5-rep mean, all clean)** | (1053−1136)/1136 = **−7.3%** | (1008−1053)/1053 = **−4.3%** | (1008−1136)/1136 = **−11.3%** |
-| auth-service — spike **(data quality issues; use with qualification)** | *see finding #16* | *see finding #16* | *see finding #16* |
-| auth-service — oscillating **(data quality issues; use with qualification)** | *see finding #16* | *see finding #16* | *see finding #16* |
+| shipping-rate-service — gradual | (917−920)/920 = **−0.3%** | (916−917)/917 = **−0.1%** | (916−920)/920 = **−0.4%** |
+| shipping-rate-service — spike | (987−1101)/1101 = **−10.4%** | (941−987)/987 = **−4.7%** | (941−1101)/1101 = **−14.5%** |
+| shipping-rate-service — oscillating | (3096−2656)/2656 = **+16.6%** | (2748−3096)/3096 = **−11.2%** | (2748−2656)/2656 = **+3.5%** |
+| auth-service — gradual | (1160−1164)/1164 = **−0.3%** | (1150−1160)/1160 = **−0.9%** | (1150−1164)/1164 = **−1.2%** |
+| auth-service — spike | (1462−1496)/1496 = **−2.3%** | (1476−1462)/1462 = **+1.0%** | (1476−1496)/1496 = **−1.3%** |
+| auth-service — oscillating | (1188−1170)/1170 = **+1.5%** | (1260−1188)/1188 = **+6.1%** | (1260−1170)/1170 = **+7.7%** |
 
-*Shipping values use 5-rep means from the clean dataset (2026-06-03). Auth gradual uses 5-rep means (all clean). Auth spike/oscillating cannot be computed reliably until the 5 empty-export runs are re-run or excluded. The K1 shipping values use the 2026-05-23 re-run dataset — the archived pre-rerun K1 values must not be used.*
+*All values are 5-rep means from the post-fix 180-run dataset (2026-08-15/17, commit `7fde0a2`). Negative = improvement. Every pre-2026-08-15 value in earlier revisions of this table was a connection-pinning artifact — see finding #12.*
 
-**Interpretation of the shipping rows:**
-- **Gradual:** The metric type (H1→H3) accounts for −48.7% improvement; the engine switch (H3→K1) then *adds back* +13% (H3 slightly beats K1). Combined net: −42% vs H1.
-- **Spike:** Metric effect exists (−9.3%) but both H3 and K1 are still bound by reactive lag. Engine effect is negligible (+2.4%).
-- **Oscillating (the most academically interesting row):** Switching from CPU to request-rate metric *worsens* latency by +411%. This counter-intuitive result (CPU HPA's H1 is the best at oscillating) is itself a publishable finding about how metric choice interacts with load pattern.
-
-This table answers definitively: "How much improvement comes from the metric? How much from the engine?" No other thesis at this level performs this decomposition.
+**Interpretation — the decomposition is now mostly null, and that IS the result:**
+- **Four of six rows are within ±2.5% on the metric axis.** Once every pod actually receives traffic, metric choice stops mattering. The old table's headline −48.7% on shipping gradual does not survive: H1 and H3 now differ by 3 ms.
+- **Shipping spike is the one row where the decomposition works as designed:** metric contributes **−10.4%**, engine a further **−4.7%**, combined **−14.5%**. Read alongside the stability figures (K1 ± 10 ms vs H3 ± 64 ms), this is the strongest evidence in the thesis that engine architecture matters independently of metric.
+- **Shipping oscillating inverts (+16.6% metric):** request-rate is *worse* than CPU here. But note all four configs are 2.7–3.1 s against a 916 ms floor, so this row compares degrees of failure, not degrees of success. Report it with finding #14's gap-closed framing rather than as a metric recommendation.
+- **Honest framing for BAB 5:** the decomposition's value has shifted from "how much improvement comes from the metric" to **"under what conditions does either factor matter at all"** — the answer being: only when the workload's service time is long relative to the load-change period. That is a more precise claim than the original and it is supported by a two-service contrast rather than a single measurement.
 
 ---
 
@@ -1601,7 +1648,7 @@ All 180 runs have been executed and stored in `experiment-results/`. The planned
 
 3. **The workload-fit finding is genuine and practical.** The experiment will empirically show when CPU-based HPA is sufficient, when request-rate scaling is needed, and how much of the improvement comes from the metric versus the engine. The factorial design still reveals WHETHER the fix is the metric (H3 vs H1) or the engine (K1 vs H3) — a nuanced finding that no other S1 thesis provides.
 
-4. **The decomposition table is a unique deliverable.** Quantifying "60% of the improvement comes from the metric, 10% from the engine" is something industry practitioners can directly act on. It's also something examiners have never seen from an S1 student.
+4. **The decomposition table is a unique deliverable — and its null rows are the finding.** The post-fix data quantifies exactly when each factor matters: four of six conditions are within ±2.5% on the metric axis (it does not matter), while shipping spike shows metric −10.4%, engine −4.7%, combined −14.5%. "Metric choice is irrelevant unless the workload's service time is long relative to the load-change period" is a directly actionable rule for practitioners, and a more defensible claim than a single headline percentage.
 
 5. **Multi-dimensional analysis.** Combining performance, efficiency, and cost into a Pareto analysis with Pareto frontiers and dollar-cost equivalents elevates this above descriptive empiricism.
 
