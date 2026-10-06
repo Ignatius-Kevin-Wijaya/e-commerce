@@ -8,7 +8,7 @@
 
 ---
 
-## 8.0 Status at a glance (2026-10-06, 10:25 UTC)
+## 8.0 Status at a glance (2026-10-06, 11:45 UTC)
 
 | Stage | Status | Outcome |
 |---|---|---|
@@ -16,8 +16,8 @@
 | User decision | ✅ 2026-10-06 | "Switch to the full 180-run open-loop campaign **only if it is robust already**" (§8.8) |
 | v2 fixes (admission control, auth pre-auth, robustness gate) | ✅ Implemented, unit-tested, deployed via ConfigMap overlay | §8.9–§8.10 |
 | v2 calibration ladders | ✅ Done 2026-10-06 06:44–08:28 | Collapse removed up to the planned peaks (§8.11) |
-| v2 smoke test (9 runs) | ⏳ Running on `ecommerce-vm` since 08:31 (5/9 done at 10:11) | Runs 1–5 validated clean (0 critical): shipping H3, K1, H2 and auth H2 all scale 1→5 pods; the single shipping B1 pod holds 105 req/s for 7 min (goodput 42.32–43.07 req/s every minute, 0 timeouts). G6 needs runs 6–9 (§8.12) |
-| 180-run open-loop campaign | ⏸ Not started | Needs smoke pass + user go-ahead; gate after rep block 2 (§8.13) |
+| v2 smoke test (9 runs) | ✅ Done 08:31–11:31; AKS stopped 11:35 | **Pre-registered gate FAIL on one cell:** shipping H3 error rate 5.32 / 6.97% across reps (27% of mean; limit 25% or 1 point), caused by a first scale-up one 15 s HPA cycle later. Everything else passes: 9/9 runs clean, B1 hold graceful, SLO-violation seconds 70/70, 70/70, 100/100 (shipping) and 140/170 (auth) (§8.12) |
+| 180-run open-loop campaign | ⏸ Approved in principle (user, ≈12:00) with G6 rule v2 — 50% or ≤ 30 s / ≤ 2 points (§8.9) | Config filled; launch awaits the user's go-ahead on time and cost; gate after 72 runs (§8.13) |
 
 **The closed-loop final dataset (Part 01, findings #13–#16) remains the authoritative dataset** unless the
 open-loop campaign is run and passes its gate.
@@ -272,8 +272,28 @@ scrapeable from a collapsed pod); uvicorn `--limit-concurrency` (also rejects pr
 - **Analysis cache** (`analysis/cache/<run_id>.npz`) was keyed by run id and file time only. Run ids repeat across the
   result folders, and analysing smoke runs 1–2 at 09:18 overwrote the v1 cache of shipping H3/K1 rep1 with smoke data.
   The cache is now tied to the raw file's md5. Impact: none on reported numbers — re-analysing all 20 v1 runs from
-  raw data reproduces `gate.json` (written 08:52, before the overwrite) with 0 differences; `summary.json` /
+  raw data reproduces `gate.json` (now `gate-v1.json`; written 08:52, before the overwrite) with 0 differences; `summary.json` /
   `tables.md` (05:18) and `pilot-openloop-report.md` (09:16) also predate it.
+
+**G6 rule v2 (chosen by the user 2026-10-06 ≈12:00 UTC — after the smoke, before any campaign data):** replicate
+SLO-violation seconds and error % each agree when the gap is **≤ 50% of the mean, or ≤ 30 s / ≤ 2 points**. G1–G5 are
+unchanged. Reasons:
+- The gap between two reps is dominated by the autoscaler's 15 s loop: in 6 of the 8 rep pairs measured (pilot +
+  smoke) the first scale-up came 14.6–15.8 s apart.
+- In the fixed system one such cycle produced gaps of up to 27% of the mean (shipping H3 errors), 30 s (auth H2
+  SLO-violation) and 1.93 points (auth H2 errors). Rule v1 (25% / 20 s / 1 point) sat at or below that noise; its
+  1-point allowance was set without checking what one cycle costs (≈1.5 points on shipping: 42.9 req/s × 15 s of
+  43,625 window requests).
+- Oscillating peaks are 180 s = 12 cycles apart, so a rep that is late at the first peak is expected to be late at all
+  three: absolute gaps can triple, relative ones should not (expectation, not yet measured).
+- The defects behind the pilot's divergence are now checked directly: start state (G2), scrape/metric loss and
+  restarts (G3).
+- Checked on labelled data: rule v2's G6 still rejects pilot v1 (shipping H2 sticky collapse, SLO-violation 170 / 310 s
+  = 58%) and passes the smoke; rule v1 rejects both. Accepted trade-off: divergence between 25% and 50% from an
+  unknown cause no longer stops the campaign; it shows up as spread in the 5-rep results.
+- The smoke stays FAIL on record (`experiment-results-openloop-smoke/analysis/gate-v1.json`); rule v2 is judged only on
+  campaign data. `pilot_openloop.py gate --rule v1|v2` (default v2) writes `analysis/gate-<rule>.json`; the pilot's
+  original `gate.json` was renamed `gate-v1.json`.
 - Run on the v1 pilot data, the gate **fails** on exactly the known problems (G2 auth H2; G3 shipping H3 metric failures
   and the two liveness restarts; G6 the rep disagreements) — evidence it detects these failures.
 
@@ -331,7 +351,7 @@ scrapeable from a collapsed pod); uvicorn `--limit-concurrency` (also rejects pr
   rather than 75%, but comparable with the pilot on identical load), shipping 10→105 req/s (bounded by the single-pod
   graceful limit, not by the B2 ceiling), SLOs 1500 / 1200 ms, timeout 5 s.
 
-## 8.12 v2 smoke test (in progress)
+## 8.12 v2 smoke test (done 2026-10-06 — pre-registered gate FAIL on one G6 cell)
 
 - **Runs (9):** auth H2 spike ×2, shipping H2/H3/K1 spike ×2 (the cells that failed the pilot) + shipping B1 spike ×1
   (a full 7-minute hold at 105 req/s; the ladder held it for 2 min). Not campaign data. Seed 20261007.
@@ -359,21 +379,64 @@ scrapeable from a collapsed pod); uvicorn `--limit-concurrency` (also rejects pr
 - **Run 5 — shipping B1 hold (clean):** one pod at 105 req/s for the full 7-minute load window: goodput **42.32–43.07
   req/s in every minute** (window mean 42.91), **0.00% timeouts**, 58.69% fast 503s, scrapeable throughout, no
   restarts → graceful; the B1-hold condition is met. Pilot v1, same cell: goodput 0.91 req/s, 99.13% errors.
-- **Status at 10:25 UTC:** 5/9 DONE (state file on the VM), run 6 (shipping K1 rep 2) in progress; expected end
-  ≈11:35 UTC (estimate, ≈1180 s per run). G6 needs the rep-2 runs 6–9. Analyse with
-  `PILOT_OPENLOOP_DIR=experiment-results-openloop-smoke tools/python312/python.exe scripts/pilot_openloop.py gate`
-  after copying the results from the VM.
+- **Runs 6–9 (rep 2, all validated clean):** shipping K1 — scale-ups +29.4 / +44.4 / +89.4 s, goodput 97.29 req/s,
+  6.33% errors, 0 timeouts, 70 s; shipping H3 — +35.1 / +50.1 / +80.1 s, goodput 96.62, 6.97% errors, 0 timeouts,
+  70 s; auth H2 — +49.5 (1→3) / +109.5 / +169.5 s, goodput 26.83 of 29.67, 9.56% errors (1.21% timeouts), 170 s;
+  shipping H2 — +79.5 s (1→4) / +199.5 s, goodput 90.45, 12.92% errors, 0 timeouts, 100 s.
+- **Finished** 11:31:31 UTC (9/9 DONE first attempt, 1172–1268 s per run); the VM stopped AKS at 11:35:26 (verified
+  11:38: `Stopped` / `Succeeded`). Results tarball md5-verified; runs 1–5 byte-identical to the copies committed in
+  `0931c62`. Validator: **9 runs, 0 critical, 0 warnings**.
 
-## 8.13 Campaign plan (only if the smoke passes and the user approves)
+**Gate result (`gate --reps 2`, pre-registered smoke criteria): FAIL — one G6 cell.**
+
+| Criterion | Result |
+|---|---|
+| G1 instrument, G2 start state, G3 observability, G5 per-pod load | ✅ PASS, 9/9 runs |
+| G4 calibration | n/a by design (no B2 runs); the tool prints FAIL for the missing B2 |
+| B1 hold (graceful, scrapeable, no restarts) | ✅ met (run 5) |
+| G6 auth H2 | ✅ SLO-violation 140 / 170 s (19% of mean); errors 11.48 / 9.56% (18%) |
+| G6 shipping H2 | ✅ 100 / 100 s (0%); 12.92 / 13.02% (1%) |
+| G6 shipping K1 | ✅ 70 / 70 s (0%); 7.61 / 6.33% (18%) |
+| G6 shipping H3 | ❌ 70 / 70 s (0%) ✅, but errors 5.32 / 6.97%: range 1.65 points = 27% of the mean (limit 25% **or** 1 point) |
+
+**Why H3's error rate differs (measured; recorded as an explanation — it does not change the verdict):**
+- Rep 2's first scale-up came **15.8 s later** (+35.1 vs +19.3 s — one 15 s HPA sync period); its 3→5 step also came
+  14.8 s later (+80.1 vs +65.3 s). Ready pod-seconds in the first 120 s after onset: 324 vs 281.
+- Failed requests by phase (rep 1 / rep 2): onset+0–30 s 1,399 / 1,406; +30–60 s **793 / 1,496**; +60–90 s 128 / 140;
+  after +90 s 0 / 0. The entire 722-request gap (1.65 points of 43,625 load-window requests) is in the 30–60 s window.
+- A similar shift occurs in auth H2 (+34.5 vs +49.5 s, 15.0 s) and K1 (+38.8 vs +29.4 s, 9.4 s); those cells pass
+  only because their mean error is higher, so a similar 1.3–1.9-point gap stays under 25% of the mean. Shipping H2 scaled at
+  +79.1 / +79.5 s in both reps.
+- One 15 s tick at the single-pod stage costs ≈ one pod's goodput × 15 s ≈ 42.9 × 15 ≈ 640 requests ≈ 1.5 points for
+  shipping — more than the 1-point error floor that was meant to absorb control-loop quantization (the 20 s
+  SLO-violation floor did absorb it). With n = 2, the error test fails on tick-phase luck alone whenever a cell's mean
+  error is below roughly 4 × 1.5–1.7 ≈ 6–7%.
+- Every structural failure of the pilot is gone in all 9 runs (no collapse, no metric blindness, 1 replica at onset,
+  even per-pod load, no scrape failures or restarts), and the primary KPI replicated exactly in the three shipping
+  cells (70/70, 70/70, 100/100 s).
+- **Consistent effects (n = 2, indicative):** on shipping, request-rate scaling beats CPU scaling — SLO-violation
+  70 s (H3, K1) vs 100 s (H2), errors 5.32–7.61% vs 12.92–13.02%, first scale-up +19–39 s vs +79 s; H3 and K1 tie.
+  Almost all errors fall in the first 120 s after onset (0–34 failed requests per run in the remaining 300 s).
+
+**Decision (user, 2026-10-06 ≈12:00 UTC): run the 180-run open-loop campaign** ("option 2"; the deadline is not a
+constraint) under G6 rule v2 (§8.9), fixed before any campaign data. The smoke stays FAIL on record and is not
+re-scored.
+
+## 8.13 Campaign plan (approved in principle 2026-10-06 with G6 rule v2; launch needs the user's go-ahead)
 
 - 180 runs (`experiment-results-openloop/runlist.txt`: 2 services × 6 configs incl. H1 × 3 patterns × 5 reps), shuffled
-  within rep blocks (seed 20261006); positions 1–72 are rep blocks 1–2.
-- **Gate after rep block 2** (72 runs, ≈24 h ≈ $12 of AKS, estimate): `gate --reps 2` on G1–G6. Pass → the 72 runs count
-  toward the campaign and reps 3–5 follow (total ≈60–63 h ≈ $31–33, estimate from the pilot's 1202 s/run and the
-  runner's 1260 s/run planning figure). Fail → stop; the closed-loop dataset stays primary and the open-loop work is
-  reported as a robustness study.
-- Rates/caps/SLOs as in §8.11 (to be written into `experiment-results-openloop/pilot-config.env` before the plan is
-  frozen).
+  within rep blocks (seed 20261006); positions 1–36 are rep 1 and 37–72 rep 2, each block covering all 36 cells (18 auth
+  + 18 shipping) — checked with a dry run (the plan freezes on the first real run).
+- **Gate after rep block 2** (72 runs): `gate --reps 2` (G1–G5 + G6 rule v2). Pass → the 72 runs count toward the
+  campaign and reps 3–5 follow after the user's go-ahead. Fail → stop; the closed-loop dataset stays primary and the
+  open-loop work is reported as a robustness study.
+- **Time and cost (estimates from the smoke's measured 1,237.5 s per auth run and 1,188.6 s per shipping run, at
+  $0.516/h of AKS):** first 72 runs ≈24.3 h ≈ $12.5; remaining 108 ≈36.4 h ≈ $18.8; total ≈60.7 h ≈ $31.3 (the
+  runner's 1,260 s/run planning figure gives 63.0 h). VM cost not included.
+- **Unattended on the VM:** `run-openloop-vm.sh experiment-results-openloop yes 72` stops at 72 DONE, archives the
+  results and stops AKS (new third argument; runs execute in plan order, so 72 DONE = positions 1–72).
+- Settings written into `experiment-results-openloop/pilot-config.env` on 2026-10-06: caps 22 / 48, auth 2→30 and
+  shipping 10→105 req/s, SLOs 1500 / 1200 ms — identical to the smoke except the seed.
 
 ## 8.14 Implications for the thesis text
 

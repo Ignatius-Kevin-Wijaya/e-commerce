@@ -54,8 +54,8 @@
 | **Open-loop pilot v1** | ✅ 20 runs (2026-10-05/06). Generator stable (0 dropped). Pre-set rule verdict **GO** via the criterion-4 explanation clause; strict reading **STAY**. (Part 08 §8.7) |
 | **User decision** | Switch to a full 180-run open-loop campaign **only if it is robust**. (Part 08 §8.8) |
 | **v2 fixes + calibration** | ✅ Admission control (both services), auth pre-authentication, robustness gate G1–G6; recalibrated 2026-10-06. (Part 08 §8.9–§8.11) |
-| **v2 smoke test** | ⏳ 9 runs on `ecommerce-vm` since 2026-10-06 08:31 UTC; 5/9 done at 10:11, all validated clean (shipping H3, K1, H2 and auth H2 scale to 5 pods; the shipping B1 pod holds 105 req/s gracefully). G6 needs runs 6–9; expected end ≈11:35 UTC (estimate). (Part 08 §8.12) |
-| **Open-loop campaign** | ⏸ Needs smoke pass + user go-ahead; gate after rep block 2 (72 runs). (Part 08 §8.13) |
+| **v2 smoke test** | ✅ Done 2026-10-06 08:31–11:31 UTC (AKS stopped 11:35). 9/9 runs clean; B1 hold graceful; SLO-violation seconds replicate. **Pre-registered gate FAIL on one cell** (shipping H3 error rate 5.32 / 6.97%, one 15 s HPA cycle apart). (Part 08 §8.12) |
+| **Open-loop campaign** | ⏸ Approved in principle 2026-10-06 (user: option 2) under G6 rule v2 — 50% or ≤ 30 s / ≤ 2 points, fixed before campaign data. Config filled; launch awaits the go-ahead on time and cost (≈24.3 h ≈ $12.5 to the 72-run gate, ≈60.7 h ≈ $31.3 in total, estimates). (Part 08 §8.9, §8.13) |
 | **Analysis (Phase 4)** | Open: Wilcoxon tests and effect sizes, time-to-scale extraction, Resource Cost Index / Pareto, regenerate `thesis-figures/` (current PNGs are from superseded data). (Part 09 §10) |
 | **Writing** | BAB 1–3 drafted (`Skripsi_Ignatius_Kevin_Wijaya.docx`, last edited 2026-06-06); BAB 3 needs revision (it still describes the retired auth arrival-rate profile and the 5.56× gate, and its generator rationale must change — Part 08 §8.14); BAB 4–5 pending. |
 
@@ -103,13 +103,17 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
 - **v2 (2026-10-06):** per-pod admission control as the outermost middleware (cap 22 auth / 48 shipping, 503 for the
   excess, probes and `/metrics` exempt), delivered by ConfigMap overlay on the unchanged images because ACR Tasks are
   unavailable in Indonesia Central; auth tokens pre-authenticated during the reset; robustness gate G1–G6 with
-  replicate rule "±25% or ≤ 20 s / ≤ 1 error point".
+  replicate rule "±25% or ≤ 20 s / ≤ 1 error point" (rule v1, judged the smoke; the campaign uses rule v2: 50% or
+  ≤ 30 s / ≤ 2 points).
   - One shipping pod is now graceful up to 105 req/s (goodput 42.36, 0 timeouts) but collapses between 105 and 140.
   - Smoke runs 1–2: shipping H3 scales 1→5 within 83 s, goodput 98.34 of 103.87 req/s (pilot: 0.72); shipping K1
     reaches 5 pods by +98.8 s, goodput 95.95 of 103.85 (pilot: 97.99% errors); 0 timeouts in both (#22).
   - Smoke runs 3–5: shipping H2 goodput 90.34 of 103.87, 13.02% errors, 0 timeouts (pilot: 24.65 / 32.01% errors);
     auth H2 11.48% errors from 1 replica at onset; the shipping B1 pod holds 105 req/s for 7 min at 42.32–43.07 req/s
     goodput per minute, 0 timeouts (pilot: collapse) (#22).
+  - Smoke verdict: all 9 runs clean, but the pre-registered gate fails on one G6 cell — shipping H3 errors 5.32 /
+    6.97% (27% of the mean; limit 25% or 1 point), from a first scale-up one 15 s HPA cycle later in rep 2. On
+    shipping, request-rate scaling (70 s, 5.32–7.61% errors) beats CPU scaling (100 s, 12.92–13.02%) in both reps (#22).
 
 ---
 
@@ -135,6 +139,7 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
 | 2026-10-06 | Keep auth peak at 30 req/s; run the smoke test on the VM and stop AKS after | Comparable with the pilot; B2 at 30 is healthy with margin; unattended run | Part 08 §8.11–§8.12 |
 | 2026-10-06 | Restructure the blueprint into an index + parts | User request; the single file had grown to 2,235 lines | this file |
 | 2026-10-06 | Stop ignoring `*.md`; commit and push the October work (tooling, services, docs, open-loop data); leave `Thesis.docx` uncommitted | User: keep the docs in the repo; the repo is public, so the thesis draft is committed only on request | this file |
+| 2026-10-06 | After the smoke FAIL: run the 180-run open-loop campaign ("option 2"; deadline not a constraint) under G6 rule v2 — 50% of the mean or ≤ 30 s / ≤ 2 points — fixed before any campaign data; smoke stays FAIL | One 15 s autoscaler cycle, the normal gap between reps (6 of 8 pairs), produced up to 27% / 30 s / 1.93 points; G2/G3 now catch the pilot's defects directly; rule v2 still rejects pilot v1 | Part 08 §8.9, §8.12–§8.13 |
 
 ---
 
@@ -153,13 +158,16 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
   (which includes `setup()`) and falsely flagged smoke auth H2 rep 1 once pre-auth made `setup()` instant — now an
   arrival count; the analysis cache was keyed by run id only and served smoke data for two v1 runs — now tied to the
   raw file's md5; no reported number was affected (v1 re-analysis: 0 differences) (Part 08 §8.9).
+- G6 rule v1's 1-point error allowance was meant to absorb control-loop timing but was never derived from it: one 15 s
+  cycle costs ≈1.5 points on shipping (1.66 measured in the smoke). Replaced for the campaign by rule v2 (Part 08 §8.9).
 
 ---
 
 ## Open items and next steps
 
-1. **Smoke test:** copy results from the VM and run `gate` (G4 not applicable — no B2 runs); judge the B1 hold
-   separately. Then the user decides on the 180-run open-loop campaign (Part 08 §8.12–§8.13).
+1. **Open-loop campaign:** launch on the user's go-ahead (AKS start, then `run-openloop-vm.sh experiment-results-openloop
+   yes 72` on the VM); after 72 runs run `gate --reps 2` (rule v2) and ask before continuing with reps 3–5 (Part 08
+   §8.13). Smoke runs 6–9 and the G6 rule change are local, not yet committed.
 2. **If the campaign runs:** write the final rates/caps into `experiment-results-openloop/pilot-config.env` before the
    plan freezes; run unattended on the VM; stop at the gate (72 runs) if it fails.
 3. **Phase 4 analysis** of the closed-loop dataset (can proceed in parallel): Wilcoxon tests and effect sizes,
