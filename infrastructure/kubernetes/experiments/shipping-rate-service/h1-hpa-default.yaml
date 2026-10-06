@@ -1,4 +1,8 @@
 # H1: HPA Default — shipping-rate-service
+# targetCPU: 80% = the Kubernetes default target (used when an HPA sets no metric),
+# no behavior field (uses K8s defaults) -> H1 is HPA with Kubernetes defaults throughout.
+# Changed from 70% on 2026-10-06 for the open-loop campaign (the closed-loop campaign of
+# 2026-08 ran H1 at 70%; see thesis_blueprint/08-open-loop-study.md §8.13).
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -20,4 +24,4 @@ spec:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 70
+          averageUtilization: 80
