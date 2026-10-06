@@ -1,0 +1,765 @@
+# k6 OPEN-LOOP PILOT — ramping-arrival-rate variant of the auth + shipping load
+#
+# Purpose: decide, with data, whether a correctly sized open-loop generator is
+# stable now that the three generator defects are fixed (connection pinning ->
+# noConnectionReuse, auth 30 s rate window -> 1 m, setup() injecting 120
+# failures -> login-first). The ONLY thing that differs from the closed-loop
+# campaign (k6-auth-job.yaml / k6-shipping-job.yaml) is the load model:
+#   - executor: ramping-arrival-rate (rates in req/s) instead of ramping-vus
+#   - request timeout is a parameter (REQUEST_TIMEOUT, default 5s) — timeouts
+#     are failed requests (status 0, error_code 1050)
+#   - every VU is preallocated: PRE_VUS = MAX_VUS >= VU_FACTOR (1.5) x peak
+#     rate x timeout, so k6 never has to allocate VUs mid-test
+#   - no thresholds, so k6 can neither abort a run nor exit non-zero on a breach
+# Stage shapes, request mix, login-first setup(), payload generator and
+# noConnectionReuse are copied from the closed-loop scripts unchanged.
+#
+# PATTERN selects the shape: gradual | spike | oscillating (ramping-arrival-rate)
+# or ladder (constant-arrival-rate calibration steps from LADDER_RATES).
+#
+# Raw per-request data: k6 writes gzipped JSON to /results/results.json.gz.
+# The container wrapper keeps the pod alive after k6 exits until the runner has
+# fetched that file (marker /results/.fetched) — the closed-loop runner's
+# `kubectl cp` ran after the pod had terminated and never got the file.
+#
+# Driven by scripts/run-pilot-openloop.sh (applies the ConfigMaps, clones the
+# suspended Job templates with per-run env). Not used by run-experiment.sh.
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-openloop-common
+  namespace: ecommerce
+data:
+  openloop-common.js: |
+    import exec from 'k6/execution';
+
+    export const PATTERN = (__ENV.PATTERN || 'spike').toLowerCase();
+    export const BASE_RATE = parseInt(__ENV.BASE_RATE || '0', 10);
+    export const PEAK_RATE = parseInt(__ENV.PEAK_RATE || '0', 10);
+    export const REQUEST_TIMEOUT = __ENV.REQUEST_TIMEOUT || '5s';
+    const VU_FACTOR = parseFloat(__ENV.VU_FACTOR || '1.5');
+
+    // '5s' -> 5, '2m' -> 120, '1m30s' -> 90, '500ms' -> 0.5
+    export function durationSeconds(text) {
+      const re = /(\d+(?:\.\d+)?)(ms|s|m|h)/g;
+      const unit = { ms: 0.001, s: 1, m: 60, h: 3600 };
+      let total = 0;
+      let matched = '';
+      let m;
+      while ((m = re.exec(text)) !== null) {
+        total += parseFloat(m[1]) * unit[m[2]];
+        matched += m[0];
+      }
+      if (!matched || matched !== String(text)) {
+        throw new Error(`Cannot parse duration '${text}'`);
+      }
+      return total;
+    }
+
+    const TIMEOUT_SECONDS = durationSeconds(REQUEST_TIMEOUT);
+
+    // In-flight requests are bounded by rate x timeout when every request
+    // times out, so this many VUs can never run out.
+    export function vusFor(rate) {
+      return Math.max(1, Math.ceil(VU_FACTOR * rate * TIMEOUT_SECONDS));
+    }
+
+    // Same shapes as the closed-loop scripts, with req/s targets instead of VUs.
+    export function rateStages(pattern, base, peak) {
+      switch (pattern) {
+        case 'gradual':
+          return [
+            { duration: '2m', target: base },  // warm-up at baseline
+            { duration: '5m', target: peak },  // gradual ramp to peak
+            { duration: '2m', target: peak },  // hold at peak
+            { duration: '3m', target: 0 },     // ramp-down
+          ];
+        case 'spike':
+          return [
+            { duration: '2m', target: base },     // warm-up at baseline
+            { duration: '10s', target: peak },    // sudden jump
+            { duration: '6m50s', target: peak },  // sustained peak
+            { duration: '3m', target: 0 },        // ramp-down
+          ];
+        case 'oscillating':
+          return [
+            { duration: '2m', target: base },     // warm-up
+            { duration: '10s', target: peak },    // cycle 1
+            { duration: '1m20s', target: peak },
+            { duration: '10s', target: base },
+            { duration: '1m20s', target: base },
+            { duration: '10s', target: peak },    // cycle 2
+            { duration: '1m20s', target: peak },
+            { duration: '10s', target: base },
+            { duration: '1m20s', target: base },
+            { duration: '10s', target: peak },    // cycle 3, then ramp-down
+            { duration: '50s', target: peak },
+            { duration: '3m', target: 0 },
+          ];
+        default:
+          throw new Error(`Unknown PATTERN '${pattern}'`);
+      }
+    }
+
+    function ladderScenarios() {
+      const rates = (__ENV.LADDER_RATES || '')
+        .split(',').map((r) => parseInt(r.trim(), 10)).filter((r) => r > 0);
+      if (!rates.length) {
+        throw new Error('PATTERN=ladder needs LADDER_RATES, e.g. "2,4,6"');
+      }
+      const step = durationSeconds(__ENV.LADDER_STEP || '2m');
+      const gap = durationSeconds(__ENV.LADDER_GAP || '30s');
+      const scenarios = {};
+      rates.forEach((rate, i) => {
+        const vus = vusFor(rate);
+        scenarios[`step${String(i + 1).padStart(2, '0')}_${rate}rps`] = {
+          executor: 'constant-arrival-rate',
+          rate,
+          timeUnit: '1s',
+          duration: `${step}s`,
+          startTime: `${i * (step + gap)}s`,
+          preAllocatedVUs: vus,
+          maxVUs: vus,
+          // Shorter than the gap so consecutive steps never overlap.
+          gracefulStop: '10s',
+        };
+      });
+      return scenarios;
+    }
+
+    function patternScenarios() {
+      if (!(BASE_RATE > 0) || !(PEAK_RATE >= BASE_RATE)) {
+        throw new Error(`Need 0 < BASE_RATE <= PEAK_RATE (got ${BASE_RATE}, ${PEAK_RATE})`);
+      }
+      const pre = parseInt(__ENV.PRE_VUS || String(vusFor(PEAK_RATE)), 10);
+      const max = parseInt(__ENV.MAX_VUS || String(pre), 10);
+      return {
+        [`openloop_${PATTERN}`]: {
+          executor: 'ramping-arrival-rate',
+          startRate: BASE_RATE,
+          timeUnit: '1s',
+          preAllocatedVUs: pre,
+          maxVUs: max,
+          stages: rateStages(PATTERN, BASE_RATE, PEAK_RATE),
+          gracefulStop: '30s',
+        },
+      };
+    }
+
+    export function buildOptions() {
+      return {
+        scenarios: PATTERN === 'ladder' ? ladderScenarios() : patternScenarios(),
+        // Every request opens a fresh connection — see k6-auth-job.yaml. Kept
+        // identical to the closed-loop campaign so autoscaler-added pods get load.
+        noConnectionReuse: true,
+        setupTimeout: '180s',
+        // Fewer per-sample tags keep the raw JSON small; url == name here.
+        systemTags: ['status', 'method', 'name', 'group', 'check', 'error', 'error_code', 'scenario', 'expected_response'],
+        summaryTrendStats: ['avg', 'min', 'med', 'max', 'p(90)', 'p(95)', 'p(99)'],
+        // No thresholds: an open-loop run must never abort or fail on a breach.
+      };
+    }
+
+    // One log line per scenario with its wall-clock start, so the analysis can
+    // align k6 time (warm-up / spike onset / ramp-down) with Kubernetes events.
+    export function markScenarioStart() {
+      if (exec.scenario.iterationInTest === 0) {
+        console.log(`SCENARIO_START name=${exec.scenario.name} start_ms=${exec.scenario.startTime}`);
+      }
+    }
+
+    export function describeConfig(service) {
+      const scenarios = buildOptions().scenarios;
+      const summary = Object.entries(scenarios).map(([name, s]) =>
+        `${name}:${s.executor}:vus=${s.preAllocatedVUs}/${s.maxVUs}`).join(' ');
+      return `OPENLOOP_CONFIG service=${service} pattern=${PATTERN} base_rate=${BASE_RATE} ` +
+        `peak_rate=${PEAK_RATE} timeout=${REQUEST_TIMEOUT} vu_factor=${VU_FACTOR} ${summary}`;
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-openloop-auth-script
+  namespace: ecommerce
+data:
+  load-test.js: |
+    import http from 'k6/http';
+    import { check } from 'k6';
+    import { SharedArray } from 'k6/data';
+    import { Trend } from 'k6/metrics';
+    import { buildOptions, describeConfig, markScenarioStart, REQUEST_TIMEOUT } from './openloop-common.js';
+
+    const NUM_USERS = parseInt(__ENV.NUM_TEST_USERS || '120', 10);
+    const AUTH_ME_PERCENT = parseInt(__ENV.AUTH_ME_PERCENT || '70', 10);
+    const AUTH_LOGIN_PERCENT = parseInt(__ENV.AUTH_LOGIN_PERCENT || '30', 10);
+    const MIX_TOTAL = Math.max(AUTH_ME_PERCENT + AUTH_LOGIN_PERCENT, 1);
+    const AUTH_ME_THRESHOLD = AUTH_ME_PERCENT / MIX_TOTAL;
+
+    export const options = buildOptions();
+
+    // Client-observed wall-clock time per request, INCLUDING the TCP connect
+    // that http_req_duration leaves out (every request connects afresh).
+    const e2e = new Trend('req_e2e_duration', true);
+
+    const BASE_URL = __ENV.TARGET_URL || 'http://auth-service.ecommerce.svc.cluster.local:8001';
+    const GATEWAY_SECRET = __ENV.INTERNAL_GATEWAY_SECRET || '';
+    const JSON_HEADERS = {
+      'Content-Type': 'application/json',
+      'X-Internal-Gateway-Secret': GATEWAY_SECRET,
+    };
+
+    const testUsers = new SharedArray('users', function () {
+      const users = [];
+      for (let i = 0; i < NUM_USERS; i++) {
+        users.push({
+          email: `loadtest_user_${i}@example.com`,
+          username: `loadtest_user_${i}`,
+          password: 'LoadTest_P@ss_2026!',
+        });
+      }
+      return users;
+    });
+
+    function randomUser() {
+      return testUsers[Math.floor(Math.random() * testUsers.length)];
+    }
+
+    // Tokens produced by preauth.js BEFORE the autoscaler is applied (mounted
+    // from the optional ConfigMap k6-openloop-auth-tokens). Logging 120 users in
+    // here instead burns ~28 s of bcrypt CPU right before the warm-up, which
+    // made H2 scale during warm-up in the 2026-10-05 pilot.
+    const PREAUTH_TOKENS = new SharedArray('preauth-tokens', function () {
+      try {
+        const tokens = JSON.parse(open('/tokens/tokens.json'));
+        return Array.isArray(tokens) ? tokens : [];
+      } catch (e) {
+        return [];
+      }
+    });
+
+    // Identical to k6-auth-job.yaml: login first, register only on failure.
+    export function setup() {
+      console.log(describeConfig('auth-service'));
+      if (PREAUTH_TOKENS.length > 0) {
+        const preauth = [];
+        for (let i = 0; i < PREAUTH_TOKENS.length; i++) {
+          preauth.push(PREAUTH_TOKENS[i]);
+        }
+        console.log(`PREAUTH_USED tokens=${preauth.length}`);
+        return { tokens: preauth };
+      }
+      console.log(`Seeding and pre-authenticating ${NUM_USERS} users...`);
+      const tokens = [];
+
+      for (let i = 0; i < NUM_USERS; i++) {
+        const user = testUsers[i];
+        let loginRes = http.post(
+          `${BASE_URL}/auth/login`,
+          JSON.stringify({ email: user.email, password: user.password }),
+          { headers: JSON_HEADERS }
+        );
+
+        if (loginRes.status !== 200) {
+          http.post(
+            `${BASE_URL}/auth/register`,
+            JSON.stringify({
+              email: user.email,
+              username: user.username,
+              password: user.password,
+              full_name: `Load Test User ${i}`,
+            }),
+            { headers: JSON_HEADERS }
+          );
+
+          loginRes = http.post(
+            `${BASE_URL}/auth/login`,
+            JSON.stringify({ email: user.email, password: user.password }),
+            { headers: JSON_HEADERS }
+          );
+        }
+
+        if (loginRes.status === 200) {
+          try {
+            const body = JSON.parse(loginRes.body);
+            if (body.access_token) {
+              tokens.push(body.access_token);
+            }
+          } catch (e) {
+            console.warn(`Failed to parse login response for user ${i}`);
+          }
+        } else {
+          console.warn(`Login failed for user ${i}: ${loginRes.status}`);
+        }
+      }
+
+      if (tokens.length === 0) {
+        throw new Error('No tokens obtained during setup');
+      }
+
+      console.log(`Pre-auth complete: ${tokens.length}/${NUM_USERS} tokens obtained`);
+      return { tokens };
+    }
+
+    function runAuthMe(data) {
+      const token = data.tokens[Math.floor(Math.random() * data.tokens.length)];
+      const started = Date.now();
+      const res = http.get(
+        `${BASE_URL}/auth/me`,
+        {
+          headers: {
+            'X-Internal-Gateway-Secret': GATEWAY_SECRET,
+            Authorization: `Bearer ${token}`,
+          },
+          timeout: REQUEST_TIMEOUT,
+        }
+      );
+      e2e.add(Date.now() - started, { endpoint: 'me', status: String(res.status) });
+      check(res, {
+        'me status is 200': (r) => r.status === 200,
+        'me returns user data': (r) => {
+          try {
+            return JSON.parse(r.body).email !== undefined;
+          } catch (e) {
+            return false;
+          }
+        },
+        'me response time < 500ms': (r) => r.timings.duration < 500,
+      });
+    }
+
+    function runLogin() {
+      const user = randomUser();
+      const started = Date.now();
+      const res = http.post(
+        `${BASE_URL}/auth/login`,
+        JSON.stringify({ email: user.email, password: user.password }),
+        { headers: JSON_HEADERS, timeout: REQUEST_TIMEOUT }
+      );
+      e2e.add(Date.now() - started, { endpoint: 'login', status: String(res.status) });
+      check(res, {
+        'login status is 200': (r) => r.status === 200,
+        'login returns access token': (r) => {
+          try {
+            return JSON.parse(r.body).access_token !== undefined;
+          } catch (e) {
+            return false;
+          }
+        },
+        'login response time < 1000ms': (r) => r.timings.duration < 1000,
+      });
+    }
+
+    export default function (data) {
+      markScenarioStart();
+      if (Math.random() < AUTH_ME_THRESHOLD) {
+        runAuthMe(data);
+        return;
+      }
+      runLogin();
+    }
+
+  # Run by the k6-openloop-auth-preauth Job during the cluster reset, before the
+  # autoscaler is applied. Same login-first logic as setup() above; prints the
+  # tokens on one raw log line that the runner turns into a ConfigMap.
+  preauth.js: |
+    import http from 'k6/http';
+
+    const NUM_USERS = parseInt(__ENV.NUM_TEST_USERS || '120', 10);
+    const BASE_URL = __ENV.TARGET_URL || 'http://auth-service.ecommerce.svc.cluster.local:8001';
+    const GATEWAY_SECRET = __ENV.INTERNAL_GATEWAY_SECRET || '';
+    const JSON_HEADERS = {
+      'Content-Type': 'application/json',
+      'X-Internal-Gateway-Secret': GATEWAY_SECRET,
+    };
+
+    export const options = { vus: 1, iterations: 1, noConnectionReuse: true };
+
+    export default function () {
+      const tokens = [];
+      for (let i = 0; i < NUM_USERS; i++) {
+        const user = {
+          email: `loadtest_user_${i}@example.com`,
+          username: `loadtest_user_${i}`,
+          password: 'LoadTest_P@ss_2026!',
+        };
+        const login = () => http.post(
+          `${BASE_URL}/auth/login`,
+          JSON.stringify({ email: user.email, password: user.password }),
+          { headers: JSON_HEADERS }
+        );
+        let res = login();
+        if (res.status !== 200) {
+          http.post(
+            `${BASE_URL}/auth/register`,
+            JSON.stringify({
+              email: user.email,
+              username: user.username,
+              password: user.password,
+              full_name: `Load Test User ${i}`,
+            }),
+            { headers: JSON_HEADERS }
+          );
+          res = login();
+        }
+        if (res.status === 200) {
+          try {
+            const body = JSON.parse(res.body);
+            if (body.access_token) {
+              tokens.push(body.access_token);
+            }
+          } catch (e) { /* counted below */ }
+        }
+      }
+      if (tokens.length === 0) {
+        throw new Error('No tokens obtained during pre-authentication');
+      }
+      console.log(`PREAUTH_TOKENS ${JSON.stringify(tokens)}`);
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-openloop-shipping-script
+  namespace: ecommerce
+data:
+  load-test.js: |
+    import http from 'k6/http';
+    import { check } from 'k6';
+    import { Trend } from 'k6/metrics';
+    import { buildOptions, describeConfig, markScenarioStart, REQUEST_TIMEOUT } from './openloop-common.js';
+
+    const MAX_ITEMS  = parseInt(__ENV.SHIPPING_MAX_ITEMS          || '4',    10);
+    const MIN_WEIGHT = parseInt(__ENV.SHIPPING_MIN_WEIGHT_GRAMS   || '200',  10);
+    const MAX_WEIGHT = parseInt(__ENV.SHIPPING_MAX_WEIGHT_GRAMS   || '2500', 10);
+    const DESTINATION_ZONES = (__ENV.SHIPPING_DESTINATION_ZONES || 'domestic,regional,remote')
+      .split(',').map((z) => z.trim()).filter(Boolean);
+
+    export const options = buildOptions();
+
+    // Client-observed wall-clock time per request, INCLUDING the TCP connect
+    // that http_req_duration leaves out (every request connects afresh).
+    const e2e = new Trend('req_e2e_duration', true);
+
+    const BASE_URL        = __ENV.TARGET_URL              || 'http://shipping-rate-service.ecommerce.svc.cluster.local:8006';
+    const TARGET_ENDPOINT = __ENV.TARGET_ENDPOINT         || '/shipping/quotes';
+    const GATEWAY_SECRET  = __ENV.INTERNAL_GATEWAY_SECRET || '';
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Identical to k6-shipping-job.yaml.
+    function buildPayload() {
+      const items = [];
+      const count = randomInt(1, MAX_ITEMS);
+      for (let i = 0; i < count; i++) {
+        items.push({
+          sku:          `sku-${randomInt(1, 2000)}`,
+          quantity:     randomInt(1, 3),
+          weight_grams: randomInt(MIN_WEIGHT, MAX_WEIGHT),
+        });
+      }
+      return JSON.stringify({
+        destination_zone: DESTINATION_ZONES[randomInt(0, DESTINATION_ZONES.length - 1)],
+        priority: Math.random() < 0.35 ? 'express' : 'standard',
+        items,
+      });
+    }
+
+    const params = {
+      headers: {
+        'Content-Type':              'application/json',
+        'X-Internal-Gateway-Secret': GATEWAY_SECRET,
+      },
+      timeout: REQUEST_TIMEOUT,
+    };
+
+    // No load here — only records the resolved scenario config in the log.
+    export function setup() {
+      console.log(describeConfig('shipping-rate-service'));
+    }
+
+    export default function () {
+      markScenarioStart();
+      const started = Date.now();
+      const res = http.post(`${BASE_URL}${TARGET_ENDPOINT}`, buildPayload(), params);
+      e2e.add(Date.now() - started, { endpoint: 'quote', status: String(res.status) });
+      check(res, {
+        'status is 200':         (r) => r.status === 200,
+        'returns quotes':        (r) => {
+          try { return JSON.parse(r.body).quote_count >= 1; }
+          catch (e) { return false; }
+        },
+        'response time <2000ms': (r) => r.timings.duration < 2000,
+      });
+    }
+
+---
+# ── Job template: auth-service ─────────────────────────────────────────────
+# Suspended: `kubectl apply -f` of this file can never start load by itself.
+# The runner clones it with suspend:false and per-run env + resources.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k6-openloop-auth
+  namespace: ecommerce
+  labels:
+    app: k6
+    target: auth-service
+    load-model: open-loop
+spec:
+  suspend: true
+  backoffLimit: 0
+  activeDeadlineSeconds: 3600
+  template:
+    metadata:
+      labels:
+        app: k6
+        target: auth-service
+        load-model: open-loop
+    spec:
+      restartPolicy: Never
+      terminationGracePeriodSeconds: 5
+      containers:
+        - name: k6
+          image: grafana/k6:0.46.0
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              k6 run --out json=/results/results.json.gz /scripts/load-test.js
+              rc=$?
+              echo "[openloop-wrapper] k6 exit code ${rc}"
+              echo "${rc}" > /results/k6-exit-code
+              md5sum /results/results.json.gz > /results/results.json.gz.md5 2>/dev/null || true
+              touch /results/.k6-done
+              waited=0
+              while [ ! -f /results/.fetched ] && [ "${waited}" -lt "${HOLD_FOR_FETCH_SECONDS}" ]; do
+                sleep 2
+                waited=$$((waited + 2))
+              done
+              exit "${rc}"
+          env:
+            - name: TARGET_URL
+              value: "http://auth-service.ecommerce.svc.cluster.local:8001"
+            - name: PATTERN
+              value: "spike"
+            - name: BASE_RATE
+              value: "0"
+            - name: PEAK_RATE
+              value: "0"
+            - name: REQUEST_TIMEOUT
+              value: "5s"
+            - name: VU_FACTOR
+              value: "1.5"
+            - name: PRE_VUS
+              value: ""
+            - name: MAX_VUS
+              value: ""
+            - name: LADDER_RATES
+              value: ""
+            - name: LADDER_STEP
+              value: "2m"
+            - name: LADDER_GAP
+              value: "30s"
+            - name: HOLD_FOR_FETCH_SECONDS
+              value: "1200"
+            - name: AUTH_ME_PERCENT
+              value: "70"
+            - name: AUTH_LOGIN_PERCENT
+              value: "30"
+            - name: NUM_TEST_USERS
+              value: "120"
+            - name: INTERNAL_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: internal-gateway-secret
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "1Gi"
+            limits:
+              cpu: "2000m"
+              memory: "4Gi"
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+            - name: results
+              mountPath: /results
+            - name: tokens
+              mountPath: /tokens
+      volumes:
+        - name: scripts
+          projected:
+            sources:
+              - configMap:
+                  name: k6-openloop-auth-script
+              - configMap:
+                  name: k6-openloop-common
+        - name: results
+          emptyDir: {}
+        # Written by the runner from the pre-auth Job; absent -> setup() logs in.
+        - name: tokens
+          configMap:
+            name: k6-openloop-auth-tokens
+            optional: true
+
+---
+# ── Job template: auth-service token pre-authentication ────────────────────
+# Logs the 120 test users in during the cluster reset, i.e. before any
+# autoscaler exists and more than RESET_WAIT seconds before it is applied.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k6-openloop-auth-preauth
+  namespace: ecommerce
+  labels:
+    app: k6
+    target: auth-service
+    load-model: open-loop
+spec:
+  suspend: true
+  backoffLimit: 0
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        app: k6
+        target: auth-service
+        load-model: open-loop
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: k6
+          image: grafana/k6:0.46.0
+          command: ["k6", "run", "--log-format", "raw", "--quiet", "--no-summary", "/scripts/preauth.js"]
+          env:
+            - name: TARGET_URL
+              value: "http://auth-service.ecommerce.svc.cluster.local:8001"
+            - name: NUM_TEST_USERS
+              value: "120"
+            - name: INTERNAL_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: internal-gateway-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+      volumes:
+        - name: scripts
+          configMap:
+            name: k6-openloop-auth-script
+
+---
+# ── Job template: shipping-rate-service ────────────────────────────────────
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k6-openloop-shipping
+  namespace: ecommerce
+  labels:
+    app: k6
+    target: shipping-rate-service
+    load-model: open-loop
+spec:
+  suspend: true
+  backoffLimit: 0
+  activeDeadlineSeconds: 3600
+  template:
+    metadata:
+      labels:
+        app: k6
+        target: shipping-rate-service
+        load-model: open-loop
+    spec:
+      restartPolicy: Never
+      terminationGracePeriodSeconds: 5
+      containers:
+        - name: k6
+          image: grafana/k6:0.46.0
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              k6 run --out json=/results/results.json.gz /scripts/load-test.js
+              rc=$?
+              echo "[openloop-wrapper] k6 exit code ${rc}"
+              echo "${rc}" > /results/k6-exit-code
+              md5sum /results/results.json.gz > /results/results.json.gz.md5 2>/dev/null || true
+              touch /results/.k6-done
+              waited=0
+              while [ ! -f /results/.fetched ] && [ "${waited}" -lt "${HOLD_FOR_FETCH_SECONDS}" ]; do
+                sleep 2
+                waited=$$((waited + 2))
+              done
+              exit "${rc}"
+          env:
+            - name: TARGET_URL
+              value: "http://shipping-rate-service.ecommerce.svc.cluster.local:8006"
+            - name: PATTERN
+              value: "spike"
+            - name: BASE_RATE
+              value: "0"
+            - name: PEAK_RATE
+              value: "0"
+            - name: REQUEST_TIMEOUT
+              value: "5s"
+            - name: VU_FACTOR
+              value: "1.5"
+            - name: PRE_VUS
+              value: ""
+            - name: MAX_VUS
+              value: ""
+            - name: LADDER_RATES
+              value: ""
+            - name: LADDER_STEP
+              value: "2m"
+            - name: LADDER_GAP
+              value: "30s"
+            - name: HOLD_FOR_FETCH_SECONDS
+              value: "1200"
+            - name: SHIPPING_DESTINATION_ZONES
+              value: "domestic,regional,remote"
+            - name: SHIPPING_MAX_ITEMS
+              value: "4"
+            - name: SHIPPING_MIN_WEIGHT_GRAMS
+              value: "200"
+            - name: SHIPPING_MAX_WEIGHT_GRAMS
+              value: "2500"
+            - name: INTERNAL_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secrets
+                  key: internal-gateway-secret
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "1Gi"
+            limits:
+              cpu: "2000m"
+              memory: "4Gi"
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+            - name: results
+              mountPath: /results
+      volumes:
+        - name: scripts
+          projected:
+            sources:
+              - configMap:
+                  name: k6-openloop-shipping-script
+              - configMap:
+                  name: k6-openloop-common
+        - name: results
+          emptyDir: {}

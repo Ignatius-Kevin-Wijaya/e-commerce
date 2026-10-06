@@ -951,4 +951,8 @@ main() {
   log_success "All done! Don't forget: az aks stop --resource-group ecommerce --name ecommerce-aks"
 }
 
-main "$@"
+# Run only when executed; scripts/run-pilot-openloop.sh sources this file to
+# reuse the reset/apply/readiness/export helpers without starting a campaign.
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  main "$@"
+fi
