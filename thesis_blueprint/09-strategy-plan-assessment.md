@@ -133,10 +133,15 @@ All 180 runs have been executed and stored in `experiment-results/`. Campaign hi
 |------|--------|-------|
 | Open-loop pilot v1 (20 runs, spike) | ✅ Done 2026-10-05/06 | Rule verdict GO via the criterion-4 explanation; strict reading STAY |
 | v2 fixes (admission control, auth pre-auth, robustness gate) + v2 calibration | ✅ Done 2026-10-06 | ConfigMap overlay on the existing images (ACR Tasks unavailable in Indonesia Central) |
-| v2 smoke test (9 runs) | ⏳ Running since 2026-10-06 08:31 UTC | Run 1 clean (shipping H3 now scales) |
-| 180-run open-loop campaign with gate after rep block 2 | ⏸ Pending smoke result + user go-ahead | ≈60–63 h ≈ $31–33 of AKS (estimate); stop at the gate if it fails |
+| v2 smoke test (9 runs) | ✅ Done 2026-10-06 08:31–11:31 UTC | 9/9 runs clean; pre-registered gate (rule v1) FAIL on one G6 cell (shipping H3 error rate) |
+| G6 rule v2 + campaign config | ✅ Fixed and pushed 2026-10-06 (`6ef8f89`, `b35bee1`) before any campaign data | 50% of the mean or ≤ 30 s / ≤ 2 points |
+| 180-run open-loop campaign with gate after rep block 2 | ⏳ Running since 2026-10-06 12:33 UTC; 12/72 at 17:36 UTC; H1 = 80% (`dddd996`) | ≈60–63 h ≈ $31–33 of AKS in total (estimate); stop at the gate if it fails |
 
 **Effect on Phase 4/5:** BAB 4 analysis of the closed-loop dataset can proceed in parallel. If the open-loop campaign passes, BAB 3/4 gain a second generator condition (Part 08 §8.14); if not, the open-loop pilot and smoke results are reported as a robustness study.
+
+> **Superseded (2026-10-06, "Replace" — Part 08 §8.14):** if the campaign passes its gate, Phases 4a–4e run on the
+> open-loop campaign and the closed-loop dataset becomes methodology background; if it fails, they run on the
+> closed-loop dataset and the open-loop work becomes a robustness section.
 
 ### Phase 5: Writing (Weeks 21-28)
 
@@ -152,6 +157,10 @@ All 180 runs have been executed and stored in `experiment-results/`. Campaign hi
 **Total: ~28 weeks (7 months).** Leaves 1 month buffer if on 8-month schedule.
 
 **Status (2026-10-05):** BAB 1–3 and front matter are drafted (`Skripsi_Ignatius_Kevin_Wijaya.docx`, last edited 2026-06-06). BAB 3 still describes the retired auth arrival-rate profile and the 5.56× gate and needs revision for the post-fix methodology; BAB 4–5 are pending the Phase 4 analysis.
+
+> **Update (2026-10-06, "Replace"):** if the open-loop campaign passes, BAB 3 is rewritten around the open-loop method
+> (generator, load shedding, pre-login, gate, H1 = 80%) with the closed-loop campaign as the reason for switching; Part
+> 11 gives the provenance and sources for every setting. BAB 4–5 wait for the campaign.
 
 **Key advantages of the extended timeline:**
 1. **2 full weeks for prometheus-adapter** (Week 8-9) — the highest-risk component gets dedicated time

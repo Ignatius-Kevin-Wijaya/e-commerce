@@ -166,7 +166,7 @@ This section maps every BAB and sub-section from your university's "Perancangan 
 **k6 (Load Testing Tool):**
 - What it is: open-source load testing tool by Grafana Labs
 - How it works: scenario-based testing with JavaScript; open-loop executors (ramping-arrival-rate, constant-arrival-rate) vs closed-loop executors (ramping-vus — used for both services in this thesis, because open-loop load drops iterations under saturation and delivers unequal load across configurations); the `noConnectionReuse` option and why it is enabled (finding #12)
-  - ⚠️ **Rewrite this justification (2026-10-06, Part 08 §8.14):** "drops iterations" only applies to an undersized generator. A correctly sized open-loop generator dropped 0 iterations in 20 runs. Explain instead that closed loop measures scaling under self-throttled load, while open loop holds the offered load fixed, so slow scaling turns directly into failed requests. Describe whichever generator(s) the final dataset uses.
+  - ⚠️ **Rewrite this justification (2026-10-06, Part 08 §8.14):** "drops iterations" only applies to an undersized generator. A correctly sized open-loop generator dropped 0 iterations in 20 runs. Explain instead that closed loop measures scaling under self-throttled load, while open loop holds the offered load fixed, so slow scaling turns directly into failed requests. Describe whichever generator(s) the final dataset uses. **Decided 2026-10-06 ("Replace"):** if the open-loop campaign passes its gate, describe the open-loop generator as the thesis method and the closed-loop campaign as the reason for switching (cite Schroeder et al. 2006; Part 11 §11.9).
 - Metrics it produces: `http_req_duration`, `http_req_failed`, `http_reqs`, `vus`
 - Why chosen: runs as Kubernetes Job (in-cluster), eliminates network variance, scriptable
 
@@ -355,6 +355,9 @@ From observation data (3.2.4), identify:
 **A. Rancangan Konfigurasi HPA Default (H1):**
 - Full YAML manifest with explanation of each field
 - `targetCPU: 70%`, default behavior policy, why these values
+  - **Update (2026-10-06):** in the thesis dataset H1 uses **80%**, the Kubernetes default target — cite the API
+    reference sentence and the dry-run check (Part 11 §11.2 D, §11.9). Mention 70% only when describing the
+    closed-loop background campaign.
 
 **B. Rancangan Konfigurasi HPA Tuned (H2):**
 - Full YAML manifest with explanation
@@ -375,7 +378,8 @@ From observation data (3.2.4), identify:
 
 **F. Rancangan Load Test (k6):**
 
-> **If the open-loop campaign is adopted (2026-10-06, Part 08):** also describe the arrival-rate stage shapes and rates (auth 2→30, shipping 10→105 req/s), the 5 s timeout, VU sizing ⌈1.5 × peak × timeout⌉, raw per-request capture, the auth token pre-authentication during the reset, and the per-pod admission control (cap 22 / 48, standard load shedding, outermost middleware, delivered via ConfigMap overlay on the unchanged images).
+> **If the open-loop campaign is adopted (2026-10-06, Part 08; "Replace" decided the same day — this is then the main
+> load-test design, plus the robustness gate with G6 rule v2 and H1 = 80%):** also describe the arrival-rate stage shapes and rates (auth 2→30, shipping 10→105 req/s), the 5 s timeout, VU sizing ⌈1.5 × peak × timeout⌉, raw per-request capture, the auth token pre-authentication during the reset, and the per-pod admission control (cap 22 / 48, standard load shedding, outermost middleware, delivered via ConfigMap overlay on the unchanged images).
 - k6 Job YAML manifest with resource requests
 - k6 test script structure: `setup()` for token pooling (auth: log in first, register only if login fails — commit `a39b1f2`), weighted scenario distribution (auth 70% `/auth/me`, 30% `/auth/login`)
 - 3 load pattern configurations, all `ramping-vus` stage shapes (gradual, spike, oscillating — see §6 Load Patterns), with `noConnectionReuse: true`
@@ -461,7 +465,7 @@ From observation data (3.2.4), identify:
 - Show the synchronized multi-panel charts: RPS, Pod Count, p95 Latency, CPU — with H1/H2/H3/K1 overlaid
 - **Length:** 8-12 pages (tables + figures — this is the heaviest section)
 
-> **Open-loop material for BAB 4 (2026-10-06, Part 08):** at minimum, report the open-loop pilot as a robustness study. A correctly sized generator is stable (finding #17). The H2/H3/K1 spread grows by more than an order of magnitude (finding #18). Pod-exported request-rate metrics go blind under overload unless the service sheds load (findings #19, #22). Request rate reacts about twice as fast as CPU (finding #20). Disclose the closed-loop `setup()` warm-up burst (finding #21). If the 180-run open-loop campaign passes its gate, it becomes a second full results section with the same tables.
+> **Open-loop material for BAB 4 (2026-10-06, Part 08):** at minimum, report the open-loop pilot as a robustness study. A correctly sized generator is stable (finding #17). The H2/H3/K1 spread grows by more than an order of magnitude (finding #18). Pod-exported request-rate metrics go blind under overload unless the service sheds load (findings #19, #22). Request rate reacts about twice as fast as CPU (finding #20). Disclose the closed-loop `setup()` warm-up burst (finding #21). If the 180-run open-loop campaign passes its gate, it becomes a second full results section with the same tables. **Superseded 2026-10-06 ("Replace", Part 08 §8.14):** if it passes, the open-loop campaign is *the* results section and the closed-loop results move to methodology background or an appendix; if it fails, report the open-loop work as the robustness study described above.
 
 #### 4.5 Analisis Perbandingan → **Analisis Komparatif HPA vs KEDA**
 

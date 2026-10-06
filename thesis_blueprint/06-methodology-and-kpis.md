@@ -47,6 +47,16 @@ A reviewer **cannot** argue that the improvement is "just the metric" — becaus
 | **H3: HPA Custom Metric** | HPA | HTTP request rate (via prometheus-adapter) | `type: Pods`, `averageValue: service-specific calibrated threshold` | **The fairness control** — same metric as KEDA, but using HPA engine. Isolates metric effect from engine effect. |
 | **K1: KEDA** | KEDA | HTTP request rate (via Prometheus scaler) | `trigger: prometheus`, `threshold: service-specific calibrated threshold` | Event-driven scaling based on actual traffic |
 
+> **Correction (2026-10-06, Part 11 §11.6 #1):** "the most common production config" for H1 has no source, and
+> Kubernetes' own default CPU target is 80% (applied when an HPA sets no metric; also `kubectl autoscale`'s fallback),
+> while its HPA walkthrough uses 50%. In the thesis, describe H1 as "an HPA with Kubernetes' default scaling behavior
+> and a moderate 70% CPU target" and justify 70% as lying between those documented values. The manifests are unchanged.
+>
+> **Update (2026-10-06 ≈15:36 UTC, user decision):** H1 now uses **80%**, so it is HPA with Kubernetes defaults
+> throughout (commit `dddd996`). This applies to the open-loop campaign, which is the thesis dataset ("Replace",
+> Part 08 §8.14). The closed-loop campaign of 2026-08 ran H1 at 70% and is reported only as methodology background.
+> The YAML block below shows the closed-loop version (70%).
+
 **Why this 6-config structure?**
 - **B1 + B2:** Baselines — frame the performance envelope (worst case to best case)
 - **H1 + H2:** HPA with CPU — tests the "default" and "best possible" CPU-based scaling
@@ -68,6 +78,14 @@ Both H3 and K1 use request-rate as the scaling metric. Their thresholds must be 
 4. Apply the SAME threshold value to both H3 (`averageValue`) and K1 (`threshold`) for that service
 5. Document service-specific calibration results separately (e.g. auth threshold and shipping threshold may differ)
 6. This ensures any H3 vs K1 performance difference is due to the engine, not the threshold
+
+> **Note (2026-10-06, Part 11 §11.6 #2):** auth's threshold (5) was set on 2026-04-13 while auth still used an
+> open-loop arrival-rate profile; shipping's (15) on 2026-04-17 with the closed-loop generator. Both are reused
+> unchanged in the open-loop campaign. They still meet the calibration intent there: quiet at base load (2 < 5 and
+> 10 < 15 req/s; every autoscaled v2 run validated so far — 8 smoke runs and campaign run 1, checked 2026-10-06 —
+> started the load phase at 1 Ready pod) and crossed before a pod
+> saturates (5 = 62.5% of one auth pod's 8 req/s capacity; 15 = 30% of one shipping pod's 50 req/s). The H2-vs-H3
+> contrast therefore compares the configs as defined, target levels included.
 
 ### HPA Configurations
 
@@ -225,7 +243,7 @@ spec:
 
 **Calibration note (final):** Both services use closed-loop `ramping-vus` with `noConnectionReuse: true` and the shared 1 m request-rate window. Auth-service: `BASE_VUS = 1`, `PEAK_VUS = 12`, shared H3/K1 threshold `5` req/s/pod (migrated from the retired `10 -> 40` RPS arrival-rate profile on 2026-08-15). Shipping-rate-service: `BASE_VUS = 10`, `PEAK_VUS = 80`, shared H3/K1 threshold `15` req/s/pod.
 
-> **Open-loop variant (added 2026-10-06, Part 08):** the same three stage shapes as `ramping-arrival-rate` targets in req/s. Pilot and v2 settings: auth 2→30 req/s, shipping 10→105 req/s, 5 s request timeout (a timeout is a failed request), all VUs preallocated at ⌈1.5 × peak × timeout⌉ (225 / 788), no k6 thresholds. v2 adds per-pod admission control (cap 22 auth / 48 shipping) and auth token pre-authentication during the reset. Autoscaler manifests, thresholds, rate windows and runner timings are unchanged.
+> **Open-loop variant (added 2026-10-06, Part 08):** the same three stage shapes as `ramping-arrival-rate` targets in req/s. Pilot and v2 settings: auth 2→30 req/s, shipping 10→105 req/s, 5 s request timeout (a timeout is a failed request), all VUs preallocated at ⌈1.5 × peak × timeout⌉ (225 / 788), no k6 thresholds. v2 adds per-pod admission control (cap 22 auth / 48 shipping) and auth token pre-authentication during the reset. Autoscaler manifests, thresholds, rate windows and runner timings are unchanged, with one exception decided for the campaign on 2026-10-06: H1's CPU target is the Kubernetes default 80% (the pilot and smoke had no H1 runs). Under "Replace" (Part 08 §8.14) this open-loop variant is the thesis method if the campaign passes its gate.
 
 ### Services Under Test (Independent Variable #3)
 

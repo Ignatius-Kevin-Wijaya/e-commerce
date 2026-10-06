@@ -1,26 +1,27 @@
 # Thesis Blueprint — Part 08: Open-Loop Load-Generator Study
 
 > Part of the thesis blueprint — index and executive summary: [thesis_blueprint.md](../thesis_blueprint.md).
-> New part, written 2026-10-06. Covers everything from the open-loop pilot request (2026-10-05) to the v2 smoke
-> test (in progress). Detailed pilot write-up: `pilot-openloop-report.md` (repo root; every result in it is
+> New part, written 2026-10-06. Covers everything from the open-loop pilot request (2026-10-05) to the 180-run
+> open-loop campaign (running since 2026-10-06 12:33 UTC). Detailed pilot write-up: `pilot-openloop-report.md` (repo root; every result in it is
 > reproduced here). All numbers below were computed from the stored data;
 > estimates are labelled as estimates. Times are UTC unless marked otherwise.
 
 ---
 
-## 8.0 Status at a glance (2026-10-06, 11:45 UTC)
+## 8.0 Status at a glance (2026-10-06, 17:40 UTC)
 
 | Stage | Status | Outcome |
 |---|---|---|
 | Pilot v1 (20 runs, spike, both services) | ✅ Done 2026-10-05 18:57 → 2026-10-06 01:39 | Pre-registered rule: **GO**, but only via the criterion-4 explanation clause; strict reading → STAY (§8.7) |
-| User decision | ✅ 2026-10-06 | "Switch to the full 180-run open-loop campaign **only if it is robust already**" (§8.8) |
+| User decision | ✅ 2026-10-06 | "Switch to the full 180-run open-loop campaign **only if it is robust already**" (§8.8); after the smoke: run the campaign under G6 rule v2 (§8.12), thesis structure "Replace" (§8.14), H1 = 80% (§8.13) |
 | v2 fixes (admission control, auth pre-auth, robustness gate) | ✅ Implemented, unit-tested, deployed via ConfigMap overlay | §8.9–§8.10 |
 | v2 calibration ladders | ✅ Done 2026-10-06 06:44–08:28 | Collapse removed up to the planned peaks (§8.11) |
 | v2 smoke test (9 runs) | ✅ Done 08:31–11:31; AKS stopped 11:35 | **Pre-registered gate FAIL on one cell:** shipping H3 error rate 5.32 / 6.97% across reps (27% of mean; limit 25% or 1 point), caused by a first scale-up one 15 s HPA cycle later. Everything else passes: 9/9 runs clean, B1 hold graceful, SLO-violation seconds 70/70, 70/70, 100/100 (shipping) and 140/170 (auth) (§8.12) |
-| 180-run open-loop campaign | ⏸ Approved in principle (user, ≈12:00) with G6 rule v2 — 50% or ≤ 30 s / ≤ 2 points (§8.9) | Config filled; launch awaits the user's go-ahead on time and cost; gate after 72 runs (§8.13) |
+| 180-run open-loop campaign | ⏳ Rep blocks 1–2 (72 runs) running on `ecommerce-vm` since 12:33:42 UTC under G6 rule v2 (§8.9); **12/72 DONE at 17:36 UTC**; H1 = 80% from position 13 (confirmed live 16:44), positions 1 and 9 re-run at 80% after position 72 | Pre-launch check: VM and cluster match the pushed HEAD (one inert adapter leftover); no failure since the start-up hiccup; the VM stops AKS after the re-runs (≈13:30 UTC 2026-10-07, estimate), then the gate decides (§8.13). Thesis structure: "Replace" (§8.14) |
 
-**The closed-loop final dataset (Part 01, findings #13–#16) remains the authoritative dataset** unless the
-open-loop campaign is run and passes its gate.
+**"Replace" (§8.14):** if the campaign passes its gate it is the thesis dataset; the closed-loop final dataset (Part 01,
+findings #13–#16) then becomes methodology background. If the campaign fails, the closed-loop dataset is the thesis
+dataset.
 
 ---
 
@@ -53,6 +54,8 @@ open-loop campaign is run and passes its gate.
   (`experiment-results/`, `experiment-results-archive/`) and closed-loop k6 jobs/runner modes unchanged (new files or
   opt-in flags only); pilot output in its own directory with its own state file; every cost- or cluster-changing step
   approved by the user first; no commits unless asked.
+  *(For the campaign the user later changed one autoscaler setting: H1's CPU target to the Kubernetes default 80%,
+  2026-10-06 — §8.13. The pilot and smoke had no H1 runs.)*
 - **Decision criteria (fixed before data):**
   1. `dropped_iterations = 0` in all 20 runs.
   2. B2: error < 1% and window p95 ≤ SLO.
@@ -422,7 +425,7 @@ unchanged. Reasons:
 constraint) under G6 rule v2 (§8.9), fixed before any campaign data. The smoke stays FAIL on record and is not
 re-scored.
 
-## 8.13 Campaign plan (approved in principle 2026-10-06 with G6 rule v2; launch needs the user's go-ahead)
+## 8.13 Campaign (approved 2026-10-06 with G6 rule v2; launched 12:33 UTC; running)
 
 - 180 runs (`experiment-results-openloop/runlist.txt`: 2 services × 6 configs incl. H1 × 3 patterns × 5 reps), shuffled
   within rep blocks (seed 20261006); positions 1–36 are rep 1 and 37–72 rep 2, each block covering all 36 cells (18 auth
@@ -437,6 +440,50 @@ re-scored.
   results and stops AKS (new third argument; runs execute in plan order, so 72 DONE = positions 1–72).
 - Settings written into `experiment-results-openloop/pilot-config.env` on 2026-10-06: caps 22 / 48, auth 2→30 and
   shipping 10→105 req/s, SLOs 1500 / 1200 ms — identical to the smoke except the seed.
+- **Pre-launch verification (2026-10-06 12:04–12:33 UTC, at the user's request — no stale code or settings):**
+  - All 332 tracked files outside the data folders on the VM are byte-identical to the pushed HEAD `d233aba`
+    (14 non-runtime files — docs, `.gitignore`, the laptop-only analysis tool — were synced first; the runner never
+    calls `pilot_openloop.py`). Campaign config, run list and launcher: identical checksums.
+  - Service code running in the pods (image + overlay): auth 18/18 and shipping 12/12 Python files equal HEAD; overlay
+    hashes `58d754bd7213` / `5b5de9e30a49` equal the hash of the VM's files; caps 22 / 48. ACR `:latest` last changed
+    2026-05-02 (auth) and 2026-04-17 (shipping); deployments use `imagePullPolicy: Always`.
+  - Prometheus: `kubectl diff` against `monitoring/prometheus.yaml` — no differences. KEDA, metrics-server, Prometheus
+    and prometheus-adapter running; custom, external and resource metrics APIs available; no leftover autoscalers or
+    k6 jobs. The 1 m `http_requests_per_second` adapter rule (H3) and the K1 `[1m]` queries match the repo.
+  - **Known drift, left in place:** the live prometheus-adapter config still has the rule
+    `auth_http_requests_per_second_30s` (added and reverted in the repo on 2026-08-15, never removed from the
+    cluster). Nothing references it, and it was present during the closed-loop campaign, the pilot and the smoke;
+    the user asked for the safest option, so it was left rather than hand-editing the adapter before a 24 h run.
+- **Launched 2026-10-06 12:33:42 UTC** on `ecommerce-vm` (tmux `campaign`, console `~/campaign-console.log`,
+  `run-openloop-vm.sh experiment-results-openloop yes 72`). The VM froze the plan (seed 20261006); its order is
+  identical to the laptop's dry run (same checksum, 180 lines). Expected checkpoint at launch ≈13:00 UTC on
+  2026-10-07 (estimate; the two H1 re-runs added later move it to ≈13:30 — see the progress bullet below).
+- **Start-up hiccup (no data affected):** attempt 1 stopped at 12:37:04 in the auth reset — a pod left in phase
+  `Failed` (Error, exit 3) by the 11:35 AKS stop kept the runner's "no pod outside Running/Completed" check from ever
+  passing (the deployment itself was 1/1 Ready). The dead pod object was deleted at 12:38:41; the launcher's attempt 2
+  passed the same check at 12:38:48 and run 1 started. No run had begun, so nothing was recorded. **Before every
+  future launch after an AKS start:** delete `Failed` auth/shipping pods (§8.15).
+- **H1 changed to 80% CPU, the Kubernetes default target (user decision, 2026-10-06 ≈15:36 UTC; commit `dddd996`
+  pushed 15:38; copied to the VM and validated with a server dry run at 15:38).** Reason: H1 stands for "HPA out of the
+  box"; its behavior was already the Kubernetes default, but its 70% target was a judgment call (Part 11 §11.6 #1).
+  Decided for construct validity, not from H1 results, and possible without a second explanation because the user
+  also chose "Replace" (§8.14). Two H1 runs had already run at 70% — plan positions 1 (auth oscillating rep 1) and 9
+  (shipping oscillating rep 1). They are archived in `experiment-results-openloop/superseded-h1-70pct/` and marked
+  not-done, so the launcher re-runs them at 80% right after position 72 and before it stops AKS; every other H1 run
+  (from position 13) runs at 80%. The manifests are read from disk at each config apply, so no running script was
+  edited. Done at 15:40 UTC, between runs: both runs' saved HPA objects show `averageUtilization: 70`; the archive
+  copies are checksum-identical (26 files each); the state file was backed up to
+  `superseded-h1-70pct/pilot-state-before-h1-change.txt` and the two DONE lines removed (7 DONE, positions 1 and 9
+  pending again). Confirmed live: position 13 (auth H1 spike rep 1) applied H1 at 16:44:18 UTC and the HPA in the
+  cluster read a target of 80%.
+- **Run 1 checked end to end** (auth H1 oscillating rep 1, 12:38–12:58, 1242 s; superseded — H1 was still 70%): its metadata records
+  `open-loop-arr-v2`, auth 2→30 req/s, timeout 5 s, 225 VUs, no connection reuse, k6 `0.46.0`, overlay
+  `58d754bd7213`, cap 22 and 120 pre-auth tokens (k6 logged `PREAUTH_USED tokens=120`); raw data md5-verified,
+  exit code 0. Validator: 0 critical, 0 warnings; 10,359 of 10,359 scheduled arrivals; 1 Ready pod at start and at
+  onset; first scale-up +64.9 s, 5 pods; load-window errors 21.93% (3.23% timeouts), SLO-violation 160 s.
+- **Progress at 17:36 UTC:** 12/72 DONE (positions 2–8 and 10–14), position 15 running; 20.1 min per run on average
+  (positions 1–14); no failure since the start-up hiccup. Remaining: positions 15–72 plus the re-runs of 1 and 9 —
+  60 runs, ≈20 h; the VM should stop AKS at ≈13:30 UTC on 2026-10-07 (estimate).
 
 ## 8.14 Implications for the thesis text
 
@@ -447,6 +494,11 @@ re-scored.
 - **If the open-loop campaign passes:** BAB 3 must describe the admission control (standard load shedding; exact cap
   rule), the auth pre-authentication, the ConfigMap overlay (same images), the open-loop KPIs (§8.2), and the gate.
   The closed-loop dataset becomes a second generator condition rather than being discarded.
+  > **Superseded by the user's decision (2026-10-06 ≈15:36 UTC): "Replace".** If the open-loop campaign passes its
+  > gate, it is the thesis dataset for BAB 4–5. The closed-loop campaign is methodology background — the evidence
+  > for why the generator was switched (BAB 3, details in an appendix) — not a second set of results compared config
+  > by config. If the campaign fails its gate, the closed-loop dataset is the thesis dataset and the open-loop work
+  > becomes a short robustness section.
 - **Disclose regardless of the decision:** the auth `setup()` burst in the closed-loop H1/H2 runs; the closed-loop
   throughput asymmetry (§8.1); that the generator choice changes the between-config spread by more than an order of
   magnitude (§8.7, indicative); the request-rate metric-blindness failure mode and why the v2 services shed load.
@@ -461,8 +513,12 @@ OPENLOOP_RESULTS_DIR=experiment-results-openloop bash scripts/run-pilot-openloop
 OPENLOOP_RESULTS_DIR=experiment-results-openloop bash scripts/run-pilot-openloop.sh run --dry-run
 OPENLOOP_RESULTS_DIR=experiment-results-openloop bash scripts/run-pilot-openloop.sh run --resume
 
-# Unattended on the VM (stops AKS when done or on give-up)
-tmux new-session -d -s campaign "bash ~/run-openloop-vm.sh experiment-results-openloop yes 2>&1 | tee -a ~/campaign-console.log"
+# Unattended on the VM (stops AKS when done, at the stop-at count, or on give-up)
+# After every AKS start, first remove pods the stop left in phase Failed — the runner's reset waits for zero of them:
+kubectl get pods -n ecommerce --field-selector=status.phase=Failed --no-headers | grep -E '^(auth-service|shipping-rate-service)-'
+kubectl delete pod -n ecommerce <each pod listed above>
+tmux new-session -d -s campaign "bash /home/kevin/run-openloop-vm.sh experiment-results-openloop yes 72 > /home/kevin/campaign-console.log 2>&1"
+# reps 3-5 after the gate: same command with stop-at 180 (or omitted)
 
 # Analysis (laptop, bundled Python)
 PYTHONUTF8=1 PILOT_OPENLOOP_DIR=experiment-results-openloop-smoke tools/python312/python.exe scripts/pilot_openloop.py validate
@@ -471,4 +527,5 @@ PYTHONUTF8=1 PILOT_OPENLOOP_DIR=experiment-results-openloop tools/python312/pyth
 
 **Costs of this study (estimates):** 2026-10-05/06 session ≈10.4 h of AKS ≈ $5.4 (idle start, 6 ladders, pilot);
 2026-10-06 v2 work from ≈06:30 UTC, ≈5.2 h ≈ $2.7 including the smoke test; ACR builds $0 (none ran). The VM
-(B2ats_v2) ran throughout.
+(B2ats_v2) ran throughout. Campaign: AKS running since the 12:23 UTC start, ≈5.2 h ≈ $2.7 by 17:36 UTC; to the
+72-run stop ≈25 h ≈ $13; reps 3–5 ≈36 h ≈ $19 more.
