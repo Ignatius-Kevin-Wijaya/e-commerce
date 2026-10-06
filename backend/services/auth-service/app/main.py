@@ -19,6 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from internal.handler.auth_handler import router as auth_router
 from internal.handler.health_handler import router as health_router
+from internal.middleware.admission_control import AdmissionControlMiddleware
 from internal.model.user import Base
 
 # ── Configuration ─────────────────────────────────────────────
@@ -124,6 +125,12 @@ async def db_session_middleware(request: Request, call_next):
         request.state.db = session
         response: Response = await call_next(request)
         return response
+
+
+# Off unless MAX_INFLIGHT_REQUESTS > 0. Added last so it is the OUTERMOST
+# middleware: shedding costs almost nothing (no DB session, no instrumentation),
+# and http_requests_total keeps counting served requests exactly as before.
+app.add_middleware(AdmissionControlMiddleware)
 
 
 # ── Register route handlers ──────────────────────────────────

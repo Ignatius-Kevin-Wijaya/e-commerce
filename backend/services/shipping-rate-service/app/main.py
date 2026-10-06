@@ -9,6 +9,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from internal.handler.health_handler import router as health_router
 from internal.handler.shipping_handler import router as shipping_router
+from internal.middleware.admission_control import AdmissionControlMiddleware
 
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 INTERNAL_GATEWAY_SECRET = os.getenv("INTERNAL_GATEWAY_SECRET", "dev_secret_gateway_key")
@@ -61,6 +62,11 @@ async def verify_gateway_secret_middleware(request: Request, call_next):
 
     return await call_next(request)
 
+
+# Off unless MAX_INFLIGHT_REQUESTS > 0. Added last so it is the OUTERMOST
+# middleware: shedding costs almost nothing, and http_requests_total keeps
+# counting served requests exactly as before.
+app.add_middleware(AdmissionControlMiddleware)
 
 app.include_router(health_router)
 app.include_router(shipping_router)
