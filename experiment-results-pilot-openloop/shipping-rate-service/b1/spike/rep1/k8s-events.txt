@@ -1,0 +1,14 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-05T22:02:28Z	Normal	Pulled	pod/k6-ol-shipping-rate-service-b1-spike-rep1-c2km2	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-05T22:02:28Z	Normal	Created	pod/k6-ol-shipping-rate-service-b1-spike-rep1-c2km2	Created container: k6
+2026-10-05T22:02:28Z	Normal	Started	pod/k6-ol-shipping-rate-service-b1-spike-rep1-c2km2	Started container k6
+2026-10-05T22:02:28Z	Normal	SuccessfulCreate	job/k6-ol-shipping-rate-service-b1-spike-rep1	Created pod: k6-ol-shipping-rate-service-b1-spike-rep1-c2km2
+2026-10-05T22:02:28Z	Normal	Scheduled	pod/k6-ol-shipping-rate-service-b1-spike-rep1-c2km2	Successfully assigned ecommerce/k6-ol-shipping-rate-service-b1-spike-rep1-c2km2 to aks-userpool-16719200-vmss00002g
+2026-10-05T22:09:46Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-4zczk	Readiness probe failed: Get "http://10.244.0.217:8006/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T22:09:59Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-4zczk	Liveness probe failed: Get "http://10.244.0.217:8006/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T22:13:59Z	Normal	Killing	pod/shipping-rate-service-68467f5cb-4zczk	Container shipping-rate-service failed liveness probe, will be restarted
+2026-10-05T22:14:01Z	Normal	Pulling	pod/shipping-rate-service-68467f5cb-4zczk	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-10-05T22:14:01Z	Normal	Pulled	pod/shipping-rate-service-68467f5cb-4zczk	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 252ms (252ms including waiting). Image size: 61321205 bytes.
+2026-10-05T22:14:02Z	Normal	Created	pod/shipping-rate-service-68467f5cb-4zczk	Created container: shipping-rate-service
+2026-10-05T22:14:02Z	Normal	Started	pod/shipping-rate-service-68467f5cb-4zczk	Started container shipping-rate-service
+2026-10-05T22:14:47Z	Normal	Completed	job/k6-ol-shipping-rate-service-b1-spike-rep1	Job completed

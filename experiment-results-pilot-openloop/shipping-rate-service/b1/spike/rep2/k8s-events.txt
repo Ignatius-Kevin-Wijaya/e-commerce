@@ -1,0 +1,9 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-05T23:02:44Z	Normal	Pulled	pod/k6-ol-shipping-rate-service-b1-spike-rep2-vtdjm	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-05T23:02:44Z	Normal	Created	pod/k6-ol-shipping-rate-service-b1-spike-rep2-vtdjm	Created container: k6
+2026-10-05T23:02:44Z	Normal	Started	pod/k6-ol-shipping-rate-service-b1-spike-rep2-vtdjm	Started container k6
+2026-10-05T23:02:44Z	Normal	SuccessfulCreate	job/k6-ol-shipping-rate-service-b1-spike-rep2	Created pod: k6-ol-shipping-rate-service-b1-spike-rep2-vtdjm
+2026-10-05T23:02:44Z	Normal	Scheduled	pod/k6-ol-shipping-rate-service-b1-spike-rep2-vtdjm	Successfully assigned ecommerce/k6-ol-shipping-rate-service-b1-spike-rep2-vtdjm to aks-userpool-16719200-vmss00002g
+2026-10-05T23:06:29Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-4zczk	Readiness probe failed: Get "http://10.244.0.217:8006/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T23:14:59Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-4zczk	Liveness probe failed: Get "http://10.244.0.217:8006/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T23:15:05Z	Normal	Completed	job/k6-ol-shipping-rate-service-b1-spike-rep2	Job completed

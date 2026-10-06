@@ -1,0 +1,47 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-05T18:20:59Z	Normal	SuccessfulCreate	replicaset/shipping-rate-service-68467f5cb	Created pod: shipping-rate-service-68467f5cb-vhn85
+2026-10-05T18:20:59Z	Normal	SuccessfulCreate	replicaset/shipping-rate-service-68467f5cb	Created pod: shipping-rate-service-68467f5cb-zwxkg
+2026-10-05T18:20:59Z	Normal	SuccessfulCreate	replicaset/shipping-rate-service-68467f5cb	Created pod: shipping-rate-service-68467f5cb-gbnx7
+2026-10-05T18:20:59Z	Normal	SuccessfulCreate	replicaset/shipping-rate-service-68467f5cb	Created pod: shipping-rate-service-68467f5cb-f5sn4
+2026-10-05T18:20:59Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled up replica set shipping-rate-service-68467f5cb from 1 to 5
+2026-10-05T18:20:59Z	Normal	Scheduled	pod/shipping-rate-service-68467f5cb-vhn85	Successfully assigned ecommerce/shipping-rate-service-68467f5cb-vhn85 to aks-userpool-16719200-vmss00002g
+2026-10-05T18:20:59Z	Normal	Scheduled	pod/shipping-rate-service-68467f5cb-zwxkg	Successfully assigned ecommerce/shipping-rate-service-68467f5cb-zwxkg to aks-userpool-16719200-vmss00002g
+2026-10-05T18:20:59Z	Normal	Scheduled	pod/shipping-rate-service-68467f5cb-gbnx7	Successfully assigned ecommerce/shipping-rate-service-68467f5cb-gbnx7 to aks-userpool-16719200-vmss00002h
+2026-10-05T18:20:59Z	Normal	Scheduled	pod/shipping-rate-service-68467f5cb-f5sn4	Successfully assigned ecommerce/shipping-rate-service-68467f5cb-f5sn4 to aks-userpool-16719200-vmss00002g
+2026-10-05T18:21:00Z	Normal	Pulling	pod/shipping-rate-service-68467f5cb-f5sn4	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-10-05T18:21:00Z	Normal	Pulled	pod/shipping-rate-service-68467f5cb-f5sn4	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 404ms (404ms including waiting). Image size: 61321205 bytes.
+2026-10-05T18:21:00Z	Normal	Created	pod/shipping-rate-service-68467f5cb-f5sn4	Created container: shipping-rate-service
+2026-10-05T18:21:00Z	Normal	Started	pod/shipping-rate-service-68467f5cb-f5sn4	Started container shipping-rate-service
+2026-10-05T18:21:00Z	Normal	Pulling	pod/shipping-rate-service-68467f5cb-gbnx7	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-10-05T18:21:00Z	Normal	Pulled	pod/shipping-rate-service-68467f5cb-gbnx7	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 222ms (222ms including waiting). Image size: 61321205 bytes.
+2026-10-05T18:21:00Z	Normal	Created	pod/shipping-rate-service-68467f5cb-gbnx7	Created container: shipping-rate-service
+2026-10-05T18:21:00Z	Normal	Started	pod/shipping-rate-service-68467f5cb-gbnx7	Started container shipping-rate-service
+2026-10-05T18:21:00Z	Normal	Pulling	pod/shipping-rate-service-68467f5cb-vhn85	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-10-05T18:21:00Z	Normal	Pulled	pod/shipping-rate-service-68467f5cb-vhn85	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 354ms (354ms including waiting). Image size: 61321205 bytes.
+2026-10-05T18:21:00Z	Normal	Created	pod/shipping-rate-service-68467f5cb-vhn85	Created container: shipping-rate-service
+2026-10-05T18:21:00Z	Normal	Started	pod/shipping-rate-service-68467f5cb-vhn85	Started container shipping-rate-service
+2026-10-05T18:21:00Z	Normal	Pulling	pod/shipping-rate-service-68467f5cb-zwxkg	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-10-05T18:21:00Z	Normal	Pulled	pod/shipping-rate-service-68467f5cb-zwxkg	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 430ms (430ms including waiting). Image size: 61321205 bytes.
+2026-10-05T18:21:00Z	Normal	Created	pod/shipping-rate-service-68467f5cb-zwxkg	Created container: shipping-rate-service
+2026-10-05T18:21:00Z	Normal	Started	pod/shipping-rate-service-68467f5cb-zwxkg	Started container shipping-rate-service
+2026-10-05T18:23:07Z	Normal	SuccessfulCreate	job/k6-ol-ladder-shipping-rate-service-b2	Created pod: k6-ol-ladder-shipping-rate-service-b2-r7vcp
+2026-10-05T18:23:07Z	Normal	Scheduled	pod/k6-ol-ladder-shipping-rate-service-b2-r7vcp	Successfully assigned ecommerce/k6-ol-ladder-shipping-rate-service-b2-r7vcp to aks-userpool-16719200-vmss00002h
+2026-10-05T18:23:08Z	Normal	Pulled	pod/k6-ol-ladder-shipping-rate-service-b2-r7vcp	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-05T18:23:08Z	Normal	Created	pod/k6-ol-ladder-shipping-rate-service-b2-r7vcp	Created container: k6
+2026-10-05T18:23:08Z	Normal	Started	pod/k6-ol-ladder-shipping-rate-service-b2-r7vcp	Started container k6
+2026-10-05T18:23:32Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-7nt42	Liveness probe failed: Get "http://10.244.0.35:8006/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T18:31:14Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-zwxkg	Liveness probe failed: Get "http://10.244.2.103:8006/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T18:31:16Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-zwxkg	Readiness probe failed: Get "http://10.244.2.103:8006/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T18:32:14Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-f5sn4	Liveness probe failed: Get "http://10.244.2.96:8006/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T18:32:14Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-gbnx7	Liveness probe failed: Get "http://10.244.0.194:8006/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T18:32:32Z	Normal	Killing	pod/shipping-rate-service-68467f5cb-7nt42	Container shipping-rate-service failed liveness probe, will be restarted
+2026-10-05T18:32:50Z	Normal	Pulling	pod/shipping-rate-service-68467f5cb-7nt42	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-10-05T18:32:50Z	Normal	Created	pod/shipping-rate-service-68467f5cb-7nt42	Created container: shipping-rate-service
+2026-10-05T18:32:50Z	Normal	Started	pod/shipping-rate-service-68467f5cb-7nt42	Started container shipping-rate-service
+2026-10-05T18:32:50Z	Normal	Pulled	pod/shipping-rate-service-68467f5cb-7nt42	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 220ms (220ms including waiting). Image size: 61321205 bytes.
+2026-10-05T18:33:04Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-vhn85	Readiness probe failed: Get "http://10.244.2.193:8006/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T18:33:05Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-f5sn4	Readiness probe failed: Get "http://10.244.2.96:8006/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T18:33:05Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-gbnx7	Readiness probe failed: Get "http://10.244.0.194:8006/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T18:33:15Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-vhn85	Liveness probe failed: Get "http://10.244.2.193:8006/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T18:34:48Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-7nt42	Readiness probe failed: Get "http://10.244.0.35:8006/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T18:35:34Z	Normal	Completed	job/k6-ol-ladder-shipping-rate-service-b2	Job completed

@@ -1,0 +1,8 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-05T20:01:50Z	Normal	SuccessfulCreate	job/k6-ol-auth-service-b1-spike-rep1	Created pod: k6-ol-auth-service-b1-spike-rep1-gnkql
+2026-10-05T20:01:50Z	Normal	Scheduled	pod/k6-ol-auth-service-b1-spike-rep1-gnkql	Successfully assigned ecommerce/k6-ol-auth-service-b1-spike-rep1-gnkql to aks-userpool-16719200-vmss00002g
+2026-10-05T20:01:51Z	Normal	Pulled	pod/k6-ol-auth-service-b1-spike-rep1-gnkql	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-05T20:01:51Z	Normal	Created	pod/k6-ol-auth-service-b1-spike-rep1-gnkql	Created container: k6
+2026-10-05T20:01:51Z	Normal	Started	pod/k6-ol-auth-service-b1-spike-rep1-gnkql	Started container k6
+2026-10-05T20:09:35Z	Warning	Unhealthy	pod/auth-service-55bd95c686-fskxx	Readiness probe failed: Get "http://10.244.1.194:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T20:14:33Z	Normal	Completed	job/k6-ol-auth-service-b1-spike-rep1	Job completed

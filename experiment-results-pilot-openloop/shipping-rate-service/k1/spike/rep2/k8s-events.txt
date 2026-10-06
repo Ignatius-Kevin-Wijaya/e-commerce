@@ -1,0 +1,17 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-05T22:20:24Z	Normal	KEDAScalersStarted	scaledobject/shipping-rate-service-keda	Scaler prometheus is built
+2026-10-05T22:20:24Z	Normal	KEDAScalersStarted	scaledobject/shipping-rate-service-keda	Started scalers watch
+2026-10-05T22:20:24Z	Normal	ScaledObjectReady	scaledobject/shipping-rate-service-keda	ScaledObject is ready for scaling
+2026-10-05T22:22:01Z	Normal	SuccessfulCreate	job/k6-ol-shipping-rate-service-k1-spike-rep2	Created pod: k6-ol-shipping-rate-service-k1-spike-rep2-c9tsg
+2026-10-05T22:22:01Z	Normal	Scheduled	pod/k6-ol-shipping-rate-service-k1-spike-rep2-c9tsg	Successfully assigned ecommerce/k6-ol-shipping-rate-service-k1-spike-rep2-c9tsg to aks-userpool-16719200-vmss00002g
+2026-10-05T22:22:02Z	Normal	Pulled	pod/k6-ol-shipping-rate-service-k1-spike-rep2-c9tsg	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-05T22:22:02Z	Normal	Created	pod/k6-ol-shipping-rate-service-k1-spike-rep2-c9tsg	Created container: k6
+2026-10-05T22:22:02Z	Normal	Started	pod/k6-ol-shipping-rate-service-k1-spike-rep2-c9tsg	Started container k6
+2026-10-05T22:24:58Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-4zczk	Readiness probe failed: Get "http://10.244.0.217:8006/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T22:29:59Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-4zczk	Liveness probe failed: Get "http://10.244.0.217:8006/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T22:33:59Z	Normal	Killing	pod/shipping-rate-service-68467f5cb-4zczk	Container shipping-rate-service failed liveness probe, will be restarted
+2026-10-05T22:34:01Z	Normal	Pulling	pod/shipping-rate-service-68467f5cb-4zczk	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-10-05T22:34:02Z	Normal	Created	pod/shipping-rate-service-68467f5cb-4zczk	Created container: shipping-rate-service
+2026-10-05T22:34:02Z	Normal	Started	pod/shipping-rate-service-68467f5cb-4zczk	Started container shipping-rate-service
+2026-10-05T22:34:02Z	Normal	Pulled	pod/shipping-rate-service-68467f5cb-4zczk	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 313ms (313ms including waiting). Image size: 61321205 bytes.
+2026-10-05T22:34:23Z	Normal	Completed	job/k6-ol-shipping-rate-service-k1-spike-rep2	Job completed

@@ -1,0 +1,1442 @@
+{
+ "auth-service_b1_20261006T072933Z": {
+  "meta": {
+   "run_id": "ladder_auth-service_b1_20261006T072933Z",
+   "kind": "ladder",
+   "service": "auth-service",
+   "config": "b1",
+   "pattern": "ladder",
+   "repetition": null,
+   "plan_position": null,
+   "start_epoch": 1791271780,
+   "end_epoch": 1791273073,
+   "duration_seconds": 1293,
+   "k6_job_name": "k6-ol-ladder-auth-service-b1",
+   "k6_pod_name": "k6-ol-ladder-auth-service-b1-ftxl4",
+   "k6_exit_code": 0,
+   "k6_scenario_start_ms": 1791272131386,
+   "target_url": "http://auth-service.ecommerce.svc.cluster.local:8001",
+   "raw_results": {
+    "file": "k6-results.json.gz",
+    "verified": true,
+    "bytes": 1704126,
+    "md5": "b65fa5b232f23faf2b3ea79a8c338c73"
+   },
+   "load_profile": {
+    "version": "open-loop-arr-v2",
+    "executor": "constant-arrival-rate",
+    "rate_unit": "req/s",
+    "base_rate": null,
+    "peak_rate": null,
+    "ladder_rates": [
+     6,
+     8,
+     10,
+     12,
+     16,
+     30
+    ],
+    "ladder_step": "2m",
+    "ladder_gap": "30s",
+    "request_timeout": "5s",
+    "vu_factor": 1.5,
+    "pre_allocated_vus": null,
+    "max_vus": 225,
+    "no_connection_reuse": true,
+    "k6_image": "grafana/k6:0.46.0",
+    "k6_resources": "1000m,1Gi,2000m,4Gi",
+    "request_mix": "AUTH_ME_PERCENT=70 AUTH_LOGIN_PERCENT=30 NUM_TEST_USERS=120"
+   },
+   "service_overrides": {
+    "image_tag": null,
+    "code_overlay_sha": "58d754bd7213",
+    "max_inflight_requests": 22
+   },
+   "preauth_tokens": {
+    "enabled": true,
+    "count": 120,
+    "epoch": 1791271866
+   },
+   "timings": {
+    "reset_wait": 120,
+    "stabilize_wait": 90,
+    "export_wait": null
+   },
+   "export_ok": true,
+   "timestamp": "2026-10-06T07:51:13.660Z"
+  },
+  "steps": [
+   {
+    "requests": 540,
+    "ok": 540,
+    "dropped": 0,
+    "attempted_rps": 6.0,
+    "completed_rps": 6.0,
+    "goodput_rps": 6.0,
+    "error_pct": 0.0,
+    "timeout_pct": 0.0,
+    "shed_pct": 0.0,
+    "timeouts_e2e": 0,
+    "timeouts_k6_code1050": 0,
+    "p50_ms": 6.0,
+    "p95_ms": 653.4999999999995,
+    "p99_ms": 1815.800000000001,
+    "p95_ok_ms": 653.4999999999995,
+    "p95_http_req_duration_ms": 653.1175491999995,
+    "step": "step01_6rps",
+    "rate": 6,
+    "pod_cpu_mean_m": [
+     257
+    ],
+    "pod_throttled_mean": [
+     0.445
+    ],
+    "carrier_cpu_total_m": 5,
+    "vus_max": 4.0,
+    "up_failures": 0,
+    "inflight_max": 3.0,
+    "k6": {
+     "cpu_max_cores": 0.013419252243974833,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.0,
+     "throttled_ratio_mean": 0.0,
+     "memory_max_bytes": 158105600.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 720,
+    "ok": 720,
+    "dropped": 0,
+    "attempted_rps": 8.0,
+    "completed_rps": 8.0,
+    "goodput_rps": 8.0,
+    "error_pct": 0.0,
+    "timeout_pct": 0.0,
+    "shed_pct": 0.0,
+    "timeouts_e2e": 0,
+    "timeouts_k6_code1050": 0,
+    "p50_ms": 20.5,
+    "p95_ms": 1225.3999999999987,
+    "p99_ms": 2127.6799999999985,
+    "p95_ok_ms": 1225.3999999999987,
+    "p95_http_req_duration_ms": 1224.9228362499987,
+    "step": "step02_8rps",
+    "rate": 8,
+    "pod_cpu_mean_m": [
+     314
+    ],
+    "pod_throttled_mean": [
+     0.619
+    ],
+    "carrier_cpu_total_m": 5,
+    "vus_max": 16.0,
+    "up_failures": 0,
+    "inflight_max": 7.0,
+    "k6": {
+     "cpu_max_cores": 0.016206391478029283,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.0,
+     "throttled_ratio_mean": 0.0,
+     "memory_max_bytes": 188805120.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 900,
+    "ok": 865,
+    "dropped": 0,
+    "attempted_rps": 10.0,
+    "completed_rps": 10.0,
+    "goodput_rps": 9.61111111111111,
+    "error_pct": 3.888888888888889,
+    "timeout_pct": 3.4444444444444446,
+    "shed_pct": 0.4444444444444444,
+    "timeouts_e2e": 31,
+    "timeouts_k6_code1050": 31,
+    "p50_ms": 83.0,
+    "p95_ms": 3688.9999999999955,
+    "p99_ms": null,
+    "p95_ok_ms": 2184.6,
+    "p95_http_req_duration_ms": 3486.2926020499954,
+    "step": "step03_10rps",
+    "rate": 10,
+    "pod_cpu_mean_m": [
+     411
+    ],
+    "pod_throttled_mean": [
+     0.848
+    ],
+    "carrier_cpu_total_m": 5,
+    "vus_max": 17.0,
+    "up_failures": 0,
+    "inflight_max": 18.0,
+    "k6": {
+     "cpu_max_cores": 0.01712237164885231,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.0,
+     "throttled_ratio_mean": 0.0,
+     "memory_max_bytes": 195690496.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 1080,
+    "ok": 1018,
+    "dropped": 0,
+    "attempted_rps": 12.0,
+    "completed_rps": 12.0,
+    "goodput_rps": 11.311111111111112,
+    "error_pct": 5.7407407407407405,
+    "timeout_pct": 1.7592592592592593,
+    "shed_pct": 3.9814814814814814,
+    "timeouts_e2e": 19,
+    "timeouts_k6_code1050": 19,
+    "p50_ms": 94.0,
+    "p95_ms": null,
+    "p99_ms": null,
+    "p95_ok_ms": 2755.499999999999,
+    "p95_http_req_duration_ms": 3319.232208699999,
+    "step": "step04_12rps",
+    "rate": 12,
+    "pod_cpu_mean_m": [
+     449
+    ],
+    "pod_throttled_mean": [
+     0.932
+    ],
+    "carrier_cpu_total_m": 5,
+    "vus_max": 24.0,
+    "up_failures": 0,
+    "inflight_max": 15.0,
+    "k6": {
+     "cpu_max_cores": 0.01862794857927361,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.0,
+     "throttled_ratio_mean": 0.0,
+     "memory_max_bytes": 205172736.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 1440,
+    "ok": 958,
+    "dropped": 0,
+    "attempted_rps": 16.0,
+    "completed_rps": 16.0,
+    "goodput_rps": 10.644444444444444,
+    "error_pct": 33.47222222222222,
+    "timeout_pct": 8.055555555555555,
+    "shed_pct": 25.416666666666668,
+    "timeouts_e2e": 116,
+    "timeouts_k6_code1050": 116,
+    "p50_ms": 984.5,
+    "p95_ms": null,
+    "p99_ms": null,
+    "p95_ok_ms": 3407.1499999999996,
+    "p95_http_req_duration_ms": 5000.0844385,
+    "step": "step05_16rps",
+    "rate": 16,
+    "pod_cpu_mean_m": [
+     500
+    ],
+    "pod_throttled_mean": [
+     1.0
+    ],
+    "carrier_cpu_total_m": 5,
+    "vus_max": 36.0,
+    "up_failures": 0,
+    "inflight_max": 22.0,
+    "k6": {
+     "cpu_max_cores": 0.02049361539927579,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.0,
+     "throttled_ratio_mean": 0.0,
+     "memory_max_bytes": 211886080.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 2700,
+    "ok": 915,
+    "dropped": 0,
+    "attempted_rps": 30.0,
+    "completed_rps": 30.0,
+    "goodput_rps": 10.166666666666666,
+    "error_pct": 66.11111111111111,
+    "timeout_pct": 5.777777777777778,
+    "shed_pct": 60.333333333333336,
+    "timeouts_e2e": 156,
+    "timeouts_k6_code1050": 156,
+    "p50_ms": null,
+    "p95_ms": null,
+    "p99_ms": null,
+    "p95_ok_ms": 4247.3,
+    "p95_http_req_duration_ms": 4999.95804925,
+    "step": "step06_30rps",
+    "rate": 30,
+    "pod_cpu_mean_m": [
+     467
+    ],
+    "pod_throttled_mean": [
+     0.996
+    ],
+    "carrier_cpu_total_m": 5,
+    "vus_max": 125.0,
+    "up_failures": 0,
+    "inflight_max": 22.0,
+    "k6": {
+     "cpu_max_cores": 0.031816238501501344,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.0,
+     "throttled_ratio_mean": 0.0,
+     "memory_max_bytes": 217075712.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   }
+  ]
+ },
+ "auth-service_b2_20261006T080857Z": {
+  "meta": {
+   "run_id": "ladder_auth-service_b2_20261006T080857Z",
+   "kind": "ladder",
+   "service": "auth-service",
+   "config": "b2",
+   "pattern": "ladder",
+   "repetition": null,
+   "plan_position": null,
+   "start_epoch": 1791274143,
+   "end_epoch": 1791275282,
+   "duration_seconds": 1139,
+   "k6_job_name": "k6-ol-ladder-auth-service-b2",
+   "k6_pod_name": "k6-ol-ladder-auth-service-b2-zx4g4",
+   "k6_exit_code": 0,
+   "k6_scenario_start_ms": 1791274489007,
+   "target_url": "http://auth-service.ecommerce.svc.cluster.local:8001",
+   "raw_results": {
+    "file": "k6-results.json.gz",
+    "verified": true,
+    "bytes": 5047482,
+    "md5": "40c8c754fe64414f9dc93d6931da24be"
+   },
+   "load_profile": {
+    "version": "open-loop-arr-v2",
+    "executor": "constant-arrival-rate",
+    "rate_unit": "req/s",
+    "base_rate": null,
+    "peak_rate": null,
+    "ladder_rates": [
+     30,
+     40,
+     50,
+     60,
+     70
+    ],
+    "ladder_step": "2m",
+    "ladder_gap": "30s",
+    "request_timeout": "5s",
+    "vu_factor": 1.5,
+    "pre_allocated_vus": null,
+    "max_vus": 525,
+    "no_connection_reuse": true,
+    "k6_image": "grafana/k6:0.46.0",
+    "k6_resources": "1000m,1Gi,2000m,4Gi",
+    "request_mix": "AUTH_ME_PERCENT=70 AUTH_LOGIN_PERCENT=30 NUM_TEST_USERS=120"
+   },
+   "service_overrides": {
+    "image_tag": null,
+    "code_overlay_sha": "58d754bd7213",
+    "max_inflight_requests": 22
+   },
+   "preauth_tokens": {
+    "enabled": true,
+    "count": 120,
+    "epoch": 1791274228
+   },
+   "timings": {
+    "reset_wait": 120,
+    "stabilize_wait": 90,
+    "export_wait": null
+   },
+   "export_ok": true,
+   "timestamp": "2026-10-06T08:28:03.169Z"
+  },
+  "steps": [
+   {
+    "requests": 2700,
+    "ok": 2700,
+    "dropped": 0,
+    "attempted_rps": 30.0,
+    "completed_rps": 30.0,
+    "goodput_rps": 30.0,
+    "error_pct": 0.0,
+    "timeout_pct": 0.0,
+    "shed_pct": 0.0,
+    "timeouts_e2e": 0,
+    "timeouts_k6_code1050": 0,
+    "p50_ms": 15.0,
+    "p95_ms": 787.2499999999986,
+    "p99_ms": 1394.0999999999976,
+    "p95_ok_ms": 787.2499999999986,
+    "p95_http_req_duration_ms": 787.478748849999,
+    "step": "step01_30rps",
+    "rate": 30,
+    "pod_cpu_mean_m": [
+     265,
+     190,
+     272,
+     215,
+     236
+    ],
+    "pod_throttled_mean": [
+     0.435,
+     0.526,
+     0.515,
+     0.474,
+     0.385
+    ],
+    "carrier_cpu_total_m": 5,
+    "vus_max": 17.0,
+    "up_failures": 0,
+    "inflight_max": 4.0,
+    "k6": {
+     "cpu_max_cores": 0.04125761935521757,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.0,
+     "throttled_ratio_mean": 0.0,
+     "memory_max_bytes": 332021760.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 3600,
+    "ok": 3577,
+    "dropped": 0,
+    "attempted_rps": 40.0,
+    "completed_rps": 40.0,
+    "goodput_rps": 39.74444444444445,
+    "error_pct": 0.6388888888888888,
+    "timeout_pct": 0.3611111111111111,
+    "shed_pct": 0.2777777777777778,
+    "timeouts_e2e": 13,
+    "timeouts_k6_code1050": 13,
+    "p50_ms": 29.0,
+    "p95_ms": 1765.0499999999943,
+    "p99_ms": 4095.1099999999974,
+    "p95_ok_ms": 1619.9999999999973,
+    "p95_http_req_duration_ms": 1692.2335502999977,
+    "step": "step02_40rps",
+    "rate": 40,
+    "pod_cpu_mean_m": [
+     354,
+     289,
+     306,
+     377,
+     261
+    ],
+    "pod_throttled_mean": [
+     0.727,
+     0.617,
+     0.69,
+     0.543,
+     0.638
+    ],
+    "carrier_cpu_total_m": 5,
+    "vus_max": 34.0,
+    "up_failures": 0,
+    "inflight_max": 22.0,
+    "k6": {
+     "cpu_max_cores": 0.04668222739088799,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.0027397260273972603,
+     "throttled_ratio_mean": 0.001288796241148832,
+     "memory_max_bytes": 385536000.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 4500,
+    "ok": 4389,
+    "dropped": 0,
+    "attempted_rps": 50.0,
+    "completed_rps": 50.0,
+    "goodput_rps": 48.766666666666666,
+    "error_pct": 2.466666666666667,
+    "timeout_pct": 1.2222222222222223,
+    "shed_pct": 1.2444444444444445,
+    "timeouts_e2e": 55,
+    "timeouts_k6_code1050": 55,
+    "p50_ms": 59.0,
+    "p95_ms": 2854.250000000001,
+    "p99_ms": null,
+    "p95_ok_ms": 1927.7999999999984,
+    "p95_http_req_duration_ms": 2319.5587558000007,
+    "step": "step03_50rps",
+    "rate": 50,
+    "pod_cpu_mean_m": [
+     430,
+     382,
+     407,
+     383,
+     394
+    ],
+    "pod_throttled_mean": [
+     0.738,
+     0.828,
+     0.898,
+     0.788,
+     0.748
+    ],
+    "carrier_cpu_total_m": 5,
+    "vus_max": 45.0,
+    "up_failures": 0,
+    "inflight_max": 22.0,
+    "k6": {
+     "cpu_max_cores": 0.052361962887005536,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.0,
+     "throttled_ratio_mean": 0.0,
+     "memory_max_bytes": 414654464.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 5400,
+    "ok": 5017,
+    "dropped": 0,
+    "attempted_rps": 60.0,
+    "completed_rps": 60.0,
+    "goodput_rps": 55.74444444444445,
+    "error_pct": 7.092592592592593,
+    "timeout_pct": 2.8333333333333335,
+    "shed_pct": 4.2592592592592595,
+    "timeouts_e2e": 153,
+    "timeouts_k6_code1050": 153,
+    "p50_ms": 125.0,
+    "p95_ms": null,
+    "p99_ms": null,
+    "p95_ok_ms": 2508.2,
+    "p95_http_req_duration_ms": 3797.6055748500003,
+    "step": "step04_60rps",
+    "rate": 60,
+    "pod_cpu_mean_m": [
+     455,
+     398,
+     432,
+     449,
+     432
+    ],
+    "pod_throttled_mean": [
+     0.874,
+     0.837,
+     0.956,
+     0.925,
+     0.834
+    ],
+    "carrier_cpu_total_m": 5,
+    "vus_max": 61.0,
+    "up_failures": 0,
+    "inflight_max": 22.0,
+    "k6": {
+     "cpu_max_cores": 0.06678579432270912,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.003105590062111801,
+     "throttled_ratio_mean": 0.0018129886453156045,
+     "memory_max_bytes": 424189952.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 6300,
+    "ok": 5334,
+    "dropped": 0,
+    "attempted_rps": 70.0,
+    "completed_rps": 70.0,
+    "goodput_rps": 59.266666666666666,
+    "error_pct": 15.333333333333334,
+    "timeout_pct": 3.4285714285714284,
+    "shed_pct": 11.904761904761905,
+    "timeouts_e2e": 216,
+    "timeouts_k6_code1050": 216,
+    "p50_ms": 373.0,
+    "p95_ms": null,
+    "p99_ms": null,
+    "p95_ok_ms": 3301.7499999999973,
+    "p95_http_req_duration_ms": 4286.285772949997,
+    "step": "step05_70rps",
+    "rate": 70,
+    "pod_cpu_mean_m": [
+     495,
+     498,
+     465,
+     467,
+     454
+    ],
+    "pod_throttled_mean": [
+     0.911,
+     0.908,
+     0.987,
+     0.963,
+     0.993
+    ],
+    "carrier_cpu_total_m": 5,
+    "vus_max": 100.0,
+    "up_failures": 0,
+    "inflight_max": 22.0,
+    "k6": {
+     "cpu_max_cores": 0.0668880695892622,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.0,
+     "throttled_ratio_mean": 0.0,
+     "memory_max_bytes": 428863488.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   }
+  ]
+ },
+ "shipping-rate-service_b1_20261006T064445Z": {
+  "meta": {
+   "run_id": "ladder_shipping-rate-service_b1_20261006T064445Z",
+   "kind": "ladder",
+   "service": "shipping-rate-service",
+   "config": "b1",
+   "pattern": "ladder",
+   "repetition": null,
+   "plan_position": null,
+   "start_epoch": 1791269091,
+   "end_epoch": 1791270345,
+   "duration_seconds": 1254,
+   "k6_job_name": "k6-ol-ladder-shipping-rate-service-b1",
+   "k6_pod_name": "k6-ol-ladder-shipping-rate-service-b1-cn8hw",
+   "k6_exit_code": 0,
+   "k6_scenario_start_ms": 1791269401597,
+   "target_url": "http://shipping-rate-service.ecommerce.svc.cluster.local:8006",
+   "raw_results": {
+    "file": "k6-results.json.gz",
+    "verified": true,
+    "bytes": 9588486,
+    "md5": "13dabba4ccc384e6440579ca294fad17"
+   },
+   "load_profile": {
+    "version": "open-loop-arr-v2",
+    "executor": "constant-arrival-rate",
+    "rate_unit": "req/s",
+    "base_rate": null,
+    "peak_rate": null,
+    "ladder_rates": [
+     40,
+     50,
+     60,
+     80,
+     105,
+     140
+    ],
+    "ladder_step": "2m",
+    "ladder_gap": "30s",
+    "request_timeout": "5s",
+    "vu_factor": 1.5,
+    "pre_allocated_vus": null,
+    "max_vus": 1050,
+    "no_connection_reuse": true,
+    "k6_image": "grafana/k6:0.46.0",
+    "k6_resources": "1000m,1Gi,2000m,4Gi",
+    "request_mix": "SHIPPING_MAX_ITEMS=4 SHIPPING_MIN_WEIGHT_GRAMS=200 SHIPPING_MAX_WEIGHT_GRAMS=2500 SHIPPING_DESTINATION_ZONES=domestic,regional,remote"
+   },
+   "service_overrides": {
+    "image_tag": null,
+    "code_overlay_sha": "f0600f42b3f0",
+    "max_inflight_requests": 48
+   },
+   "preauth_tokens": {
+    "enabled": false,
+    "count": null,
+    "epoch": null
+   },
+   "timings": {
+    "reset_wait": 120,
+    "stabilize_wait": 90,
+    "export_wait": null
+   },
+   "export_ok": true,
+   "timestamp": "2026-10-06T07:05:45.822Z"
+  },
+  "steps": [
+   {
+    "requests": 3600,
+    "ok": 3600,
+    "dropped": 0,
+    "attempted_rps": 40.0,
+    "completed_rps": 40.0,
+    "goodput_rps": 40.0,
+    "error_pct": 0.0,
+    "timeout_pct": 0.0,
+    "shed_pct": 0.0,
+    "timeouts_e2e": 0,
+    "timeouts_k6_code1050": 0,
+    "p50_ms": 707.0,
+    "p95_ms": 917.0,
+    "p99_ms": 935.0,
+    "p95_ok_ms": 917.0,
+    "p95_http_req_duration_ms": 916.6247487499999,
+    "step": "step01_40rps",
+    "rate": 40,
+    "pod_cpu_mean_m": [
+     266
+    ],
+    "pod_throttled_mean": [
+     0.006
+    ],
+    "carrier_cpu_total_m": 163,
+    "vus_max": 32.0,
+    "up_failures": 0,
+    "inflight_max": 31.0,
+    "k6": {
+     "cpu_max_cores": 0.05875752179210797,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.0030581039755351682,
+     "throttled_ratio_mean": 0.0013500060875606072,
+     "memory_max_bytes": 583307264.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 4500,
+    "ok": 4500,
+    "dropped": 0,
+    "attempted_rps": 50.0,
+    "completed_rps": 50.0,
+    "goodput_rps": 50.0,
+    "error_pct": 0.0,
+    "timeout_pct": 0.0,
+    "shed_pct": 0.0,
+    "timeouts_e2e": 0,
+    "timeouts_k6_code1050": 0,
+    "p50_ms": 716.0,
+    "p95_ms": 929.0,
+    "p99_ms": 962.0,
+    "p95_ok_ms": 929.0,
+    "p95_http_req_duration_ms": 929.176327,
+    "step": "step02_50rps",
+    "rate": 50,
+    "pod_cpu_mean_m": [
+     377
+    ],
+    "pod_throttled_mean": [
+     0.036
+    ],
+    "carrier_cpu_total_m": 200,
+    "vus_max": 40.0,
+    "up_failures": 0,
+    "inflight_max": 40.0,
+    "k6": {
+     "cpu_max_cores": 0.06748676373262742,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.003891050583657587,
+     "throttled_ratio_mean": 0.0009727626459143968,
+     "memory_max_bytes": 628862976.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 5400,
+    "ok": 3768,
+    "dropped": 0,
+    "attempted_rps": 60.0,
+    "completed_rps": 60.0,
+    "goodput_rps": 41.86666666666667,
+    "error_pct": 30.22222222222222,
+    "timeout_pct": 0.0,
+    "shed_pct": 30.22222222222222,
+    "timeouts_e2e": 0,
+    "timeouts_k6_code1050": 0,
+    "p50_ms": 1217.0,
+    "p95_ms": null,
+    "p99_ms": null,
+    "p95_ok_ms": 1375.0,
+    "p95_http_req_duration_ms": 1354.39387835,
+    "step": "step03_60rps",
+    "rate": 60,
+    "pod_cpu_mean_m": [
+     463
+    ],
+    "pod_throttled_mean": [
+     0.989
+    ],
+    "carrier_cpu_total_m": 193,
+    "vus_max": 62.0,
+    "up_failures": 0,
+    "inflight_max": 48.0,
+    "k6": {
+     "cpu_max_cores": 0.07077607644991207,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.012738853503184712,
+     "throttled_ratio_mean": 0.005316672325936946,
+     "memory_max_bytes": 663244800.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 7200,
+    "ok": 3682,
+    "dropped": 0,
+    "attempted_rps": 80.0,
+    "completed_rps": 80.0,
+    "goodput_rps": 40.91111111111111,
+    "error_pct": 48.861111111111114,
+    "timeout_pct": 0.0,
+    "shed_pct": 48.861111111111114,
+    "timeouts_e2e": 0,
+    "timeouts_k6_code1050": 0,
+    "p50_ms": 1483.0,
+    "p95_ms": null,
+    "p99_ms": null,
+    "p95_ok_ms": 1442.9499999999998,
+    "p95_http_req_duration_ms": 1389.2364231499998,
+    "step": "step04_80rps",
+    "rate": 80,
+    "pod_cpu_mean_m": [
+     477
+    ],
+    "pod_throttled_mean": [
+     0.99
+    ],
+    "carrier_cpu_total_m": 186,
+    "vus_max": 64.0,
+    "up_failures": 0,
+    "inflight_max": 48.0,
+    "k6": {
+     "cpu_max_cores": 0.08780526347056376,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.0039603960396039604,
+     "throttled_ratio_mean": 0.002009493483348933,
+     "memory_max_bytes": 681807872.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 9450,
+    "ok": 675,
+    "dropped": 0,
+    "attempted_rps": 105.0,
+    "completed_rps": 105.0,
+    "goodput_rps": 7.5,
+    "error_pct": 92.85714285714286,
+    "timeout_pct": 77.16402116402116,
+    "shed_pct": 15.693121693121693,
+    "timeouts_e2e": 7292,
+    "timeouts_k6_code1050": 7292,
+    "p50_ms": null,
+    "p95_ms": null,
+    "p99_ms": null,
+    "p95_ok_ms": 4917.6,
+    "p95_http_req_duration_ms": 5000.82668385,
+    "step": "step05_105rps",
+    "rate": 105,
+    "pod_cpu_mean_m": [
+     500
+    ],
+    "pod_throttled_mean": [
+     0.998
+    ],
+    "carrier_cpu_total_m": 183,
+    "vus_max": 525.0,
+    "up_failures": 0,
+    "inflight_max": 48.0,
+    "k6": {
+     "cpu_max_cores": 0.10526772191185595,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.004228329809725159,
+     "throttled_ratio_mean": 0.00315854407843496,
+     "memory_max_bytes": 703725568.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 12600,
+    "ok": 0,
+    "dropped": 0,
+    "attempted_rps": 140.0,
+    "completed_rps": 140.0,
+    "goodput_rps": 0.0,
+    "error_pct": 100.0,
+    "timeout_pct": 100.0,
+    "shed_pct": 0.0,
+    "timeouts_e2e": 12600,
+    "timeouts_k6_code1050": 12248,
+    "p50_ms": null,
+    "p95_ms": null,
+    "p99_ms": null,
+    "p95_ok_ms": null,
+    "p95_http_req_duration_ms": 5000.75079225,
+    "step": "step06_140rps",
+    "rate": 140,
+    "pod_cpu_mean_m": [
+     500
+    ],
+    "pod_throttled_mean": [
+     0.999
+    ],
+    "carrier_cpu_total_m": 179,
+    "vus_max": 705.0,
+    "up_failures": 6,
+    "inflight_max": 48.0,
+    "k6": {
+     "cpu_max_cores": 0.11733951056675097,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.004914004914004914,
+     "throttled_ratio_mean": 0.004114168423006727,
+     "memory_max_bytes": 749682688.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   }
+  ]
+ },
+ "shipping-rate-service_b1_20261006T070814Z": {
+  "meta": {
+   "run_id": "ladder_shipping-rate-service_b1_20261006T070814Z",
+   "kind": "ladder",
+   "service": "shipping-rate-service",
+   "config": "b1",
+   "pattern": "ladder",
+   "repetition": null,
+   "plan_position": null,
+   "start_epoch": 1791270500,
+   "end_epoch": 1791271750,
+   "duration_seconds": 1250,
+   "k6_job_name": "k6-ol-ladder-shipping-rate-service-b1",
+   "k6_pod_name": "k6-ol-ladder-shipping-rate-service-b1-89nhx",
+   "k6_exit_code": 0,
+   "k6_scenario_start_ms": 1791270803168,
+   "target_url": "http://shipping-rate-service.ecommerce.svc.cluster.local:8006",
+   "raw_results": {
+    "file": "k6-results.json.gz",
+    "verified": true,
+    "bytes": 12430750,
+    "md5": "b7bd7f63017ccf9baac362c1df810e16"
+   },
+   "load_profile": {
+    "version": "open-loop-arr-v2",
+    "executor": "constant-arrival-rate",
+    "rate_unit": "req/s",
+    "base_rate": null,
+    "peak_rate": null,
+    "ladder_rates": [
+     50,
+     60,
+     80,
+     105,
+     140,
+     180
+    ],
+    "ladder_step": "2m",
+    "ladder_gap": "30s",
+    "request_timeout": "5s",
+    "vu_factor": 1.5,
+    "pre_allocated_vus": null,
+    "max_vus": 1350,
+    "no_connection_reuse": true,
+    "k6_image": "grafana/k6:0.46.0",
+    "k6_resources": "1000m,1Gi,2000m,4Gi",
+    "request_mix": "SHIPPING_MAX_ITEMS=4 SHIPPING_MIN_WEIGHT_GRAMS=200 SHIPPING_MAX_WEIGHT_GRAMS=2500 SHIPPING_DESTINATION_ZONES=domestic,regional,remote"
+   },
+   "service_overrides": {
+    "image_tag": null,
+    "code_overlay_sha": "5b5de9e30a49",
+    "max_inflight_requests": 48
+   },
+   "preauth_tokens": {
+    "enabled": false,
+    "count": null,
+    "epoch": null
+   },
+   "timings": {
+    "reset_wait": 120,
+    "stabilize_wait": 90,
+    "export_wait": null
+   },
+   "export_ok": true,
+   "timestamp": "2026-10-06T07:29:11.075Z"
+  },
+  "steps": [
+   {
+    "requests": 4500,
+    "ok": 4462,
+    "dropped": 0,
+    "attempted_rps": 50.0,
+    "completed_rps": 50.0,
+    "goodput_rps": 49.577777777777776,
+    "error_pct": 0.8444444444444444,
+    "timeout_pct": 0.0,
+    "shed_pct": 0.8444444444444444,
+    "timeouts_e2e": 0,
+    "timeouts_k6_code1050": 0,
+    "p50_ms": 743.0,
+    "p95_ms": 1000.0,
+    "p99_ms": 1235.0600000000013,
+    "p95_ok_ms": 983.0,
+    "p95_http_req_duration_ms": 982.5372422500001,
+    "step": "step01_50rps",
+    "rate": 50,
+    "pod_cpu_mean_m": [
+     405
+    ],
+    "pod_throttled_mean": [
+     0.284
+    ],
+    "carrier_cpu_total_m": 199,
+    "vus_max": 48.0,
+    "up_failures": 0,
+    "inflight_max": 40.0,
+    "k6": {
+     "cpu_max_cores": 0.07501309623933679,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.0030030030030030034,
+     "throttled_ratio_mean": 0.001752280866204917,
+     "memory_max_bytes": 725168128.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 5400,
+    "ok": 3999,
+    "dropped": 0,
+    "attempted_rps": 60.0,
+    "completed_rps": 60.0,
+    "goodput_rps": 44.43333333333333,
+    "error_pct": 25.944444444444443,
+    "timeout_pct": 0.0,
+    "shed_pct": 25.944444444444443,
+    "timeouts_e2e": 0,
+    "timeouts_k6_code1050": 0,
+    "p50_ms": 1089.0,
+    "p95_ms": null,
+    "p99_ms": null,
+    "p95_ok_ms": 1264.0,
+    "p95_http_req_duration_ms": 1246.3242272999998,
+    "step": "step02_60rps",
+    "rate": 60,
+    "pod_cpu_mean_m": [
+     500
+    ],
+    "pod_throttled_mean": [
+     1.0
+    ],
+    "carrier_cpu_total_m": 199,
+    "vus_max": 52.0,
+    "up_failures": 0,
+    "inflight_max": 47.0,
+    "k6": {
+     "cpu_max_cores": 0.07172593134799862,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.0038461538461538464,
+     "throttled_ratio_mean": 0.0009615384615384616,
+     "memory_max_bytes": 772698112.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 7200,
+    "ok": 3901,
+    "dropped": 0,
+    "attempted_rps": 80.0,
+    "completed_rps": 80.0,
+    "goodput_rps": 43.34444444444444,
+    "error_pct": 45.81944444444444,
+    "timeout_pct": 0.0,
+    "shed_pct": 45.81944444444444,
+    "timeouts_e2e": 0,
+    "timeouts_k6_code1050": 0,
+    "p50_ms": 1285.0,
+    "p95_ms": null,
+    "p99_ms": null,
+    "p95_ok_ms": 1315.0,
+    "p95_http_req_duration_ms": 1274.9181393499998,
+    "step": "step03_80rps",
+    "rate": 80,
+    "pod_cpu_mean_m": [
+     500
+    ],
+    "pod_throttled_mean": [
+     0.988
+    ],
+    "carrier_cpu_total_m": 188,
+    "vus_max": 58.0,
+    "up_failures": 0,
+    "inflight_max": 48.0,
+    "k6": {
+     "cpu_max_cores": 0.08836025840411525,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.004784688995215311,
+     "throttled_ratio_mean": 0.00213425855274379,
+     "memory_max_bytes": 827617280.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 9450,
+    "ok": 3812,
+    "dropped": 0,
+    "attempted_rps": 105.0,
+    "completed_rps": 105.0,
+    "goodput_rps": 42.355555555555554,
+    "error_pct": 59.66137566137566,
+    "timeout_pct": 0.0,
+    "shed_pct": 59.66137566137566,
+    "timeouts_e2e": 0,
+    "timeouts_k6_code1050": 0,
+    "p50_ms": null,
+    "p95_ms": null,
+    "p99_ms": null,
+    "p95_ok_ms": 1364.0,
+    "p95_http_req_duration_ms": 1296.9224967,
+    "step": "step04_105rps",
+    "rate": 105,
+    "pod_cpu_mean_m": [
+     500
+    ],
+    "pod_throttled_mean": [
+     0.997
+    ],
+    "carrier_cpu_total_m": 184,
+    "vus_max": 64.0,
+    "up_failures": 0,
+    "inflight_max": 48.0,
+    "k6": {
+     "cpu_max_cores": 0.10313427342734281,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.004,
+     "throttled_ratio_mean": 0.0018896797153024913,
+     "memory_max_bytes": 853106688.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 12600,
+    "ok": 0,
+    "dropped": 0,
+    "attempted_rps": 140.0,
+    "completed_rps": 140.0,
+    "goodput_rps": 0.0,
+    "error_pct": 100.0,
+    "timeout_pct": 97.73015873015873,
+    "shed_pct": 2.2698412698412698,
+    "timeouts_e2e": 12314,
+    "timeouts_k6_code1050": 12314,
+    "p50_ms": null,
+    "p95_ms": null,
+    "p99_ms": null,
+    "p95_ok_ms": null,
+    "p95_http_req_duration_ms": 5000.841280000001,
+    "step": "step05_140rps",
+    "rate": 140,
+    "pod_cpu_mean_m": [
+     500
+    ],
+    "pod_throttled_mean": [
+     0.997
+    ],
+    "carrier_cpu_total_m": 188,
+    "vus_max": 701.0,
+    "up_failures": 3,
+    "inflight_max": 48.0,
+    "k6": {
+     "cpu_max_cores": 0.12262342305531432,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.0051413881748071984,
+     "throttled_ratio_mean": 0.0036573484758536078,
+     "memory_max_bytes": 886464512.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 16200,
+    "ok": 0,
+    "dropped": 0,
+    "attempted_rps": 180.0,
+    "completed_rps": 180.0,
+    "goodput_rps": 0.0,
+    "error_pct": 100.0,
+    "timeout_pct": 100.0,
+    "shed_pct": 0.0,
+    "timeouts_e2e": 16200,
+    "timeouts_k6_code1050": 15781,
+    "p50_ms": null,
+    "p95_ms": null,
+    "p99_ms": null,
+    "p95_ok_ms": null,
+    "p95_http_req_duration_ms": 5000.76448075,
+    "step": "step06_180rps",
+    "rate": 180,
+    "pod_cpu_mean_m": [
+     468
+    ],
+    "pod_throttled_mean": [
+     0.988
+    ],
+    "carrier_cpu_total_m": 186,
+    "vus_max": 908.0,
+    "up_failures": 6,
+    "inflight_max": 48.0,
+    "k6": {
+     "cpu_max_cores": 0.14902008857112395,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.00974025974025974,
+     "throttled_ratio_mean": 0.005337435925302034,
+     "memory_max_bytes": 938397696.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   }
+  ]
+ },
+ "shipping-rate-service_b2_20261006T075234Z": {
+  "meta": {
+   "run_id": "ladder_shipping-rate-service_b2_20261006T075234Z",
+   "kind": "ladder",
+   "service": "shipping-rate-service",
+   "config": "b2",
+   "pattern": "ladder",
+   "repetition": null,
+   "plan_position": null,
+   "start_epoch": 1791273160,
+   "end_epoch": 1791274115,
+   "duration_seconds": 955,
+   "k6_job_name": "k6-ol-ladder-shipping-rate-service-b2",
+   "k6_pod_name": "k6-ol-ladder-shipping-rate-service-b2-tzs7b",
+   "k6_exit_code": 0,
+   "k6_scenario_start_ms": 1791273462871,
+   "target_url": "http://shipping-rate-service.ecommerce.svc.cluster.local:8006",
+   "raw_results": {
+    "file": "k6-results.json.gz",
+    "verified": true,
+    "bytes": 14249718,
+    "md5": "97f85138cbcfb2d52918fa2b82f22db3"
+   },
+   "load_profile": {
+    "version": "open-loop-arr-v2",
+    "executor": "constant-arrival-rate",
+    "rate_unit": "req/s",
+    "base_rate": null,
+    "peak_rate": null,
+    "ladder_rates": [
+     120,
+     160,
+     200,
+     250
+    ],
+    "ladder_step": "2m",
+    "ladder_gap": "30s",
+    "request_timeout": "5s",
+    "vu_factor": 1.5,
+    "pre_allocated_vus": null,
+    "max_vus": 1875,
+    "no_connection_reuse": true,
+    "k6_image": "grafana/k6:0.46.0",
+    "k6_resources": "1000m,1Gi,2000m,4Gi",
+    "request_mix": "SHIPPING_MAX_ITEMS=4 SHIPPING_MIN_WEIGHT_GRAMS=200 SHIPPING_MAX_WEIGHT_GRAMS=2500 SHIPPING_DESTINATION_ZONES=domestic,regional,remote"
+   },
+   "service_overrides": {
+    "image_tag": null,
+    "code_overlay_sha": "5b5de9e30a49",
+    "max_inflight_requests": 48
+   },
+   "preauth_tokens": {
+    "enabled": false,
+    "count": null,
+    "epoch": null
+   },
+   "timings": {
+    "reset_wait": 120,
+    "stabilize_wait": 90,
+    "export_wait": null
+   },
+   "export_ok": true,
+   "timestamp": "2026-10-06T08:08:35.380Z"
+  },
+  "steps": [
+   {
+    "requests": 10800,
+    "ok": 10800,
+    "dropped": 0,
+    "attempted_rps": 120.0,
+    "completed_rps": 120.0,
+    "goodput_rps": 120.0,
+    "error_pct": 0.0,
+    "timeout_pct": 0.0,
+    "shed_pct": 0.0,
+    "timeouts_e2e": 0,
+    "timeouts_k6_code1050": 0,
+    "p50_ms": 717.0,
+    "p95_ms": 918.0,
+    "p99_ms": 934.0,
+    "p95_ok_ms": 918.0,
+    "p95_http_req_duration_ms": 917.3933874,
+    "step": "step01_120rps",
+    "rate": 120,
+    "pod_cpu_mean_m": [
+     180,
+     171,
+     169,
+     185,
+     178
+    ],
+    "pod_throttled_mean": [
+     0.004,
+     0.001,
+     0.001,
+     0.002,
+     0.001
+    ],
+    "carrier_cpu_total_m": 453,
+    "vus_max": 92.0,
+    "up_failures": 0,
+    "inflight_max": 25.0,
+    "k6": {
+     "cpu_max_cores": 0.15039142975766448,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.009463722397476343,
+     "throttled_ratio_mean": 0.0071581465200726245,
+     "memory_max_bytes": 1011339264.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 14400,
+    "ok": 14218,
+    "dropped": 0,
+    "attempted_rps": 160.0,
+    "completed_rps": 160.0,
+    "goodput_rps": 157.9777777777778,
+    "error_pct": 1.2638888888888888,
+    "timeout_pct": 0.3333333333333333,
+    "shed_pct": 0.9305555555555556,
+    "timeouts_e2e": 48,
+    "timeouts_k6_code1050": 48,
+    "p50_ms": 717.0,
+    "p95_ms": 925.0,
+    "p99_ms": null,
+    "p95_ok_ms": 919.0,
+    "p95_http_req_duration_ms": 919.77055875,
+    "step": "step02_160rps",
+    "rate": 160,
+    "pod_cpu_mean_m": [
+     236,
+     239,
+     239,
+     255,
+     211
+    ],
+    "pod_throttled_mean": [
+     0.008,
+     0.017,
+     0.013,
+     0.009,
+     0.01
+    ],
+    "carrier_cpu_total_m": 627,
+    "vus_max": 151.0,
+    "up_failures": 0,
+    "inflight_max": 30.0,
+    "k6": {
+     "cpu_max_cores": 0.1938451128770473,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.00963855421686747,
+     "throttled_ratio_mean": 0.005878709488059715,
+     "memory_max_bytes": 1164722176.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 18000,
+    "ok": 17984,
+    "dropped": 0,
+    "attempted_rps": 200.0,
+    "completed_rps": 200.0,
+    "goodput_rps": 199.82222222222222,
+    "error_pct": 0.08888888888888889,
+    "timeout_pct": 0.0,
+    "shed_pct": 0.08888888888888889,
+    "timeouts_e2e": 0,
+    "timeouts_k6_code1050": 0,
+    "p50_ms": 723.0,
+    "p95_ms": 932.0,
+    "p99_ms": 990.0099999999984,
+    "p95_ok_ms": 932.0,
+    "p95_http_req_duration_ms": 930.95660675,
+    "step": "step03_200rps",
+    "rate": 200,
+    "pod_cpu_mean_m": [
+     318,
+     372,
+     336,
+     351,
+     308
+    ],
+    "pod_throttled_mean": [
+     0.107,
+     0.055,
+     0.182,
+     0.056,
+     0.167
+    ],
+    "carrier_cpu_total_m": 836,
+    "vus_max": 158.0,
+    "up_failures": 0,
+    "inflight_max": 36.0,
+    "k6": {
+     "cpu_max_cores": 0.24675415452469102,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.011811023622047246,
+     "throttled_ratio_mean": 0.00791059050492796,
+     "memory_max_bytes": 1178882048.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   },
+   {
+    "requests": 22501,
+    "ok": 19083,
+    "dropped": 0,
+    "attempted_rps": 250.01111111111112,
+    "completed_rps": 250.01111111111112,
+    "goodput_rps": 212.03333333333333,
+    "error_pct": 15.190435980623084,
+    "timeout_pct": 0.4177592107017466,
+    "shed_pct": 14.772676769921336,
+    "timeouts_e2e": 94,
+    "timeouts_k6_code1050": 94,
+    "p50_ms": 1032.0,
+    "p95_ms": null,
+    "p99_ms": null,
+    "p95_ok_ms": 1335.8999999999978,
+    "p95_http_req_duration_ms": 1327.98654,
+    "step": "step04_250rps",
+    "rate": 250,
+    "pod_cpu_mean_m": [
+     483,
+     407,
+     459,
+     459,
+     423
+    ],
+    "pod_throttled_mean": [
+     0.913,
+     0.789,
+     0.904,
+     0.502,
+     0.839
+    ],
+    "carrier_cpu_total_m": 910,
+    "vus_max": 233.0,
+    "up_failures": 0,
+    "inflight_max": 48.0,
+    "k6": {
+     "cpu_max_cores": 0.2554571071469153,
+     "cpu_limit_cores": 2.0,
+     "throttled_ratio_max": 0.009469696969696968,
+     "throttled_ratio_mean": 0.00605410707577736,
+     "memory_max_bytes": 1204559872.0,
+     "memory_limit_bytes": 4294967296.0
+    }
+   }
+  ]
+ }
+}

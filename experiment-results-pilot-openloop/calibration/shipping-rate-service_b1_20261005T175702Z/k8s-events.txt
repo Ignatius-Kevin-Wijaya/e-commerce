@@ -1,0 +1,10 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-05T18:01:49Z	Normal	Pulling	pod/k6-ol-ladder-shipping-rate-service-b1-6ks5d	Pulling image "grafana/k6:0.46.0"
+2026-10-05T18:01:49Z	Normal	SuccessfulCreate	job/k6-ol-ladder-shipping-rate-service-b1	Created pod: k6-ol-ladder-shipping-rate-service-b1-6ks5d
+2026-10-05T18:01:49Z	Normal	Scheduled	pod/k6-ol-ladder-shipping-rate-service-b1-6ks5d	Successfully assigned ecommerce/k6-ol-ladder-shipping-rate-service-b1-6ks5d to aks-userpool-16719200-vmss00002g
+2026-10-05T18:01:54Z	Normal	Pulled	pod/k6-ol-ladder-shipping-rate-service-b1-6ks5d	Successfully pulled image "grafana/k6:0.46.0" in 4.983s (4.983s including waiting). Image size: 16554265 bytes.
+2026-10-05T18:01:54Z	Normal	Created	pod/k6-ol-ladder-shipping-rate-service-b1-6ks5d	Created container: k6
+2026-10-05T18:01:54Z	Normal	Started	pod/k6-ol-ladder-shipping-rate-service-b1-6ks5d	Started container k6
+2026-10-05T18:09:32Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-7nt42	Liveness probe failed: Get "http://10.244.0.35:8006/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T18:14:47Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-7nt42	Readiness probe failed: Get "http://10.244.0.35:8006/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T18:16:44Z	Normal	Completed	job/k6-ol-ladder-shipping-rate-service-b1	Job completed

@@ -1,0 +1,17 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-06T07:33:19Z	Normal	SuccessfulCreate	replicaset/auth-service-74c577b9b7	Created pod: auth-service-74c577b9b7-pnk2f
+2026-10-06T07:33:19Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-74c577b9b7 from 0 to 1
+2026-10-06T07:33:19Z	Normal	Scheduled	pod/auth-service-74c577b9b7-pnk2f	Successfully assigned ecommerce/auth-service-74c577b9b7-pnk2f to aks-userpool-16719200-vmss00002i
+2026-10-06T07:33:20Z	Normal	Pulling	pod/auth-service-74c577b9b7-pnk2f	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-06T07:33:23Z	Normal	Pulled	pod/auth-service-74c577b9b7-pnk2f	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 3.165s (3.165s including waiting). Image size: 129975007 bytes.
+2026-10-06T07:33:23Z	Normal	Created	pod/auth-service-74c577b9b7-pnk2f	Created container: auth-service
+2026-10-06T07:33:23Z	Normal	Started	pod/auth-service-74c577b9b7-pnk2f	Started container auth-service
+2026-10-06T07:33:40Z	Normal	Killing	pod/auth-service-55bd95c686-j8qss	Stopping container auth-service
+2026-10-06T07:33:40Z	Normal	SuccessfulDelete	replicaset/auth-service-55bd95c686	Deleted pod: auth-service-55bd95c686-j8qss
+2026-10-06T07:33:40Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-55bd95c686 from 1 to 0
+2026-10-06T07:35:29Z	Normal	SuccessfulCreate	job/k6-ol-ladder-auth-service-b1	Created pod: k6-ol-ladder-auth-service-b1-ftxl4
+2026-10-06T07:35:29Z	Normal	Scheduled	pod/k6-ol-ladder-auth-service-b1-ftxl4	Successfully assigned ecommerce/k6-ol-ladder-auth-service-b1-ftxl4 to aks-userpool-16719200-vmss00002i
+2026-10-06T07:35:30Z	Normal	Pulled	pod/k6-ol-ladder-auth-service-b1-ftxl4	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-06T07:35:30Z	Normal	Created	pod/k6-ol-ladder-auth-service-b1-ftxl4	Created container: k6
+2026-10-06T07:35:30Z	Normal	Started	pod/k6-ol-ladder-auth-service-b1-ftxl4	Started container k6
+2026-10-06T07:50:18Z	Normal	Completed	job/k6-ol-ladder-auth-service-b1	Job completed

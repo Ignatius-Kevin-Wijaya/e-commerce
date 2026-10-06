@@ -1,0 +1,20 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-06T06:47:45Z	Normal	SuccessfulCreate	replicaset/shipping-rate-service-55755d4c6b	Created pod: shipping-rate-service-55755d4c6b-gsktv
+2026-10-06T06:47:45Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled up replica set shipping-rate-service-55755d4c6b from 0 to 1
+2026-10-06T06:47:45Z	Normal	Scheduled	pod/shipping-rate-service-55755d4c6b-gsktv	Successfully assigned ecommerce/shipping-rate-service-55755d4c6b-gsktv to aks-userpool-16719200-vmss00002i
+2026-10-06T06:47:46Z	Normal	Pulling	pod/shipping-rate-service-55755d4c6b-gsktv	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-10-06T06:47:49Z	Normal	Pulled	pod/shipping-rate-service-55755d4c6b-gsktv	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 3.249s (3.249s including waiting). Image size: 61321205 bytes.
+2026-10-06T06:47:49Z	Normal	Created	pod/shipping-rate-service-55755d4c6b-gsktv	Created container: shipping-rate-service
+2026-10-06T06:47:49Z	Normal	Started	pod/shipping-rate-service-55755d4c6b-gsktv	Started container shipping-rate-service
+2026-10-06T06:48:06Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled down replica set shipping-rate-service-68467f5cb from 1 to 0
+2026-10-06T06:48:07Z	Normal	Killing	pod/shipping-rate-service-68467f5cb-qr9xv	Stopping container shipping-rate-service
+2026-10-06T06:48:07Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-68467f5cb	Deleted pod: shipping-rate-service-68467f5cb-qr9xv
+2026-10-06T06:49:54Z	Normal	Pulling	pod/k6-ol-ladder-shipping-rate-service-b1-cn8hw	Pulling image "grafana/k6:0.46.0"
+2026-10-06T06:49:54Z	Normal	SuccessfulCreate	job/k6-ol-ladder-shipping-rate-service-b1	Created pod: k6-ol-ladder-shipping-rate-service-b1-cn8hw
+2026-10-06T06:49:54Z	Normal	Scheduled	pod/k6-ol-ladder-shipping-rate-service-b1-cn8hw	Successfully assigned ecommerce/k6-ol-ladder-shipping-rate-service-b1-cn8hw to aks-userpool-16719200-vmss00002i
+2026-10-06T06:49:59Z	Normal	Pulled	pod/k6-ol-ladder-shipping-rate-service-b1-cn8hw	Successfully pulled image "grafana/k6:0.46.0" in 5.003s (5.003s including waiting). Image size: 16554265 bytes.
+2026-10-06T06:49:59Z	Normal	Created	pod/k6-ol-ladder-shipping-rate-service-b1-cn8hw	Created container: k6
+2026-10-06T06:49:59Z	Normal	Started	pod/k6-ol-ladder-shipping-rate-service-b1-cn8hw	Started container k6
+2026-10-06T07:04:00Z	Warning	Unhealthy	pod/shipping-rate-service-55755d4c6b-gsktv	Liveness probe failed: Get "http://10.244.2.239:8006/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-06T07:04:41Z	Warning	Unhealthy	pod/shipping-rate-service-55755d4c6b-gsktv	Readiness probe failed: Get "http://10.244.2.239:8006/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-06T07:04:48Z	Normal	Completed	job/k6-ol-ladder-shipping-rate-service-b1	Job completed

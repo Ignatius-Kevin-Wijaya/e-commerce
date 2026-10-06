@@ -1,0 +1,8 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-05T16:45:27Z	Normal	SuccessfulCreate	job/k6-ol-ladder-auth-service-b1	Created pod: k6-ol-ladder-auth-service-b1-nxpn6
+2026-10-05T16:45:27Z	Normal	Scheduled	pod/k6-ol-ladder-auth-service-b1-nxpn6	Successfully assigned ecommerce/k6-ol-ladder-auth-service-b1-nxpn6 to aks-userpool-16719200-vmss00002h
+2026-10-05T16:45:28Z	Normal	Pulled	pod/k6-ol-ladder-auth-service-b1-nxpn6	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-05T16:45:28Z	Normal	Created	pod/k6-ol-ladder-auth-service-b1-nxpn6	Created container: k6
+2026-10-05T16:45:28Z	Normal	Started	pod/k6-ol-ladder-auth-service-b1-nxpn6	Started container k6
+2026-10-05T17:04:35Z	Warning	Unhealthy	pod/auth-service-55bd95c686-fskxx	Readiness probe failed: Get "http://10.244.1.194:8001/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T17:05:44Z	Normal	Completed	job/k6-ol-ladder-auth-service-b1	Job completed

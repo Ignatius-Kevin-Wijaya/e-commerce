@@ -1,0 +1,55 @@
+{
+  "run_id": "ladder_auth-service_b2_20261005T161810Z",
+  "kind": "ladder",
+  "service": "auth-service",
+  "config": "b2",
+  "pattern": "ladder",
+  "repetition": null,
+  "plan_position": null,
+  "start_epoch": 1791217099,
+  "end_epoch": 1791218390,
+  "duration_seconds": 1291,
+  "k6_job_name": "k6-ol-ladder-auth-service-b2",
+  "k6_pod_name": "k6-ol-ladder-auth-service-b2-x55q9",
+  "k6_exit_code": 0,
+  "k6_scenario_start_ms": 1791217436808,
+  "target_url": "http://auth-service.ecommerce.svc.cluster.local:8001",
+  "raw_results": {
+    "file": "k6-results.json.gz",
+    "verified": true,
+    "bytes": 5487831,
+    "md5": "f5dbc18082016fd2ff89e8ced4b18ea6"
+  },
+  "load_profile": {
+    "version": "open-loop-arr-v1",
+    "executor": "constant-arrival-rate",
+    "rate_unit": "req/s",
+    "base_rate": null,
+    "peak_rate": null,
+    "ladder_rates": [
+      20,
+      30,
+      40,
+      50,
+      60,
+      70
+    ],
+    "ladder_step": "2m",
+    "ladder_gap": "30s",
+    "request_timeout": "5s",
+    "vu_factor": 1.5,
+    "pre_allocated_vus": null,
+    "max_vus": 525,
+    "no_connection_reuse": true,
+    "k6_image": "grafana/k6:0.46.0",
+    "k6_resources": "1000m,1Gi,2000m,4Gi",
+    "request_mix": "AUTH_ME_PERCENT=70 AUTH_LOGIN_PERCENT=30 NUM_TEST_USERS=120"
+  },
+  "timings": {
+    "reset_wait": 120,
+    "stabilize_wait": 90,
+    "export_wait": null
+  },
+  "export_ok": true,
+  "timestamp": "2026-10-05T16:39:50.791Z"
+}

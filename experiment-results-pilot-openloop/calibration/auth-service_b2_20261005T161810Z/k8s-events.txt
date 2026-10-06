@@ -1,0 +1,33 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-05T16:21:07Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-mb4jx
+2026-10-05T16:21:07Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-tlhqx
+2026-10-05T16:21:07Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-twbww
+2026-10-05T16:21:07Z	Normal	SuccessfulCreate	replicaset/auth-service-55bd95c686	Created pod: auth-service-55bd95c686-ksk5l
+2026-10-05T16:21:07Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-55bd95c686 from 1 to 5
+2026-10-05T16:21:07Z	Normal	Scheduled	pod/auth-service-55bd95c686-mb4jx	Successfully assigned ecommerce/auth-service-55bd95c686-mb4jx to aks-userpool-16719200-vmss00002h
+2026-10-05T16:21:07Z	Normal	Scheduled	pod/auth-service-55bd95c686-tlhqx	Successfully assigned ecommerce/auth-service-55bd95c686-tlhqx to aks-userpool-16719200-vmss00002g
+2026-10-05T16:21:07Z	Normal	Scheduled	pod/auth-service-55bd95c686-twbww	Successfully assigned ecommerce/auth-service-55bd95c686-twbww to aks-userpool-16719200-vmss00002h
+2026-10-05T16:21:07Z	Normal	Scheduled	pod/auth-service-55bd95c686-ksk5l	Successfully assigned ecommerce/auth-service-55bd95c686-ksk5l to aks-userpool-16719200-vmss00002g
+2026-10-05T16:21:08Z	Normal	Pulling	pod/auth-service-55bd95c686-ksk5l	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-05T16:21:08Z	Normal	Pulling	pod/auth-service-55bd95c686-tlhqx	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-05T16:21:09Z	Normal	Pulling	pod/auth-service-55bd95c686-mb4jx	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-05T16:21:09Z	Normal	Pulling	pod/auth-service-55bd95c686-twbww	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-05T16:21:12Z	Normal	Pulled	pod/auth-service-55bd95c686-ksk5l	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 3.523s (3.523s including waiting). Image size: 129975007 bytes.
+2026-10-05T16:21:12Z	Normal	Created	pod/auth-service-55bd95c686-ksk5l	Created container: auth-service
+2026-10-05T16:21:12Z	Normal	Started	pod/auth-service-55bd95c686-ksk5l	Started container auth-service
+2026-10-05T16:21:12Z	Normal	Pulled	pod/auth-service-55bd95c686-mb4jx	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 3.053s (3.053s including waiting). Image size: 129975007 bytes.
+2026-10-05T16:21:12Z	Normal	Created	pod/auth-service-55bd95c686-mb4jx	Created container: auth-service
+2026-10-05T16:21:12Z	Normal	Started	pod/auth-service-55bd95c686-mb4jx	Started container auth-service
+2026-10-05T16:21:12Z	Normal	Pulled	pod/auth-service-55bd95c686-tlhqx	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 3.521s (3.521s including waiting). Image size: 129975007 bytes.
+2026-10-05T16:21:12Z	Normal	Created	pod/auth-service-55bd95c686-tlhqx	Created container: auth-service
+2026-10-05T16:21:12Z	Normal	Started	pod/auth-service-55bd95c686-tlhqx	Started container auth-service
+2026-10-05T16:21:12Z	Normal	Pulled	pod/auth-service-55bd95c686-twbww	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 3.051s (3.051s including waiting). Image size: 129975007 bytes.
+2026-10-05T16:21:12Z	Normal	Created	pod/auth-service-55bd95c686-twbww	Created container: auth-service
+2026-10-05T16:21:12Z	Normal	Started	pod/auth-service-55bd95c686-twbww	Started container auth-service
+2026-10-05T16:23:19Z	Normal	Pulling	pod/k6-ol-ladder-auth-service-b2-x55q9	Pulling image "grafana/k6:0.46.0"
+2026-10-05T16:23:19Z	Normal	SuccessfulCreate	job/k6-ol-ladder-auth-service-b2	Created pod: k6-ol-ladder-auth-service-b2-x55q9
+2026-10-05T16:23:19Z	Normal	Scheduled	pod/k6-ol-ladder-auth-service-b2-x55q9	Successfully assigned ecommerce/k6-ol-ladder-auth-service-b2-x55q9 to aks-userpool-16719200-vmss00002h
+2026-10-05T16:23:27Z	Normal	Pulled	pod/k6-ol-ladder-auth-service-b2-x55q9	Successfully pulled image "grafana/k6:0.46.0" in 7.431s (7.431s including waiting). Image size: 16554265 bytes.
+2026-10-05T16:23:27Z	Normal	Created	pod/k6-ol-ladder-auth-service-b2-x55q9	Created container: k6
+2026-10-05T16:23:27Z	Normal	Started	pod/k6-ol-ladder-auth-service-b2-x55q9	Started container k6
+2026-10-05T16:38:53Z	Normal	Completed	job/k6-ol-ladder-auth-service-b2	Job completed

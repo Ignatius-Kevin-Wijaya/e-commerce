@@ -1,0 +1,25 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-05T18:59:57Z	Normal	KEDAScalersStarted	scaledobject/shipping-rate-service-keda	Scaler prometheus is built
+2026-10-05T18:59:57Z	Normal	KEDAScalersStarted	scaledobject/shipping-rate-service-keda	Started scalers watch
+2026-10-05T18:59:57Z	Normal	ScaledObjectReady	scaledobject/shipping-rate-service-keda	ScaledObject is ready for scaling
+2026-10-05T19:01:35Z	Normal	SuccessfulCreate	job/k6-ol-shipping-rate-service-k1-spike-rep1	Created pod: k6-ol-shipping-rate-service-k1-spike-rep1-rtddh
+2026-10-05T19:01:35Z	Normal	Scheduled	pod/k6-ol-shipping-rate-service-k1-spike-rep1-rtddh	Successfully assigned ecommerce/k6-ol-shipping-rate-service-k1-spike-rep1-rtddh to aks-userpool-16719200-vmss00002g
+2026-10-05T19:01:36Z	Normal	Pulled	pod/k6-ol-shipping-rate-service-k1-spike-rep1-rtddh	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-05T19:01:36Z	Normal	Created	pod/k6-ol-shipping-rate-service-k1-spike-rep1-rtddh	Created container: k6
+2026-10-05T19:01:36Z	Normal	Started	pod/k6-ol-shipping-rate-service-k1-spike-rep1-rtddh	Started container k6
+2026-10-05T19:03:57Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-shipping-rate-service-keda	New size: 2; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: shipping-rate-service-keda,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+2026-10-05T19:03:57Z	Normal	Pulling	pod/shipping-rate-service-68467f5cb-7cmfq	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-10-05T19:03:57Z	Normal	SuccessfulCreate	replicaset/shipping-rate-service-68467f5cb	Created pod: shipping-rate-service-68467f5cb-7cmfq
+2026-10-05T19:03:57Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled up replica set shipping-rate-service-68467f5cb from 1 to 2
+2026-10-05T19:03:57Z	Normal	Scheduled	pod/shipping-rate-service-68467f5cb-7cmfq	Successfully assigned ecommerce/shipping-rate-service-68467f5cb-7cmfq to aks-userpool-16719200-vmss00002h
+2026-10-05T19:03:58Z	Normal	Pulled	pod/shipping-rate-service-68467f5cb-7cmfq	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 259ms (259ms including waiting). Image size: 61321205 bytes.
+2026-10-05T19:03:58Z	Normal	Created	pod/shipping-rate-service-68467f5cb-7cmfq	Created container: shipping-rate-service
+2026-10-05T19:03:58Z	Normal	Started	pod/shipping-rate-service-68467f5cb-7cmfq	Started container shipping-rate-service
+2026-10-05T19:04:14Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-gbnx7	Liveness probe failed: Get "http://10.244.0.194:8006/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T19:04:55Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-7cmfq	Readiness probe failed: Get "http://10.244.0.205:8006/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T19:04:57Z	Normal	SuccessfulRescale	horizontalpodautoscaler/keda-hpa-shipping-rate-service-keda	New size: 1; reason: All metrics below target
+2026-10-05T19:04:57Z	Normal	Killing	pod/shipping-rate-service-68467f5cb-7cmfq	Stopping container shipping-rate-service
+2026-10-05T19:04:57Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-68467f5cb	Deleted pod: shipping-rate-service-68467f5cb-7cmfq
+2026-10-05T19:04:57Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled down replica set shipping-rate-service-68467f5cb from 2 to 1
+2026-10-05T19:11:13Z	Warning	Unhealthy	pod/shipping-rate-service-68467f5cb-gbnx7	Readiness probe failed: Get "http://10.244.0.194:8006/ready": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2026-10-05T19:13:54Z	Normal	Completed	job/k6-ol-shipping-rate-service-k1-spike-rep1	Job completed

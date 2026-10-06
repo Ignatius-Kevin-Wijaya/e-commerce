@@ -1,0 +1,48 @@
+{
+  "run_id": "auth-service_h3_spike_rep1",
+  "kind": "pilot",
+  "service": "auth-service",
+  "config": "h3",
+  "pattern": "spike",
+  "repetition": 1,
+  "plan_position": 3,
+  "start_epoch": 1791229071,
+  "end_epoch": 1791230268,
+  "duration_seconds": 1197,
+  "k6_job_name": "k6-ol-auth-service-h3-spike-rep1",
+  "k6_pod_name": "k6-ol-auth-service-h3-spike-rep1-lq97n",
+  "k6_exit_code": 0,
+  "k6_scenario_start_ms": 1791229341528,
+  "target_url": "http://auth-service.ecommerce.svc.cluster.local:8001",
+  "raw_results": {
+    "file": "k6-results.json.gz",
+    "verified": true,
+    "bytes": 2599925,
+    "md5": "f1afd44d95e8ebc7359e5b90b977c492"
+  },
+  "load_profile": {
+    "version": "open-loop-arr-v1",
+    "executor": "ramping-arrival-rate",
+    "rate_unit": "req/s",
+    "base_rate": 2,
+    "peak_rate": 30,
+    "ladder_rates": null,
+    "ladder_step": null,
+    "ladder_gap": null,
+    "request_timeout": "5s",
+    "vu_factor": 1.5,
+    "pre_allocated_vus": 225,
+    "max_vus": 225,
+    "no_connection_reuse": true,
+    "k6_image": "grafana/k6:0.46.0",
+    "k6_resources": "1000m,1Gi,2000m,4Gi",
+    "request_mix": "AUTH_ME_PERCENT=70 AUTH_LOGIN_PERCENT=30 NUM_TEST_USERS=120"
+  },
+  "timings": {
+    "reset_wait": 120,
+    "stabilize_wait": 90,
+    "export_wait": 180
+  },
+  "export_ok": true,
+  "timestamp": "2026-10-05T19:57:49.100Z"
+}
