@@ -200,6 +200,10 @@ applied unequally. §11.5 lists every judgment call with its alternatives.
    and committed before any campaign data, with measured reasons (Part 08 §8.9).
 5. **Cluster vs repository drift:** an unused 30 s auth rule remains in the live prometheus-adapter config (reverted in
    the repository on 2026-08-15). Nothing references it, and it was present in every dataset (Part 08 §8.13).
+6. **The campaign continued after its pre-registered gate failed** (2026-10-07). **Handling:** the FAIL stays on
+   record; the reasons are documented (G1–G4 passed everywhere; the G5/G6 failures trace to the HPA's lagging CPU
+   reading, a property of the system); repeatability became a measured outcome; the analysis plan was fixed and pushed
+   before any rep 3–5 data; nothing else changed (Part 12).
 
 ## 11.7 Is it real? Authenticity and reproducibility evidence
 
@@ -251,6 +255,7 @@ Software Heritage); add a "research data and reproducibility" section to BAB 3 o
 | Isn't load shedding changing the system? | Yes, and it is reported as part of the system under test: it is standard overload protection, applied identically to every config. Without it the pilot showed pods collapsing and metrics going blank. | §11.6 #3 |
 | Why did the gate rule change? | The smoke showed the original error allowance was smaller than one autoscaler cycle's effect. The new rule was fixed and committed before any campaign data; the smoke stays a FAIL. | §11.2 J, §11.6 #4 |
 | How do we know the results are real? | Raw data for every request, independent sources that agree, checksums, third-party timestamps, rules fixed before data, and anyone can re-run it. | §11.7 |
+| Why did you continue after the gate failed? | The checks that test the measurement (G1–G4) passed in every run. What failed was repeatability of CPU-based HPA, and the HPA timelines show why: its CPU reading lags the load, so its outcome depends on timing. That is a real property of the system, so we measured it with the full 5 repetitions instead of stopping — documented, with the analysis plan fixed before the new runs. | §11.6 #6, Part 12 |
 | Is the comparison fair? | Within a service and pattern, yes: the same load, pods, start, limits and shuffled order, checked in every run. H3 vs K1 isolates the engine, H2 vs H3 the metric (each at its own target). Across services, compare relative outcomes, not raw numbers. | §11.10 |
 
 ## 11.9 Sources worth citing

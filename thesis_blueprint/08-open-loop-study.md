@@ -2,7 +2,8 @@
 
 > Part of the thesis blueprint — index and executive summary: [thesis_blueprint.md](../thesis_blueprint.md).
 > New part, written 2026-10-06. Covers everything from the open-loop pilot request (2026-10-05) to the 180-run
-> open-loop campaign (rep blocks 1–2 finished 2026-10-07; pre-registered gate FAIL; decision pending). Detailed pilot write-up: `pilot-openloop-report.md` (repo root; every result in it is
+> open-loop campaign (rep blocks 1–2 finished 2026-10-07; pre-registered gate FAIL; continued as a documented
+> deviation — Part 12). Detailed pilot write-up: `pilot-openloop-report.md` (repo root; every result in it is
 > reproduced here). All numbers below were computed from the stored data;
 > estimates are labelled as estimates. Times are UTC unless marked otherwise.
 
@@ -17,7 +18,7 @@
 | v2 fixes (admission control, auth pre-auth, robustness gate) | ✅ Implemented, unit-tested, deployed via ConfigMap overlay | §8.9–§8.10 |
 | v2 calibration ladders | ✅ Done 2026-10-06 06:44–08:28 | Collapse removed up to the planned peaks (§8.11) |
 | v2 smoke test (9 runs) | ✅ Done 08:31–11:31; AKS stopped 11:35 | **Pre-registered gate FAIL on one cell:** shipping H3 error rate 5.32 / 6.97% across reps (27% of mean; limit 25% or 1 point), caused by a first scale-up one 15 s HPA cycle later. Everything else passes: 9/9 runs clean, B1 hold graceful, SLO-violation seconds 70/70, 70/70, 100/100 (shipping) and 140/170 (auth) (§8.12) |
-| 180-run open-loop campaign | ✅ Rep blocks 1–2 done: 72/72 at 2026-10-07 13:31 UTC (positions 1 and 9 re-run at H1 = 80%); AKS stopped 13:33:57; all 79 raw files match their capture checksums | **Pre-registered gate (rule v2): FAIL.** G1–G4 pass in all 72 runs; G5 fails in 1 run and G6 in 3 of 24 autoscaled cells — all CPU-based (auth gradual H1, auth oscillating H2, shipping oscillating H1). Request-rate cells (H3, K1) reproducible in 12/12. **User decision pending** (§8.13) |
+| 180-run open-loop campaign | ✅ Rep blocks 1–2 done: 72/72 at 2026-10-07 13:31 UTC (positions 1 and 9 re-run at H1 = 80%); AKS stopped 13:33:57; all 79 raw files match their capture checksums | **Pre-registered gate (rule v2): FAIL.** G1–G4 pass in all 72 runs; G5 fails in 1 run and G6 in 3 of 24 autoscaled cells — all CPU-based (auth gradual H1, auth oscillating H2, shipping oscillating H1). Request-rate cells (H3, K1) reproducible in 12/12. **User decision: continue with reps 3–5 as a documented deviation** (Part 12; launch awaits the go-ahead) (§8.13) |
 
 **"Replace" (§8.14):** if the campaign passes its gate it is the thesis dataset; the closed-loop final dataset (Part 01,
 findings #13–#16) then becomes methodology background. If the campaign fails, the closed-loop dataset is the thesis
@@ -425,7 +426,7 @@ unchanged. Reasons:
 constraint) under G6 rule v2 (§8.9), fixed before any campaign data. The smoke stays FAIL on record and is not
 re-scored.
 
-## 8.13 Campaign (approved 2026-10-06 with G6 rule v2; rep blocks 1–2 done 2026-10-07; gate FAIL)
+## 8.13 Campaign (approved 2026-10-06 with G6 rule v2; rep blocks 1–2 done 2026-10-07; gate FAIL; continued as a documented deviation)
 
 - 180 runs (`experiment-results-openloop/runlist.txt`: 2 services × 6 configs incl. H1 × 3 patterns × 5 reps), shuffled
   within rep blocks (seed 20261006); positions 1–36 are rep 1 and 37–72 rep 2, each block covering all 36 cells (18 auth
@@ -530,7 +531,11 @@ Seconds over SLO per cell (rep 1 / rep 2; bold = G6 fail):
   timestamp of a repeated "Scaled up … to 4 from 1"; time-to-scale for oscillating runs must come from
   `hpa-timeline.jsonl` / `pod-timeline.jsonl`.
 - **Pre-registered consequence:** stop; do not run reps 3–5; the closed-loop dataset is the thesis dataset and the
-  open-loop work becomes a robustness section (§8.14). **The user has not decided yet (2026-10-07).**
+  open-loop work becomes a robustness section (§8.14).
+- **Decision (user, 2026-10-07): continue as a documented deviation.** Reps 3–5 run with nothing else changed; the
+  open-loop campaign stays the thesis dataset; repeatability becomes a measured outcome. The deviation, its reasons and
+  the analysis plan are fixed in [Part 12](12-deviation-and-analysis-plan.md), committed and pushed before any rep 3–5
+  run; the FAIL verdict stays on record.
 
 ## 8.14 Implications for the thesis text
 
@@ -546,6 +551,9 @@ Seconds over SLO per cell (rep 1 / rep 2; bold = G6 fail):
   > for why the generator was switched (BAB 3, details in an appendix) — not a second set of results compared config
   > by config. If the campaign fails its gate, the closed-loop dataset is the thesis dataset and the open-loop work
   > becomes a short robustness section.
+  >
+  > **2026-10-07:** the gate failed after rep blocks 1–2; the user continued as a documented deviation (Part 12), so
+  > the open-loop campaign stays the thesis dataset and the closed-loop campaign stays methodology background.
 - **Disclose regardless of the decision:** the auth `setup()` burst in the closed-loop H1/H2 runs; the closed-loop
   throughput asymmetry (§8.1); that the generator choice changes the between-config spread by more than an order of
   magnitude (§8.7, indicative); the request-rate metric-blindness failure mode and why the v2 services shed load.

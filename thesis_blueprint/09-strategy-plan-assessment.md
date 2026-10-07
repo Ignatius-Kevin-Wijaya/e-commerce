@@ -135,7 +135,7 @@ All 180 runs have been executed and stored in `experiment-results/`. Campaign hi
 | v2 fixes (admission control, auth pre-auth, robustness gate) + v2 calibration | ✅ Done 2026-10-06 | ConfigMap overlay on the existing images (ACR Tasks unavailable in Indonesia Central) |
 | v2 smoke test (9 runs) | ✅ Done 2026-10-06 08:31–11:31 UTC | 9/9 runs clean; pre-registered gate (rule v1) FAIL on one G6 cell (shipping H3 error rate) |
 | G6 rule v2 + campaign config | ✅ Fixed and pushed 2026-10-06 (`6ef8f89`, `b35bee1`) before any campaign data | 50% of the mean or ≤ 30 s / ≤ 2 points |
-| 180-run open-loop campaign with gate after rep block 2 | ✅ Rep blocks 1–2 done 2026-10-07 (72/72); **gate FAIL** (G5 1 run; G6 3 of 24 cells, all CPU-based); user decision pending | ≈25.2 h ≈ $13.0 of AKS so far (estimate); pre-registered consequence: stop, closed-loop dataset = thesis dataset |
+| 180-run open-loop campaign with gate after rep block 2 | ✅ Rep blocks 1–2 done 2026-10-07 (72/72); **gate FAIL** (G5 1 run; G6 3 of 24 cells, all CPU-based); **continued as a documented deviation** (Part 12) | ≈25.2 h ≈ $13.0 of AKS so far (estimate); reps 3–5 ≈36 h ≈ $19 more after the go-ahead; Phase 4 follows the analysis plan in Part 12 |
 
 **Effect on Phase 4/5:** BAB 4 analysis of the closed-loop dataset can proceed in parallel. If the open-loop campaign passes, BAB 3/4 gain a second generator condition (Part 08 §8.14); if not, the open-loop pilot and smoke results are reported as a robustness study.
 
