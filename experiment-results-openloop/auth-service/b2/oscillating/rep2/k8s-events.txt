@@ -1,0 +1,32 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-07T05:45:39Z	Normal	KEDAScalersStarted	scaledobject/auth-service-keda	Scaler prometheus is built
+2026-10-07T05:46:39Z	Normal	KEDAScalersStopped	scaledobject/auth-service-keda	Stopped scalers watch
+2026-10-07T05:46:39Z	Warning	ScaledObjectDeleted	scaledobject/auth-service-keda	ScaledObject was deleted
+2026-10-07T05:49:30Z	Normal	SuccessfulCreate	replicaset/auth-service-74c577b9b7	Created pod: auth-service-74c577b9b7-vvdkr
+2026-10-07T05:49:30Z	Normal	ScalingReplicaSet	deployment/auth-service	(combined from similar events): Scaled up replica set auth-service-74c577b9b7 from 1 to 5
+2026-10-07T05:49:30Z	Normal	Scheduled	pod/auth-service-74c577b9b7-vvdkr	Successfully assigned ecommerce/auth-service-74c577b9b7-vvdkr to aks-userpool-16719200-vmss00002n
+2026-10-07T05:49:30Z	Normal	Scheduled	pod/auth-service-74c577b9b7-nk2tz	Successfully assigned ecommerce/auth-service-74c577b9b7-nk2tz to aks-userpool-16719200-vmss00002n
+2026-10-07T05:49:30Z	Normal	Scheduled	pod/auth-service-74c577b9b7-f95td	Successfully assigned ecommerce/auth-service-74c577b9b7-f95td to aks-userpool-16719200-vmss00002n
+2026-10-07T05:49:30Z	Normal	Scheduled	pod/auth-service-74c577b9b7-698nz	Successfully assigned ecommerce/auth-service-74c577b9b7-698nz to aks-userpool-16719200-vmss00002n
+2026-10-07T05:49:31Z	Normal	Pulling	pod/auth-service-74c577b9b7-698nz	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-07T05:49:31Z	Normal	Pulled	pod/auth-service-74c577b9b7-698nz	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 433ms (433ms including waiting). Image size: 129975007 bytes.
+2026-10-07T05:49:31Z	Normal	Created	pod/auth-service-74c577b9b7-698nz	Created container: auth-service
+2026-10-07T05:49:31Z	Normal	Pulling	pod/auth-service-74c577b9b7-f95td	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-07T05:49:31Z	Normal	Pulled	pod/auth-service-74c577b9b7-f95td	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 293ms (293ms including waiting). Image size: 129975007 bytes.
+2026-10-07T05:49:31Z	Normal	Created	pod/auth-service-74c577b9b7-f95td	Created container: auth-service
+2026-10-07T05:49:31Z	Normal	Started	pod/auth-service-74c577b9b7-f95td	Started container auth-service
+2026-10-07T05:49:31Z	Normal	Pulling	pod/auth-service-74c577b9b7-nk2tz	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-07T05:49:31Z	Normal	Pulled	pod/auth-service-74c577b9b7-nk2tz	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 360ms (360ms including waiting). Image size: 129975007 bytes.
+2026-10-07T05:49:31Z	Normal	Created	pod/auth-service-74c577b9b7-nk2tz	Created container: auth-service
+2026-10-07T05:49:31Z	Normal	Pulling	pod/auth-service-74c577b9b7-vvdkr	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-07T05:49:31Z	Normal	Pulled	pod/auth-service-74c577b9b7-vvdkr	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 406ms (406ms including waiting). Image size: 129975007 bytes.
+2026-10-07T05:49:31Z	Normal	Created	pod/auth-service-74c577b9b7-vvdkr	Created container: auth-service
+2026-10-07T05:49:32Z	Normal	Started	pod/auth-service-74c577b9b7-698nz	Started container auth-service
+2026-10-07T05:49:32Z	Normal	Started	pod/auth-service-74c577b9b7-nk2tz	Started container auth-service
+2026-10-07T05:49:32Z	Normal	Started	pod/auth-service-74c577b9b7-vvdkr	Started container auth-service
+2026-10-07T05:51:26Z	Normal	SuccessfulCreate	job/k6-ol-auth-service-b2-oscillating-rep2	Created pod: k6-ol-auth-service-b2-oscillating-rep2-gxfzq
+2026-10-07T05:51:26Z	Normal	Scheduled	pod/k6-ol-auth-service-b2-oscillating-rep2-gxfzq	Successfully assigned ecommerce/k6-ol-auth-service-b2-oscillating-rep2-gxfzq to aks-userpool-16719200-vmss00002n
+2026-10-07T05:51:27Z	Normal	Pulled	pod/k6-ol-auth-service-b2-oscillating-rep2-gxfzq	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-07T05:51:27Z	Normal	Created	pod/k6-ol-auth-service-b2-oscillating-rep2-gxfzq	Created container: k6
+2026-10-07T05:51:27Z	Normal	Started	pod/k6-ol-auth-service-b2-oscillating-rep2-gxfzq	Started container k6
+2026-10-07T06:03:37Z	Normal	Completed	job/k6-ol-auth-service-b2-oscillating-rep2	Job completed

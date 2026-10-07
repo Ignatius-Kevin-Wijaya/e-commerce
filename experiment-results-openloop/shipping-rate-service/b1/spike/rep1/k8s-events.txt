@@ -1,0 +1,14 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-06T20:01:44Z	Normal	Killing	pod/shipping-rate-service-6ff89474bc-fp5x7	Stopping container shipping-rate-service
+2026-10-06T20:01:44Z	Normal	Killing	pod/shipping-rate-service-6ff89474bc-k8jnt	Stopping container shipping-rate-service
+2026-10-06T20:01:44Z	Normal	Killing	pod/shipping-rate-service-6ff89474bc-kfzzg	Stopping container shipping-rate-service
+2026-10-06T20:01:44Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-6ff89474bc	Deleted pod: shipping-rate-service-6ff89474bc-fp5x7
+2026-10-06T20:01:44Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-6ff89474bc	Deleted pod: shipping-rate-service-6ff89474bc-k8jnt
+2026-10-06T20:01:44Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-6ff89474bc	Deleted pod: shipping-rate-service-6ff89474bc-kfzzg
+2026-10-06T20:01:44Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled down replica set shipping-rate-service-6ff89474bc from 4 to 1
+2026-10-06T20:05:32Z	Normal	Pulled	pod/k6-ol-shipping-rate-service-b1-spike-rep1-g44md	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-06T20:05:32Z	Normal	Created	pod/k6-ol-shipping-rate-service-b1-spike-rep1-g44md	Created container: k6
+2026-10-06T20:05:32Z	Normal	Started	pod/k6-ol-shipping-rate-service-b1-spike-rep1-g44md	Started container k6
+2026-10-06T20:05:32Z	Normal	SuccessfulCreate	job/k6-ol-shipping-rate-service-b1-spike-rep1	Created pod: k6-ol-shipping-rate-service-b1-spike-rep1-g44md
+2026-10-06T20:05:32Z	Normal	Scheduled	pod/k6-ol-shipping-rate-service-b1-spike-rep1-g44md	Successfully assigned ecommerce/k6-ol-shipping-rate-service-b1-spike-rep1-g44md to aks-userpool-16719200-vmss00002n
+2026-10-06T20:17:53Z	Normal	Completed	job/k6-ol-shipping-rate-service-b1-spike-rep1	Job completed

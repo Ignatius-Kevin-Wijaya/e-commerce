@@ -1,0 +1,57 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-07T01:48:23Z	Normal	SuccessfulCreate	job/k6-ol-shipping-rate-service-h3-gradual-rep2	Created pod: k6-ol-shipping-rate-service-h3-gradual-rep2-2pnng
+2026-10-07T01:48:23Z	Normal	Scheduled	pod/k6-ol-shipping-rate-service-h3-gradual-rep2-2pnng	Successfully assigned ecommerce/k6-ol-shipping-rate-service-h3-gradual-rep2-2pnng to aks-userpool-16719200-vmss00002n
+2026-10-07T01:48:24Z	Normal	Pulled	pod/k6-ol-shipping-rate-service-h3-gradual-rep2-2pnng	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-07T01:48:24Z	Normal	Created	pod/k6-ol-shipping-rate-service-h3-gradual-rep2-2pnng	Created container: k6
+2026-10-07T01:48:24Z	Normal	Started	pod/k6-ol-shipping-rate-service-h3-gradual-rep2-2pnng	Started container k6
+2026-10-07T01:51:31Z	Normal	Pulling	pod/shipping-rate-service-6ff89474bc-s8qt2	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-10-07T01:51:31Z	Normal	SuccessfulCreate	replicaset/shipping-rate-service-6ff89474bc	Created pod: shipping-rate-service-6ff89474bc-s8qt2
+2026-10-07T01:51:31Z	Normal	SuccessfulRescale	horizontalpodautoscaler/shipping-rate-service-hpa-custom	New size: 2; reason: pods metric http_requests_per_second above target
+2026-10-07T01:51:31Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled up replica set shipping-rate-service-6ff89474bc from 1 to 2
+2026-10-07T01:51:31Z	Normal	Scheduled	pod/shipping-rate-service-6ff89474bc-s8qt2	Successfully assigned ecommerce/shipping-rate-service-6ff89474bc-s8qt2 to aks-userpool-16719200-vmss00002n
+2026-10-07T01:51:32Z	Normal	Pulled	pod/shipping-rate-service-6ff89474bc-s8qt2	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 306ms (306ms including waiting). Image size: 61321205 bytes.
+2026-10-07T01:51:32Z	Normal	Created	pod/shipping-rate-service-6ff89474bc-s8qt2	Created container: shipping-rate-service
+2026-10-07T01:51:32Z	Normal	Started	pod/shipping-rate-service-6ff89474bc-s8qt2	Started container shipping-rate-service
+2026-10-07T01:52:16Z	Normal	SuccessfulCreate	replicaset/shipping-rate-service-6ff89474bc	Created pod: shipping-rate-service-6ff89474bc-rvjcf
+2026-10-07T01:52:16Z	Normal	SuccessfulRescale	horizontalpodautoscaler/shipping-rate-service-hpa-custom	New size: 3; reason: pods metric http_requests_per_second above target
+2026-10-07T01:52:16Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled up replica set shipping-rate-service-6ff89474bc from 2 to 3
+2026-10-07T01:52:16Z	Normal	Scheduled	pod/shipping-rate-service-6ff89474bc-rvjcf	Successfully assigned ecommerce/shipping-rate-service-6ff89474bc-rvjcf to aks-userpool-16719200-vmss00002n
+2026-10-07T01:52:17Z	Normal	Pulling	pod/shipping-rate-service-6ff89474bc-rvjcf	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-10-07T01:52:17Z	Normal	Pulled	pod/shipping-rate-service-6ff89474bc-rvjcf	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 196ms (196ms including waiting). Image size: 61321205 bytes.
+2026-10-07T01:52:17Z	Normal	Created	pod/shipping-rate-service-6ff89474bc-rvjcf	Created container: shipping-rate-service
+2026-10-07T01:52:17Z	Normal	Started	pod/shipping-rate-service-6ff89474bc-rvjcf	Started container shipping-rate-service
+2026-10-07T01:53:01Z	Normal	Pulling	pod/shipping-rate-service-6ff89474bc-d77bf	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-10-07T01:53:01Z	Normal	SuccessfulCreate	replicaset/shipping-rate-service-6ff89474bc	Created pod: shipping-rate-service-6ff89474bc-d77bf
+2026-10-07T01:53:01Z	Normal	SuccessfulRescale	horizontalpodautoscaler/shipping-rate-service-hpa-custom	New size: 4; reason: pods metric http_requests_per_second above target
+2026-10-07T01:53:01Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled up replica set shipping-rate-service-6ff89474bc from 3 to 4
+2026-10-07T01:53:01Z	Normal	Scheduled	pod/shipping-rate-service-6ff89474bc-d77bf	Successfully assigned ecommerce/shipping-rate-service-6ff89474bc-d77bf to aks-userpool-16719200-vmss00002n
+2026-10-07T01:53:02Z	Normal	Pulled	pod/shipping-rate-service-6ff89474bc-d77bf	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 219ms (219ms including waiting). Image size: 61321205 bytes.
+2026-10-07T01:53:02Z	Normal	Created	pod/shipping-rate-service-6ff89474bc-d77bf	Created container: shipping-rate-service
+2026-10-07T01:53:02Z	Normal	Started	pod/shipping-rate-service-6ff89474bc-d77bf	Started container shipping-rate-service
+2026-10-07T01:54:01Z	Normal	SuccessfulCreate	replicaset/shipping-rate-service-6ff89474bc	Created pod: shipping-rate-service-6ff89474bc-9pczq
+2026-10-07T01:54:01Z	Normal	SuccessfulRescale	horizontalpodautoscaler/shipping-rate-service-hpa-custom	New size: 5; reason: pods metric http_requests_per_second above target
+2026-10-07T01:54:01Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled up replica set shipping-rate-service-6ff89474bc from 4 to 5
+2026-10-07T01:54:01Z	Normal	Scheduled	pod/shipping-rate-service-6ff89474bc-9pczq	Successfully assigned ecommerce/shipping-rate-service-6ff89474bc-9pczq to aks-userpool-16719200-vmss00002n
+2026-10-07T01:54:02Z	Normal	Pulling	pod/shipping-rate-service-6ff89474bc-9pczq	Pulling image "ecommerce.azurecr.io/shipping-rate-service:latest"
+2026-10-07T01:54:02Z	Normal	Pulled	pod/shipping-rate-service-6ff89474bc-9pczq	Successfully pulled image "ecommerce.azurecr.io/shipping-rate-service:latest" in 160ms (160ms including waiting). Image size: 61321205 bytes.
+2026-10-07T01:54:02Z	Normal	Created	pod/shipping-rate-service-6ff89474bc-9pczq	Created container: shipping-rate-service
+2026-10-07T01:54:02Z	Normal	Started	pod/shipping-rate-service-6ff89474bc-9pczq	Started container shipping-rate-service
+2026-10-07T01:59:47Z	Normal	Killing	pod/shipping-rate-service-6ff89474bc-rvjcf	Stopping container shipping-rate-service
+2026-10-07T01:59:47Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-6ff89474bc	Deleted pod: shipping-rate-service-6ff89474bc-rvjcf
+2026-10-07T01:59:47Z	Normal	SuccessfulRescale	horizontalpodautoscaler/shipping-rate-service-hpa-custom	New size: 4; reason: All metrics below target
+2026-10-07T01:59:47Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled down replica set shipping-rate-service-6ff89474bc from 5 to 4
+2026-10-07T02:00:02Z	Normal	Killing	pod/shipping-rate-service-6ff89474bc-s8qt2	Stopping container shipping-rate-service
+2026-10-07T02:00:02Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-6ff89474bc	Deleted pod: shipping-rate-service-6ff89474bc-s8qt2
+2026-10-07T02:00:02Z	Normal	SuccessfulRescale	horizontalpodautoscaler/shipping-rate-service-hpa-custom	New size: 3; reason: All metrics below target
+2026-10-07T02:00:02Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled down replica set shipping-rate-service-6ff89474bc from 4 to 3
+2026-10-07T02:00:03Z	Warning	Unhealthy	pod/shipping-rate-service-6ff89474bc-s8qt2	Readiness probe failed: Get "http://10.244.1.67:8006/ready": dial tcp 10.244.1.67:8006: connect: connection refused
+2026-10-07T02:00:17Z	Normal	Killing	pod/shipping-rate-service-6ff89474bc-d77bf	Stopping container shipping-rate-service
+2026-10-07T02:00:17Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-6ff89474bc	Deleted pod: shipping-rate-service-6ff89474bc-d77bf
+2026-10-07T02:00:17Z	Normal	SuccessfulRescale	horizontalpodautoscaler/shipping-rate-service-hpa-custom	New size: 2; reason: All metrics below target
+2026-10-07T02:00:17Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled down replica set shipping-rate-service-6ff89474bc from 3 to 2
+2026-10-07T02:00:18Z	Warning	Unhealthy	pod/shipping-rate-service-6ff89474bc-d77bf	Readiness probe failed: Get "http://10.244.1.107:8006/ready": dial tcp 10.244.1.107:8006: connect: connection refused
+2026-10-07T02:00:44Z	Normal	Completed	job/k6-ol-shipping-rate-service-h3-gradual-rep2	Job completed
+2026-10-07T02:00:47Z	Normal	Killing	pod/shipping-rate-service-6ff89474bc-9pczq	Stopping container shipping-rate-service
+2026-10-07T02:00:47Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-6ff89474bc	Deleted pod: shipping-rate-service-6ff89474bc-9pczq
+2026-10-07T02:00:47Z	Normal	SuccessfulRescale	horizontalpodautoscaler/shipping-rate-service-hpa-custom	New size: 1; reason: All metrics below target
+2026-10-07T02:00:47Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled down replica set shipping-rate-service-6ff89474bc from 2 to 1

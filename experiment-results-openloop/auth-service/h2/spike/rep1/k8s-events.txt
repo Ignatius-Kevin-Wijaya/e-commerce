@@ -1,0 +1,47 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-06T19:26:22Z	Normal	Pulled	pod/k6-ol-auth-service-h2-spike-rep1-kmb4s	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-06T19:26:22Z	Normal	Created	pod/k6-ol-auth-service-h2-spike-rep1-kmb4s	Created container: k6
+2026-10-06T19:26:22Z	Normal	Started	pod/k6-ol-auth-service-h2-spike-rep1-kmb4s	Started container k6
+2026-10-06T19:26:22Z	Normal	SuccessfulCreate	job/k6-ol-auth-service-h2-spike-rep1	Created pod: k6-ol-auth-service-h2-spike-rep1-kmb4s
+2026-10-06T19:26:22Z	Normal	Scheduled	pod/k6-ol-auth-service-h2-spike-rep1-kmb4s	Successfully assigned ecommerce/k6-ol-auth-service-h2-spike-rep1-kmb4s to aks-userpool-16719200-vmss00002n
+2026-10-06T19:29:29Z	Normal	SuccessfulCreate	replicaset/auth-service-74c577b9b7	Created pod: auth-service-74c577b9b7-p7jzj
+2026-10-06T19:29:29Z	Normal	SuccessfulCreate	replicaset/auth-service-74c577b9b7	Created pod: auth-service-74c577b9b7-h7sl9
+2026-10-06T19:29:29Z	Normal	SuccessfulCreate	replicaset/auth-service-74c577b9b7	Created pod: auth-service-74c577b9b7-smxxt
+2026-10-06T19:29:29Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-tuned	New size: 4; reason: cpu resource utilization (percentage of request) above target
+2026-10-06T19:29:29Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-74c577b9b7 from 1 to 4
+2026-10-06T19:29:29Z	Normal	Scheduled	pod/auth-service-74c577b9b7-p7jzj	Successfully assigned ecommerce/auth-service-74c577b9b7-p7jzj to aks-userpool-16719200-vmss00002n
+2026-10-06T19:29:29Z	Normal	Scheduled	pod/auth-service-74c577b9b7-h7sl9	Successfully assigned ecommerce/auth-service-74c577b9b7-h7sl9 to aks-userpool-16719200-vmss00002n
+2026-10-06T19:29:29Z	Normal	Scheduled	pod/auth-service-74c577b9b7-smxxt	Successfully assigned ecommerce/auth-service-74c577b9b7-smxxt to aks-userpool-16719200-vmss00002n
+2026-10-06T19:29:30Z	Normal	Pulling	pod/auth-service-74c577b9b7-h7sl9	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-06T19:29:30Z	Normal	Pulled	pod/auth-service-74c577b9b7-h7sl9	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 408ms (408ms including waiting). Image size: 129975007 bytes.
+2026-10-06T19:29:30Z	Normal	Created	pod/auth-service-74c577b9b7-h7sl9	Created container: auth-service
+2026-10-06T19:29:30Z	Normal	Started	pod/auth-service-74c577b9b7-h7sl9	Started container auth-service
+2026-10-06T19:29:30Z	Normal	Pulling	pod/auth-service-74c577b9b7-p7jzj	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-06T19:29:30Z	Normal	Pulled	pod/auth-service-74c577b9b7-p7jzj	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 463ms (463ms including waiting). Image size: 129975007 bytes.
+2026-10-06T19:29:30Z	Normal	Created	pod/auth-service-74c577b9b7-p7jzj	Created container: auth-service
+2026-10-06T19:29:30Z	Normal	Started	pod/auth-service-74c577b9b7-p7jzj	Started container auth-service
+2026-10-06T19:29:30Z	Normal	Pulling	pod/auth-service-74c577b9b7-smxxt	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-06T19:29:30Z	Normal	Pulled	pod/auth-service-74c577b9b7-smxxt	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 403ms (403ms including waiting). Image size: 129975007 bytes.
+2026-10-06T19:29:30Z	Normal	Created	pod/auth-service-74c577b9b7-smxxt	Created container: auth-service
+2026-10-06T19:29:30Z	Normal	Started	pod/auth-service-74c577b9b7-smxxt	Started container auth-service
+2026-10-06T19:31:29Z	Normal	SuccessfulCreate	replicaset/auth-service-74c577b9b7	Created pod: auth-service-74c577b9b7-b4tk4
+2026-10-06T19:31:29Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-tuned	New size: 5; reason: cpu resource utilization (percentage of request) above target
+2026-10-06T19:31:29Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-74c577b9b7 from 4 to 5
+2026-10-06T19:31:29Z	Normal	Scheduled	pod/auth-service-74c577b9b7-b4tk4	Successfully assigned ecommerce/auth-service-74c577b9b7-b4tk4 to aks-userpool-16719200-vmss00002n
+2026-10-06T19:31:30Z	Normal	Pulling	pod/auth-service-74c577b9b7-b4tk4	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-06T19:31:30Z	Normal	Pulled	pod/auth-service-74c577b9b7-b4tk4	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 194ms (194ms including waiting). Image size: 129975007 bytes.
+2026-10-06T19:31:30Z	Normal	Created	pod/auth-service-74c577b9b7-b4tk4	Created container: auth-service
+2026-10-06T19:31:30Z	Normal	Started	pod/auth-service-74c577b9b7-b4tk4	Started container auth-service
+2026-10-06T19:38:30Z	Normal	Completed	job/k6-ol-auth-service-h2-spike-rep1	Job completed
+2026-10-06T19:38:45Z	Normal	Killing	pod/auth-service-74c577b9b7-b4tk4	Stopping container auth-service
+2026-10-06T19:38:45Z	Normal	Killing	pod/auth-service-74c577b9b7-h7sl9	Stopping container auth-service
+2026-10-06T19:38:45Z	Normal	Killing	pod/auth-service-74c577b9b7-smxxt	Stopping container auth-service
+2026-10-06T19:38:45Z	Normal	SuccessfulDelete	replicaset/auth-service-74c577b9b7	Deleted pod: auth-service-74c577b9b7-smxxt
+2026-10-06T19:38:45Z	Normal	SuccessfulDelete	replicaset/auth-service-74c577b9b7	Deleted pod: auth-service-74c577b9b7-b4tk4
+2026-10-06T19:38:45Z	Normal	SuccessfulDelete	replicaset/auth-service-74c577b9b7	Deleted pod: auth-service-74c577b9b7-h7sl9
+2026-10-06T19:38:45Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-tuned	New size: 2; reason: All metrics below target
+2026-10-06T19:38:45Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-74c577b9b7 from 5 to 2
+2026-10-06T19:39:15Z	Normal	Killing	pod/auth-service-74c577b9b7-p7jzj	Stopping container auth-service
+2026-10-06T19:39:15Z	Normal	SuccessfulDelete	replicaset/auth-service-74c577b9b7	Deleted pod: auth-service-74c577b9b7-p7jzj
+2026-10-06T19:39:15Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-tuned	New size: 1; reason: All metrics below target
+2026-10-06T19:39:15Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-74c577b9b7 from 2 to 1

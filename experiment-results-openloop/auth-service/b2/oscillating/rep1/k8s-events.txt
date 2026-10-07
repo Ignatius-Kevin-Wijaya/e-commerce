@@ -1,0 +1,32 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-06T22:01:40Z	Normal	KEDAScalersStarted	scaledobject/auth-service-keda	Scaler prometheus is built
+2026-10-06T22:02:41Z	Normal	KEDAScalersStopped	scaledobject/auth-service-keda	Stopped scalers watch
+2026-10-06T22:02:41Z	Warning	ScaledObjectDeleted	scaledobject/auth-service-keda	ScaledObject was deleted
+2026-10-06T22:05:31Z	Normal	SuccessfulCreate	replicaset/auth-service-74c577b9b7	Created pod: auth-service-74c577b9b7-pjj6x
+2026-10-06T22:05:31Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-74c577b9b7 from 1 to 5
+2026-10-06T22:05:31Z	Normal	Scheduled	pod/auth-service-74c577b9b7-pjj6x	Successfully assigned ecommerce/auth-service-74c577b9b7-pjj6x to aks-userpool-16719200-vmss00002n
+2026-10-06T22:05:31Z	Normal	Scheduled	pod/auth-service-74c577b9b7-5tk55	Successfully assigned ecommerce/auth-service-74c577b9b7-5tk55 to aks-userpool-16719200-vmss00002n
+2026-10-06T22:05:31Z	Normal	Scheduled	pod/auth-service-74c577b9b7-8knnw	Successfully assigned ecommerce/auth-service-74c577b9b7-8knnw to aks-userpool-16719200-vmss00002n
+2026-10-06T22:05:31Z	Normal	Scheduled	pod/auth-service-74c577b9b7-mshwl	Successfully assigned ecommerce/auth-service-74c577b9b7-mshwl to aks-userpool-16719200-vmss00002n
+2026-10-06T22:05:32Z	Normal	Pulling	pod/auth-service-74c577b9b7-5tk55	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-06T22:05:32Z	Normal	Pulled	pod/auth-service-74c577b9b7-5tk55	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 446ms (446ms including waiting). Image size: 129975007 bytes.
+2026-10-06T22:05:32Z	Normal	Created	pod/auth-service-74c577b9b7-5tk55	Created container: auth-service
+2026-10-06T22:05:32Z	Normal	Started	pod/auth-service-74c577b9b7-5tk55	Started container auth-service
+2026-10-06T22:05:32Z	Normal	Pulling	pod/auth-service-74c577b9b7-8knnw	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-06T22:05:32Z	Normal	Pulled	pod/auth-service-74c577b9b7-8knnw	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 407ms (407ms including waiting). Image size: 129975007 bytes.
+2026-10-06T22:05:32Z	Normal	Created	pod/auth-service-74c577b9b7-8knnw	Created container: auth-service
+2026-10-06T22:05:32Z	Normal	Started	pod/auth-service-74c577b9b7-8knnw	Started container auth-service
+2026-10-06T22:05:32Z	Normal	Pulling	pod/auth-service-74c577b9b7-mshwl	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-06T22:05:32Z	Normal	Pulled	pod/auth-service-74c577b9b7-mshwl	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 404ms (404ms including waiting). Image size: 129975007 bytes.
+2026-10-06T22:05:32Z	Normal	Created	pod/auth-service-74c577b9b7-mshwl	Created container: auth-service
+2026-10-06T22:05:32Z	Normal	Started	pod/auth-service-74c577b9b7-mshwl	Started container auth-service
+2026-10-06T22:05:32Z	Normal	Pulling	pod/auth-service-74c577b9b7-pjj6x	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-06T22:05:32Z	Normal	Pulled	pod/auth-service-74c577b9b7-pjj6x	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 505ms (505ms including waiting). Image size: 129975007 bytes.
+2026-10-06T22:05:32Z	Normal	Created	pod/auth-service-74c577b9b7-pjj6x	Created container: auth-service
+2026-10-06T22:05:32Z	Normal	Started	pod/auth-service-74c577b9b7-pjj6x	Started container auth-service
+2026-10-06T22:07:29Z	Normal	Pulled	pod/k6-ol-auth-service-b2-oscillating-rep1-276bh	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-06T22:07:29Z	Normal	Created	pod/k6-ol-auth-service-b2-oscillating-rep1-276bh	Created container: k6
+2026-10-06T22:07:29Z	Normal	Started	pod/k6-ol-auth-service-b2-oscillating-rep1-276bh	Started container k6
+2026-10-06T22:07:29Z	Normal	SuccessfulCreate	job/k6-ol-auth-service-b2-oscillating-rep1	Created pod: k6-ol-auth-service-b2-oscillating-rep1-276bh
+2026-10-06T22:07:29Z	Normal	Scheduled	pod/k6-ol-auth-service-b2-oscillating-rep1-276bh	Successfully assigned ecommerce/k6-ol-auth-service-b2-oscillating-rep1-276bh to aks-userpool-16719200-vmss00002n
+2026-10-06T22:19:51Z	Normal	Completed	job/k6-ol-auth-service-b2-oscillating-rep1	Job completed
