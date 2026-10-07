@@ -251,6 +251,7 @@ Software Heritage); add a "research data and reproducibility" section to BAB 3 o
 | Isn't load shedding changing the system? | Yes, and it is reported as part of the system under test: it is standard overload protection, applied identically to every config. Without it the pilot showed pods collapsing and metrics going blank. | §11.6 #3 |
 | Why did the gate rule change? | The smoke showed the original error allowance was smaller than one autoscaler cycle's effect. The new rule was fixed and committed before any campaign data; the smoke stays a FAIL. | §11.2 J, §11.6 #4 |
 | How do we know the results are real? | Raw data for every request, independent sources that agree, checksums, third-party timestamps, rules fixed before data, and anyone can re-run it. | §11.7 |
+| Is the comparison fair? | Within a service and pattern, yes: the same load, pods, start, limits and shuffled order, checked in every run. H3 vs K1 isolates the engine, H2 vs H3 the metric (each at its own target). Across services, compare relative outcomes, not raw numbers. | §11.10 |
 
 ## 11.9 Sources worth citing
 
@@ -278,3 +279,56 @@ Check edition, volume and page details against the original before citing.
 | Arcuri, A., & Briand, L. (2011). A practical guide for using statistical tests to assess randomized algorithms in software engineering. *ICSE '11*. | Non-parametric tests, effect sizes, number of repetitions | Phase 4 analysis |
 | Nosek, B. A., Ebersole, C. R., DeHaven, A. C., & Mellor, D. T. (2018). The preregistration revolution. *PNAS*, 115(11). | Fixing analysis rules before seeing data | Gate rules |
 | Wilkinson, M. D., et al. (2016). The FAIR guiding principles for scientific data management and stewardship. *Scientific Data*, 3. | Findable, accessible, reusable research data | Data archive and DOI |
+
+## 11.10 Is the comparison fair? (added 2026-10-07)
+
+A comparison is fair when the conditions being compared differ only in the factor under study, everything else is
+held equal or randomized, and the outcome is measured the same way.
+
+**The main comparison — the six configurations within one service and one pattern — is fair:**
+
+| Held equal | How | Checked by |
+|---|---|---|
+| Offered load | Open loop: the identical arrival schedule for every config of a service × pattern (e.g. 54,274 requests for shipping spike), whatever the server does | G1: attempted = offered within 2%, 0 dropped |
+| Pods | Same image, code overlay, CPU/memory, probes and load-shedding cap for every config. B1 and B2 manifests differ only in the replica count (1 vs 5); autoscaled configs deploy the B1 manifest plus their autoscaler | Overlay hash and cap recorded in every run's metadata |
+| Start state | Every run starts from 1 pod after the same reset; auth users are logged in before the run | G2 |
+| Scaling limits | min 1 / max 5 for every autoscaler; B2 = the same 5 pods, permanently | Manifests |
+| Scaling behavior | H2, H3 and K1 share one behavior block | Manifests |
+| H3 vs K1 metric | Same Prometheus counter, same 1-minute window, same threshold; same HPA controller makes the final decision | Manifests |
+| Traffic spread | Connection reuse off, so new pods receive traffic | G5 |
+| Measurement | Same KPIs, KPI window (120–540 s) and SLO per service | Validator |
+| Time and order | Order shuffled within each rep block; 5 reps; drift spreads across configs instead of hitting one | Frozen plan |
+| Environment | Same cluster, nodes and monitoring; one service autoscaled at a time | Pre-launch check |
+
+**What each contrast isolates:**
+- **H3 vs K1 → engine only** (HPA + prometheus-adapter vs KEDA): the cleanest contrast in the design.
+- **H2 vs H3 → metric** (CPU vs request rate), each at its own target (see caveat 1).
+- **H1 vs H2 → default vs tuned HPA**: a package — target (80% vs 50%) and behavior both differ, by design.
+- **B1 and B2 → the bounds.** G4 confirms the load sits between them (B1 overloaded, B2 healthy), so the
+  autoscalers have room to differ.
+
+**What is not compared directly, and why that is still fair:**
+- **Across services**, the workload type differs on purpose, so the loads (2→30 vs 10→105 req/s), SLOs, thresholds and
+  caps differ too. Each service was calibrated by the same rules (one-pod capacity C, B2's healthy ceiling, base below
+  the threshold, peak rule; §11.2 F). Compare **normalized** outcomes — the share of the B1→B2 gap each config closes,
+  rankings, and the direction of the metric and engine effects — not raw latency or error counts.
+- **Across patterns**, the shapes and volumes differ (auth: 10,359–15,399 requests per run). Compare configs within a
+  pattern; across patterns, use the same normalized measures.
+
+**Caveats to disclose:**
+1. **Different trigger levels.** H2's 50% CPU target corresponds to roughly 3.3 req/s per auth pod and 23 per shipping
+   pod (estimates), against request-rate thresholds of 5 and 15. The "metric effect" is therefore each metric at its
+   calibrated or standard target, not at an equalized trigger point (§11.6 #2).
+2. **H1 vs H2 differs in two things** (target and behavior); report it as default vs tuned, not as a single factor.
+3. **Load shedding is part of the system.** It applies to every config, but it caps what a request-rate metric can see
+   (it counts served requests), which is a property of H3 and K1 under overload (§11.6 #3).
+4. **Two H1 runs ran outside their shuffled position** (re-run at 80% after position 72; Part 08 §8.13).
+5. **Five repetitions detect only large differences.** Report effect sizes and spread with every test (Arcuri & Briand
+   2011).
+
+**Short answer for the supervisor:** "Within each service and load pattern, the six configurations are compared under
+identical conditions: the same offered load, the same pods, the same starting state, the same limits, and runs in
+shuffled order, with checks in every run confirming it. H3 versus K1 isolates the engine and H2 versus H3 the metric,
+each metric at its own calibrated target. The two services are calibrated by the same rules but run different loads by
+design, so across services we compare relative outcomes such as the share of the B1-to-B2 gap closed, not raw
+latencies."

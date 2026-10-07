@@ -22,7 +22,7 @@
 | 08 | [08-open-loop-study.md](thesis_blueprint/08-open-loop-study.md) | **Open-loop study:** motivation, pre-set criteria, tooling, calibration, pilot results and verdict, user decisions, v2 fixes, robustness gate (rules v1 and v2), v2 calibration, smoke result, campaign (running), thesis structure ("Replace"), thesis implications | new |
 | 09 | [09-strategy-plan-assessment.md](thesis_blueprint/09-strategy-plan-assessment.md) | Stand-out strategy (narrative, Pareto, timeline figure, decomposition table), project plan and status, final assessment | §9–§11 |
 | 10 | [10-chapter-outline.md](thesis_blueprint/10-chapter-outline.md) | BAB 1–5 writing guide (Struktur Perancangan Jaringan) | §12 |
-| 11 | [11-provenance-and-validity.md](thesis_blueprint/11-provenance-and-validity.md) | **Defense guide:** where every setting comes from (default / measured / fairness / judgment / pre-registered), validity by type, fairness controls, judgment calls, known weak spots and their handling, evidence that the results are real, ready answers, sources to cite | new |
+| 11 | [11-provenance-and-validity.md](thesis_blueprint/11-provenance-and-validity.md) | **Defense guide:** where every setting comes from (default / measured / fairness / judgment / pre-registered), validity by type, fairness controls, judgment calls, known weak spots and their handling, evidence that the results are real, ready answers, sources to cite, whether the comparisons are fair (§11.10) | new |
 
 ---
 
@@ -41,10 +41,12 @@
   carrier-mock; product-service = exploratory appendix (dependency-limited by its database) (Part 01 #5–#11).
 - **Load patterns:** gradual, spike, oscillating — each a 12-minute k6 schedule (2 m warm-up, 7 m pattern, 3 m
   ramp-down), `noConnectionReuse: true`.
-- **Datasets ("Replace", decided 2026-10-06):** the thesis dataset is the **open-loop campaign** (`ramping-arrival-rate`,
-  auth 2→30 and shipping 10→105 req/s, per-pod load shedding; running) if it passes its robustness gate. The
-  **closed-loop campaign** (`ramping-vus`, auth 1→12 VUs, shipping 10→80 VUs; complete) is methodology background — the
-  evidence for switching generators — and the fallback if the gate fails (Part 08 §8.14).
+- **Datasets ("Replace", decided 2026-10-06):** the thesis dataset was to be the **open-loop campaign**
+  (`ramping-arrival-rate`, auth 2→30 and shipping 10→105 req/s, per-pod load shedding) if it passed its robustness
+  gate, with the **closed-loop campaign** (`ramping-vus`, auth 1→12 VUs, shipping 10→80 VUs; complete) as methodology
+  background and fallback (Part 08 §8.14). **The gate failed on 2026-10-07** after rep blocks 1–2 (72 runs), so by the
+  pre-registered plan the closed-loop campaign is the thesis dataset and the open-loop work a robustness section —
+  **user decision pending** (Part 08 §8.13).
 - **Platform:** AKS `ecommerce-aks` (RG `ecommerce`, Indonesia Central, 3× Standard_D4as_v5, Kubernetes 1.33.7), KEDA
   AKS add-on, prometheus-adapter (Helm), in-cluster Prometheus, k6 as Kubernetes Jobs; runs driven from
   `ecommerce-vm` (Part 05). Runner protocol: reset (`RESET_WAIT` 120 s) → apply + stabilize (90 s) → readiness →
@@ -52,22 +54,22 @@
 
 ---
 
-## Current status (2026-10-06, 17:40 UTC)
+## Current status (2026-10-07, 14:00 UTC)
 
 | Track | Status |
 |---|---|
-| **Closed-loop final dataset** | ✅ 180/180 runs (2026-08-15 → 08-17, 58 h 49 m), all valid Prometheus exports, 177/180 at 0.00% error; `validate-results.sh` 0/0/0, `deep_validate.py` 0 critical (19 stale heuristic warnings on auth B1). **Methodology background and fallback:** it becomes the thesis dataset only if the open-loop campaign fails its gate ("Replace"). (Part 01 #13, Dataset Status; Part 08 §8.14) |
+| **Closed-loop final dataset** | ✅ 180/180 runs (2026-08-15 → 08-17, 58 h 49 m), all valid Prometheus exports, 177/180 at 0.00% error; `validate-results.sh` 0/0/0, `deep_validate.py` 0 critical (19 stale heuristic warnings on auth B1). Under "Replace" it is the fallback, used if the open-loop campaign fails its gate — which happened on 2026-10-07, so by the pre-registered plan **it is the thesis dataset** (user decision pending). (Part 01 #13, Dataset Status; Part 08 §8.13–§8.14) |
 | **Open-loop pilot v1** | ✅ 20 runs (2026-10-05/06). Generator stable (0 dropped). Pre-set rule verdict **GO** via the criterion-4 explanation clause; strict reading **STAY**. (Part 08 §8.7) |
 | **User decisions** | Switch to a full 180-run open-loop campaign **only if it is robust** (Part 08 §8.8). After the smoke: run the campaign under G6 rule v2; thesis structure **"Replace"**; **H1 = 80%** (Kubernetes default) (Part 08 §8.9, §8.13, §8.14). |
 | **v2 fixes + calibration** | ✅ Admission control (both services), auth pre-authentication, robustness gate G1–G6; recalibrated 2026-10-06. (Part 08 §8.9–§8.11) |
 | **v2 smoke test** | ✅ Done 2026-10-06 08:31–11:31 UTC (AKS stopped 11:35). 9/9 runs clean; B1 hold graceful; SLO-violation seconds replicate. **Pre-registered gate FAIL on one cell** (shipping H3 error rate 5.32 / 6.97%, one 15 s HPA cycle apart). (Part 08 §8.12) |
-| **Open-loop campaign** | ⏳ Rep blocks 1–2 (72 runs) running on `ecommerce-vm` since 2026-10-06 12:33:42 UTC under G6 rule v2 (50% or ≤ 30 s / ≤ 2 points, fixed before campaign data). **12/72 DONE at 17:36 UTC**, no failure since the start-up hiccup. H1 = 80% from position 13 (confirmed live 16:44 UTC); positions 1 and 9 re-run at 80% after position 72; the VM then stops AKS (≈13:30 UTC 2026-10-07, estimate from 20.1 min/run) and the gate decides. If it passes, this is the thesis dataset ("Replace"). (Part 08 §8.9, §8.13, §8.14) |
+| **Open-loop campaign** | ✅ Rep blocks 1–2 done: 72/72 at 2026-10-07 13:31 UTC (H1 = 80%; positions 1 and 9 re-run), AKS stopped 13:33:57, all raw files checksum-verified. **Pre-registered gate (rule v2): FAIL** — G1–G4 pass in all 72 runs; G5 fails in 1 run; G6 fails in 3 of 24 cells, all CPU-based (request-rate cells reproducible 12/12; finding #23). Pre-registered consequence: stop; the closed-loop dataset is the thesis dataset. **User decision pending.** (Part 08 §8.13) |
 | **Analysis (Phase 4)** | Waits for the gate; runs on the thesis dataset (the open-loop campaign if it passes): Wilcoxon tests and effect sizes, time-to-scale extraction, Resource Cost Index / Pareto, figures (`thesis-figures/` PNGs are from superseded data). (Part 09 §10) |
 | **Writing** | BAB 1–3 drafted (`Skripsi_Ignatius_Kevin_Wijaya.docx`, last edited 2026-06-06). Under "Replace", BAB 3 must present the open-loop method (generator, load shedding, pre-login, gate, H1 = 80%) with the closed-loop campaign as the reason for switching; its old generator rationale and auth arrival-rate profile are out of date (Part 08 §8.14, Part 10 notes, Part 11). BAB 4–5 wait for the campaign. |
 
 ---
 
-## Headline results — closed-loop final dataset (Part 01, findings #13–#16; background and fallback under "Replace")
+## Headline results — closed-loop final dataset (Part 01, findings #13–#16; the thesis dataset by the pre-registered plan after the open-loop gate failed — decision pending)
 
 p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
 
@@ -123,7 +125,12 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
 - **Campaign (from 2026-10-06 12:33 UTC):** 180 runs (2 services × 6 configs × 3 patterns × 5 reps), gate after rep
   blocks 1–2 (72 runs) under G6 rule v2 (50% or ≤ 30 s / ≤ 2 points), committed before any campaign data. Pre-launch
   check: all 332 tracked files outside the data folders on the VM equal the pushed HEAD; code in the pods equals HEAD. H1 set to the Kubernetes
-  default 80% (positions 1 and 9, run at 70%, archived and re-run). 12/72 done at 17:36 UTC (Part 08 §8.13).
+  default 80% (positions 1 and 9, run at 70%, archived and re-run). Rep blocks 1–2 finished 2026-10-07 13:31 UTC.
+  - **Gate: FAIL.** Measurement sound (G1–G4 pass in all 72 runs), but repeatability failed in 3 of 12 CPU-based
+    cells and in none of the 12 request-rate cells. In auth oscillating H2 rep 1 the HPA's lagging CPU reading made it
+    scale in anti-phase to the load (≈50% errors in every peak; rep 2: 16.28% overall) (#23, Part 08 §8.13).
+  - Seconds over SLO (rep 1/rep 2), shipping spike: K1 70/70, H3 80/70, H2 110/90, H1 140/100; shipping gradual:
+    H3 and K1 0/0, H1 70/60; auth gradual: K1 40/40, H3 50/50, H2 100/70, H1 140/70.
 
 ---
 
@@ -186,13 +193,12 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
 
 ## Open items and next steps
 
-1. **Open-loop campaign (running since 2026-10-06 12:33 UTC):** after position 72 the launcher re-runs positions 1 and
-   9 (H1 at 80%) and stops AKS. Then fetch the results (md5-verified), run `validate` and `gate --reps 2` (rule v2),
-   report, and ask before continuing with reps 3–5 (Part 08 §8.13). Merge the VM's `pilot.log` without overwriting the
-   laptop's calibration log; keep `superseded-h1-70pct/` as a record.
-2. **After the gate:** PASS → with the user's go-ahead, start AKS, delete pods left `Failed` by the stop, and run
-   positions 73–180 (`run-openloop-vm.sh experiment-results-openloop yes`, ≈36 h ≈ $19, estimate). FAIL → stop; the
-   closed-loop dataset becomes the thesis dataset and the open-loop work a robustness section.
+1. **Decide after the gate FAIL (user, pending):** the pre-registered consequence is to stop — the closed-loop dataset
+   becomes the thesis dataset and the open-loop work (pilot, smoke, 72 campaign runs) a robustness section. Being
+   discussed: why the three CPU-based cells failed and what could address it (Part 08 §8.13).
+2. **If the user decides otherwise:** any further open-loop runs must be declared before they run and disclosed as a
+   deviation from the gate; after an AKS start, delete pods left `Failed` by the stop before launching. Positions
+   73–180 would take ≈36 h ≈ $19 (estimate). `ecommerce-vm` stays allocated until this is decided.
 3. **Phase 4 analysis** on the thesis dataset: Wilcoxon tests and effect sizes, time-to-scale from `k8s-events.txt`,
    Resource Cost Index and Pareto, decomposition table, regenerated figures; add the k6-vs-Prometheus cross-check to
    the validator (descriptive only, Part 11 §11.7).

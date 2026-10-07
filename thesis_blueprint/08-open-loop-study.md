@@ -2,13 +2,13 @@
 
 > Part of the thesis blueprint — index and executive summary: [thesis_blueprint.md](../thesis_blueprint.md).
 > New part, written 2026-10-06. Covers everything from the open-loop pilot request (2026-10-05) to the 180-run
-> open-loop campaign (running since 2026-10-06 12:33 UTC). Detailed pilot write-up: `pilot-openloop-report.md` (repo root; every result in it is
+> open-loop campaign (rep blocks 1–2 finished 2026-10-07; pre-registered gate FAIL; decision pending). Detailed pilot write-up: `pilot-openloop-report.md` (repo root; every result in it is
 > reproduced here). All numbers below were computed from the stored data;
 > estimates are labelled as estimates. Times are UTC unless marked otherwise.
 
 ---
 
-## 8.0 Status at a glance (2026-10-06, 17:40 UTC)
+## 8.0 Status at a glance (2026-10-07, 14:00 UTC)
 
 | Stage | Status | Outcome |
 |---|---|---|
@@ -17,7 +17,7 @@
 | v2 fixes (admission control, auth pre-auth, robustness gate) | ✅ Implemented, unit-tested, deployed via ConfigMap overlay | §8.9–§8.10 |
 | v2 calibration ladders | ✅ Done 2026-10-06 06:44–08:28 | Collapse removed up to the planned peaks (§8.11) |
 | v2 smoke test (9 runs) | ✅ Done 08:31–11:31; AKS stopped 11:35 | **Pre-registered gate FAIL on one cell:** shipping H3 error rate 5.32 / 6.97% across reps (27% of mean; limit 25% or 1 point), caused by a first scale-up one 15 s HPA cycle later. Everything else passes: 9/9 runs clean, B1 hold graceful, SLO-violation seconds 70/70, 70/70, 100/100 (shipping) and 140/170 (auth) (§8.12) |
-| 180-run open-loop campaign | ⏳ Rep blocks 1–2 (72 runs) running on `ecommerce-vm` since 12:33:42 UTC under G6 rule v2 (§8.9); **12/72 DONE at 17:36 UTC**; H1 = 80% from position 13 (confirmed live 16:44), positions 1 and 9 re-run at 80% after position 72 | Pre-launch check: VM and cluster match the pushed HEAD (one inert adapter leftover); no failure since the start-up hiccup; the VM stops AKS after the re-runs (≈13:30 UTC 2026-10-07, estimate), then the gate decides (§8.13). Thesis structure: "Replace" (§8.14) |
+| 180-run open-loop campaign | ✅ Rep blocks 1–2 done: 72/72 at 2026-10-07 13:31 UTC (positions 1 and 9 re-run at H1 = 80%); AKS stopped 13:33:57; all 79 raw files match their capture checksums | **Pre-registered gate (rule v2): FAIL.** G1–G4 pass in all 72 runs; G5 fails in 1 run and G6 in 3 of 24 autoscaled cells — all CPU-based (auth gradual H1, auth oscillating H2, shipping oscillating H1). Request-rate cells (H3, K1) reproducible in 12/12. **User decision pending** (§8.13) |
 
 **"Replace" (§8.14):** if the campaign passes its gate it is the thesis dataset; the closed-loop final dataset (Part 01,
 findings #13–#16) then becomes methodology background. If the campaign fails, the closed-loop dataset is the thesis
@@ -425,7 +425,7 @@ unchanged. Reasons:
 constraint) under G6 rule v2 (§8.9), fixed before any campaign data. The smoke stays FAIL on record and is not
 re-scored.
 
-## 8.13 Campaign (approved 2026-10-06 with G6 rule v2; launched 12:33 UTC; running)
+## 8.13 Campaign (approved 2026-10-06 with G6 rule v2; rep blocks 1–2 done 2026-10-07; gate FAIL)
 
 - 180 runs (`experiment-results-openloop/runlist.txt`: 2 services × 6 configs incl. H1 × 3 patterns × 5 reps), shuffled
   within rep blocks (seed 20261006); positions 1–36 are rep 1 and 37–72 rep 2, each block covering all 36 cells (18 auth
@@ -484,6 +484,53 @@ re-scored.
 - **Progress at 17:36 UTC:** 12/72 DONE (positions 2–8 and 10–14), position 15 running; 20.1 min per run on average
   (positions 1–14); no failure since the start-up hiccup. Remaining: positions 15–72 plus the re-runs of 1 and 9 —
   60 runs, ≈20 h; the VM should stop AKS at ≈13:30 UTC on 2026-10-07 (estimate).
+- **Rep blocks 1–2 finished (2026-10-07):** the main invocation ended at 12:49 UTC with 70 DONE; the launcher then
+  re-ran positions 1 and 9 at H1 = 80% (12:50–13:30), reached 72/72 at 13:31, found no leftover k6 job and stopped AKS
+  (13:33:57, verified `Stopped`). No failure after the start-up hiccup. The 329 MB archive was md5-verified after
+  download, and all 79 raw files (72 runs, 2 superseded runs, 5 ladders) match the checksums recorded inside the k6
+  pods at capture. On the laptop, the ladder log was moved to `calibration/ladders.log` and the campaign log is
+  `pilot.log`.
+
+**Gate result (`gate --reps 2`, rule v2, 2026-10-07): FAIL** (`analysis/gate-v2.json`)
+
+| Criterion | Result |
+|---|---|
+| G1 instrument, G2 start state, G3 observability | ✅ all 72 runs |
+| G4 calibration | ✅ every service × pattern: B2 ≤ 0.06% errors and p95 ≤ SLO; B1 250–410 s over SLO, 43.6–68.9% errors |
+| G5 per-pod load | ❌ auth H2 oscillating rep 1: two pods below 20% of the mean **CPU** share (their request shares were 0.88 and 1.00) |
+| G6 repeatability | ❌ 3 of 24 cells: auth gradual H1 (140/70 s; 3.06/0.62% errors), auth oscillating H2 (200/150 s; 46.09/16.28%), shipping oscillating H1 (170/90 s; 20.90/15.20%) |
+
+Seconds over SLO per cell (rep 1 / rep 2; bold = G6 fail):
+
+| | auth gradual | auth spike | auth oscillating | ship gradual | ship spike | ship oscillating |
+|---|---|---|---|---|---|---|
+| B1 | 340/300 | 410/410 | 260/250 | 280/270 | 410/410 | 250/250 |
+| B2 | 10/10 | 30/30 | 10/0 | 0/10 | 0/0 | 0/0 |
+| H1 | **140/70** | 230/210 | 180/160 | 70/60 | 140/100 | **170/90** |
+| H2 | 100/70 | 100/130 | **200/150** | 20/0 | 110/90 | 190/190 |
+| H3 | 50/50 | 130/140 | 240/240 | 0/0 | 80/70 | 190/190 |
+| K1 | 40/40 | 110/140 | 240/220 | 0/0 | 70/70 | 170/190 |
+
+**Why the three cells failed (measured; recorded as explanation — it does not change the verdict):**
+- **auth oscillating H2:** the HPA's CPU reading lags the load by about a minute and updates in steps. In rep 1 it
+  first showed 196% at +71 s (peak 1 runs +0–90 s) → 1→4 pods only as the peak ended; at +201 s, 21 s into peak 2, it
+  still showed 7% from the quiet gap → 4→1; at +251 s it showed 167% → back to 4 as peak 2 ended; the same at +382 s in
+  peak 3. Every peak met 1 pod (≈50% errors per peak; all errors are 503 rejections or timeouts, no 5xx). In rep 2 the
+  first reading came at +37 s, capacity built up during peak 1 and never fully dropped (16.28% errors). The G5 flag is
+  the same run: pods added and removed out of phase got a normal request share but little CPU work.
+- **auth gradual H1:** first scale-up at +139 s in rep 1 vs +95 s in rep 2 (44 s apart); in rep 1 one pod carried
+  the ramp past its capacity (15.1% errors in onset+90–180 s, against 0.9% in rep 2).
+- **shipping oscillating H1:** both reps scaled 1→2 in peak 1, but rep 2 added a third pod at +109 s, between peaks,
+  while rep 1 added more only at +244 s, during peak 2 (9.3% vs 0.0% errors in that peak). H1's 300 s scale-down
+  window then kept the pods.
+- **Common cause:** CPU-based HPA acts on a lagging, step-updated CPU reading; under time-varying open-loop load, when
+  those updates land relative to the load decides the outcome. The request-rate autoscalers (1-minute Prometheus rate,
+  scraped every 15 s) were reproducible in all 12 of their cells.
+- **Tooling caveat:** Kubernetes aggregates identical repeated events, so `k8s-events.txt` keeps only the last
+  timestamp of a repeated "Scaled up … to 4 from 1"; time-to-scale for oscillating runs must come from
+  `hpa-timeline.jsonl` / `pod-timeline.jsonl`.
+- **Pre-registered consequence:** stop; do not run reps 3–5; the closed-loop dataset is the thesis dataset and the
+  open-loop work becomes a robustness section (§8.14). **The user has not decided yet (2026-10-07).**
 
 ## 8.14 Implications for the thesis text
 
@@ -527,5 +574,5 @@ PYTHONUTF8=1 PILOT_OPENLOOP_DIR=experiment-results-openloop tools/python312/pyth
 
 **Costs of this study (estimates):** 2026-10-05/06 session ≈10.4 h of AKS ≈ $5.4 (idle start, 6 ladders, pilot);
 2026-10-06 v2 work from ≈06:30 UTC, ≈5.2 h ≈ $2.7 including the smoke test; ACR builds $0 (none ran). The VM
-(B2ats_v2) ran throughout. Campaign: AKS running since the 12:23 UTC start, ≈5.2 h ≈ $2.7 by 17:36 UTC; to the
-72-run stop ≈25 h ≈ $13; reps 3–5 ≈36 h ≈ $19 more.
+(B2ats_v2) ran throughout. Campaign rep blocks 1–2: AKS from 12:23 UTC 2026-10-06 to 13:34 UTC 2026-10-07, ≈25.2 h ≈ $13.0;
+reps 3–5 would be ≈36 h ≈ $19 more.
