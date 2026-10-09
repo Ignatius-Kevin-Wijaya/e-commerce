@@ -247,9 +247,12 @@ Azure's record holds every AKS start and stop of both campaigns: closed loop, st
 17 August 22:34:35 UTC; open loop, four start/stop pairs from 5 October 14:53:04 to 9 October 02:50:36 UTC. The dataset
 is tagged `openloop-dataset-v1` (an annotated tag on `c1e72e2`, pushed 2026-10-09 09:20 UTC).
 
-**Still to do:** a GitHub release with a Zenodo DOI after the repository cleanup (README, green CI; settle the
-repository name first, since the archive records it); a "research data and reproducibility" section in BAB 3 or an
-appendix.
+The repository cleanup that the DOI waits for is done (2026-10-09): CI is green on every service (run 37928949340), the
+repository has a README that leads with the results, and it was renamed `k8s-autoscaling-hpa-vs-keda` (the old
+`e-commerce` URL redirects; commit SHAs and the tag are unchanged).
+
+**Still to do:** a `CITATION.cff`, a GitHub release and its Zenodo DOI (the owner connects Zenodo to GitHub first); a
+"research data and reproducibility" section in BAB 3 or an appendix that cites the DOI.
 
 ## 11.8 Ready answers to common questions
 

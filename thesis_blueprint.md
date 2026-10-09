@@ -237,11 +237,17 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
    the closed-loop campaign as the reason for switching; use Part 11 for provenance and sources; draft BAB 4–5 from
    the Part 12 results.
 5. **Research data (Part 11 §11.7):** done 2026-10-09: the Azure Activity Log and daily billed costs exported
-   privately, and the dataset tagged `openloop-dataset-v1` on `c1e72e2`. Still to do: a GitHub release with a Zenodo DOI
-   after the repository cleanup; the reproducibility section.
+   privately, the dataset tagged `openloop-dataset-v1` on `c1e72e2`, and the repository cleaned up (green CI, README,
+   renamed `k8s-autoscaling-hpa-vs-keda`). Still to do: `CITATION.cff`, a GitHub release with a Zenodo DOI; the
+   reproducibility section.
 6. **Housekeeping:**
    - All October work through the campaign analysis (`4be8e00`, `bfdd938`, `4cf2d29`, `9c5dc8c`, 2026-10-09) is
      committed and pushed; the dataset tag `openloop-dataset-v1` points at `c1e72e2`.
+   - Repository: renamed `k8s-autoscaling-hpa-vs-keda` on 2026-10-09 (the old `e-commerce` URL redirects), with a
+     README, description and topics. CI is green again: ruff 0.15.22 and the test tools are pinned, a root `ruff.toml`
+     fixes the rule set, shipping-rate-service and carrier-mock-service joined the test matrix, the unused `cd.yml` was
+     removed and the test SQLite files are no longer tracked (`b8b3f4b`, `5265959`). Commits use the owner's personal
+     address (repository `user.email`).
    - Idle cost: in September 2026, with AKS stopped all month, the thesis resource groups were still billed 888,752 IDR
      (load balancer 281,129; VM software licence 190,627; VM 120,150; virtual network 112,452; storage 106,133;
      ACR 77,952; Azure Cost Management export of 2026-10-09).
