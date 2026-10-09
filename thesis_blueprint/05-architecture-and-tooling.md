@@ -48,10 +48,10 @@ These pods are automatically deployed by AKS and consume from the allocatable po
 
 | Pod | CPU Request | CPU Limit | Memory Request | Source |
 |-----|-----------|---------|---------------|--------|
-| auth-db (PostgreSQL) | 250m | 500m | 256Mi | [`postgres/auth-db.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/postgres/auth-db.yaml) |
-| product-db (PostgreSQL) | 250m | 500m | 256Mi | [`postgres/product-db.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/postgres/product-db.yaml) |
-| order-db (PostgreSQL) | 250m | 500m | 256Mi | [`postgres/order-db.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/postgres/order-db.yaml) |
-| redis | 100m | 250m | 128Mi | [`redis/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/redis/deployment.yaml) |
+| auth-db (PostgreSQL) | 250m | 500m | 256Mi | [`postgres/auth-db.yaml`](../infrastructure/kubernetes/postgres/auth-db.yaml) |
+| product-db (PostgreSQL) | 250m | 500m | 256Mi | [`postgres/product-db.yaml`](../infrastructure/kubernetes/postgres/product-db.yaml) |
+| order-db (PostgreSQL) | 250m | 500m | 256Mi | [`postgres/order-db.yaml`](../infrastructure/kubernetes/postgres/order-db.yaml) |
+| redis | 100m | 250m | 128Mi | [`redis/deployment.yaml`](../infrastructure/kubernetes/redis/deployment.yaml) |
 | **Subtotal** | **850m** | **1750m** | **896Mi** | |
 
 #### Layer 3: Application Services (Fixed at 1 replica during experiments)
@@ -60,13 +60,13 @@ During experiments, only ONE service is under autoscaling. All others run at `re
 
 | Pod | CPU Request | CPU Limit | Memory Request | Source |
 |-----|-----------|---------|---------------|--------|
-| api-gateway | 200m | 1000m | 256Mi | [`gateway/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/gateway/deployment.yaml) |
-| auth-service | 250m | 500m | 128Mi | [`auth/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/auth/deployment.yaml) |
-| product-service | 250m | 500m | 128Mi | [`product/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/product/deployment.yaml) |
-| cart-service | 100m | 500m | 128Mi | [`cart/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/cart/deployment.yaml) |
-| order-service | 100m | 500m | 128Mi | [`order/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/order/deployment.yaml) |
-| payment-service | 100m | 500m | 128Mi | [`payment/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/payment/deployment.yaml) |
-| frontend | 100m | 500m | 128Mi | [`frontend/deployment.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/frontend/deployment.yaml) |
+| api-gateway | 200m | 1000m | 256Mi | [`gateway/deployment.yaml`](../infrastructure/kubernetes/gateway/deployment.yaml) |
+| auth-service | 250m | 500m | 128Mi | [`auth/deployment.yaml`](../infrastructure/kubernetes/auth/deployment.yaml) |
+| product-service | 250m | 500m | 128Mi | [`product/deployment.yaml`](../infrastructure/kubernetes/product/deployment.yaml) |
+| cart-service | 100m | 500m | 128Mi | [`cart/deployment.yaml`](../infrastructure/kubernetes/cart/deployment.yaml) |
+| order-service | 100m | 500m | 128Mi | [`order/deployment.yaml`](../infrastructure/kubernetes/order/deployment.yaml) |
+| payment-service | 100m | 500m | 128Mi | [`payment/deployment.yaml`](../infrastructure/kubernetes/payment/deployment.yaml) |
+| frontend | 100m | 500m | 128Mi | [`frontend/deployment.yaml`](../infrastructure/kubernetes/frontend/deployment.yaml) |
 | **Subtotal (all 7 at 1 replica)** | **1100m** | **4000m** | **1024Mi** | |
 
 *Note: The current Kubernetes manifests already run the application services at `replicas: 1`, which matches the experiment requirement to isolate the autoscaling variable.*
@@ -75,10 +75,10 @@ During experiments, only ONE service is under autoscaling. All others run at `re
 
 | Pod | CPU Request | CPU Limit | Memory Request | Source |
 |-----|-----------|---------|---------------|--------|
-| prometheus | 100m | 500m | 256Mi | [`monitoring/prometheus.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/monitoring/prometheus.yaml) |
-| grafana | 50m | 200m | 128Mi | [`monitoring/grafana.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/monitoring/grafana.yaml) |
-| loki | 50m | 200m | 128Mi | [`monitoring/loki.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/monitoring/loki.yaml) |
-| promtail | 50m × 3 = 150m | 200m × 3 = 600m | 64Mi × 3 = 192Mi | [`monitoring/promtail.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/monitoring/promtail.yaml) (DaemonSet, 3 pods) |
+| prometheus | 100m | 500m | 256Mi | [`monitoring/prometheus.yaml`](../infrastructure/kubernetes/monitoring/prometheus.yaml) |
+| grafana | 50m | 200m | 128Mi | [`monitoring/grafana.yaml`](../infrastructure/kubernetes/monitoring/grafana.yaml) |
+| loki | 50m | 200m | 128Mi | [`monitoring/loki.yaml`](../infrastructure/kubernetes/monitoring/loki.yaml) |
+| promtail | 50m × 3 = 150m | 200m × 3 = 600m | 64Mi × 3 = 192Mi | [`monitoring/promtail.yaml`](../infrastructure/kubernetes/monitoring/promtail.yaml) (DaemonSet, 3 pods) |
 | **Subtotal (current)** | **350m** | **1500m** | **704Mi** | |
 
 **Status:** The AKS monitoring manifests now declare resource requests and limits. This removes the earlier BestEffort-eviction confound from Prometheus/Grafana/Loki and keeps the monitoring layer aligned with the thesis methodology.
@@ -99,7 +99,7 @@ These are installed at runtime and their resource requests are estimated from de
 
 | Pod | CPU Request | CPU Limit | Memory Request | Source |
 |-----|-----------|---------|---------------|--------|
-| k6 Job | 500m | 1500m | 512Mi | [`load-testing/k6-job.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/load-testing/k6-job.yaml), [`load-testing/k6-auth-job.yaml`](file:///home/kevin/Projects/e-commerce/infrastructure/kubernetes/load-testing/k6-auth-job.yaml) |
+| k6 Job | 500m | 1500m | 512Mi | [`load-testing/k6-job.yaml`](../infrastructure/kubernetes/load-testing/k6-job.yaml), [`load-testing/k6-auth-job.yaml`](../infrastructure/kubernetes/load-testing/k6-auth-job.yaml) |
 
 #### Layer 7: Autoscaled Pods (Peak — tested service scales to 5 replicas)
 
@@ -172,6 +172,9 @@ Remaining from $150/month credit:                        ~$70
 ```
 
 **$80 is well within budget.** You have ~$70 of buffer for mistakes, extended debugging sessions, or additional experiment configurations.
+
+> **Actual campaign time (added 2026-10-09):** the closed-loop campaign ran 58 h 49 m (2026-08-15 → 08-17, Part 06);
+> the open-loop thesis campaign used ≈61.6 h ≈ $31.8 of AKS (estimate from the AKS start/stop times, Part 08 §8.15).
 
 ### AKS Create Command
 

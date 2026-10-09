@@ -76,6 +76,11 @@ Produce a summary table that no other S1 thesis has:
 
 *All values are 5-rep means from the post-fix 180-run dataset (2026-08-15/17, commit `7fde0a2`). Negative = improvement. Percentages are computed from the rounded means shown (from unrounded means: shipping-spike metric −10.3%, shipping-gradual engine −0.0%). Every pre-2026-08-15 value in earlier revisions of this table was a connection-pinning artifact — see finding #12.*
 
+> **Note (2026-10-09):** this table is the closed-loop background dataset. For the thesis dataset (the open-loop
+> campaign) rebuild it from the Part 12 analyses with the **metric effect as H3 vs H2**, which share the
+> scaling-behavior block; H3 vs H1 also changes the CPU target (80%) and the behavior (Part 12 §12.4 A2, Part 11
+> §11.10).
+
 **Interpretation — the decomposition is now mostly null, and that IS the result:**
 - **Four of six rows are within ±2.5% on the metric axis.** Once every pod actually receives traffic, metric choice stops mattering. The old table's headline −48.7% on shipping gradual does not survive: H1 and H3 now differ by 3 ms.
 - **Shipping spike is the one row where the decomposition works as designed:** metric contributes **−10.4%**, engine a further **−4.7%**, combined **−14.5%**. Read alongside the stability figures (K1 ± 10 ms vs H3 ± 64 ms), this is the strongest evidence in the thesis that engine architecture matters independently of metric.
@@ -127,6 +132,12 @@ All 180 runs have been executed and stored in `experiment-results/`. Campaign hi
 | 4d | Pareto frontier computation and cost analysis. Build the decomposition table (metric effect vs engine effect). | Pareto plots, decomposition table |
 | 4e | Regenerate all figures from the post-fix dataset (`thesis-figures/`, dated 2026-06-12, is superseded), then create annotated timeline visualizations, comparison bar charts and the recommendation matrix. | All thesis figures |
 
+> **Note (2026-10-09):** Phase 4 now runs on the open-loop campaign and follows [Part 12](12-deviation-and-analysis-plan.md):
+> 4a → A1 (medians with min–max of O1–O5); 4b → O4 from `hpa-timeline.jsonl` / `pod-timeline.jsonl`, not
+> `k8s-events.txt` (Kubernetes merges repeated events); 4c → A2, exact Mann–Whitney tests with A12 and Holm on H2 vs H3,
+> H3 vs K1 and H1 vs H2 (not Wilcoxon signed-rank on H1 vs H3, H3 vs K1, H1 vs K1); 4d → A3 (gap closed) and A5
+> (Pareto); plus A4 (repeatability) and A6 (mechanism plots).
+
 ### Phase 4b: Open-Loop Study (added 2026-10-06 — Part 08)
 
 | Task | Status | Notes |
@@ -142,6 +153,9 @@ All 180 runs have been executed and stored in `experiment-results/`. Campaign hi
 > **Superseded (2026-10-06, "Replace" — Part 08 §8.14):** if the campaign passes its gate, Phases 4a–4e run on the
 > open-loop campaign and the closed-loop dataset becomes methodology background; if it fails, they run on the
 > closed-loop dataset and the open-loop work becomes a robustness section.
+>
+> **Outcome (2026-10-07/09):** the gate failed, the user continued as a documented deviation, and the campaign is
+> complete, so Phases 4a–4e run on the open-loop campaign as planned in Part 12.
 
 ### Phase 5: Writing (Weeks 21-28)
 
@@ -161,6 +175,9 @@ All 180 runs have been executed and stored in `experiment-results/`. Campaign hi
 > **Update (2026-10-06, "Replace"):** if the open-loop campaign passes, BAB 3 is rewritten around the open-loop method
 > (generator, load shedding, pre-login, gate, H1 = 80%) with the closed-loop campaign as the reason for switching; Part
 > 11 gives the provenance and sources for every setting. BAB 4–5 wait for the campaign.
+>
+> **Update (2026-10-09):** the open-loop campaign is the thesis dataset (Part 12) and is complete; BAB 3 is rewritten
+> around the open-loop method, and BAB 4–5 wait for the Part 12 analyses.
 
 **Key advantages of the extended timeline:**
 1. **2 full weeks for prometheus-adapter** (Week 8-9) — the highest-risk component gets dedicated time
@@ -191,7 +208,7 @@ All 180 runs have been executed and stored in `experiment-results/`. Campaign hi
 
 6. **Real application, real cloud.** Testing on an actual microservices app on AKS (not a synthetic benchmark) gives external validity.
 
-7. **Statistical rigor.** 5 repetitions, Wilcoxon signed-rank significance testing, 95% confidence intervals. This is uncommon at S1 level.
+7. **Statistical rigor.** 5 repetitions, Wilcoxon signed-rank significance testing, 95% confidence intervals. This is uncommon at S1 level. *(2026-10-09: for the thesis dataset, exact Mann–Whitney tests with A12 effect sizes and Holm correction, fixed before reps 3–5 — Part 12 §12.4.)*
 
 8. **Annotated timeline visualizations.** The synchronized multi-panel charts with H1/H2/H3/K1 overlaid on the same plot produce undeniable visual evidence. Examiners remember these.
 

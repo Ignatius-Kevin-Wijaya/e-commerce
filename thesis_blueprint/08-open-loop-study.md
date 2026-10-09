@@ -22,7 +22,8 @@
 
 **"Replace" (§8.14):** if the campaign passes its gate it is the thesis dataset; the closed-loop final dataset (Part 01,
 findings #13–#16) then becomes methodology background. If the campaign fails, the closed-loop dataset is the thesis
-dataset.
+dataset. **Outcome:** the gate failed (2026-10-07) and the user continued as a documented deviation, so the open-loop
+campaign is the thesis dataset ([Part 12](12-deviation-and-analysis-plan.md)).
 
 ---
 
@@ -97,7 +98,7 @@ runs on the laptop with `tools/python312`).
 | File | Purpose |
 |---|---|
 | `infrastructure/kubernetes/load-testing/k6-openloop-pilot.yaml` | Shared stage-shape module + one open-loop script per service. `PATTERN` = gradual / spike / oscillating (`ramping-arrival-rate`, same shapes as closed loop: spike = 2 m base → 10 s jump → 6 m 50 s peak → 3 m ramp-down) or `ladder` (`constant-arrival-rate` steps). Same request mix (auth 70% `/auth/me` + 30% `/auth/login`), login-first `setup()`, shipping payload generator and `noConnectionReuse: true` as closed loop. `REQUEST_TIMEOUT` (default 5 s). preAllocatedVUs = maxVUs = ⌈1.5 × rate × timeout⌉. **No thresholds** (cannot abort). Trimmed system tags. `req_e2e_duration` Trend. One `SCENARIO_START` log line with the scenario's wall-clock start. Suspended Job templates (auth, shipping, auth pre-auth); a wrapper keeps the k6 container alive after k6 exits until the runner has fetched the gzipped per-request JSON |
-| `scripts/run-pilot-openloop.sh` | `run [--resume] [--dry-run] [--max-runs N]` and `ladder --service S --config b1\|b2 --rates "…" [--step] [--gap] [--max-inflight N]`. Sources `run-experiment.sh` for reset/apply/readiness. Explicit run list; own results dir and state file (`OPENLOOP_RESULTS_DIR` selects the campaign dir); run order shuffled within each rep block with a seeded PRNG and **frozen** in `.pilot-plan` (+ fingerprint of run list + config; changing either after the freeze aborts). Resets **both** core services each run (runs of the two services are interleaved). 5 s pod/HPA watcher (`pod-timeline.jsonl`, `hpa-timeline.jsonl`). Raw-data fetch verified by md5 + `gzip -t`. Extra Prometheus exports. A run is DONE only if raw data verified, k6 exit 0, required exports non-empty (and, v2, pre-auth tokens used) |
+| `scripts/run-pilot-openloop.sh` | `run [--resume] [--dry-run] [--max-runs N]` and `ladder --service S --config b1\|b2 --rates "…" [--step] [--gap] [--max-inflight N]`. Sources `run-experiment.sh` for reset/apply/readiness. Explicit run list; own results dir and state file (`OPENLOOP_RESULTS_DIR` selects the campaign dir); run order shuffled within each rep block with a seeded PRNG and **frozen** in `.pilot-plan` (+ fingerprint of run list + config; changing either after the freeze aborts). Resets **both** core services each run (runs of the two services are interleaved). Pod/HPA watcher, a 5 s sleep plus the queries, so snapshots ≈6 s apart (`pod-timeline.jsonl`, `hpa-timeline.jsonl`). Raw-data fetch verified by md5 + `gzip -t`. Extra Prometheus exports. A run is DONE only if raw data verified, k6 exit 0, required exports non-empty (and, v2, pre-auth tokens used) |
 | `scripts/pilot_openloop.py` | `ladder`, `validate`, `report`, `gate` (v2). Parses the raw JSON (cached as `.npz`), computes window statistics, SLO bins, scaling timelines, per-pod distribution, k6 resource use, closed-loop references, criteria/gate verdicts |
 | `scripts/run-experiment-helper.js` | New subcommands only: `clone-job-env`, `pod-snapshot`, `hpa-snapshot`, `shuffle-plan`, `render-deployment`, `configmap-from-file(s)` |
 | `scripts/run-experiment.sh` | Only a `BASH_SOURCE` guard around `main "$@"` so it can be sourced; behaviour unchanged when executed |
@@ -332,7 +333,7 @@ unchanged. Reasons:
   `preauth_tokens`. Runner hardened: ends with `pilot_main "$@"; exit $?` so editing the file during a multi-hour run
   cannot inject commands.
 - **Validator fix (2026-10-06):** a pod's last scrape during a scale-down termination was counted as "unscrapeable while
-  Ready" (watcher snapshots every 5 s had not yet seen the deletion); a sample now counts only if the pod is still
+  Ready" (the watcher's snapshots, ≈6 s apart, had not yet seen the deletion); a sample now counts only if the pod is still
   seen after it and not deleted within the next 15 s.
 
 ## 8.11 v2 calibration ladders (2026-10-06, caps on)
@@ -365,7 +366,7 @@ unchanged. Reasons:
   experiment-results-openloop-smoke yes`, console `~/smoke-console.log`); expected end ≈11:40 UTC (estimate); the VM
   stops AKS when done (or on give-up).
 - **Run 1 — shipping H3 spike (validated clean):** the request-rate metric now rises with the load (10.1 → 20.2 → 42.6
-  req/s/pod); H3 scaled 1→2 at +19 s, 2→3 at +50 s, 3→5 at +65 s, all 5 pods Ready by +83 s; load-window goodput
+  req/s/pod); H3 scaled 1→2 at +19 s, 2→3 at +49 s, 3→5 at +65 s, all 5 pods Ready by +83 s; load-window goodput
   **98.34 of 103.87 req/s**, errors **5.32%** (fast 503s while scaling, **0 timeouts**); per-pod shares 0.99–1.01.
   Pilot v1, same cell: goodput 0.72 req/s, 99.30% errors, H3 never scaled.
 - **Run 1 SLO-violation:** 70 s (pilot same cell: 410 s); errors are all 503 sheds (5.32%).
@@ -514,18 +515,23 @@ Seconds over SLO per cell (rep 1 / rep 2; bold = G6 fail):
 
 **Why the three cells failed (measured; recorded as explanation — it does not change the verdict):**
 - **auth oscillating H2:** the HPA's CPU reading lags the load by about a minute and updates in steps. In rep 1 it
-  first showed 196% at +71 s (peak 1 runs +0–90 s) → 1→4 pods only as the peak ended; at +201 s, 21 s into peak 2, it
-  still showed 7% from the quiet gap → 4→1; at +251 s it showed 167% → back to 4 as peak 2 ended; the same at +382 s in
-  peak 3. Every peak met 1 pod (≈50% errors per peak; all errors are 503 rejections or timeouts, no 5xx). In rep 2 the
-  first reading came at +37 s, capacity built up during peak 1 and never fully dropped (16.28% errors). The G5 flag is
-  the same run: pods added and removed out of phase got a normal request share but little CPU work.
+  first read 196% at +65 s (peak 1 runs +0–90 s) → 1→4 pods, Ready at +82–84 s, only as the peak ended; at +200 s,
+  20 s into peak 2, it still read 7% from the quiet gap → 4→1; at +245 s it read 167% → back to 4, Ready at +263 s, as
+  peak 2 ended (+270 s); the same scale-down came at +381 s in peak 3. Each peak was served mostly by 1 pod (≈50% errors
+  per peak; of the 3,420 failed load-window requests, 2,744 were 503 rejections, 675 timeouts and 1 a refused
+  connection during the +381 s scale-down — no 5xx). In rep 2 the first scale-up came at +34 s, capacity built up during peak 1 and never fell back to
+  1 pod (16.28% errors). The G5 flag is the same run: pods added and removed out of phase got a normal request share
+  but little CPU work. (Scale times are the HPA's own `lastScaleTime`, as for the other cells; the watcher's snapshots,
+  ≈6 s apart, show each change up to one snapshot later — the earlier text quoted those: +71 / +201 / +251 / +382 s.)
 - **auth gradual H1:** first scale-up at +139 s in rep 1 vs +95 s in rep 2 (44 s apart); in rep 1 one pod carried
   the ramp past its capacity (15.1% errors in onset+90–180 s, against 0.9% in rep 2).
 - **shipping oscillating H1:** both reps scaled 1→2 in peak 1, but rep 2 added a third pod at +109 s, between peaks,
   while rep 1 added more only at +244 s, during peak 2 (9.3% vs 0.0% errors in that peak). H1's 300 s scale-down
   window then kept the pods.
-- **Common cause:** CPU-based HPA acts on a lagging, step-updated CPU reading; under time-varying open-loop load, when
-  those updates land relative to the load decides the outcome. The request-rate autoscalers (1-minute Prometheus rate,
+- **Common cause:** CPU-based HPA acts on a lagging, step-updated CPU reading — over all 60 H1/H2 runs of the campaign
+  it changed about once a minute (median 61.4 s between changes, 82% of the gaps 50–70 s; measured 2026-10-09) while
+  the HPA evaluates every 15 s; under time-varying open-loop load, when those updates land relative to the load decides
+  the outcome. The request-rate autoscalers (1-minute Prometheus rate,
   scraped every 15 s) were reproducible in all 12 of their cells.
 - **Tooling caveat:** Kubernetes aggregates identical repeated events, so `k8s-events.txt` keeps only the last
   timestamp of a repeated "Scaled up … to 4 from 1"; time-to-scale for oscillating runs must come from
@@ -546,14 +552,21 @@ Seconds over SLO per cell (rep 1 / rep 2; bold = G6 fail):
   (first attempt, no failure or retry in 36 h), found no leftover k6 job and stopped AKS at 02:50:54 (verified
   `Stopped`). Early checks during the run had validated 81 of the 108 runs clean (positions 73–153), so no re-run had to
   be queued.
-- **Verification and data quality (2026-10-09 ≈06:40–07:00 UTC):** the 812 MB archive's md5 matched after download;
+- **Verification and data quality (2026-10-09 ≈06:39–06:48 UTC):** the 812 MB archive's md5 matched after download;
   the 72 rep 1–2 run folders, the superseded H1 runs, config, run list and plan are byte-identical to the committed
   copies; the VM's `pilot.log` extends the committed one (its first 2,499 lines are identical). All 187 raw files
   (180 runs, 2 superseded, 5 ladders) match the checksums recorded inside the k6 pods. Part 12 §12.2 over all 180 runs:
   G1, G2, G3 pass in every run (no re-runs needed); G4 passes in every service × pattern over 5 reps — B2 ≤ 0.18%
   errors with p95 655–943 ms (auth, SLO 1500) and 916–919 ms (shipping, SLO 1200), B1 250–410 s over SLO with
   43.57–68.93% errors; G5 flags only auth H2 oscillating rep 1 (kept as an outcome). The 5-rep G4 check ran on a scratch
-  copy so the committed rep 1–2 gate record (`analysis/gate-v2.json`) stays unchanged.
+  copy so the committed rep 1–2 gate record (`analysis/gate-v2.json`) stays unchanged. Committed 06:48 UTC and pushed
+  (`4be8e00`: reps 3–5, campaign log and state, 2,918 files; `bfdd938`: these records).
+- **Audit before the analysis (2026-10-09 ≈07:00–07:15 UTC, user request):** re-running the analysis tool over all
+  180 runs reproduced every campaign number above (gate table, G6 failures, G4 ranges, the G5 flag, arrival counts;
+  all 120 autoscaled runs at 1 Ready pod at start and onset), and all 187 raw files still match their checksums. It
+  corrected the auth oscillating H2 scale times (above) and found the once-a-minute CPU refresh (common cause, above).
+  It also noticed that reps 1–2 looked worse than reps 3–5 in several cells; the user added an exploratory session
+  check to A4, written into Part 12 before any analysis.
 
 ## 8.14 Implications for the thesis text
 

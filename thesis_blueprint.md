@@ -12,18 +12,18 @@
 
 | Part | File | Contents | Former section |
 |---|---|---|---|
-| 01 | [01-direction-and-findings.md](thesis_blueprint/01-direction-and-findings.md) | Thesis evolution, strengths/risks, must-fix table, what is validated on AKS, **confirmed findings #1–#22**, what it means for the thesis, dataset status | §1 |
-| 02 | [02-timeline.md](thesis_blueprint/02-timeline.md) | Full chronological timeline, 2026-04-07 → 2026-10-06 | §1 (timeline) |
+| 01 | [01-direction-and-findings.md](thesis_blueprint/01-direction-and-findings.md) | Thesis evolution, strengths/risks, must-fix table, what is validated on AKS, **confirmed findings #1–#23**, what it means for the thesis, dataset status | §1 |
+| 02 | [02-timeline.md](thesis_blueprint/02-timeline.md) | Full chronological timeline, 2026-04-07 → 2026-10-09 | §1 (timeline) |
 | 03 | [03-calibration-deep-dive.md](thesis_blueprint/03-calibration-deep-dive.md) | Closed-loop shipping calibration: why `ramping-vus`, PEAK_VUS = 80, CPU not purely wait-dominant, threshold 5 → 15, pre-flight bug fixes, measured B1/B2 gates | §1 (deep dive) |
 | 04 | [04-title-and-scope.md](thesis_blueprint/04-title-and-scope.md) | Approved title and its rationale; scope, assumptions, boundaries | §2–§3 |
 | 05 | [05-architecture-and-tooling.md](thesis_blueprint/05-architecture-and-tooling.md) | AKS sizing (3× D4as_v5), pod inventory, resource budget, cost; platform decisions (in-cluster PostgreSQL, ACR, in-cluster k6, Prometheus/Grafana) | §4–§5 |
 | 06 | [06-methodology-and-kpis.md](thesis_blueprint/06-methodology-and-kpis.md) | Factorial design, the 6 configurations with YAML, load patterns, protocol, run count; KPIs (closed- and open-loop definitions) | §6–§7 |
 | 07 | [07-risks.md](thesis_blueprint/07-risks.md) | Risks 1–12 with mitigations; operational lessons | §8 |
-| 08 | [08-open-loop-study.md](thesis_blueprint/08-open-loop-study.md) | **Open-loop study:** motivation, pre-set criteria, tooling, calibration, pilot results and verdict, user decisions, v2 fixes, robustness gate (rules v1 and v2), v2 calibration, smoke result, campaign (running), thesis structure ("Replace"), thesis implications | new |
+| 08 | [08-open-loop-study.md](thesis_blueprint/08-open-loop-study.md) | **Open-loop study:** motivation, pre-set criteria, tooling, calibration, pilot results and verdict, user decisions, v2 fixes, robustness gate (rules v1 and v2), v2 calibration, smoke result, campaign (gate FAIL, documented deviation, 180/180 complete), thesis structure ("Replace"), thesis implications | new |
 | 09 | [09-strategy-plan-assessment.md](thesis_blueprint/09-strategy-plan-assessment.md) | Stand-out strategy (narrative, Pareto, timeline figure, decomposition table), project plan and status, final assessment | §9–§11 |
 | 10 | [10-chapter-outline.md](thesis_blueprint/10-chapter-outline.md) | BAB 1–5 writing guide (Struktur Perancangan Jaringan) | §12 |
 | 11 | [11-provenance-and-validity.md](thesis_blueprint/11-provenance-and-validity.md) | **Defense guide:** where every setting comes from (default / measured / fairness / judgment / pre-registered), validity by type, fairness controls, judgment calls, known weak spots and their handling, evidence that the results are real, ready answers, sources to cite, whether the comparisons are fair (§11.10) | new |
-| 12 | [12-deviation-and-analysis-plan.md](thesis_blueprint/12-deviation-and-analysis-plan.md) | **Deviation after the gate FAIL and the pre-registered analysis plan** for the full open-loop dataset: reasons, unchanged settings, data-quality rules, outcomes O1–O5, analyses A1–A6, reporting rules, execution of reps 3–5 | new |
+| 12 | [12-deviation-and-analysis-plan.md](thesis_blueprint/12-deviation-and-analysis-plan.md) | **Deviation after the gate FAIL and the pre-registered analysis plan** for the full open-loop dataset: reasons, unchanged settings, data-quality rules, outcomes O1–O5, analyses A1–A6 (plus an exploratory session check), reporting rules, execution of reps 3–5 | new |
 
 ---
 
@@ -66,7 +66,7 @@
 | **v2 smoke test** | ✅ Done 2026-10-06 08:31–11:31 UTC (AKS stopped 11:35). 9/9 runs clean; B1 hold graceful; SLO-violation seconds replicate. **Pre-registered gate FAIL on one cell** (shipping H3 error rate 5.32 / 6.97%, one 15 s HPA cycle apart). (Part 08 §8.12) |
 | **Open-loop campaign** | ✅ Rep blocks 1–2 done: 72/72 at 2026-10-07 13:31 UTC (H1 = 80%; positions 1 and 9 re-run), AKS stopped 13:33:57, all raw files checksum-verified. **Pre-registered gate (rule v2): FAIL** — G1–G4 pass in all 72 runs; G5 fails in 1 run; G6 fails in 3 of 24 cells, all CPU-based (request-rate cells reproducible 12/12; finding #23). Pre-registered consequence: stop. **User decision (2026-10-07): continue with reps 3–5 as a documented deviation** — the open-loop campaign stays the thesis dataset; analysis plan in Part 12, pushed (`b7fa4d3`) before any new run. **✅ Campaign complete: 180/180** (reps 3–5 from 2026-10-07 14:32 to 2026-10-09 02:47 UTC, no failure; AKS stopped 02:50:54). All 187 raw files checksum-verified; data-quality rules (Part 12 §12.2): G1–G4 pass in all 180 runs, no re-runs needed, G5 flag only in auth H2 oscillating rep 1. ≈61.6 h ≈ $31.8 of AKS in total (estimate). (Part 08 §8.13, Part 12) |
 | **Analysis (Phase 4)** | **Next:** the pre-registered analyses A1–A6 of Part 12 on all 180 runs — outcomes O1–O5, exact permutation tests with A12 effect sizes, the gap-closed comparison, repeatability (incl. anti-phase scale-downs) and the resource/Pareto view; then figures (`thesis-figures/` PNGs are from superseded data). (Part 12 §12.3–§12.4) |
-| **Writing** | BAB 1–3 drafted (`Skripsi_Ignatius_Kevin_Wijaya.docx`, last edited 2026-06-06). Under "Replace", BAB 3 must present the open-loop method (generator, load shedding, pre-login, gate, H1 = 80%) with the closed-loop campaign as the reason for switching; its old generator rationale and auth arrival-rate profile are out of date (Part 08 §8.14, Part 10 notes, Part 11). BAB 4–5 wait for the campaign. |
+| **Writing** | BAB 1–3 drafted (`Skripsi_Ignatius_Kevin_Wijaya.docx`, last edited 2026-06-06). Under "Replace", BAB 3 must present the open-loop method (generator, load shedding, pre-login, gate, H1 = 80%) with the closed-loop campaign as the reason for switching; its old generator rationale and auth arrival-rate profile are out of date (Part 08 §8.14, Part 10 notes, Part 11). BAB 4–5 wait for the Part 12 analyses. |
 
 ---
 
@@ -97,7 +97,7 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
 
 ---
 
-## Headline — open-loop study (Part 08; findings #17–#22)
+## Headline — open-loop study (Part 08; findings #17–#23)
 
 - **Pilot v1 (2026-10-05/06, 20 runs, spike):** auth 2→30 req/s (SLO 1.5 s), shipping 10→105 req/s (SLO 1.2 s), 5 s
   timeout, k6 0.46.0.
@@ -159,14 +159,14 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
 | 2026-10-06 | Keep auth peak at 30 req/s; run the smoke test on the VM and stop AKS after | Comparable with the pilot; B2 at 30 is healthy with margin; unattended run | Part 08 §8.11–§8.12 |
 | 2026-10-06 | Restructure the blueprint into an index + parts | User request; the single file had grown to 2,235 lines | this file |
 | 2026-10-06 | Stop ignoring `*.md`; commit and push the October work (tooling, services, docs, open-loop data); leave `Thesis.docx` uncommitted | User: keep the docs in the repo; the repo is public, so the thesis draft is committed only on request | this file |
-| 2026-10-07 | **Continue past the gate FAIL as a documented deviation:** run reps 3–5; the open-loop campaign is the thesis dataset; repeatability becomes a measured outcome; analysis plan fixed and pushed before any rep 3–5 data | G1–G4 passed in all 72 runs; the G5/G6 failures trace to the HPA's lagging CPU reading (system behavior); open loop is the realistic load model; 2 reps cannot characterize the variability | Part 12 |
+| 2026-10-06 | After the smoke FAIL: run the 180-run open-loop campaign ("option 2"; deadline not a constraint) under G6 rule v2 — 50% of the mean or ≤ 30 s / ≤ 2 points — fixed before any campaign data; smoke stays FAIL | One 15 s autoscaler cycle, the normal gap between reps (6 of 8 pairs), produced up to 27% / 30 s / 1.93 points; G2/G3 now catch the pilot's defects directly; rule v2 still rejects pilot v1 | Part 08 §8.9, §8.12–§8.13 |
 | 2026-10-06 | **Thesis structure "Replace":** if the open-loop campaign passes its gate it is the thesis dataset; the closed-loop campaign becomes methodology background (why the generator was switched), not a second result set; it stays the fallback if the gate fails | The user's original decision was to switch; one dataset keeps the thesis on HPA vs KEDA | Part 08 §8.14 |
 | 2026-10-06 | **H1 = 80% CPU** (the Kubernetes default target) for the campaign, from position 13; positions 1 and 9 (run at 70%) archived and re-run at 80% before the gate | H1 stands for HPA out of the box; 70% was an undocumented judgment call; decided for construct validity, not from H1 results (`dddd996`) | Part 08 §8.13, Part 11 §11.6 #1 |
-| 2026-10-06 | After the smoke FAIL: run the 180-run open-loop campaign ("option 2"; deadline not a constraint) under G6 rule v2 — 50% of the mean or ≤ 30 s / ≤ 2 points — fixed before any campaign data; smoke stays FAIL | One 15 s autoscaler cycle, the normal gap between reps (6 of 8 pairs), produced up to 27% / 30 s / 1.93 points; G2/G3 now catch the pilot's defects directly; rule v2 still rejects pilot v1 | Part 08 §8.9, §8.12–§8.13 |
+| 2026-10-07 | **Continue past the gate FAIL as a documented deviation:** run reps 3–5; the open-loop campaign is the thesis dataset; repeatability becomes a measured outcome; analysis plan fixed and pushed before any rep 3–5 data | G1–G4 passed in all 72 runs; the G5/G6 failures trace to the HPA's lagging CPU reading (system behavior); open loop is the realistic load model; 2 reps cannot characterize the variability | Part 12 |
 
 ---
 
-## Corrections and contradictions recorded (2026-10-05/06)
+## Corrections and contradictions recorded (2026-10-05 → 10-09)
 
 - Auth `BASE_VUS=1` throughput: **11.6–15.9 req/s**, not ≈6 (Part 01 "validated on AKS"; same stale comment in
   `k6-auth-job.yaml`).
@@ -192,6 +192,18 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
   loop, not a platform default (Part 11 §11.2 E).
 - G6 rule v1's 1-point error allowance was meant to absorb control-loop timing but was never derived from it: one 15 s
   cycle costs ≈1.5 points on shipping (1.66 measured in the smoke). Replaced for the campaign by rule v2 (Part 08 §8.9).
+- *(Audit of 2026-10-09, against the 180 stored runs.)* Finding #23 and Part 08 gave the auth oscillating H2 rep 1
+  scale times as seen by the watcher (+71 / +201 / +251 / +382 s); the HPA's own record (`lastScaleTime`), used for
+  every other cell, gives **+65 / +200 / +245 / +381 s**. The watcher's snapshots are ≈6.1 s apart (a 5 s sleep plus
+  the queries), not 5 s. Corrected in Parts 01, 07 and 08.
+- Part 04's scope assumption that metrics-server gives CPU data at 15 s resolution does not hold on this cluster: the
+  HPA's CPU reading changed **about once a minute** (median 61.4 s between changes over the 60 CPU-based campaign runs).
+  This is the lag behind finding #23 (Part 04 note, Part 11 §11.2 E).
+- The older parts planned Wilcoxon signed-rank tests with 95% confidence intervals, time to scale from Kubernetes
+  events, and an "H3 vs H1" metric effect. For the thesis dataset, Part 12 fixed exact Mann–Whitney tests with A12 and
+  Holm, medians with min–max, time to scale from the HPA and pod timelines, and **H2 vs H3** as the metric contrast
+  (H1 vs H3 also changes the target and the scaling behaviour). Part 12 governs; notes added in Parts 01, 04, 06,
+  09 and 10.
 
 ---
 
@@ -200,21 +212,22 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
 1. **Campaign complete (2026-10-09):** 180/180 runs, verified and merged; data-quality rules passed with no re-runs
    needed (Part 08 §8.13).
 2. **Next — analyses A1–A6 exactly as pre-registered in Part 12** on all 180 runs (time to scale from the HPA and pod
-   timelines, not `k8s-events.txt`), then the thesis figures.
-3. **Phase 4 extras** on the thesis dataset: decomposition table, regenerated figures; add the k6-vs-Prometheus cross-check to
-   the validator (descriptive only, Part 11 §11.7).
+   timelines, not `k8s-events.txt`), plus the exploratory session check (reps 1–2 vs 3–5, added 2026-10-09 before any
+   analysis and labelled as not pre-registered), then the thesis figures.
+3. **Phase 4 extras** on the thesis dataset: decomposition table (metric effect = H2 vs H3, as in Part 12 A2),
+   regenerated figures; add the k6-vs-Prometheus cross-check to the validator (descriptive only, Part 11 §11.7).
 4. **Writing:** rewrite BAB 3 around the open-loop method (generator, load shedding, pre-login, gate, H1 = 80%) with
-   the closed-loop campaign as the reason for switching; use Part 11 for provenance and sources; draft BAB 4–5 after
-   the campaign.
+   the closed-loop campaign as the reason for switching; use Part 11 for provenance and sources; draft BAB 4–5 from
+   the Part 12 analyses.
 5. **Research-data to-dos (Part 11 §11.7):** export the Azure Activity Log and cost records privately (90-day
    retention; the August entries expire around mid-November); archive a DOI snapshot at submission; write the
    reproducibility section.
 6. **Housekeeping:**
-   - All October work, including the G6 rule v2, the H1 change and these blueprint updates, is committed and pushed.
+   - All October work through the completed campaign (`4be8e00`, `bfdd938`, 2026-10-09) is committed and pushed.
    - `.gitignore` no longer ignores `*.md` (only `*.pdf`); the blueprint parts and `pilot-openloop-report.md` are
      versioned. `Thesis.docx` (repo root) stays untracked unless the user asks — the repository is public.
-   - `ecommerce-vm` is idle since the campaign finished (2026-10-09); deallocate it when no more runs are planned (user
-     decision pending); the laptop SSH key is authorised on it.
+   - `ecommerce-vm` is idle since the campaign finished (2026-10-09) and stays allocated (user decision, 2026-10-09);
+     the laptop SSH key is authorised on it.
    - The live prometheus-adapter config still has the unused `auth_http_requests_per_second_30s` rule (Part 08 §8.13).
    - `deep_validate.py` heuristics still assume the retired auth open-loop profile.
    - Shipping closed-loop metadata records `load_profile.version = "wait-bound-v1"` although those runs used

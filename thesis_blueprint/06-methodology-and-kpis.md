@@ -36,6 +36,10 @@ This enables three isolated comparisons:
 
 A reviewer **cannot** argue that the improvement is "just the metric" — because H3 directly tests that claim.
 
+> **Note (2026-10-09):** for the thesis dataset the metric contrast is **H2 vs H3**: they share the scaling-behavior
+> block, while H1 also differs in target (80%) and behavior (Kubernetes defaults). The planned contrasts are H2 vs H3
+> (metric), H3 vs K1 (engine) and H1 vs H2 (default vs tuned) — Part 12 §12.4 A2, Part 11 §11.10.
+
 ### Autoscaling Configurations (Independent Variable #1)
 
 | Config | Method | Metric | Key Settings | Rationale |
@@ -82,8 +86,8 @@ Both H3 and K1 use request-rate as the scaling metric. Their thresholds must be 
 > **Note (2026-10-06, Part 11 §11.6 #2):** auth's threshold (5) was set on 2026-04-13 while auth still used an
 > open-loop arrival-rate profile; shipping's (15) on 2026-04-17 with the closed-loop generator. Both are reused
 > unchanged in the open-loop campaign. They still meet the calibration intent there: quiet at base load (2 < 5 and
-> 10 < 15 req/s; every autoscaled v2 run validated so far — 8 smoke runs and campaign run 1, checked 2026-10-06 —
-> started the load phase at 1 Ready pod) and crossed before a pod
+> 10 < 15 req/s; all 120 autoscaled campaign runs had exactly 1 Ready pod at scenario start and at onset — gate
+> criterion G2, checked 2026-10-09 — as did the 8 autoscaled smoke runs) and crossed before a pod
 > saturates (5 = 62.5% of one auth pod's 8 req/s capacity; 15 = 30% of one shipping pod's 50 req/s). The H2-vs-H3
 > contrast therefore compares the configs as defined, target levels included.
 
@@ -243,7 +247,7 @@ spec:
 
 **Calibration note (final):** Both services use closed-loop `ramping-vus` with `noConnectionReuse: true` and the shared 1 m request-rate window. Auth-service: `BASE_VUS = 1`, `PEAK_VUS = 12`, shared H3/K1 threshold `5` req/s/pod (migrated from the retired `10 -> 40` RPS arrival-rate profile on 2026-08-15). Shipping-rate-service: `BASE_VUS = 10`, `PEAK_VUS = 80`, shared H3/K1 threshold `15` req/s/pod.
 
-> **Open-loop variant (added 2026-10-06, Part 08):** the same three stage shapes as `ramping-arrival-rate` targets in req/s. Pilot and v2 settings: auth 2→30 req/s, shipping 10→105 req/s, 5 s request timeout (a timeout is a failed request), all VUs preallocated at ⌈1.5 × peak × timeout⌉ (225 / 788), no k6 thresholds. v2 adds per-pod admission control (cap 22 auth / 48 shipping) and auth token pre-authentication during the reset. Autoscaler manifests, thresholds, rate windows and runner timings are unchanged, with one exception decided for the campaign on 2026-10-06: H1's CPU target is the Kubernetes default 80% (the pilot and smoke had no H1 runs). Under "Replace" (Part 08 §8.14) this open-loop variant is the thesis method if the campaign passes its gate.
+> **Open-loop variant (added 2026-10-06, Part 08):** the same three stage shapes as `ramping-arrival-rate` targets in req/s. Pilot and v2 settings: auth 2→30 req/s, shipping 10→105 req/s, 5 s request timeout (a timeout is a failed request), all VUs preallocated at ⌈1.5 × peak × timeout⌉ (225 / 788), no k6 thresholds. v2 adds per-pod admission control (cap 22 auth / 48 shipping) and auth token pre-authentication during the reset. Autoscaler manifests, thresholds, rate windows and runner timings are unchanged, with one exception decided for the campaign on 2026-10-06: H1's CPU target is the Kubernetes default 80% (the pilot and smoke had no H1 runs). Under "Replace" (Part 08 §8.14) this open-loop variant is the thesis method if the campaign passes its gate. **Update (2026-10-09):** the gate failed, the user continued as a documented deviation, and the campaign is complete (180/180), so this open-loop variant is the thesis method (Part 12).
 
 ### Services Under Test (Independent Variable #3)
 
@@ -287,6 +291,12 @@ With 7-8 months available, you can spread experiments across multiple sessions (
 
 ## 7. KPI / Metrics Design
 
+> **Note (2026-10-09):** for the thesis dataset (the open-loop campaign) the outcomes O1–O5 and the analyses A1–A6 are
+> fixed in [Part 12](12-deviation-and-analysis-plan.md) §12.3–§12.4. Where this section differs — p95 as the primary
+> KPI, time to scale and scaling-event counts from Kubernetes events, the Resource Cost Index — Part 12 governs: the
+> primary outcome is seconds over SLO, time to scale comes from the HPA and pod timelines, and efficiency is
+> replica-seconds and CPU core-seconds.
+
 ### Primary KPIs (Must Report For Every Configuration)
 
 | KPI | Definition | Unit | Source | Why It's Primary |
@@ -323,7 +333,7 @@ These were fixed before any open-loop data existed (`scripts/pilot_openloop.py`)
 | SLO-violation seconds | Number of 10 s bins in the load window whose p95 exceeds the SLO, × 10 s. SLO: auth 1500 ms, shipping 1200 ms. |
 | Offered / attempted / goodput | Scheduled arrivals (integrated stage schedule) / started requests + dropped iterations / successful requests per second. |
 | Error %, timeout %, shed % | Failed requests; requests that hit the 5 s timeout; requests rejected with 503 by admission control (v2). |
-| Time to scale | Spike onset → first `ScalingReplicaSet` scale-up event, and → first new pod's Ready transition (5 s pod watcher with exact `lastTransitionTime`). |
+| Time to scale | Spike onset → first `ScalingReplicaSet` scale-up event, and → first new pod's Ready transition (pod watcher every 5 s plus query time — snapshots ≈6 s apart — with exact `lastTransitionTime`). *Superseded for the campaign analysis (2026-10-09) by Part 12 O4: the first increase of the HPA's desired replicas from `hpa-timeline.jsonl`, because Kubernetes merges repeated events.* |
 | Per-pod distribution | During the peak, each pod Ready ≥ 60 s: its mean share of the per-pod request rate and CPU relative to the mean of such pods; < 20% flags pinning. |
 
 ### How KPIs Are Interpreted

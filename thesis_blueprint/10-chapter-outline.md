@@ -2,6 +2,12 @@
 
 > Part of the thesis blueprint — index and executive summary: [thesis_blueprint.md](../thesis_blueprint.md).
 > Sections moved verbatim from the single-file blueprint on 2026-10-06; original section numbers (§N) and finding numbers (#N) are kept so every cross-reference still resolves. Later additions are marked with their date.
+>
+> **Read with this (2026-10-09):** the open-loop campaign is the thesis dataset (gate FAIL, documented deviation, 180/180
+> complete — [Part 12](12-deviation-and-analysis-plan.md)). Wherever this outline depends on the gate ("if the campaign
+> passes"), take the open-loop branch. Outcomes, tests and reporting follow Part 12 §12.3–§12.5 (seconds over SLO as the
+> primary outcome; exact Mann–Whitney tests with A12 and Holm; medians with min–max; metric contrast H2 vs H3). Draft
+> text below that quotes closed-loop numbers (§4.5–§4.6, §5.1–§5.2) is a template, to be rewritten from those analyses.
 
 ---
 
@@ -147,6 +153,10 @@ This section maps every BAB and sub-section from your university's "Perancangan 
 - Descriptive statistics: mean, median, standard deviation, percentiles (p50, p95, p99)
 - Confidence intervals: 95% CI interpretation for experimental measurements
 - Non-parametric significance testing: Wilcoxon signed-rank test — why non-parametric (can't assume normal distribution of latency data), how it works, when to reject H0
+  - **Update (2026-10-09):** describe the tests actually used (Part 12 §12.4): the exact Mann–Whitney (rank-sum)
+    test for two independent groups of 5 runs, the Vargha–Delaney A12 effect size, Holm's correction for the 3 contrasts
+    per family, and why 5 vs 5 can reach p = 0.0079 at best. The signed-rank test needs paired samples; confidence
+    intervals are not part of the plan (medians with min–max instead). Sources: Part 11 §11.9.
 - Effect size measurement: how to quantify the magnitude of difference (not just "is it significant" but "how much")
 - Multi-objective optimization: Pareto frontier definition, dominance relation, how to identify Pareto-optimal configurations
 - **Length:** 2-3 pages (this is critical methodology — examiners will scrutinize this)
@@ -166,7 +176,7 @@ This section maps every BAB and sub-section from your university's "Perancangan 
 **k6 (Load Testing Tool):**
 - What it is: open-source load testing tool by Grafana Labs
 - How it works: scenario-based testing with JavaScript; open-loop executors (ramping-arrival-rate, constant-arrival-rate) vs closed-loop executors (ramping-vus — used for both services in this thesis, because open-loop load drops iterations under saturation and delivers unequal load across configurations); the `noConnectionReuse` option and why it is enabled (finding #12)
-  - ⚠️ **Rewrite this justification (2026-10-06, Part 08 §8.14):** "drops iterations" only applies to an undersized generator. A correctly sized open-loop generator dropped 0 iterations in 20 runs. Explain instead that closed loop measures scaling under self-throttled load, while open loop holds the offered load fixed, so slow scaling turns directly into failed requests. Describe whichever generator(s) the final dataset uses. **Decided 2026-10-06 ("Replace"):** if the open-loop campaign passes its gate, describe the open-loop generator as the thesis method and the closed-loop campaign as the reason for switching (cite Schroeder et al. 2006; Part 11 §11.9).
+  - ⚠️ **Rewrite this justification (2026-10-06, Part 08 §8.14):** "drops iterations" only applies to an undersized generator. A correctly sized open-loop generator dropped 0 iterations in 20 runs. Explain instead that closed loop measures scaling under self-throttled load, while open loop holds the offered load fixed, so slow scaling turns directly into failed requests. Describe whichever generator(s) the final dataset uses. **Decided 2026-10-06 ("Replace"):** if the open-loop campaign passes its gate, describe the open-loop generator as the thesis method and the closed-loop campaign as the reason for switching (cite Schroeder et al. 2006; Part 11 §11.9). **2026-10-09:** the open-loop generator is the thesis method (gate FAIL, documented deviation — Part 12).
 - Metrics it produces: `http_req_duration`, `http_req_failed`, `http_reqs`, `vus`
 - Why chosen: runs as Kubernetes Job (in-cluster), eliminates network variance, scriptable
 
@@ -379,7 +389,7 @@ From observation data (3.2.4), identify:
 **F. Rancangan Load Test (k6):**
 
 > **If the open-loop campaign is adopted (2026-10-06, Part 08; "Replace" decided the same day — this is then the main
-> load-test design, plus the robustness gate with G6 rule v2 and H1 = 80%):** also describe the arrival-rate stage shapes and rates (auth 2→30, shipping 10→105 req/s), the 5 s timeout, VU sizing ⌈1.5 × peak × timeout⌉, raw per-request capture, the auth token pre-authentication during the reset, and the per-pod admission control (cap 22 / 48, standard load shedding, outermost middleware, delivered via ConfigMap overlay on the unchanged images).
+> load-test design, plus the robustness gate with G6 rule v2 and H1 = 80%; adopted — Part 12, 2026-10-07):** also describe the arrival-rate stage shapes and rates (auth 2→30, shipping 10→105 req/s), the 5 s timeout, VU sizing ⌈1.5 × peak × timeout⌉, raw per-request capture, the auth token pre-authentication during the reset, and the per-pod admission control (cap 22 / 48, standard load shedding, outermost middleware, delivered via ConfigMap overlay on the unchanged images).
 - k6 Job YAML manifest with resource requests
 - k6 test script structure: `setup()` for token pooling (auth: log in first, register only if login fails — commit `a39b1f2`), weighted scenario distribution (auth 70% `/auth/me`, 30% `/auth/login`)
 - 3 load pattern configurations, all `ramping-vus` stage shapes (gradual, spike, oscillating — see §6 Load Patterns), with `noConnectionReuse: true`
@@ -440,6 +450,9 @@ From observation data (3.2.4), identify:
 - Simulation environment description: how k6 runs inside the cluster, how load patterns map to k6 stages
 - Execution protocol: the 8-step procedure (reset → apply → stabilize → warm-up → test → cooldown → export → next)
 - Execution log: summary of the final 180-run campaign — one continuous session, 2026-08-15 06:11 → 08-17 17:05 UTC (58 h 49 m runner time) — plus the superseded earlier campaign and why it was discarded (finding #12)
+  - **Update (2026-10-09):** the thesis dataset is the open-loop campaign: rep blocks 1–2 on 2026-10-06 12:33 →
+    2026-10-07 13:31 UTC, the gate, then reps 3–5 on 2026-10-07 14:32 → 2026-10-09 02:47 UTC (two sessions; the two H1
+    runs re-run at 80%) — Part 08 §8.13. The closed-loop campaign above is the reason for switching generators.
 - Example raw output: show a sample k6 summary output for one run (what the terminal looks like after a test completes)
 - Data collection: how Prometheus data is exported (PromQL queries used, JSON/CSV format), how k6 results are stored
 - **Use real data from your actual experiments** — this cannot be written before experiments
@@ -460,12 +473,14 @@ From observation data (3.2.4), identify:
 | ... | ... | ... | ... | ... | ... | ... |
 | K1 (KEDA) | Oscillating | mean ± SD | mean ± SD | mean ± SD | mean ± SD | mean ± SD |
 
-- Include 95% confidence intervals
+- Include 95% confidence intervals *(2026-10-09: for the thesis dataset, report median, min and max over the 5 reps
+  per Part 12 A1, with O1 seconds over SLO as the primary column; window p95 is "fail" in most autoscaled open-loop
+  runs because more than 5% of their requests failed)*
 - Include the annotated scaling timeline visualizations (Strategy 3) for 3-5 most interesting runs
 - Show the synchronized multi-panel charts: RPS, Pod Count, p95 Latency, CPU — with H1/H2/H3/K1 overlaid
 - **Length:** 8-12 pages (tables + figures — this is the heaviest section)
 
-> **Open-loop material for BAB 4 (2026-10-06, Part 08):** at minimum, report the open-loop pilot as a robustness study. A correctly sized generator is stable (finding #17). The H2/H3/K1 spread grows by more than an order of magnitude (finding #18). Pod-exported request-rate metrics go blind under overload unless the service sheds load (findings #19, #22). Request rate reacts about twice as fast as CPU (finding #20). Disclose the closed-loop `setup()` warm-up burst (finding #21). If the 180-run open-loop campaign passes its gate, it becomes a second full results section with the same tables. **Superseded 2026-10-06 ("Replace", Part 08 §8.14):** if it passes, the open-loop campaign is *the* results section and the closed-loop results move to methodology background or an appendix; if it fails, report the open-loop work as the robustness study described above.
+> **Open-loop material for BAB 4 (2026-10-06, Part 08):** at minimum, report the open-loop pilot as a robustness study. A correctly sized generator is stable (finding #17). The H2/H3/K1 spread grows by more than an order of magnitude (finding #18). Pod-exported request-rate metrics go blind under overload unless the service sheds load (findings #19, #22). Request rate reacts about twice as fast as CPU (finding #20). Disclose the closed-loop `setup()` warm-up burst (finding #21). If the 180-run open-loop campaign passes its gate, it becomes a second full results section with the same tables. **Superseded 2026-10-06 ("Replace", Part 08 §8.14):** if it passes, the open-loop campaign is *the* results section and the closed-loop results move to methodology background or an appendix; if it fails, report the open-loop work as the robustness study described above. **Outcome (2026-10-07/09):** the gate failed, the user continued as a documented deviation, and the campaign is complete, so the open-loop campaign is *the* results section; report the gate verdict and the deviation (Part 12).
 
 #### 4.5 Analisis Perbandingan → **Analisis Komparatif HPA vs KEDA**
 
@@ -473,7 +488,8 @@ From observation data (3.2.4), identify:
 
 **A. Perbandingan Langsung (H1/H2 vs K1):**
 - For each load pattern × service combination: which method performed better on each KPI?
-- Statistical significance: Wilcoxon signed-rank test results (p-values, reject/accept H0)
+- Statistical significance: Wilcoxon signed-rank test results (p-values, reject/accept H0) *(2026-10-09: exact
+  Mann–Whitney tests with A12 and Holm on the planned contrasts H2 vs H3, H3 vs K1, H1 vs H2 — Part 12 A2)*
 - Effect sizes: how large is the difference?
 
 **B. Isolasi Faktor — Dekomposisi (the unique deliverable):**
@@ -484,6 +500,8 @@ From observation data (3.2.4), identify:
 | auth-service | measured improvement | measured improvement | measured improvement |
 
 - Interpret using the final values in §9 Strategy 4: the decomposition is mostly null; metric and engine separate only on shipping spike
+  *(2026-10-09: those are closed-loop values; for the thesis dataset take the metric effect as H3 vs H2 — they share
+  the behavior block — and fill the table from the Part 12 analyses)*
 - Discuss what this means practically
 
 **C. Perbandingan per Load Pattern:**

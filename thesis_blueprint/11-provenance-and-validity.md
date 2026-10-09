@@ -78,6 +78,7 @@ applied unequally. §11.5 lists every judgment call with its alternatives.
 | Prometheus scrape interval | 15 s | J | Prometheus' own default is 1 minute; 15 s matches the 15 s HPA loop so each decision sees fresh data. |
 | Request counter | `http_requests_total` from the service's instrumentation = requests the service served | J | Same meaning in both datasets. Load-shedding rejections are not counted because the limiter sits outside the instrumentation (Part 08 §8.10). |
 | Adapter rule, KEDA query | 1-minute rate in both | F | Identical data for H3 and K1. |
+| CPU metric for H1/H2 (kubelet → metrics-server) | AKS-managed, left unchanged; on this cluster the HPA's CPU reading changed about once a minute | D/M | Measured 2026-10-09: median 61.4 s between changes over the 60 H1/H2 campaign runs (82% of gaps 50–70 s), while the HPA evaluates every 15 s. A property of the platform, reported as such: it is the lag behind finding #23 (Part 08 §8.13). |
 
 ### F. Load generation
 
@@ -138,7 +139,7 @@ applied unequally. §11.5 lists every judgment call with its alternatives.
 | **Internal** | Is a difference caused by the config and not something else? | Fairness controls (§11.4); identical offered load; reset to 1 pod; shuffled order; one service at a time; G2 checks the start state and G5 the load spread in every run. | Gate results |
 | **Manipulation check** | Is the load in the range where autoscaling matters? | G4 requires B1 overloaded and B2 healthy in every service × pattern. Closed-loop measured B1/B2 p95 ratios: 2.72–3.62× (Part 03). | Gate G4; Part 03 |
 | **Measurement** | Did the instruments measure correctly? | G1 (no dropped requests, offered = attempted), k6 resource headroom, checksums, and agreement between independent sources (§11.7). | Validator output |
-| **Statistical conclusion** | Are the differences larger than run-to-run noise? | 5 reps, spread reported, non-parametric tests and effect sizes planned (Arcuri & Briand 2011), G6 repeatability check. | Phase 4 analysis |
+| **Statistical conclusion** | Are the differences larger than run-to-run noise? | 5 reps, spread reported; exact Mann–Whitney tests with A12 effect sizes and Holm correction, fixed before reps 3–5 (Part 12 §12.4; Arcuri & Briand 2011); after the G6 FAIL, repeatability is measured as an outcome (A4). | Phase 4 analysis |
 | **External** | How far do the results generalize? | Stated limitations: one cluster size, two synthetic services, fixed thresholds, max 5 replicas, 12-minute runs, a simulated carrier delay, load shedding in the open-loop variant. | BAB 5 limitations |
 
 ## 11.4 Fairness controls — what is held equal, and why
@@ -160,7 +161,7 @@ applied unequally. §11.5 lists every judgment call with its alternatives.
 | Max 5 replicas | Shared ceiling | Higher | Fits the cluster with headroom; equal for all | B2's cost; ceiling effects at peak |
 | Three patterns | Load coverage | Others (e.g. diurnal) | Growth, burst and periodic load are the classic cases | Generality of the conclusions |
 | 5 s timeout | Failure bound | k6's 60 s default | A user-facing bound | Error % includes timeouts |
-| 5 repetitions | Precision | 3 or 10 | ≈60 h per open-loop campaign (estimate) | Width of confidence intervals |
+| 5 repetitions | Precision | 3 or 10 | ≈60 h per open-loop campaign (estimate; actual ≈61.6 h) | Test power: with 5 vs 5 the smallest two-sided p is 0.0079, so only complete or near-complete separation is significant (Part 12 §12.4) |
 | Gate tolerances | Stop rule | — | Derived from the control-loop timing (rule v2) | Only whether the campaign continues, not the reported numbers |
 
 ## 11.6 Known weak spots and how they are handled
@@ -179,9 +180,9 @@ applied unequally. §11.5 lists every judgment call with its alternatives.
    load-shedding pod still serves (the metric counts served requests), so H3/K1 could stop scaling exactly when needed;
    and the thresholds were fixed before any campaign data, while H3/K1 runs had already run. **Handling:** the
    calibration intent still holds.
-   - Quiet at base: 2 < 5 and 10 < 15 req/s; G2 found exactly 1 Ready pod at onset in every autoscaled v2 run validated
-     so far (8 smoke runs and campaign run 1, checked 2026-10-06; the campaign's other runs are validated at the gate). In the closed-loop dataset, auth's base load (11.6–15.9 req/s) was above 5, so open loop meets
-     this intent better.
+   - Quiet at base: 2 < 5 and 10 < 15 req/s; G2 found exactly 1 Ready pod at scenario start and at onset in all 120
+     autoscaled campaign runs (checked 2026-10-09) and in the 8 autoscaled smoke runs. In the closed-loop dataset, auth's
+     base load (11.6–15.9 req/s) was above 5, so open loop meets this intent better.
    - Crossed before a pod saturates: 5 is 62.5% of one auth pod's capacity (8 req/s) and 15 is 30% of one shipping pod's
      (50 req/s).
    - Identical for H3 and K1, so the engine comparison is unaffected.
@@ -232,7 +233,7 @@ independent sources, reproducibility, and timestamps the author does not control
    GitHub push records, ACR image dates.
 5. **Decisions before data, failures included.** Rules are committed before the data they judge, and the record keeps
    the failures: the pilot's ambiguous verdict, the smoke FAIL, two analysis-tool bugs (Part 08 §8.9, §8.12).
-6. **Anyone can re-run it.** Manifests, scripts and configs are in the repository; one cell takes about 20 minutes and
+6. **Anyone can re-run it.** Manifests, scripts and configs are in the repository; one run takes about 20 minutes and
    about $0.17 of AKS (estimate).
 
 **To do:** export the Azure Activity Log and cost records for the study period (the Activity Log is kept for 90 days;
@@ -282,6 +283,9 @@ Check edition, volume and page details against the original before citing.
 | Jain, R. (1991). *The Art of Computer Systems Performance Analysis*. Wiley. | Factorial design, replication, randomization | §11.2 A |
 | Papadopoulos, A. V., et al. Methodological principles for reproducible performance evaluation in cloud computing. *IEEE Transactions on Software Engineering*. | Repetitions, reporting variability, publishing data and code | §11.2 A, §11.7 |
 | Arcuri, A., & Briand, L. (2011). A practical guide for using statistical tests to assess randomized algorithms in software engineering. *ICSE '11*. | Non-parametric tests, effect sizes, number of repetitions | Phase 4 analysis |
+| Mann, H. B., & Whitney, D. R. (1947). On a test of whether one of two random variables is stochastically larger than the other. *Annals of Mathematical Statistics*, 18(1). *(added 2026-10-09)* | Rank-sum test for two independent samples | Part 12 A2 |
+| Holm, S. (1979). A simple sequentially rejective multiple test procedure. *Scandinavian Journal of Statistics*, 6(2). *(added 2026-10-09)* | Multiple-comparison correction | Part 12 A2 (3 contrasts per family) |
+| Vargha, A., & Delaney, H. D. (2000). A critique and improvement of the CL common language effect size statistics of McGraw and Wong. *Journal of Educational and Behavioral Statistics*, 25(2). *(added 2026-10-09)* | The A12 effect size | Part 12 A2 |
 | Nosek, B. A., Ebersole, C. R., DeHaven, A. C., & Mellor, D. T. (2018). The preregistration revolution. *PNAS*, 115(11). | Fixing analysis rules before seeing data | Gate rules |
 | Wilkinson, M. D., et al. (2016). The FAIR guiding principles for scientific data management and stewardship. *Scientific Data*, 3. | Findable, accessible, reusable research data | Data archive and DOI |
 

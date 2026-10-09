@@ -61,6 +61,11 @@ documented adjustment of the open-loop study, after G6 rule v2 (2026-10-06, befo
 | O4 | Time to scale | Onset → first increase of the HPA's desired replicas; onset → first new pod Ready | `hpa-timeline.jsonl`, `pod-timeline.jsonl` (not Kubernetes events, which merge repeats) |
 | O5 | Resource use | Ready replica-seconds and CPU core-seconds in the KPI window | `pod-timeline.jsonl`, `prom_cpu_usage.json` |
 
+*Implementation note (added 2026-10-09, after the data and before any analysis; the definitions are unchanged):* for O4,
+the time of an increase of desired replicas is the HPA status field `lastScaleTime` recorded in the first
+`hpa-timeline.jsonl` snapshot that shows the increase. The snapshots are ≈6.1 s apart (a 5 s sleep plus the queries),
+so the snapshot time alone would add up to one interval of watcher lag; `lastScaleTime` is exact to the second.
+
 ## 12.4 Analyses
 
 **A1 — Description.** Per cell (service × pattern × config): median, minimum and maximum over the 5 reps for O1–O5.
@@ -76,6 +81,11 @@ pattern × outcome). With 5 vs 5 the smallest possible two-sided p is 0.0079, so
 near-complete separation (U ≤ 1, p ≤ 0.0159, for the first Holm step). **Effect sizes and medians are the primary
 reporting; every test is reported, significant or not.**
 
+*Clarification (added 2026-10-09; no change to the plan):* this test supersedes the "Wilcoxon signed-rank, 95% CI"
+planned in older parts (01, 04, 09, 10): the signed-rank test assumes paired samples, while runs of two configurations
+are independent. The metric contrast is H2 vs H3 because they share the scaling-behavior block; the older
+decomposition table's "H3 vs H1" also changes the CPU target and the behavior.
+
 **A3 — Normalized comparison across services and patterns** (Part 11 §11.10): for each autoscaler, the share of the
 B1→B2 gap it closes on O1, using cell medians: (B1 − X) / (B1 − B2). Rankings and the direction of the metric and
 engine effects are compared across cells; raw latencies are not.
@@ -87,6 +97,20 @@ engine effects are compared across cells; raw latencies are not.
 - Mechanism count, from the HPA timelines: an **anti-phase scale-down** is any decrease of the HPA's desired replicas
   while the scheduled load is at its peak (gradual: 420–540 s; spike: 130–540 s; oscillating: 130–210, 310–390 and
   490–540 s of k6 time). Report the count per run and per config.
+
+*Exploratory addition — session check (user decision 2026-10-09, written before any A1–A6 analysis; not
+pre-registered: prompted by a pattern noticed while auditing the blueprint, where reps 1–2 looked worse than reps 3–5
+in several cells).* Reps 1–2 ran in session 1 (2026-10-06 12:33 → 10-07 13:31 UTC) and reps 3–5 in session 2
+(2026-10-07 14:32 → 10-09 02:47 UTC), with an AKS stop and start in between. Every config has 2 runs in session 1 and
+3 in session 2, so a session shift cannot bias the A2 contrasts, but it adds to the A4 dispersion. Reported as
+exploratory, separate from A1–A6, which are unchanged:
+- per cell, the session medians of O1 and O2 (reps 1–2 vs reps 3–5) and their difference; with 2 vs 3 runs no per-cell
+  test is possible (smallest two-sided p = 0.2);
+- across cells, the number in which session 1 is worse versus better (ties left out), with an exact two-sided sign
+  test, separately for B1/B2 (a shift in the system itself) and for the autoscaled configs;
+- the A4 dispersion recomputed within sessions (spread around each session's median), to show how much of a cell's
+  spread lies between the sessions;
+- a candidate cause: the nodes the service pods ran on in each session (`pod-timeline.jsonl` records each pod's node).
 
 **A5 — Efficiency.** O5 against O1 per cell (resource used versus seconds over SLO), shown as a Pareto view per service ×
 pattern; B1 and B2 mark the extremes.
@@ -113,4 +137,5 @@ including auth oscillating H2 rep 1 and rep 2.
 with no failure; AKS stopped 02:50:54. Data-quality rules (§12.2) over all 180 runs: G1, G2 and G3 pass in every run,
 so no re-runs were needed; G4 passes in every service × pattern over the 5 reps; G5 flags only auth H2 oscillating
 rep 1, kept as an outcome (Part 08 §8.13). Analyses A1–A6 are next; nothing in this plan was changed after the data
-arrived.
+arrived. Added on 2026-10-09, before any analysis and marked as such: two clarifications (O4 timing; the choice of
+test) and the exploratory session check under A4.

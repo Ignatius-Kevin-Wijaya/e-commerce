@@ -121,6 +121,11 @@ The v3 title had two parentheticals: `(CPU Utilization vs Request Rate)` and `(H
 | Statistical method | 5 repetitions, Wilcoxon signed-rank, 95% CI |
 | Cost analysis | Pod-seconds × CPU-request × AKS pricing → dollar-cost per scenario |
 
+> **Note (2026-10-09):** for the thesis dataset (the open-loop campaign) the outcomes and statistics are fixed in
+> [Part 12](12-deviation-and-analysis-plan.md) §12.3–§12.4: primary outcome seconds over SLO, then error %, goodput,
+> time to scale and resource use (replica-seconds, CPU core-seconds); exact Mann–Whitney tests with A12 effect sizes and
+> Holm correction; medians with min–max. "Wilcoxon signed-rank, 95% CI" above is superseded.
+
 ### Out of Scope
 
 | Item | Why excluded |
@@ -141,6 +146,12 @@ The v3 title had two parentheticals: `(CPU Utilization vs Request Rate)` and `(H
 3. AKS node hardware (D4as_v5) provides consistent, non-burstable CPU performance
 4. Controlled downstream-call latency inside AKS is an acceptable experimental proxy for external dependency wait in production microservices
 5. The e-commerce-inspired service patterns (authentication, shipping quote lookup, payment/product/cart flows) are representative of typical web-based microservices
+
+> **Correction to assumption 1 (2026-10-09, measured):** on this cluster the HPA's CPU reading changed only about
+> once a minute — median 61.4 s between changes over the 60 CPU-based (H1, H2) open-loop campaign runs, 82% of the gaps
+> between 50 and 70 s — not every 15 s. The HPA still evaluates every 15 s, but on a CPU value that can be about a
+> minute old. This is the lag behind finding #23 and belongs in BAB 3/4 as a property of the CPU pipeline, not a defect of the
+> experiment.
 
 ### Boundaries
 
