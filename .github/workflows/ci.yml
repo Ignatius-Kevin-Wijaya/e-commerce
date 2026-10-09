@@ -18,6 +18,8 @@ jobs:
           - cart-service
           - order-service
           - payment-service
+          - shipping-rate-service
+          - carrier-mock-service
 
     defaults:
       run:
@@ -44,7 +46,8 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-          pip install ruff pytest pytest-asyncio httpx aiosqlite
+          # Pinned so a new tool release cannot turn CI red without a code change.
+          pip install ruff==0.15.22 pytest==9.1.1 pytest-asyncio==1.4.0 aiosqlite==0.22.1
 
       - name: Lint with ruff
         run: ruff check .
@@ -87,7 +90,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-          pip install ruff
+          pip install ruff==0.15.22
 
       - name: Lint with ruff
         run: ruff check .

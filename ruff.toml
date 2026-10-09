@@ -1,0 +1,7 @@
+# Lint configuration for every Python directory in the repository.
+# The rule set is written out (it is ruff 0.15's default) so that a new ruff release
+# cannot change what CI checks; CI also pins the ruff version.
+extend-exclude = ["tools"]
+
+[lint]
+select = ["E4", "E7", "E9", "F"]
