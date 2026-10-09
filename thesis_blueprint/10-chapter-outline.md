@@ -8,6 +8,8 @@
 > passes"), take the open-loop branch. Outcomes, tests and reporting follow Part 12 §12.3–§12.5 (seconds over SLO as the
 > primary outcome; exact Mann–Whitney tests with A12 and Holm; medians with min–max; metric contrast H2 vs H3). Draft
 > text below that quotes closed-loop numbers (§4.5–§4.6, §5.1–§5.2) is a template, to be rewritten from those analyses.
+> The results are in Part 08 §8.16 and findings #24–#28; the full tables are in
+> `experiment-results-openloop/analysis/part12/report.md`.
 
 ---
 

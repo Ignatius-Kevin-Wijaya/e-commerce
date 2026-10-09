@@ -3,13 +3,13 @@
 > Part of the thesis blueprint — index and executive summary: [thesis_blueprint.md](../thesis_blueprint.md).
 > New part, written 2026-10-06. Covers everything from the open-loop pilot request (2026-10-05) to the 180-run
 > open-loop campaign (rep blocks 1–2 finished 2026-10-07; pre-registered gate FAIL; continued as a documented
-> deviation — Part 12; all 180 runs complete 2026-10-09). Detailed pilot write-up: `pilot-openloop-report.md` (repo root; every result in it is
+> deviation — Part 12; all 180 runs complete 2026-10-09; Part 12 analyses done 2026-10-09, §8.16). Detailed pilot write-up: `pilot-openloop-report.md` (repo root; every result in it is
 > reproduced here). All numbers below were computed from the stored data;
 > estimates are labelled as estimates. Times are UTC unless marked otherwise.
 
 ---
 
-## 8.0 Status at a glance (2026-10-09, 07:00 UTC)
+## 8.0 Status at a glance (2026-10-09, 07:35 UTC)
 
 | Stage | Status | Outcome |
 |---|---|---|
@@ -18,7 +18,8 @@
 | v2 fixes (admission control, auth pre-auth, robustness gate) | ✅ Implemented, unit-tested, deployed via ConfigMap overlay | §8.9–§8.10 |
 | v2 calibration ladders | ✅ Done 2026-10-06 06:44–08:28 | Collapse removed up to the planned peaks (§8.11) |
 | v2 smoke test (9 runs) | ✅ Done 08:31–11:31; AKS stopped 11:35 | **Pre-registered gate FAIL on one cell:** shipping H3 error rate 5.32 / 6.97% across reps (27% of mean; limit 25% or 1 point), caused by a first scale-up one 15 s HPA cycle later. Everything else passes: 9/9 runs clean, B1 hold graceful, SLO-violation seconds 70/70, 70/70, 100/100 (shipping) and 140/170 (auth) (§8.12) |
-| 180-run open-loop campaign | ✅ **Complete: 180/180** — rep blocks 1–2 by 2026-10-07 13:31 UTC, reps 3–5 from 2026-10-07 14:32 to 2026-10-09 02:47 UTC; AKS stopped 02:50:54; all 187 raw files match their capture checksums | Gate after rep blocks 1–2 (rule v2): **FAIL** (G5 1 run; G6 3 of 24 cells, all CPU-based) — continued as a documented deviation (Part 12). Data-quality rules over all 180 runs (Part 12 §12.2): G1–G4 pass everywhere, no re-runs needed, G5 flag only in auth H2 oscillating rep 1 (kept as an outcome). **Next: analyses A1–A6** (§8.13) |
+| 180-run open-loop campaign | ✅ **Complete: 180/180** — rep blocks 1–2 by 2026-10-07 13:31 UTC, reps 3–5 from 2026-10-07 14:32 to 2026-10-09 02:47 UTC; AKS stopped 02:50:54; all 187 raw files match their capture checksums | Gate after rep blocks 1–2 (rule v2): **FAIL** (G5 1 run; G6 3 of 24 cells, all CPU-based) — continued as a documented deviation (Part 12). Data-quality rules over all 180 runs (Part 12 §12.2): G1–G4 pass everywhere, no re-runs needed, G5 flag only in auth H2 oscillating rep 1 (kept as an outcome) (§8.13) |
+| Part 12 analyses (A1–A6 + exploratory session check) | ✅ Done 2026-10-09 (`9c5dc8c`) | 5 of 36 planned tests significant: request rate beats CPU under spike load (shipping O1 and O2, auth O2), tuned beats default HPA on auth spike O1 and shipping gradual O2; engine (HPA vs KEDA) never significant; oscillating load defeats every autoscaler (gap closed 4–60%); CPU-based cells less repeatable on O1 (p = 0.0004) (§8.16) |
 
 **"Replace" (§8.14):** if the campaign passes its gate it is the thesis dataset; the closed-loop final dataset (Part 01,
 findings #13–#16) then becomes methodology background. If the campaign fails, the closed-loop dataset is the thesis
@@ -615,3 +616,101 @@ PYTHONUTF8=1 PILOT_OPENLOOP_DIR=experiment-results-openloop tools/python312/pyth
 2026-10-06 v2 work from ≈06:30 UTC, ≈5.2 h ≈ $2.7 including the smoke test; ACR builds $0 (none ran). The VM
 (B2ats_v2) ran throughout. Campaign rep blocks 1–2: AKS from 12:23 UTC 2026-10-06 to 13:34 UTC 2026-10-07, ≈25.2 h ≈ $13.0;
 reps 3–5: 14:24 UTC 2026-10-07 to 02:51 UTC 2026-10-09, ≈36.4 h ≈ $18.8; whole campaign ≈61.6 h ≈ $31.8.
+
+## 8.16 Campaign results — the Part 12 analyses (2026-10-09)
+
+Run on all 180 runs with `scripts/analyze_openloop_campaign.py` (commit `9c5dc8c`, 2026-10-09 07:25 UTC), exactly as
+defined in [Part 12](12-deviation-and-analysis-plan.md) §12.3–§12.4. Full tables:
+`experiment-results-openloop/analysis/part12/report.md`; per-run values: `runs.csv`; figures: `figures/` (A1 overview,
+A5 resource views, A6 mechanism plots). Medians over the 5 reps; p-values from exact two-sided rank-sum tests,
+Holm-corrected within each family of 3 contrasts; A12 = probability that a run of the first config scores higher
+(worse) than a run of the second. Checks: no scale-up before onset in any run; every scale time comes from the HPA's own
+`lastScaleTime`; 28 CPU samples per run in the KPI window. The exact test reproduces the known p-values (0.0079, 0.0159)
+and a brute-force enumeration with ties, and repeated runs give identical output.
+
+**O1 seconds over SLO (median [min–max]) and O2 error % (median):**
+
+| | auth gradual | auth spike | auth oscillating | ship gradual | ship spike | ship oscillating |
+|---|---|---|---|---|---|---|
+| B1 | 310 [290–340] · 49.86% | 410 [410–410] · 65.25% | 250 [250–260] · 56.74% | 280 [270–280] · 43.78% | 410 [410–410] · 58.25% | 250 [250–250] · 52.04% |
+| B2 | 10 [0–20] · 0.00% | 30 [0–30] · 0.01% | 10 [0–20] · 0.03% | 0 [0–10] · 0.00% | 0 [0–10] · 0.00% | 0 [0–0] · 0.00% |
+| H1 | 120 [70–140] · 1.06% | 200 [170–230] · 15.14% | 180 [150–200] · 22.05% | 50 [10–70] · 1.94% | 100 [90–140] · 12.27% | 100 [90–170] · 15.30% |
+| H2 | 70 [40–100] · 0.32% | 130 [100–150] · 12.50% | 200 [150–230] · 34.29% | 0 [0–20] · 0.01% | 90 [90–110] · 10.64% | 140 [130–190] · 16.65% |
+| H3 | 50 [10–50] · 0.00% | 100 [90–140] · 7.73% | 240 [220–240] · 36.51% | 0 [0–10] · 0.00% | 70 [50–80] · 5.19% | 190 [190–190] · 28.42% |
+| K1 | 40 [30–40] · 0.01% | 110 [110–140] · 8.68% | 220 [200–250] · 34.03% | 0 [0–10] · 0.00% | 70 [70–80] · 6.90% | 190 [170–190] · 26.61% |
+
+**A2 — planned contrasts.** 5 of the 36 tests are significant after Holm, all with complete or near-complete separation:
+
+| Contrast | Cell · outcome | Medians | p (Holm) | A12 |
+|---|---|---|---|---|
+| H2 vs H3 (metric) | shipping spike · O1 | 90 vs 70 s | 0.024 | 1.00 |
+| H2 vs H3 (metric) | shipping spike · O2 | 10.64 vs 5.19% | 0.024 | 1.00 |
+| H2 vs H3 (metric) | auth spike · O2 | 12.50 vs 7.73% | 0.048 | 0.96 |
+| H1 vs H2 (default vs tuned) | auth spike · O1 | 200 vs 130 s | 0.024 | 1.00 |
+| H1 vs H2 (default vs tuned) | shipping gradual · O2 | 1.94 vs 0.01% | 0.024 | 1.00 |
+
+- **Engine (H3 vs K1):** none of the 12 tests is significant (smallest p 0.31); the medians differ by at most 20 s and
+  2.48 points (auth oscillating).
+- **Metric under oscillating load:** the direction reverses — CPU (H2) beats request rate (H3) on O1 (auth 200 vs 240 s,
+  A12 0.12, p = 0.056 before / 0.17 after Holm; shipping 140 vs 190 s, A12 0.20, p = 0.17 / 0.33); not significant.
+- With 5 vs 5 runs the smallest possible p is 0.0079, so a non-significant contrast is "not shown", not "no difference".
+
+**O4 — first scale-up after onset (median s):**
+
+| | auth gradual | auth spike | auth oscillating | ship gradual | ship spike | ship oscillating |
+|---|---|---|---|---|---|---|
+| H1 | 109.8 | 65.1 | 65.2 | 153.2 | 65.1 | 50.0 |
+| H2 | 95.8 | 65.0 | 49.8 | 109.3 | 64.8 | 34.7 |
+| H3 | 79.8 | 35.2 | 34.4 | 64.4 | 19.7 | 19.8 |
+| K1 | 66.4 | 35.5 | 24.2 | 66.7 | 35.0 | 22.8 |
+
+In every one of the 120 autoscaled runs the first new pod was Ready 17.0–19.0 s after the first scale-up (median 18.0 s).
+
+**A3 — share of the B1→B2 gap closed (O1 medians):**
+
+| | auth gradual | auth spike | auth oscillating | ship gradual | ship spike | ship oscillating |
+|---|---|---|---|---|---|---|
+| H1 | 63.3% | 55.3% | 29.2% | 82.1% | 75.6% | 60.0% |
+| H2 | 80.0% | 73.7% | 20.8% | 100.0% | 78.0% | 44.0% |
+| H3 | 86.7% | 81.6% | 4.2% | 100.0% | 82.9% | 24.0% |
+| K1 | 90.0% | 78.9% | 12.5% | 100.0% | 82.9% | 24.0% |
+
+Under oscillating load the request-rate autoscalers were back at 1 Ready pod at the start of peaks 2 and 3 in all 20 of
+their runs — their 1-minute rate falls during the 80 s base hold and the shared 30 s scale-down window lets them follow
+it — so every peak began on one pod. H1 and H2 entered those peaks with 2–5 pods.
+
+**A4 — repeatability.**
+- Per-cell dispersion, CPU-based (H1, H2; 12 cells) vs request-rate (H3, K1; 12 cells): O1 range median 60 vs 20 s
+  (p = 0.0004, A12 0.90) and O1 MAD 10 vs 0 s (p = 0.0091, A12 0.80); O2 range 4.49 vs 2.82 points (p = 0.44) and
+  O2 MAD 0.69 vs 0.30 (p = 0.38). Four tests, reported without correction; the O1 range result stays below 0.05 even
+  after multiplying by 4.
+- The widest cells: auth oscillating H2 (errors 16.28–46.09%) and shipping oscillating H2 (13.93–41.53%).
+- Anti-phase scale-downs (desired replicas lowered inside a peak window): 23, all in H2 oscillating — every one of its
+  10 runs (auth 2, 3, 2, 3, 2; shipping 2, 2, 1, 3, 3). None in the 90 H1, H3 and K1 runs: H1's 300 s scale-down window
+  holds its pods, and the request-rate reading follows the load.
+
+**Exploratory session check (not pre-registered; Part 12 §12.4).**
+- Autoscaled cells, session 1 (reps 1–2) vs session 2 (reps 3–5): session 1 worse in 14, better in 5, tied in 5 on O1
+  (sign test p = 0.064); worse in 16, better in 6, tied in 2 on O2 (p = 0.053). B1/B2 controls: 5 worse / 3 better /
+  4 tied on O1 (p = 0.73) and 7 / 5 / 0 on O2 (p = 0.77) — no consistent shift in the system itself.
+- The shift is concentrated in shipping oscillating H2: session medians 41.28% vs 16.12% errors; its error range of
+  27.60 points shrinks to 2.72 within sessions. Auth oscillating H2's spread stays within sessions (29.81 points either
+  way) — the timing effect of finding #23, not a session effect.
+- Candidate cause, not tested: in session 1 the pod serving at onset was the same pod for each service in every run,
+  and both sat on the same node (`aks-userpool-16719200-vmss00002l`); in session 2 they ran on other nodes.
+
+**A5 — resource use against O1.** The autoscalers used 41.1–87.0% of B2's Ready replica-seconds but 64.3–102.8% of its
+CPU core-seconds: CPU use follows the load served, so the saving from autoscaling is reserved capacity, not CPU burned.
+Non-dominated configs on replica-seconds vs O1 (cell medians): auth gradual B1, B2, H1, H2, K1; auth spike all six;
+auth oscillating B1, B2, H1, H2, K1; shipping gradual B1, H1, H2 (H2 matches B2's 0 s with 56.3% of its replica-seconds);
+shipping spike B1, B2, H1, H2, K1; shipping oscillating B1, B2, H1, H2.
+
+**A6 — mechanism figures:** `figures/a6_auth_h2_oscillating.png` (the anti-phase run and its rep 2),
+`a6_auth_h1_gradual.png`, `a6_shipping_h1_oscillating.png` (the other two G6 cells) and `a6_auth_h3_oscillating.png`
+(request-rate contrast): scheduled and served load, the autoscaler's reading against its target, desired replicas and
+Ready pods, with the peak windows shaded.
+
+**Reading of the results (to be argued in BAB 4–5; findings #24–#28):** under spike load the metric matters and the
+engine does not; oscillating load with a 90 s half-cycle defeats every autoscaler, where a long scale-down window helps
+and a short one with a lagging CPU signal hurts; CPU-based scaling repeats worse on seconds over SLO; and autoscaling
+saves reserved capacity rather than CPU.

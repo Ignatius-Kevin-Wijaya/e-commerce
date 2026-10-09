@@ -12,14 +12,14 @@
 
 | Part | File | Contents | Former section |
 |---|---|---|---|
-| 01 | [01-direction-and-findings.md](thesis_blueprint/01-direction-and-findings.md) | Thesis evolution, strengths/risks, must-fix table, what is validated on AKS, **confirmed findings #1–#23**, what it means for the thesis, dataset status | §1 |
+| 01 | [01-direction-and-findings.md](thesis_blueprint/01-direction-and-findings.md) | Thesis evolution, strengths/risks, must-fix table, what is validated on AKS, **confirmed findings #1–#28**, what it means for the thesis, dataset status | §1 |
 | 02 | [02-timeline.md](thesis_blueprint/02-timeline.md) | Full chronological timeline, 2026-04-07 → 2026-10-09 | §1 (timeline) |
 | 03 | [03-calibration-deep-dive.md](thesis_blueprint/03-calibration-deep-dive.md) | Closed-loop shipping calibration: why `ramping-vus`, PEAK_VUS = 80, CPU not purely wait-dominant, threshold 5 → 15, pre-flight bug fixes, measured B1/B2 gates | §1 (deep dive) |
 | 04 | [04-title-and-scope.md](thesis_blueprint/04-title-and-scope.md) | Approved title and its rationale; scope, assumptions, boundaries | §2–§3 |
 | 05 | [05-architecture-and-tooling.md](thesis_blueprint/05-architecture-and-tooling.md) | AKS sizing (3× D4as_v5), pod inventory, resource budget, cost; platform decisions (in-cluster PostgreSQL, ACR, in-cluster k6, Prometheus/Grafana) | §4–§5 |
 | 06 | [06-methodology-and-kpis.md](thesis_blueprint/06-methodology-and-kpis.md) | Factorial design, the 6 configurations with YAML, load patterns, protocol, run count; KPIs (closed- and open-loop definitions) | §6–§7 |
 | 07 | [07-risks.md](thesis_blueprint/07-risks.md) | Risks 1–12 with mitigations; operational lessons | §8 |
-| 08 | [08-open-loop-study.md](thesis_blueprint/08-open-loop-study.md) | **Open-loop study:** motivation, pre-set criteria, tooling, calibration, pilot results and verdict, user decisions, v2 fixes, robustness gate (rules v1 and v2), v2 calibration, smoke result, campaign (gate FAIL, documented deviation, 180/180 complete), thesis structure ("Replace"), thesis implications | new |
+| 08 | [08-open-loop-study.md](thesis_blueprint/08-open-loop-study.md) | **Open-loop study:** motivation, pre-set criteria, tooling, calibration, pilot results and verdict, user decisions, v2 fixes, robustness gate (rules v1 and v2), v2 calibration, smoke result, campaign (gate FAIL, documented deviation, 180/180 complete), campaign results (§8.16), thesis structure ("Replace"), thesis implications | new |
 | 09 | [09-strategy-plan-assessment.md](thesis_blueprint/09-strategy-plan-assessment.md) | Stand-out strategy (narrative, Pareto, timeline figure, decomposition table), project plan and status, final assessment | §9–§11 |
 | 10 | [10-chapter-outline.md](thesis_blueprint/10-chapter-outline.md) | BAB 1–5 writing guide (Struktur Perancangan Jaringan) | §12 |
 | 11 | [11-provenance-and-validity.md](thesis_blueprint/11-provenance-and-validity.md) | **Defense guide:** where every setting comes from (default / measured / fairness / judgment / pre-registered), validity by type, fairness controls, judgment calls, known weak spots and their handling, evidence that the results are real, ready answers, sources to cite, whether the comparisons are fair (§11.10) | new |
@@ -55,7 +55,7 @@
 
 ---
 
-## Current status (2026-10-09, 07:00 UTC)
+## Current status (2026-10-09, 07:35 UTC)
 
 | Track | Status |
 |---|---|
@@ -65,8 +65,8 @@
 | **v2 fixes + calibration** | ✅ Admission control (both services), auth pre-authentication, robustness gate G1–G6; recalibrated 2026-10-06. (Part 08 §8.9–§8.11) |
 | **v2 smoke test** | ✅ Done 2026-10-06 08:31–11:31 UTC (AKS stopped 11:35). 9/9 runs clean; B1 hold graceful; SLO-violation seconds replicate. **Pre-registered gate FAIL on one cell** (shipping H3 error rate 5.32 / 6.97%, one 15 s HPA cycle apart). (Part 08 §8.12) |
 | **Open-loop campaign** | ✅ Rep blocks 1–2 done: 72/72 at 2026-10-07 13:31 UTC (H1 = 80%; positions 1 and 9 re-run), AKS stopped 13:33:57, all raw files checksum-verified. **Pre-registered gate (rule v2): FAIL** — G1–G4 pass in all 72 runs; G5 fails in 1 run; G6 fails in 3 of 24 cells, all CPU-based (request-rate cells reproducible 12/12; finding #23). Pre-registered consequence: stop. **User decision (2026-10-07): continue with reps 3–5 as a documented deviation** — the open-loop campaign stays the thesis dataset; analysis plan in Part 12, pushed (`b7fa4d3`) before any new run. **✅ Campaign complete: 180/180** (reps 3–5 from 2026-10-07 14:32 to 2026-10-09 02:47 UTC, no failure; AKS stopped 02:50:54). All 187 raw files checksum-verified; data-quality rules (Part 12 §12.2): G1–G4 pass in all 180 runs, no re-runs needed, G5 flag only in auth H2 oscillating rep 1. ≈61.6 h ≈ $31.8 of AKS in total (estimate). (Part 08 §8.13, Part 12) |
-| **Analysis (Phase 4)** | **Next:** the pre-registered analyses A1–A6 of Part 12 on all 180 runs — outcomes O1–O5, exact permutation tests with A12 effect sizes, the gap-closed comparison, repeatability (incl. anti-phase scale-downs) and the resource/Pareto view; then figures (`thesis-figures/` PNGs are from superseded data). (Part 12 §12.3–§12.4) |
-| **Writing** | BAB 1–3 drafted (`Skripsi_Ignatius_Kevin_Wijaya.docx`, last edited 2026-06-06). Under "Replace", BAB 3 must present the open-loop method (generator, load shedding, pre-login, gate, H1 = 80%) with the closed-loop campaign as the reason for switching; its old generator rationale and auth arrival-rate profile are out of date (Part 08 §8.14, Part 10 notes, Part 11). BAB 4–5 wait for the Part 12 analyses. |
+| **Analysis (Phase 4)** | ✅ **Part 12 analyses A1–A6 done 2026-10-09** on all 180 runs, plus the exploratory session check (`scripts/analyze_openloop_campaign.py`, `9c5dc8c`; tables and working figures in `experiment-results-openloop/analysis/part12/`). 5 of 36 planned tests significant; results in Part 08 §8.16 and findings #24–#28. **Next:** thesis figures (`thesis-figures/` PNGs are from superseded data) and the decomposition table (metric effect = H2 vs H3). |
+| **Writing** | BAB 1–3 drafted (`Skripsi_Ignatius_Kevin_Wijaya.docx`, last edited 2026-06-06). Under "Replace", BAB 3 must present the open-loop method (generator, load shedding, pre-login, gate, H1 = 80%) with the closed-loop campaign as the reason for switching; its old generator rationale and auth arrival-rate profile are out of date (Part 08 §8.14, Part 10 notes, Part 11). BAB 4–5 can now be drafted from the Part 12 results (Part 08 §8.16, findings #24–#28). |
 
 ---
 
@@ -97,7 +97,7 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
 
 ---
 
-## Headline — open-loop study (Part 08; findings #17–#23)
+## Headline — open-loop study (Part 08; findings #17–#28)
 
 - **Pilot v1 (2026-10-05/06, 20 runs, spike):** auth 2→30 req/s (SLO 1.5 s), shipping 10→105 req/s (SLO 1.2 s), 5 s
   timeout, k6 0.46.0.
@@ -134,6 +134,20 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
     scale in anti-phase to the load (≈50% errors in every peak; rep 2: 16.28% overall) (#23, Part 08 §8.13).
   - Seconds over SLO (rep 1/rep 2), shipping spike: K1 70/70, H3 80/70, H2 110/90, H1 140/100; shipping gradual:
     H3 and K1 0/0, H1 70/60; auth gradual: K1 40/40, H3 50/50, H2 100/70, H1 140/70.
+- **Campaign results — Part 12 analyses on all 180 runs (2026-10-09; Part 08 §8.16, findings #24–#28).** Medians over
+  5 reps; exact rank-sum tests, Holm within each family of 3; 5 of 36 planned tests significant.
+  - **Metric (H2 vs H3):** request rate beats CPU under spike load — shipping 90 vs 70 s over SLO and 10.64 vs 5.19%
+    errors (p = 0.024, A12 = 1.00 each), auth errors 12.50 vs 7.73% (p = 0.048) — and scales 30–45 s earlier. Under
+    oscillating load the direction reverses (not significant).
+  - **Engine (H3 vs K1):** no significant difference in any of the 12 tests (smallest p 0.31).
+  - **Default vs tuned (H1 vs H2):** tuned wins on auth spike (200 vs 130 s, p = 0.024) and shipping gradual errors;
+    the default does better under oscillating load.
+  - **Oscillating load defeats every autoscaler on both services:** 4.2–29.2% (auth) and 24.0–60.0% (shipping) of the
+    B1→B2 gap closed, against 55.3–100% under gradual and spike load. H3 and K1 start every later peak on 1 pod.
+  - **Repeatability:** CPU-based cells spread more on seconds over SLO (median range 60 vs 20 s, p = 0.0004); all 23
+    anti-phase scale-downs are in H2 oscillating. Exploratory: autoscaled cells tend to be worse in session 1
+    (reps 1–2) than session 2 (sign tests p = 0.064 and 0.053).
+  - **Efficiency:** autoscalers held 41.1–87.0% of B2's replica-seconds but used 64.3–102.8% of its CPU core-seconds.
 
 ---
 
@@ -163,6 +177,7 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
 | 2026-10-06 | **Thesis structure "Replace":** if the open-loop campaign passes its gate it is the thesis dataset; the closed-loop campaign becomes methodology background (why the generator was switched), not a second result set; it stays the fallback if the gate fails | The user's original decision was to switch; one dataset keeps the thesis on HPA vs KEDA | Part 08 §8.14 |
 | 2026-10-06 | **H1 = 80% CPU** (the Kubernetes default target) for the campaign, from position 13; positions 1 and 9 (run at 70%) archived and re-run at 80% before the gate | H1 stands for HPA out of the box; 70% was an undocumented judgment call; decided for construct validity, not from H1 results (`dddd996`) | Part 08 §8.13, Part 11 §11.6 #1 |
 | 2026-10-07 | **Continue past the gate FAIL as a documented deviation:** run reps 3–5; the open-loop campaign is the thesis dataset; repeatability becomes a measured outcome; analysis plan fixed and pushed before any rep 3–5 data | G1–G4 passed in all 72 runs; the G5/G6 failures trace to the HPA's lagging CPU reading (system behavior); open loop is the realistic load model; 2 reps cannot characterize the variability | Part 12 |
+| 2026-10-09 | Add an exploratory session check (reps 1–2 vs 3–5) to A4, written into Part 12 before any analysis and labelled as not pre-registered | The blueprint audit showed reps 1–2 worse than reps 3–5 in several cells; a session shift cannot bias the balanced contrasts but inflates the A4 dispersion | Part 12 §12.4 |
 
 ---
 
@@ -211,19 +226,21 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
 
 1. **Campaign complete (2026-10-09):** 180/180 runs, verified and merged; data-quality rules passed with no re-runs
    needed (Part 08 §8.13).
-2. **Next — analyses A1–A6 exactly as pre-registered in Part 12** on all 180 runs (time to scale from the HPA and pod
-   timelines, not `k8s-events.txt`), plus the exploratory session check (reps 1–2 vs 3–5, added 2026-10-09 before any
-   analysis and labelled as not pre-registered), then the thesis figures.
-3. **Phase 4 extras** on the thesis dataset: decomposition table (metric effect = H2 vs H3, as in Part 12 A2),
-   regenerated figures; add the k6-vs-Prometheus cross-check to the validator (descriptive only, Part 11 §11.7).
+2. **Analyses done (2026-10-09):** A1–A6 exactly as pre-registered in Part 12, plus the exploratory session check;
+   results in Part 08 §8.16 and findings #24–#28 (`9c5dc8c`).
+3. **Next — Phase 4 extras** on the thesis dataset: thesis figures (the working figures are in
+   `experiment-results-openloop/analysis/part12/figures/`; `thesis-figures/` is superseded), decomposition table
+   (metric effect = H2 vs H3, as in Part 12 A2); add the k6-vs-Prometheus cross-check to the validator (descriptive
+   only, Part 11 §11.7).
 4. **Writing:** rewrite BAB 3 around the open-loop method (generator, load shedding, pre-login, gate, H1 = 80%) with
    the closed-loop campaign as the reason for switching; use Part 11 for provenance and sources; draft BAB 4–5 from
-   the Part 12 analyses.
+   the Part 12 results.
 5. **Research-data to-dos (Part 11 §11.7):** export the Azure Activity Log and cost records privately (90-day
    retention; the August entries expire around mid-November); archive a DOI snapshot at submission; write the
    reproducibility section.
 6. **Housekeeping:**
-   - All October work through the completed campaign (`4be8e00`, `bfdd938`, 2026-10-09) is committed and pushed.
+   - All October work through the campaign analysis (`4be8e00`, `bfdd938`, `4cf2d29`, `9c5dc8c`, 2026-10-09) is
+     committed and pushed.
    - `.gitignore` no longer ignores `*.md` (only `*.pdf`); the blueprint parts and `pilot-openloop-report.md` are
      versioned. `Thesis.docx` (repo root) stays untracked unless the user asks — the repository is public.
    - `ecommerce-vm` is idle since the campaign finished (2026-10-09) and stays allocated (user decision, 2026-10-09);
@@ -248,7 +265,7 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
 | §8 risks | Part 07 |
 | §9 strategy, §10 timeline plan, §11 assessment | Part 09 |
 | §12 chapter outline (BAB 1–5) | Part 10 |
-| findings #1–#22 | Part 01 |
+| findings #1–#28 | Part 01 |
 | open-loop study | Part 08 |
 | provenance, validity, defense Q&A, sources | Part 11 |
 | deviation after the gate, analysis plan | Part 12 |

@@ -139,3 +139,6 @@ so no re-runs were needed; G4 passes in every service × pattern over the 5 reps
 rep 1, kept as an outcome (Part 08 §8.13). Analyses A1–A6 are next; nothing in this plan was changed after the data
 arrived. Added on 2026-10-09, before any analysis and marked as such: two clarifications (O4 timing; the choice of
 test) and the exploratory session check under A4.
+
+**Analyses run (2026-10-09):** `scripts/analyze_openloop_campaign.py` (commit `9c5dc8c`) on all 180 runs, as defined
+above; outputs in `experiment-results-openloop/analysis/part12/`. Results: Part 08 §8.16 and findings #24–#28.

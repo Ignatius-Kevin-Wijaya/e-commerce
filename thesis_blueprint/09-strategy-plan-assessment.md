@@ -137,6 +137,10 @@ All 180 runs have been executed and stored in `experiment-results/`. Campaign hi
 > `k8s-events.txt` (Kubernetes merges repeated events); 4c → A2, exact Mann–Whitney tests with A12 and Holm on H2 vs H3,
 > H3 vs K1 and H1 vs H2 (not Wilcoxon signed-rank on H1 vs H3, H3 vs K1, H1 vs K1); 4d → A3 (gap closed) and A5
 > (Pareto); plus A4 (repeatability) and A6 (mechanism plots).
+>
+> **Done 2026-10-09** (`9c5dc8c`): A1–A6 and the exploratory session check — results in Part 08 §8.16 and findings
+> #24–#28. Still open: 4d's decomposition table on the open-loop data (metric effect = H2 vs H3) and 4e's thesis
+> figures (working figures in `experiment-results-openloop/analysis/part12/figures/`).
 
 ### Phase 4b: Open-Loop Study (added 2026-10-06 — Part 08)
 
@@ -147,6 +151,7 @@ All 180 runs have been executed and stored in `experiment-results/`. Campaign hi
 | v2 smoke test (9 runs) | ✅ Done 2026-10-06 08:31–11:31 UTC | 9/9 runs clean; pre-registered gate (rule v1) FAIL on one G6 cell (shipping H3 error rate) |
 | G6 rule v2 + campaign config | ✅ Fixed and pushed 2026-10-06 (`6ef8f89`, `b35bee1`) before any campaign data | 50% of the mean or ≤ 30 s / ≤ 2 points |
 | 180-run open-loop campaign with gate after rep block 2 | ✅ **Complete 2026-10-09 (180/180)**; gate after rep blocks 1–2 FAIL (G5 1 run; G6 3 of 24 cells, all CPU-based), continued as a documented deviation (Part 12); G1–G4 pass in all 180 runs | ≈61.6 h ≈ $31.8 of AKS in total (estimate); Phase 4 follows the analysis plan in Part 12 |
+| Part 12 analyses A1–A6 (+ exploratory session check) | ✅ Done 2026-10-09 (`9c5dc8c`) | Part 08 §8.16; findings #24–#28 |
 
 **Effect on Phase 4/5:** BAB 4 analysis of the closed-loop dataset can proceed in parallel. If the open-loop campaign passes, BAB 3/4 gain a second generator condition (Part 08 §8.14); if not, the open-loop pilot and smoke results are reported as a robustness study.
 
