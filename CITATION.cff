@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this experiment, its data or its code, please cite it as below."
+title: "Kubernetes autoscaling: HPA vs KEDA, CPU vs request rate"
+abstract: >-
+  A controlled experiment on Azure Kubernetes Service that separates the effect of the scaling metric
+  (CPU vs request rate) from that of the autoscaler (the Kubernetes Horizontal Pod Autoscaler vs KEDA):
+  180 open-loop load-test runs (2 services x 6 configurations x 3 load patterns x 5 repetitions) with
+  per-request data, the code and manifests that produced them, the pre-registered analysis, and the
+  research log of the undergraduate thesis "Analisis Pengaruh Jenis Metrik Penskalaan dan Mekanisme
+  Autoscaler (HPA vs KEDA) terhadap Responsivitas dan Efisiensi Resource Aplikasi Microservices pada
+  Kubernetes".
+type: software
+authors:
+  - family-names: Wijaya
+    given-names: Ignatius Kevin
+license: Apache-2.0
+repository-code: "https://github.com/Ignatius-Kevin-Wijaya/k8s-autoscaling-hpa-vs-keda"
+keywords:
+  - kubernetes
+  - autoscaling
+  - horizontal pod autoscaler
+  - keda
+  - prometheus
+  - load testing
+  - azure kubernetes service
+version: "1.0.0"
+date-released: "2026-10-09"
