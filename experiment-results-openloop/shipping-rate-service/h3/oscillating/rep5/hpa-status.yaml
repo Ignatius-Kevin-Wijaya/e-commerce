@@ -1,0 +1,71 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"labels":{"experiment":"h3-hpa-custom-metric"},"name":"shipping-rate-service-hpa-custom","namespace":"ecommerce"},"spec":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":15,"type":"Percent","value":100}],"stabilizationWindowSeconds":30},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Pods","value":5}],"stabilizationWindowSeconds":0}},"maxReplicas":5,"metrics":[{"pods":{"metric":{"name":"http_requests_per_second"},"target":{"averageValue":"15","type":"AverageValue"}},"type":"Pods"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"shipping-rate-service"}}}
+  creationTimestamp: "2026-10-08T16:05:46Z"
+  labels:
+    experiment: h3-hpa-custom-metric
+  name: shipping-rate-service-hpa-custom
+  namespace: ecommerce
+  resourceVersion: "7591619"
+  uid: 68da57ae-bd2b-4ec4-b8ba-d44485a897d5
+spec:
+  behavior:
+    scaleDown:
+      policies:
+      - periodSeconds: 15
+        type: Percent
+        value: 100
+      selectPolicy: Max
+      stabilizationWindowSeconds: 30
+    scaleUp:
+      policies:
+      - periodSeconds: 15
+        type: Pods
+        value: 5
+      selectPolicy: Max
+      stabilizationWindowSeconds: 0
+  maxReplicas: 5
+  metrics:
+  - pods:
+      metric:
+        name: http_requests_per_second
+      target:
+        averageValue: "15"
+        type: AverageValue
+    type: Pods
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: shipping-rate-service
+status:
+  conditions:
+  - lastTransitionTime: "2026-10-08T16:06:01Z"
+    message: recommended size matches current size
+    reason: ReadyForNewScale
+    status: "True"
+    type: AbleToScale
+  - lastTransitionTime: "2026-10-08T16:06:01Z"
+    message: the HPA was able to successfully calculate a replica count from pods
+      metric http_requests_per_second
+    reason: ValidMetricFound
+    status: "True"
+    type: ScalingActive
+  - lastTransitionTime: "2026-10-08T16:17:34Z"
+    message: the desired count is within the acceptable range
+    reason: DesiredWithinRange
+    status: "False"
+    type: ScalingLimited
+  currentMetrics:
+  - pods:
+      current:
+        averageValue: 155m
+      metric:
+        name: http_requests_per_second
+    type: Pods
+  currentReplicas: 1
+  desiredReplicas: 1
+  lastScaleTime: "2026-10-08T16:19:49Z"

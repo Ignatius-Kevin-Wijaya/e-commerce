@@ -1,0 +1,32 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-08T05:02:26Z	Normal	Pulling	pod/auth-service-74c577b9b7-fch58	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-08T05:02:26Z	Normal	Pulling	pod/auth-service-74c577b9b7-n7r66	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-08T05:02:26Z	Normal	Pulling	pod/auth-service-74c577b9b7-w7zh4	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-08T05:02:26Z	Normal	SuccessfulCreate	replicaset/auth-service-74c577b9b7	Created pod: auth-service-74c577b9b7-w7zh4
+2026-10-08T05:02:26Z	Normal	SuccessfulCreate	replicaset/auth-service-74c577b9b7	Created pod: auth-service-74c577b9b7-fch58
+2026-10-08T05:02:26Z	Normal	SuccessfulCreate	replicaset/auth-service-74c577b9b7	Created pod: auth-service-74c577b9b7-n7r66
+2026-10-08T05:02:26Z	Normal	SuccessfulCreate	replicaset/auth-service-74c577b9b7	Created pod: auth-service-74c577b9b7-8wwzk
+2026-10-08T05:02:26Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled up replica set auth-service-74c577b9b7 from 1 to 5
+2026-10-08T05:02:26Z	Normal	Scheduled	pod/auth-service-74c577b9b7-w7zh4	Successfully assigned ecommerce/auth-service-74c577b9b7-w7zh4 to aks-userpool-16719200-vmss00002q
+2026-10-08T05:02:26Z	Normal	Scheduled	pod/auth-service-74c577b9b7-fch58	Successfully assigned ecommerce/auth-service-74c577b9b7-fch58 to aks-userpool-16719200-vmss00002q
+2026-10-08T05:02:26Z	Normal	Scheduled	pod/auth-service-74c577b9b7-n7r66	Successfully assigned ecommerce/auth-service-74c577b9b7-n7r66 to aks-userpool-16719200-vmss00002q
+2026-10-08T05:02:26Z	Normal	Scheduled	pod/auth-service-74c577b9b7-8wwzk	Successfully assigned ecommerce/auth-service-74c577b9b7-8wwzk to aks-userpool-16719200-vmss00002q
+2026-10-08T05:02:27Z	Normal	Pulling	pod/auth-service-74c577b9b7-8wwzk	Pulling image "ecommerce.azurecr.io/auth-service:latest"
+2026-10-08T05:02:27Z	Normal	Pulled	pod/auth-service-74c577b9b7-8wwzk	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 310ms (310ms including waiting). Image size: 129975007 bytes.
+2026-10-08T05:02:27Z	Normal	Created	pod/auth-service-74c577b9b7-8wwzk	Created container: auth-service
+2026-10-08T05:02:27Z	Normal	Started	pod/auth-service-74c577b9b7-8wwzk	Started container auth-service
+2026-10-08T05:02:27Z	Normal	Pulled	pod/auth-service-74c577b9b7-fch58	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 353ms (353ms including waiting). Image size: 129975007 bytes.
+2026-10-08T05:02:27Z	Normal	Created	pod/auth-service-74c577b9b7-fch58	Created container: auth-service
+2026-10-08T05:02:27Z	Normal	Started	pod/auth-service-74c577b9b7-fch58	Started container auth-service
+2026-10-08T05:02:27Z	Normal	Pulled	pod/auth-service-74c577b9b7-n7r66	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 356ms (356ms including waiting). Image size: 129975007 bytes.
+2026-10-08T05:02:27Z	Normal	Created	pod/auth-service-74c577b9b7-n7r66	Created container: auth-service
+2026-10-08T05:02:27Z	Normal	Started	pod/auth-service-74c577b9b7-n7r66	Started container auth-service
+2026-10-08T05:02:27Z	Normal	Pulled	pod/auth-service-74c577b9b7-w7zh4	Successfully pulled image "ecommerce.azurecr.io/auth-service:latest" in 336ms (336ms including waiting). Image size: 129975007 bytes.
+2026-10-08T05:02:27Z	Normal	Created	pod/auth-service-74c577b9b7-w7zh4	Created container: auth-service
+2026-10-08T05:02:27Z	Normal	Started	pod/auth-service-74c577b9b7-w7zh4	Started container auth-service
+2026-10-08T05:04:23Z	Normal	SuccessfulCreate	job/k6-ol-auth-service-b2-oscillating-rep4	Created pod: k6-ol-auth-service-b2-oscillating-rep4-dtmkn
+2026-10-08T05:04:23Z	Normal	Scheduled	pod/k6-ol-auth-service-b2-oscillating-rep4-dtmkn	Successfully assigned ecommerce/k6-ol-auth-service-b2-oscillating-rep4-dtmkn to aks-userpool-16719200-vmss00002q
+2026-10-08T05:04:24Z	Normal	Pulled	pod/k6-ol-auth-service-b2-oscillating-rep4-dtmkn	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-08T05:04:24Z	Normal	Created	pod/k6-ol-auth-service-b2-oscillating-rep4-dtmkn	Created container: k6
+2026-10-08T05:04:24Z	Normal	Started	pod/k6-ol-auth-service-b2-oscillating-rep4-dtmkn	Started container k6
+2026-10-08T05:16:33Z	Normal	Completed	job/k6-ol-auth-service-b2-oscillating-rep4	Job completed

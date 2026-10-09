@@ -1,0 +1,58 @@
+{
+  "run_id": "shipping-rate-service_h1_oscillating_rep4",
+  "kind": "pilot",
+  "service": "shipping-rate-service",
+  "config": "h1",
+  "pattern": "oscillating",
+  "repetition": 4,
+  "plan_position": 115,
+  "start_epoch": 1791434385,
+  "end_epoch": 1791435561,
+  "duration_seconds": 1176,
+  "k6_job_name": "k6-ol-shipping-rate-service-h1-oscillating-rep4",
+  "k6_pod_name": "k6-ol-shipping-rate-service-h1-oscillating-rep4-nccn9",
+  "k6_exit_code": 0,
+  "k6_scenario_start_ms": 1791434630994,
+  "target_url": "http://shipping-rate-service.ecommerce.svc.cluster.local:8006",
+  "raw_results": {
+    "file": "k6-results.json.gz",
+    "verified": true,
+    "bytes": 6161404,
+    "md5": "551d00b47924ee35425fbc82470d6ea5"
+  },
+  "load_profile": {
+    "version": "open-loop-arr-v2",
+    "executor": "ramping-arrival-rate",
+    "rate_unit": "req/s",
+    "base_rate": 10,
+    "peak_rate": 105,
+    "ladder_rates": null,
+    "ladder_step": null,
+    "ladder_gap": null,
+    "request_timeout": "5s",
+    "vu_factor": 1.5,
+    "pre_allocated_vus": 788,
+    "max_vus": 788,
+    "no_connection_reuse": true,
+    "k6_image": "grafana/k6:0.46.0",
+    "k6_resources": "1000m,1Gi,2000m,4Gi",
+    "request_mix": "SHIPPING_MAX_ITEMS=4 SHIPPING_MIN_WEIGHT_GRAMS=200 SHIPPING_MAX_WEIGHT_GRAMS=2500 SHIPPING_DESTINATION_ZONES=domestic,regional,remote"
+  },
+  "service_overrides": {
+    "image_tag": null,
+    "code_overlay_sha": "5b5de9e30a49",
+    "max_inflight_requests": 48
+  },
+  "preauth_tokens": {
+    "enabled": false,
+    "count": null,
+    "epoch": null
+  },
+  "timings": {
+    "reset_wait": 120,
+    "stabilize_wait": 90,
+    "export_wait": 180
+  },
+  "export_ok": true,
+  "timestamp": "2026-10-08T04:59:21.687Z"
+}

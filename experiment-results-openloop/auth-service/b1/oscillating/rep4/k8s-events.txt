@@ -1,0 +1,16 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-08T06:19:54Z	Normal	Killing	pod/auth-service-74c577b9b7-85d6m	Stopping container auth-service
+2026-10-08T06:19:54Z	Normal	Killing	pod/auth-service-74c577b9b7-cmrnt	Stopping container auth-service
+2026-10-08T06:19:54Z	Normal	Killing	pod/auth-service-74c577b9b7-ftf2f	Stopping container auth-service
+2026-10-08T06:19:54Z	Normal	Killing	pod/auth-service-74c577b9b7-s5nwm	Stopping container auth-service
+2026-10-08T06:19:54Z	Normal	SuccessfulDelete	replicaset/auth-service-74c577b9b7	Deleted pod: auth-service-74c577b9b7-cmrnt
+2026-10-08T06:19:54Z	Normal	SuccessfulDelete	replicaset/auth-service-74c577b9b7	Deleted pod: auth-service-74c577b9b7-85d6m
+2026-10-08T06:19:54Z	Normal	SuccessfulDelete	replicaset/auth-service-74c577b9b7	Deleted pod: auth-service-74c577b9b7-ftf2f
+2026-10-08T06:19:54Z	Normal	SuccessfulDelete	replicaset/auth-service-74c577b9b7	Deleted pod: auth-service-74c577b9b7-s5nwm
+2026-10-08T06:19:54Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-74c577b9b7 from 5 to 1
+2026-10-08T06:24:22Z	Normal	Pulled	pod/k6-ol-auth-service-b1-oscillating-rep4-mjlqp	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-08T06:24:22Z	Normal	Created	pod/k6-ol-auth-service-b1-oscillating-rep4-mjlqp	Created container: k6
+2026-10-08T06:24:22Z	Normal	Started	pod/k6-ol-auth-service-b1-oscillating-rep4-mjlqp	Started container k6
+2026-10-08T06:24:22Z	Normal	SuccessfulCreate	job/k6-ol-auth-service-b1-oscillating-rep4	Created pod: k6-ol-auth-service-b1-oscillating-rep4-mjlqp
+2026-10-08T06:24:22Z	Normal	Scheduled	pod/k6-ol-auth-service-b1-oscillating-rep4-mjlqp	Successfully assigned ecommerce/k6-ol-auth-service-b1-oscillating-rep4-mjlqp to aks-userpool-16719200-vmss00002q
+2026-10-08T06:36:42Z	Normal	Completed	job/k6-ol-auth-service-b1-oscillating-rep4	Job completed

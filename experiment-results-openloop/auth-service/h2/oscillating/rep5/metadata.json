@@ -1,0 +1,58 @@
+{
+  "run_id": "auth-service_h2_oscillating_rep5",
+  "kind": "pilot",
+  "service": "auth-service",
+  "config": "h2",
+  "pattern": "oscillating",
+  "repetition": 5,
+  "plan_position": 171,
+  "start_epoch": 1791501844,
+  "end_epoch": 1791503063,
+  "duration_seconds": 1219,
+  "k6_job_name": "k6-ol-auth-service-h2-oscillating-rep5",
+  "k6_pod_name": "k6-ol-auth-service-h2-oscillating-rep5-cwjcc",
+  "k6_exit_code": 0,
+  "k6_scenario_start_ms": 1791502129246,
+  "target_url": "http://auth-service.ecommerce.svc.cluster.local:8001",
+  "raw_results": {
+    "file": "k6-results.json.gz",
+    "verified": true,
+    "bytes": 1800573,
+    "md5": "d16e6537044f9f00c4dc0125ea6999f3"
+  },
+  "load_profile": {
+    "version": "open-loop-arr-v2",
+    "executor": "ramping-arrival-rate",
+    "rate_unit": "req/s",
+    "base_rate": 2,
+    "peak_rate": 30,
+    "ladder_rates": null,
+    "ladder_step": null,
+    "ladder_gap": null,
+    "request_timeout": "5s",
+    "vu_factor": 1.5,
+    "pre_allocated_vus": 225,
+    "max_vus": 225,
+    "no_connection_reuse": true,
+    "k6_image": "grafana/k6:0.46.0",
+    "k6_resources": "1000m,1Gi,2000m,4Gi",
+    "request_mix": "AUTH_ME_PERCENT=70 AUTH_LOGIN_PERCENT=30 NUM_TEST_USERS=120"
+  },
+  "service_overrides": {
+    "image_tag": null,
+    "code_overlay_sha": "58d754bd7213",
+    "max_inflight_requests": 22
+  },
+  "preauth_tokens": {
+    "enabled": true,
+    "count": 120,
+    "epoch": 1791501903
+  },
+  "timings": {
+    "reset_wait": 120,
+    "stabilize_wait": 90,
+    "export_wait": 180
+  },
+  "export_ok": true,
+  "timestamp": "2026-10-08T23:44:23.847Z"
+}

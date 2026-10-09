@@ -1,0 +1,16 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-08T13:21:53Z	Normal	Killing	pod/shipping-rate-service-6ff89474bc-4fgwz	Stopping container shipping-rate-service
+2026-10-08T13:21:53Z	Normal	Killing	pod/shipping-rate-service-6ff89474bc-tgjjv	Stopping container shipping-rate-service
+2026-10-08T13:21:53Z	Normal	Killing	pod/shipping-rate-service-6ff89474bc-wb2w9	Stopping container shipping-rate-service
+2026-10-08T13:21:53Z	Normal	Killing	pod/shipping-rate-service-6ff89474bc-xhzsx	Stopping container shipping-rate-service
+2026-10-08T13:21:53Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-6ff89474bc	Deleted pod: shipping-rate-service-6ff89474bc-wb2w9
+2026-10-08T13:21:53Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-6ff89474bc	Deleted pod: shipping-rate-service-6ff89474bc-tgjjv
+2026-10-08T13:21:53Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-6ff89474bc	Deleted pod: shipping-rate-service-6ff89474bc-xhzsx
+2026-10-08T13:21:53Z	Normal	SuccessfulDelete	replicaset/shipping-rate-service-6ff89474bc	Deleted pod: shipping-rate-service-6ff89474bc-4fgwz
+2026-10-08T13:21:53Z	Normal	ScalingReplicaSet	deployment/shipping-rate-service	Scaled down replica set shipping-rate-service-6ff89474bc from 5 to 1
+2026-10-08T13:25:40Z	Normal	SuccessfulCreate	job/k6-ol-shipping-rate-service-b1-oscillating-rep4	Created pod: k6-ol-shipping-rate-service-b1-oscillating-rep4-dz7jz
+2026-10-08T13:25:40Z	Normal	Scheduled	pod/k6-ol-shipping-rate-service-b1-oscillating-rep4-dz7jz	Successfully assigned ecommerce/k6-ol-shipping-rate-service-b1-oscillating-rep4-dz7jz to aks-userpool-16719200-vmss00002q
+2026-10-08T13:25:41Z	Normal	Pulled	pod/k6-ol-shipping-rate-service-b1-oscillating-rep4-dz7jz	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-08T13:25:41Z	Normal	Created	pod/k6-ol-shipping-rate-service-b1-oscillating-rep4-dz7jz	Created container: k6
+2026-10-08T13:25:41Z	Normal	Started	pod/k6-ol-shipping-rate-service-b1-oscillating-rep4-dz7jz	Started container k6
+2026-10-08T13:38:02Z	Normal	Completed	job/k6-ol-shipping-rate-service-b1-oscillating-rep4	Job completed

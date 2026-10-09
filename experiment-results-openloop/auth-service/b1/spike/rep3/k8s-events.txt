@@ -1,0 +1,18 @@
+TIMESTAMP	TYPE	REASON	OBJECT	MESSAGE
+2026-10-07T16:33:24Z	Normal	Killing	pod/auth-service-74c577b9b7-vkdbp	Stopping container auth-service
+2026-10-07T16:33:24Z	Normal	SuccessfulDelete	replicaset/auth-service-74c577b9b7	Deleted pod: auth-service-74c577b9b7-vkdbp
+2026-10-07T16:33:24Z	Normal	SuccessfulRescale	horizontalpodautoscaler/auth-service-hpa-default	New size: 4; reason: All metrics below target
+2026-10-07T16:33:24Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-74c577b9b7 from 5 to 4
+2026-10-07T16:33:41Z	Normal	ScalingReplicaSet	deployment/auth-service	Scaled down replica set auth-service-74c577b9b7 from 4 to 1
+2026-10-07T16:33:42Z	Normal	Killing	pod/auth-service-74c577b9b7-6lbdv	Stopping container auth-service
+2026-10-07T16:33:42Z	Normal	Killing	pod/auth-service-74c577b9b7-qwc9n	Stopping container auth-service
+2026-10-07T16:33:42Z	Normal	Killing	pod/auth-service-74c577b9b7-z7cfc	Stopping container auth-service
+2026-10-07T16:33:42Z	Normal	SuccessfulDelete	replicaset/auth-service-74c577b9b7	Deleted pod: auth-service-74c577b9b7-qwc9n
+2026-10-07T16:33:42Z	Normal	SuccessfulDelete	replicaset/auth-service-74c577b9b7	Deleted pod: auth-service-74c577b9b7-z7cfc
+2026-10-07T16:33:42Z	Normal	SuccessfulDelete	replicaset/auth-service-74c577b9b7	Deleted pod: auth-service-74c577b9b7-6lbdv
+2026-10-07T16:38:09Z	Normal	SuccessfulCreate	job/k6-ol-auth-service-b1-spike-rep3	Created pod: k6-ol-auth-service-b1-spike-rep3-g2nm8
+2026-10-07T16:38:09Z	Normal	Scheduled	pod/k6-ol-auth-service-b1-spike-rep3-g2nm8	Successfully assigned ecommerce/k6-ol-auth-service-b1-spike-rep3-g2nm8 to aks-userpool-16719200-vmss00002q
+2026-10-07T16:38:10Z	Normal	Pulled	pod/k6-ol-auth-service-b1-spike-rep3-g2nm8	Container image "grafana/k6:0.46.0" already present on machine
+2026-10-07T16:38:10Z	Normal	Created	pod/k6-ol-auth-service-b1-spike-rep3-g2nm8	Created container: k6
+2026-10-07T16:38:10Z	Normal	Started	pod/k6-ol-auth-service-b1-spike-rep3-g2nm8	Started container k6
+2026-10-07T16:50:18Z	Normal	Completed	job/k6-ol-auth-service-b1-spike-rep3	Job completed
