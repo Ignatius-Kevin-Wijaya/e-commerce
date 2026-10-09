@@ -178,6 +178,7 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
 | 2026-10-06 | **H1 = 80% CPU** (the Kubernetes default target) for the campaign, from position 13; positions 1 and 9 (run at 70%) archived and re-run at 80% before the gate | H1 stands for HPA out of the box; 70% was an undocumented judgment call; decided for construct validity, not from H1 results (`dddd996`) | Part 08 §8.13, Part 11 §11.6 #1 |
 | 2026-10-07 | **Continue past the gate FAIL as a documented deviation:** run reps 3–5; the open-loop campaign is the thesis dataset; repeatability becomes a measured outcome; analysis plan fixed and pushed before any rep 3–5 data | G1–G4 passed in all 72 runs; the G5/G6 failures trace to the HPA's lagging CPU reading (system behavior); open loop is the realistic load model; 2 reps cannot characterize the variability | Part 12 |
 | 2026-10-09 | Add an exploratory session check (reps 1–2 vs 3–5) to A4, written into Part 12 before any analysis and labelled as not pre-registered | The blueprint audit showed reps 1–2 worse than reps 3–5 in several cells; a session shift cannot bias the balanced contrasts but inflates the A4 dispersion | Part 12 §12.4 |
+| 2026-10-09 | Lock the open-loop dataset in this order: export the Azure Activity Log and costs privately, tag `openloop-dataset-v1` on `c1e72e2`, then a GitHub release with a Zenodo DOI after the repository cleanup | The Activity Log is kept 90 days; the cleanup and the SRE case study of the user's portfolio plan change files next to the data, so the tag comes first; Zenodo archives a release, which should have a README and green CI | Part 11 §11.7 |
 
 ---
 
@@ -235,12 +236,15 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
 4. **Writing:** rewrite BAB 3 around the open-loop method (generator, load shedding, pre-login, gate, H1 = 80%) with
    the closed-loop campaign as the reason for switching; use Part 11 for provenance and sources; draft BAB 4–5 from
    the Part 12 results.
-5. **Research-data to-dos (Part 11 §11.7):** export the Azure Activity Log and cost records privately (90-day
-   retention; the August entries expire around mid-November); archive a DOI snapshot at submission; write the
-   reproducibility section.
+5. **Research data (Part 11 §11.7):** done 2026-10-09: the Azure Activity Log and daily billed costs exported
+   privately, and the dataset tagged `openloop-dataset-v1` on `c1e72e2`. Still to do: a GitHub release with a Zenodo DOI
+   after the repository cleanup; the reproducibility section.
 6. **Housekeeping:**
    - All October work through the campaign analysis (`4be8e00`, `bfdd938`, `4cf2d29`, `9c5dc8c`, 2026-10-09) is
-     committed and pushed.
+     committed and pushed; the dataset tag `openloop-dataset-v1` points at `c1e72e2`.
+   - Idle cost: in September 2026, with AKS stopped all month, the thesis resource groups were still billed 888,752 IDR
+     (load balancer 281,129; VM software licence 190,627; VM 120,150; virtual network 112,452; storage 106,133;
+     ACR 77,952; Azure Cost Management export of 2026-10-09).
    - `.gitignore` no longer ignores `*.md` (only `*.pdf`); the blueprint parts and `pilot-openloop-report.md` are
      versioned. `Thesis.docx` (repo root) stays untracked unless the user asks — the repository is public.
    - `ecommerce-vm` is idle since the campaign finished (2026-10-09) and stays allocated (user decision, 2026-10-09);

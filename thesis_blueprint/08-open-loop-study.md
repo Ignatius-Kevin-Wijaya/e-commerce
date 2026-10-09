@@ -617,6 +617,12 @@ PYTHONUTF8=1 PILOT_OPENLOOP_DIR=experiment-results-openloop tools/python312/pyth
 (B2ats_v2) ran throughout. Campaign rep blocks 1–2: AKS from 12:23 UTC 2026-10-06 to 13:34 UTC 2026-10-07, ≈25.2 h ≈ $13.0;
 reps 3–5: 14:24 UTC 2026-10-07 to 02:51 UTC 2026-10-09, ≈36.4 h ≈ $18.8; whole campaign ≈61.6 h ≈ $31.8.
 
+**Azure's own records (exported 2026-10-09, Part 11 §11.7).** The Activity Log dates the campaign's AKS stops at
+13:33:40 (2026-10-07) and 02:50:36 (2026-10-09) UTC; the times in §8.13 come from the VM launcher's log, 17–18 s later.
+Billed cost of the thesis resource groups (Azure Cost Management, IDR): 5–8 October 794,895, with 9 October not yet
+billed at export; for comparison, 15–17 August (closed-loop campaign) 782,482, and September, with AKS stopped all
+month, 888,752 — the stopped cluster's load balancer and the VM with its software licence keep billing.
+
 ## 8.16 Campaign results — the Part 12 analyses (2026-10-09)
 
 Run on all 180 runs with `scripts/analyze_openloop_campaign.py` (commit `9c5dc8c`, 2026-10-09 07:25 UTC), exactly as

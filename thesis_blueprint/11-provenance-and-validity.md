@@ -236,9 +236,20 @@ independent sources, reproducibility, and timestamps the author does not control
 6. **Anyone can re-run it.** Manifests, scripts and configs are in the repository; one run takes about 20 minutes and
    about $0.17 of AKS (estimate).
 
-**To do:** export the Azure Activity Log and cost records for the study period (the Activity Log is kept for 90 days;
-keep the export private — it contains account identities); archive a snapshot with a DOI at submission (Zenodo or
-Software Heritage); add a "research data and reproducibility" section to BAB 3 or an appendix.
+**Done (2026-10-09):** the Azure Activity Log of both thesis resource groups (12 July → 9 October; the earliest event
+kept is from 15 August) and the daily billed cost of those resource groups were exported to a private folder outside
+the repository, with a README listing the files and their SHA-256:
+- `activity-log_ecommerce_2026-07-12_to_2026-10-09.json` — `e092e2e8fe81794514b48a65b62b096c81441004800c82cb52546246982a0b95`
+- `activity-log_MC_ecommerce_ecommerce-aks_indonesiacentral_2026-07-12_to_2026-10-09.json` — `455134f2b1d05cd92cf7b5c0a5a34b63432ec9525264b78bc31c2b97992f630e`
+- `cost-daily_thesis-resource-groups_2026-07-12_to_2026-10-09.json` — `3b3cdb763f6ef1c4f5446346c7c22541b95503ef3dbfd65622f8d9ca4828c6a6`
+
+Azure's record holds every AKS start and stop of both campaigns: closed loop, start 15 August 03:55:43 and stop
+17 August 22:34:35 UTC; open loop, four start/stop pairs from 5 October 14:53:04 to 9 October 02:50:36 UTC. The dataset
+is tagged `openloop-dataset-v1` (an annotated tag on `c1e72e2`, pushed 2026-10-09 09:20 UTC).
+
+**Still to do:** a GitHub release with a Zenodo DOI after the repository cleanup (README, green CI; settle the
+repository name first, since the archive records it); a "research data and reproducibility" section in BAB 3 or an
+appendix.
 
 ## 11.8 Ready answers to common questions
 
