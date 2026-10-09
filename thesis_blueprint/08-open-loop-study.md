@@ -3,13 +3,13 @@
 > Part of the thesis blueprint — index and executive summary: [thesis_blueprint.md](../thesis_blueprint.md).
 > New part, written 2026-10-06. Covers everything from the open-loop pilot request (2026-10-05) to the 180-run
 > open-loop campaign (rep blocks 1–2 finished 2026-10-07; pre-registered gate FAIL; continued as a documented
-> deviation — Part 12). Detailed pilot write-up: `pilot-openloop-report.md` (repo root; every result in it is
+> deviation — Part 12; all 180 runs complete 2026-10-09). Detailed pilot write-up: `pilot-openloop-report.md` (repo root; every result in it is
 > reproduced here). All numbers below were computed from the stored data;
 > estimates are labelled as estimates. Times are UTC unless marked otherwise.
 
 ---
 
-## 8.0 Status at a glance (2026-10-07, 14:00 UTC)
+## 8.0 Status at a glance (2026-10-09, 07:00 UTC)
 
 | Stage | Status | Outcome |
 |---|---|---|
@@ -18,7 +18,7 @@
 | v2 fixes (admission control, auth pre-auth, robustness gate) | ✅ Implemented, unit-tested, deployed via ConfigMap overlay | §8.9–§8.10 |
 | v2 calibration ladders | ✅ Done 2026-10-06 06:44–08:28 | Collapse removed up to the planned peaks (§8.11) |
 | v2 smoke test (9 runs) | ✅ Done 08:31–11:31; AKS stopped 11:35 | **Pre-registered gate FAIL on one cell:** shipping H3 error rate 5.32 / 6.97% across reps (27% of mean; limit 25% or 1 point), caused by a first scale-up one 15 s HPA cycle later. Everything else passes: 9/9 runs clean, B1 hold graceful, SLO-violation seconds 70/70, 70/70, 100/100 (shipping) and 140/170 (auth) (§8.12) |
-| 180-run open-loop campaign | ✅ Rep blocks 1–2 done: 72/72 at 2026-10-07 13:31 UTC (positions 1 and 9 re-run at H1 = 80%); AKS stopped 13:33:57; all 79 raw files match their capture checksums | **Pre-registered gate (rule v2): FAIL.** G1–G4 pass in all 72 runs; G5 fails in 1 run and G6 in 3 of 24 autoscaled cells — all CPU-based (auth gradual H1, auth oscillating H2, shipping oscillating H1). Request-rate cells (H3, K1) reproducible in 12/12. **User decision: continue with reps 3–5 as a documented deviation** (Part 12; launch awaits the go-ahead) (§8.13) |
+| 180-run open-loop campaign | ✅ **Complete: 180/180** — rep blocks 1–2 by 2026-10-07 13:31 UTC, reps 3–5 from 2026-10-07 14:32 to 2026-10-09 02:47 UTC; AKS stopped 02:50:54; all 187 raw files match their capture checksums | Gate after rep blocks 1–2 (rule v2): **FAIL** (G5 1 run; G6 3 of 24 cells, all CPU-based) — continued as a documented deviation (Part 12). Data-quality rules over all 180 runs (Part 12 §12.2): G1–G4 pass everywhere, no re-runs needed, G5 flag only in auth H2 oscillating rep 1 (kept as an outcome). **Next: analyses A1–A6** (§8.13) |
 
 **"Replace" (§8.14):** if the campaign passes its gate it is the thesis dataset; the closed-loop final dataset (Part 01,
 findings #13–#16) then becomes methodology background. If the campaign fails, the closed-loop dataset is the thesis
@@ -426,7 +426,7 @@ unchanged. Reasons:
 constraint) under G6 rule v2 (§8.9), fixed before any campaign data. The smoke stays FAIL on record and is not
 re-scored.
 
-## 8.13 Campaign (approved 2026-10-06 with G6 rule v2; rep blocks 1–2 done 2026-10-07; gate FAIL; continued as a documented deviation)
+## 8.13 Campaign (approved 2026-10-06 with G6 rule v2; gate FAIL after rep blocks 1–2; continued as a documented deviation; complete 2026-10-09)
 
 - 180 runs (`experiment-results-openloop/runlist.txt`: 2 services × 6 configs incl. H1 × 3 patterns × 5 reps), shuffled
   within rep blocks (seed 20261006); positions 1–36 are rep 1 and 37–72 rep 2, each block covering all 36 cells (18 auth
@@ -536,6 +536,24 @@ Seconds over SLO per cell (rep 1 / rep 2; bold = G6 fail):
   open-loop campaign stays the thesis dataset; repeatability becomes a measured outcome. The deviation, its reasons and
   the analysis plan are fixed in [Part 12](12-deviation-and-analysis-plan.md), committed and pushed before any rep 3–5
   run; the FAIL verdict stays on record.
+- **Reps 3–5 launched (2026-10-07):** Part 12 pushed in `b7fa4d3` at 14:22:42 UTC. The VM was synced from git (docs
+  only had changed) and re-verified: 334/334 tracked non-data files equal HEAD. AKS started 14:24–14:31; no `Failed`
+  auth or shipping pods; monitoring, KEDA and metrics APIs healthy. The launcher started at 14:32:17 (tmux
+  `campaign345`, console `~/campaign-console-reps345.log`, no stop-at): 72 DONE, 108 pending, first run plan position
+  73 (auth B2 oscillating rep 3), same settings and frozen order. Expected end, with AKS stopped by the VM, ≈02:45 UTC
+  on 2026-10-09 (estimate from 20.1 min per run).
+- **Reps 3–5 finished (2026-10-09):** position 180 completed at 02:45:32 UTC; the launcher reported 180/180 at 02:47:49
+  (first attempt, no failure or retry in 36 h), found no leftover k6 job and stopped AKS at 02:50:54 (verified
+  `Stopped`). Early checks during the run had validated 81 of the 108 runs clean (positions 73–153), so no re-run had to
+  be queued.
+- **Verification and data quality (2026-10-09 ≈06:40–07:00 UTC):** the 812 MB archive's md5 matched after download;
+  the 72 rep 1–2 run folders, the superseded H1 runs, config, run list and plan are byte-identical to the committed
+  copies; the VM's `pilot.log` extends the committed one (its first 2,499 lines are identical). All 187 raw files
+  (180 runs, 2 superseded, 5 ladders) match the checksums recorded inside the k6 pods. Part 12 §12.2 over all 180 runs:
+  G1, G2, G3 pass in every run (no re-runs needed); G4 passes in every service × pattern over 5 reps — B2 ≤ 0.18%
+  errors with p95 655–943 ms (auth, SLO 1500) and 916–919 ms (shipping, SLO 1200), B1 250–410 s over SLO with
+  43.57–68.93% errors; G5 flags only auth H2 oscillating rep 1 (kept as an outcome). The 5-rep G4 check ran on a scratch
+  copy so the committed rep 1–2 gate record (`analysis/gate-v2.json`) stays unchanged.
 
 ## 8.14 Implications for the thesis text
 
@@ -583,4 +601,4 @@ PYTHONUTF8=1 PILOT_OPENLOOP_DIR=experiment-results-openloop tools/python312/pyth
 **Costs of this study (estimates):** 2026-10-05/06 session ≈10.4 h of AKS ≈ $5.4 (idle start, 6 ladders, pilot);
 2026-10-06 v2 work from ≈06:30 UTC, ≈5.2 h ≈ $2.7 including the smoke test; ACR builds $0 (none ran). The VM
 (B2ats_v2) ran throughout. Campaign rep blocks 1–2: AKS from 12:23 UTC 2026-10-06 to 13:34 UTC 2026-10-07, ≈25.2 h ≈ $13.0;
-reps 3–5 would be ≈36 h ≈ $19 more.
+reps 3–5: 14:24 UTC 2026-10-07 to 02:51 UTC 2026-10-09, ≈36.4 h ≈ $18.8; whole campaign ≈61.6 h ≈ $31.8.

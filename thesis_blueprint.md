@@ -55,7 +55,7 @@
 
 ---
 
-## Current status (2026-10-07, 14:00 UTC)
+## Current status (2026-10-09, 07:00 UTC)
 
 | Track | Status |
 |---|---|
@@ -64,8 +64,8 @@
 | **User decisions** | Switch to a full 180-run open-loop campaign **only if it is robust** (Part 08 §8.8). After the smoke: run the campaign under G6 rule v2; thesis structure **"Replace"**; **H1 = 80%** (Kubernetes default) (Part 08 §8.9, §8.13, §8.14). |
 | **v2 fixes + calibration** | ✅ Admission control (both services), auth pre-authentication, robustness gate G1–G6; recalibrated 2026-10-06. (Part 08 §8.9–§8.11) |
 | **v2 smoke test** | ✅ Done 2026-10-06 08:31–11:31 UTC (AKS stopped 11:35). 9/9 runs clean; B1 hold graceful; SLO-violation seconds replicate. **Pre-registered gate FAIL on one cell** (shipping H3 error rate 5.32 / 6.97%, one 15 s HPA cycle apart). (Part 08 §8.12) |
-| **Open-loop campaign** | ✅ Rep blocks 1–2 done: 72/72 at 2026-10-07 13:31 UTC (H1 = 80%; positions 1 and 9 re-run), AKS stopped 13:33:57, all raw files checksum-verified. **Pre-registered gate (rule v2): FAIL** — G1–G4 pass in all 72 runs; G5 fails in 1 run; G6 fails in 3 of 24 cells, all CPU-based (request-rate cells reproducible 12/12; finding #23). Pre-registered consequence: stop. **User decision (2026-10-07): continue with reps 3–5 as a documented deviation** — the open-loop campaign stays the thesis dataset; analysis plan in Part 12, pushed before any new run; launch awaits the go-ahead (≈36 h ≈ $19, estimate). (Part 08 §8.13, Part 12) |
-| **Analysis (Phase 4)** | Waits for the gate; runs on the thesis dataset (the open-loop campaign if it passes): Wilcoxon tests and effect sizes, time-to-scale extraction, Resource Cost Index / Pareto, figures (`thesis-figures/` PNGs are from superseded data). (Part 09 §10) |
+| **Open-loop campaign** | ✅ Rep blocks 1–2 done: 72/72 at 2026-10-07 13:31 UTC (H1 = 80%; positions 1 and 9 re-run), AKS stopped 13:33:57, all raw files checksum-verified. **Pre-registered gate (rule v2): FAIL** — G1–G4 pass in all 72 runs; G5 fails in 1 run; G6 fails in 3 of 24 cells, all CPU-based (request-rate cells reproducible 12/12; finding #23). Pre-registered consequence: stop. **User decision (2026-10-07): continue with reps 3–5 as a documented deviation** — the open-loop campaign stays the thesis dataset; analysis plan in Part 12, pushed (`b7fa4d3`) before any new run. **✅ Campaign complete: 180/180** (reps 3–5 from 2026-10-07 14:32 to 2026-10-09 02:47 UTC, no failure; AKS stopped 02:50:54). All 187 raw files checksum-verified; data-quality rules (Part 12 §12.2): G1–G4 pass in all 180 runs, no re-runs needed, G5 flag only in auth H2 oscillating rep 1. ≈61.6 h ≈ $31.8 of AKS in total (estimate). (Part 08 §8.13, Part 12) |
+| **Analysis (Phase 4)** | **Next:** the pre-registered analyses A1–A6 of Part 12 on all 180 runs — outcomes O1–O5, exact permutation tests with A12 effect sizes, the gap-closed comparison, repeatability (incl. anti-phase scale-downs) and the resource/Pareto view; then figures (`thesis-figures/` PNGs are from superseded data). (Part 12 §12.3–§12.4) |
 | **Writing** | BAB 1–3 drafted (`Skripsi_Ignatius_Kevin_Wijaya.docx`, last edited 2026-06-06). Under "Replace", BAB 3 must present the open-loop method (generator, load shedding, pre-login, gate, H1 = 80%) with the closed-loop campaign as the reason for switching; its old generator rationale and auth arrival-rate profile are out of date (Part 08 §8.14, Part 10 notes, Part 11). BAB 4–5 wait for the campaign. |
 
 ---
@@ -126,7 +126,9 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
 - **Campaign (from 2026-10-06 12:33 UTC):** 180 runs (2 services × 6 configs × 3 patterns × 5 reps), gate after rep
   blocks 1–2 (72 runs) under G6 rule v2 (50% or ≤ 30 s / ≤ 2 points), committed before any campaign data. Pre-launch
   check: all 332 tracked files outside the data folders on the VM equal the pushed HEAD; code in the pods equals HEAD. H1 set to the Kubernetes
-  default 80% (positions 1 and 9, run at 70%, archived and re-run). Rep blocks 1–2 finished 2026-10-07 13:31 UTC.
+  default 80% (positions 1 and 9, run at 70%, archived and re-run). Rep blocks 1–2 finished 2026-10-07 13:31 UTC;
+  after the gate FAIL and the documented deviation (Part 12), reps 3–5 finished 2026-10-09 02:47 UTC — 180/180 runs,
+  all passing G1–G4.
   - **Gate: FAIL.** Measurement sound (G1–G4 pass in all 72 runs), but repeatability failed in 3 of 12 CPU-based
     cells and in none of the 12 request-rate cells. In auth oscillating H2 rep 1 the HPA's lagging CPU reading made it
     scale in anti-phase to the load (≈50% errors in every peak; rep 2: 16.28% overall) (#23, Part 08 §8.13).
@@ -195,12 +197,11 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
 
 ## Open items and next steps
 
-1. **Reps 3–5 (decided 2026-10-07, documented deviation):** the user reviews Part 12; it is then committed and pushed
-   before any new run. With the user's go-ahead: start AKS, delete pods left `Failed` by the stop, check the VM against
-   HEAD, run positions 73–180 (`run-openloop-vm.sh experiment-results-openloop yes`, ≈36 h ≈ $19, estimate).
-2. **After reps 3–5:** fetch and verify, apply the data-quality rules (Part 12 §12.2), then analyses A1–A6.
-3. **Phase 4 analysis** on the thesis dataset: Wilcoxon tests and effect sizes, time-to-scale from `k8s-events.txt`,
-   Resource Cost Index and Pareto, decomposition table, regenerated figures; add the k6-vs-Prometheus cross-check to
+1. **Campaign complete (2026-10-09):** 180/180 runs, verified and merged; data-quality rules passed with no re-runs
+   needed (Part 08 §8.13).
+2. **Next — analyses A1–A6 exactly as pre-registered in Part 12** on all 180 runs (time to scale from the HPA and pod
+   timelines, not `k8s-events.txt`), then the thesis figures.
+3. **Phase 4 extras** on the thesis dataset: decomposition table, regenerated figures; add the k6-vs-Prometheus cross-check to
    the validator (descriptive only, Part 11 §11.7).
 4. **Writing:** rewrite BAB 3 around the open-loop method (generator, load shedding, pre-login, gate, H1 = 80%) with
    the closed-loop campaign as the reason for switching; use Part 11 for provenance and sources; draft BAB 4–5 after
@@ -212,7 +213,8 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
    - All October work, including the G6 rule v2, the H1 change and these blueprint updates, is committed and pushed.
    - `.gitignore` no longer ignores `*.md` (only `*.pdf`); the blueprint parts and `pilot-openloop-report.md` are
      versioned. `Thesis.docx` (repo root) stays untracked unless the user asks — the repository is public.
-   - `ecommerce-vm` runs the campaign — deallocate it only after the campaign; the laptop SSH key is authorised on it.
+   - `ecommerce-vm` is idle since the campaign finished (2026-10-09); deallocate it when no more runs are planned (user
+     decision pending); the laptop SSH key is authorised on it.
    - The live prometheus-adapter config still has the unused `auth_http_requests_per_second_30s` rule (Part 08 §8.13).
    - `deep_validate.py` heuristics still assume the retired auth open-loop profile.
    - Shipping closed-loop metadata records `load_profile.version = "wait-bound-v1"` although those runs used

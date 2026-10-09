@@ -108,3 +108,9 @@ including auth oscillating H2 rep 1 and rep 2.
 3. On the VM: `run-openloop-vm.sh experiment-results-openloop yes` (no stop-at, so it runs to position 180), which
    stops AKS at the end. About 36 h and $19 of AKS (estimate).
 4. Fetch the results, verify the checksums, run the validator and the analyses above.
+
+**Executed:** Part 12 pushed in `b7fa4d3` (2026-10-07 14:22:42 UTC); reps 3–5 ran 2026-10-07 14:32 → 2026-10-09 02:47 UTC
+with no failure; AKS stopped 02:50:54. Data-quality rules (§12.2) over all 180 runs: G1, G2 and G3 pass in every run,
+so no re-runs were needed; G4 passes in every service × pattern over the 5 reps; G5 flags only auth H2 oscillating
+rep 1, kept as an outcome (Part 08 §8.13). Analyses A1–A6 are next; nothing in this plan was changed after the data
+arrived.
