@@ -251,8 +251,16 @@ The repository cleanup that the DOI waits for is done (2026-10-09): CI is green 
 repository has a README that leads with the results, and it was renamed `k8s-autoscaling-hpa-vs-keda` (the old
 `e-commerce` URL redirects; commit SHAs and the tag are unchanged).
 
-**Still to do:** a `CITATION.cff`, a GitHub release and its Zenodo DOI (the owner connects Zenodo to GitHub first); a
-"research data and reproducibility" section in BAB 3 or an appendix that cites the DOI.
+**Archived with a DOI (2026-10-09).** Release `v1.0.0` (an annotated tag on `01aff4e`, CI green, published 12:33:22
+UTC) was archived by Zenodo's GitHub integration as a 1.189 GB zip, MD5 `e65f3b2128eb6ee92ead1a3c9bf50895`, with the
+metadata from `CITATION.cff`:
+- **version DOI 10.5281/zenodo.23263355**, the exact snapshot to cite in the thesis;
+- concept DOI 10.5281/zenodo.23263354, which always resolves to the latest version.
+
+The data in the release is identical to the dataset tag `openloop-dataset-v1`; only CI, the README, the citation file
+and these notes changed in between.
+
+**Still to do:** a "research data and reproducibility" section in BAB 3 or an appendix that cites the version DOI.
 
 ## 11.8 Ready answers to common questions
 
@@ -302,6 +310,7 @@ Check edition, volume and page details against the original before citing.
 | Vargha, A., & Delaney, H. D. (2000). A critique and improvement of the CL common language effect size statistics of McGraw and Wong. *Journal of Educational and Behavioral Statistics*, 25(2). *(added 2026-10-09)* | The A12 effect size | Part 12 A2 |
 | Nosek, B. A., Ebersole, C. R., DeHaven, A. C., & Mellor, D. T. (2018). The preregistration revolution. *PNAS*, 115(11). | Fixing analysis rules before seeing data | Gate rules |
 | Wilkinson, M. D., et al. (2016). The FAIR guiding principles for scientific data management and stewardship. *Scientific Data*, 3. | Findable, accessible, reusable research data | Data archive and DOI |
+| Wijaya, I. K. (2026). *Kubernetes autoscaling: HPA vs KEDA, CPU vs request rate* (Version 1.0.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.23263355 *(added 2026-10-09)* | The archived data, code and analysis of this thesis | BAB 3 reproducibility section; data availability statement |
 
 ## 11.10 Is the comparison fair? (added 2026-10-07)
 

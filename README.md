@@ -1,5 +1,7 @@
 # Kubernetes autoscaling: HPA vs KEDA, CPU vs request rate
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23263354.svg)](https://doi.org/10.5281/zenodo.23263354)
+
 Does it matter **which metric** an autoscaler scales on (CPU or request rate), and **which autoscaler** does the scaling
 (the Kubernetes HPA or KEDA)? This repository holds a controlled experiment on Azure Kubernetes Service that separates
 the two, with every request of every run, the code that produced it, and the analysis.
@@ -110,6 +112,16 @@ It reads every run's per-request k6 data and writes `report.md`, `runs.csv`, `re
 | `experiment-results-archive/` | Superseded closed-loop runs |
 | `thesis_blueprint.md`, `thesis_blueprint/` | Research log: design, decisions, findings, provenance and validity |
 | `pilot-openloop-report.md` | Report of the open-loop pilot |
+
+## Cite
+
+The release used by the thesis is archived on Zenodo:
+
+> Wijaya, I. K. (2026). *Kubernetes autoscaling: HPA vs KEDA, CPU vs request rate* (Version 1.0.0) [Software].
+> Zenodo. https://doi.org/10.5281/zenodo.23263355
+
+The concept DOI [10.5281/zenodo.23263354](https://doi.org/10.5281/zenodo.23263354) always resolves to the latest
+version. GitHub's "Cite this repository" button uses [CITATION.cff](CITATION.cff).
 
 ## License
 

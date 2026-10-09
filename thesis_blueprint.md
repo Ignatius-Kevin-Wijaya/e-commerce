@@ -238,8 +238,8 @@ p95 latency in ms, mean ± population SD over 5 reps (2026-08-15 → 08-17):
    the Part 12 results.
 5. **Research data (Part 11 §11.7):** done 2026-10-09: the Azure Activity Log and daily billed costs exported
    privately, the dataset tagged `openloop-dataset-v1` on `c1e72e2`, and the repository cleaned up (green CI, README,
-   renamed `k8s-autoscaling-hpa-vs-keda`). Still to do: `CITATION.cff`, a GitHub release with a Zenodo DOI; the
-   reproducibility section.
+   renamed `k8s-autoscaling-hpa-vs-keda`), and release `v1.0.0` archived on Zenodo: **DOI 10.5281/zenodo.23263355**
+   (concept DOI 10.5281/zenodo.23263354). Still to do: the reproducibility section in BAB 3, citing that DOI.
 6. **Housekeeping:**
    - All October work through the campaign analysis (`4be8e00`, `bfdd938`, `4cf2d29`, `9c5dc8c`, 2026-10-09) is
      committed and pushed; the dataset tag `openloop-dataset-v1` points at `c1e72e2`.
